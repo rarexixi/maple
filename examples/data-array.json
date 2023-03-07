@@ -1,0 +1,42 @@
+{
+    "variables": {
+    },
+    "plugins": [
+        {
+            "type": "source",
+            "name": "jdbc",
+            "config": {
+                "resultTable": "spark_000021",
+                "url": "jdbc:mysql://localhost:3306/",
+                "driver": "com.mysql.cj.jdbc.Driver",
+                "user": "xi_root",
+                "password": "123456",
+                "query": "select * from linkis.linkis_cg_manager_label limit 10",
+                "options": {
+                }
+            }
+        },
+        {
+            "type": "transformation",
+            "name": "sql",
+            "config": {
+                "sourceTable": "",
+                "resultTable": "spark_00003",
+                "sql": "select * from spark_000021 limit 100"
+            }
+        },
+        {
+            "type": "sink",
+            "name": "file",
+            "config": {
+                "sourceTable": "spark_00003",
+                "path": "file:///home/linkis/testjson",
+                "serializer": "json",
+                "partitionBy": [
+                    "dt"
+                ],
+                "saveMode": "overwrite"
+            }
+        }
+    ]
+}

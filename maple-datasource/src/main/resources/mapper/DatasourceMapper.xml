@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.datasource.presentation.mapper.DatasourceMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceEntity">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="datasourceType" column="datasource_type"/>
+        <result property="version" column="version"/>
+        <result property="datasourceConfig" column="datasource_config"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_datasource`</sql>
+
+    <!--插入数据源配置-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">`id`,</if>
+            <if test="entity.name != null">`name`,</if>
+            <if test="entity.description != null">`description`,</if>
+            <if test="entity.datasourceType != null">`datasource_type`,</if>
+            <if test="entity.version != null">`version`,</if>
+            <if test="entity.datasourceConfig != null">`datasource_config`,</if>
+            <if test="entity.deleted != null">`deleted`,</if>
+            <if test="entity.createUser != null">`create_user`,</if>
+            <if test="entity.updateUser != null">`update_user`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">#{entity.id},</if>
+            <if test="entity.name != null">#{entity.name},</if>
+            <if test="entity.description != null">#{entity.description},</if>
+            <if test="entity.datasourceType != null">#{entity.datasourceType},</if>
+            <if test="entity.version != null">#{entity.version},</if>
+            <if test="entity.datasourceConfig != null">#{entity.datasourceConfig},</if>
+            <if test="entity.deleted != null">#{entity.deleted},</if>
+            <if test="entity.createUser != null">#{entity.createUser},</if>
+            <if test="entity.updateUser != null">#{entity.updateUser},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入数据源配置-->
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/>
+        (
+            `id`,
+            `name`,
+            `description`,
+            `datasource_type`,
+            `version`,
+            `datasource_config`,
+            `deleted`,
+            `create_user`,
+            `update_user`,
+            `create_time`,
+            `update_time`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.name},
+            #{item.description},
+            #{item.datasourceType},
+            #{item.version},
+            #{item.datasourceConfig},
+            #{item.deleted},
+            #{item.createUser},
+            #{item.updateUser},
+            #{item.createTime},
+            #{item.updateTime}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据主键条件更新数据源配置-->
+    <update id="update">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.name != null">
+                `name` = #{entity.name},
+            </if>
+            <if test="entity.description != null">
+                `description` = #{entity.description},
+            </if>
+            <if test="entity.datasourceType != null">
+                `datasource_type` = #{entity.datasourceType},
+            </if>
+            <if test="entity.version != null">
+                `version` = #{entity.version},
+            </if>
+            <if test="entity.datasourceConfig != null">
+                `datasource_config` = #{entity.datasourceConfig},
+            </if>
+            <if test="entity.deleted != null">
+                `deleted` = #{entity.deleted},
+            </if>
+            <if test="entity.createUser != null">
+                `create_user` = #{entity.createUser},
+            </if>
+            <if test="entity.updateUser != null">
+                `update_user` = #{entity.updateUser},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            <choose>
+                <when test="condition.id != null">
+                    `id` = #{condition.id}
+                </when>
+                <when test="condition.ids != null">
+                    `id` in <foreach collection="condition.ids" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                </when>
+                <otherwise>
+                    1!=1
+                </otherwise>
+            </choose>
+        </where>
+    </update>
+
+    <!--根据主键获取数据源配置详情-->
+    <select id="detail" resultMap="ExtResultMap">
+        SELECT DISTINCT
+        MT.`id`,
+        MT.`name`,
+        MT.`description`,
+        MT.`datasource_type`,
+        MT.`version`,
+        MT.`datasource_config`,
+        MT.`deleted`,
+        MT.`create_user`,
+        MT.`update_user`,
+        MT.`create_time`,
+        MT.`update_time`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            MT.`id` = #{id}
+        </where>
+    </select>
+
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.id != null">
+                        AND MT.`id` = #{condition.id}
+                    </if>
+                    <if test="condition.idIn != null and condition.idIn.size() > 0">
+                        AND MT.`id` IN
+                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.idNotIn != null and condition.idNotIn.size() > 0">
+                        AND MT.`id` NOT IN
+                        <foreach collection="condition.idNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.idMin != null">
+                        <![CDATA[
+                        AND MT.`id` >= #{condition.idMin}
+                        ]]>
+                    </if>
+                    <if test="condition.idMax != null">
+                        <![CDATA[
+                        AND MT.`id` <= #{condition.idMax}
+                        ]]>
+                    </if>
+                    <if test="condition.name != null and condition.name != ''">
+                        AND MT.`name` = #{condition.name}
+                    </if>
+                    <if test="condition.nameIn != null and condition.nameIn.size() > 0">
+                        AND MT.`name` IN
+                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.nameNotIn != null and condition.nameNotIn.size() > 0">
+                        AND MT.`name` NOT IN
+                        <foreach collection="condition.nameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.nameIsNotEmpty != null and condition.nameIsNotEmpty == true">
+                        AND MT.`name` IS NOT NULL AND `name` != ''
+                    </if>
+                    <if test="condition.nameIsEmpty != null and condition.nameIsEmpty == true">
+                        AND (MT.`name` IS NULL OR MT.`name` = '')
+                    </if>
+                    <if test="condition.nameStartWith != null and condition.nameStartWith != ''">
+                        AND MT.`name` LIKE concat(#{condition.nameStartWith}, '%')
+                    </if>
+                    <if test="condition.nameEndWith != null and condition.nameEndWith != ''">
+                        AND MT.`name` LIKE concat('%', #{condition.nameEndWith})
+                    </if>
+                    <if test="condition.nameContains != null and condition.nameContains != ''">
+                        AND MT.`name` LIKE concat('%', #{condition.nameContains}, '%')
+                    </if>
+                    <if test="condition.description != null and condition.description != ''">
+                        AND MT.`description` = #{condition.description}
+                    </if>
+                    <if test="condition.descIn != null and condition.descIn.size() > 0">
+                        AND MT.`description` IN
+                        <foreach collection="condition.descIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.descNotIn != null and condition.descNotIn.size() > 0">
+                        AND MT.`description` NOT IN
+                        <foreach collection="condition.descNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.descIsNotEmpty != null and condition.descIsNotEmpty == true">
+                        AND MT.`description` IS NOT NULL AND `description` != ''
+                    </if>
+                    <if test="condition.descIsEmpty != null and condition.descIsEmpty == true">
+                        AND (MT.`description` IS NULL OR MT.`description` = '')
+                    </if>
+                    <if test="condition.descStartWith != null and condition.descStartWith != ''">
+                        AND MT.`description` LIKE concat(#{condition.descStartWith}, '%')
+                    </if>
+                    <if test="condition.descEndWith != null and condition.descEndWith != ''">
+                        AND MT.`description` LIKE concat('%', #{condition.descEndWith})
+                    </if>
+                    <if test="condition.descContains != null and condition.descContains != ''">
+                        AND MT.`description` LIKE concat('%', #{condition.descContains}, '%')
+                    </if>
+                    <if test="condition.datasourceType != null and condition.datasourceType != ''">
+                        AND MT.`datasource_type` = #{condition.datasourceType}
+                    </if>
+                    <if test="condition.datasourceTypeIn != null and condition.datasourceTypeIn.size() > 0">
+                        AND MT.`datasource_type` IN
+                        <foreach collection="condition.datasourceTypeIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.datasourceTypeNotIn != null and condition.datasourceTypeNotIn.size() > 0">
+                        AND MT.`datasource_type` NOT IN
+                        <foreach collection="condition.datasourceTypeNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.datasourceTypeIsNotEmpty != null and condition.datasourceTypeIsNotEmpty == true">
+                        AND MT.`datasource_type` IS NOT NULL AND `datasource_type` != ''
+                    </if>
+                    <if test="condition.datasourceTypeIsEmpty != null and condition.datasourceTypeIsEmpty == true">
+                        AND (MT.`datasource_type` IS NULL OR MT.`datasource_type` = '')
+                    </if>
+                    <if test="condition.datasourceTypeStartWith != null and condition.datasourceTypeStartWith != ''">
+                        AND MT.`datasource_type` LIKE concat(#{condition.datasourceTypeStartWith}, '%')
+                    </if>
+                    <if test="condition.datasourceTypeEndWith != null and condition.datasourceTypeEndWith != ''">
+                        AND MT.`datasource_type` LIKE concat('%', #{condition.datasourceTypeEndWith})
+                    </if>
+                    <if test="condition.datasourceTypeContains != null and condition.datasourceTypeContains != ''">
+                        AND MT.`datasource_type` LIKE concat('%', #{condition.datasourceTypeContains}, '%')
+                    </if>
+                    <if test="condition.version != null and condition.version != ''">
+                        AND MT.`version` = #{condition.version}
+                    </if>
+                    <if test="condition.deleted != null">
+                        AND MT.`deleted` = #{condition.deleted}
+                    </if>
+                    <if test="condition.createUser != null">
+                        AND MT.`create_user` = #{condition.createUser}
+                    </if>
+                    <if test="condition.createUserIn != null and condition.createUserIn.size() > 0">
+                        AND MT.`create_user` IN
+                        <foreach collection="condition.createUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createUserNotIn != null and condition.createUserNotIn.size() > 0">
+                        AND MT.`create_user` NOT IN
+                        <foreach collection="condition.createUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createUserMin != null">
+                        <![CDATA[
+                        AND MT.`create_user` >= #{condition.createUserMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createUserMax != null">
+                        <![CDATA[
+                        AND MT.`create_user` <= #{condition.createUserMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateUser != null">
+                        AND MT.`update_user` = #{condition.updateUser}
+                    </if>
+                    <if test="condition.updateUserIn != null and condition.updateUserIn.size() > 0">
+                        AND MT.`update_user` IN
+                        <foreach collection="condition.updateUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updateUserNotIn != null and condition.updateUserNotIn.size() > 0">
+                        AND MT.`update_user` NOT IN
+                        <foreach collection="condition.updateUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updateUserMin != null">
+                        <![CDATA[
+                        AND MT.`update_user` >= #{condition.updateUserMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateUserMax != null">
+                        <![CDATA[
+                        AND MT.`update_user` <= #{condition.updateUserMax}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMin != null">
+                        <![CDATA[
+                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMax != null">
+                        <![CDATA[
+                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMin != null">
+                        <![CDATA[
+                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMax != null">
+                        <![CDATA[
+                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        ]]>
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+
+    <!--根据主键条件删除数据源配置-->
+    <delete id="delete">
+        DELETE FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </delete>
+
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <if test="condition.columns != null">
+            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
+        </if>
+        <if test="condition.columns == null">
+            MT.`id`,
+            MT.`name`,
+            MT.`description`,
+            MT.`datasource_type`,
+            MT.`version`,
+            MT.`datasource_config`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        </if>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="condition.orderBy != null">
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+</mapper>

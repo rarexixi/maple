@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.datasource.presentation.mapper.DatasourceConfigKeyMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceConfigKeyEntity">
+        <result property="id" column="id"/>
+        <result property="datasourceType" column="datasource_type"/>
+        <result property="versions" column="versions"/>
+        <result property="keyCode" column="key_code"/>
+        <result property="keyName" column="key_name"/>
+        <result property="keyOrder" column="key_order"/>
+        <result property="defaultValue" column="default_value"/>
+        <result property="valueType" column="value_type"/>
+        <result property="required" column="required"/>
+        <result property="valueRegex" column="value_regex"/>
+        <result property="description" column="description"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="tableName">`maple_datasource_config_key`</sql>
+
+    <!--插入数据源配置项-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">`id`,</if>
+            <if test="entity.datasourceType != null">`datasource_type`,</if>
+            <if test="entity.versions != null">`versions`,</if>
+            <if test="entity.keyCode != null">`key_code`,</if>
+            <if test="entity.keyName != null">`key_name`,</if>
+            <if test="entity.keyOrder != null">`key_order`,</if>
+            <if test="entity.defaultValue != null">`default_value`,</if>
+            <if test="entity.valueType != null">`value_type`,</if>
+            <if test="entity.required != null">`required`,</if>
+            <if test="entity.valueRegex != null">`value_regex`,</if>
+            <if test="entity.description != null">`description`,</if>
+            <if test="entity.deleted != null">`deleted`,</if>
+            <if test="entity.createUser != null">`create_user`,</if>
+            <if test="entity.updateUser != null">`update_user`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">#{entity.id},</if>
+            <if test="entity.datasourceType != null">#{entity.datasourceType},</if>
+            <if test="entity.versions != null">#{entity.versions},</if>
+            <if test="entity.keyCode != null">#{entity.keyCode},</if>
+            <if test="entity.keyName != null">#{entity.keyName},</if>
+            <if test="entity.keyOrder != null">#{entity.keyOrder},</if>
+            <if test="entity.defaultValue != null">#{entity.defaultValue},</if>
+            <if test="entity.valueType != null">#{entity.valueType},</if>
+            <if test="entity.required != null">#{entity.required},</if>
+            <if test="entity.valueRegex != null">#{entity.valueRegex},</if>
+            <if test="entity.description != null">#{entity.description},</if>
+            <if test="entity.deleted != null">#{entity.deleted},</if>
+            <if test="entity.createUser != null">#{entity.createUser},</if>
+            <if test="entity.updateUser != null">#{entity.updateUser},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入数据源配置项-->
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/>
+        (
+            `id`,
+            `datasource_type`,
+            `versions`,
+            `key_code`,
+            `key_name`,
+            `key_order`,
+            `default_value`,
+            `value_type`,
+            `required`,
+            `value_regex`,
+            `description`,
+            `deleted`,
+            `create_user`,
+            `update_user`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.datasourceType},
+            #{item.versions},
+            #{item.keyCode},
+            #{item.keyName},
+            #{item.keyOrder},
+            #{item.defaultValue},
+            #{item.valueType},
+            #{item.required},
+            #{item.valueRegex},
+            #{item.description},
+            #{item.deleted},
+            #{item.createUser},
+            #{item.updateUser}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据主键条件更新数据源配置项-->
+    <update id="update">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.datasourceType != null">
+                `datasource_type` = #{entity.datasourceType},
+            </if>
+            <if test="entity.versions != null">
+                `versions` = #{entity.versions},
+            </if>
+            <if test="entity.keyCode != null">
+                `key_code` = #{entity.keyCode},
+            </if>
+            <if test="entity.keyName != null">
+                `key_name` = #{entity.keyName},
+            </if>
+            <if test="entity.keyOrder != null">
+                `key_order` = #{entity.keyOrder},
+            </if>
+            <if test="entity.defaultValue != null">
+                `default_value` = #{entity.defaultValue},
+            </if>
+            <if test="entity.valueType != null">
+                `value_type` = #{entity.valueType},
+            </if>
+            <if test="entity.required != null">
+                `required` = #{entity.required},
+            </if>
+            <if test="entity.valueRegex != null">
+                `value_regex` = #{entity.valueRegex},
+            </if>
+            <if test="entity.description != null">
+                `description` = #{entity.description},
+            </if>
+            <if test="entity.deleted != null">
+                `deleted` = #{entity.deleted},
+            </if>
+            <if test="entity.createUser != null">
+                `create_user` = #{entity.createUser},
+            </if>
+            <if test="entity.updateUser != null">
+                `update_user` = #{entity.updateUser},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            <choose>
+                <when test="condition.id != null">
+                    `id` = #{condition.id}
+                </when>
+                <when test="condition.ids != null">
+                    `id` in <foreach collection="condition.ids" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                </when>
+                <otherwise>
+                    1!=1
+                </otherwise>
+            </choose>
+        </where>
+    </update>
+
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.datasourceType != null and condition.datasourceType != ''">
+                        AND MT.`datasource_type` = #{condition.datasourceType}
+                    </if>
+                    <if test="condition.datasourceTypeIn != null and condition.datasourceTypeIn.size() > 0">
+                        AND MT.`datasource_type` IN <foreach collection="condition.datasourceTypeIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.deleted != null">
+                        AND MT.`deleted` = #{condition.deleted}
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+
+    <!--根据主键条件删除数据源配置项-->
+    <delete id="delete">
+        DELETE FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </delete>
+
+    <select id="select" resultMap="BaseResultMap">
+        SELECT
+        <if test="condition.columns != null">
+            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
+        </if>
+        <if test="condition.columns == null">
+            MT.`id`,
+            MT.`datasource_type`,
+            MT.`versions`,
+            MT.`key_code`,
+            MT.`key_name`,
+            MT.`key_order`,
+            MT.`default_value`,
+            MT.`value_type`,
+            MT.`required`,
+            MT.`value_regex`,
+            MT.`description`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        </if>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="condition.orderBy != null">
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+</mapper>

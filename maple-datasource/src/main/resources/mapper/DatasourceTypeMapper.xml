@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.datasource.presentation.mapper.DatasourceTypeMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceTypeEntity">
+        <result property="typeCode" column="type_code"/>
+        <result property="typeName" column="type_name"/>
+        <result property="icon" column="icon"/>
+        <result property="classifier" column="classifier"/>
+        <result property="versions" column="versions"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceTypeEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_datasource_type`</sql>
+
+    <!--插入数据源类型-->
+    <insert id="insert">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.typeCode != null">`type_code`,</if>
+            <if test="entity.typeName != null">`type_name`,</if>
+            <if test="entity.icon != null">`icon`,</if>
+            <if test="entity.classifier != null">`classifier`,</if>
+            <if test="entity.versions != null">`versions`,</if>
+            <if test="entity.deleted != null">`deleted`,</if>
+            <if test="entity.createUser != null">`create_user`,</if>
+            <if test="entity.updateUser != null">`update_user`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.typeCode != null">#{entity.typeCode},</if>
+            <if test="entity.typeName != null">#{entity.typeName},</if>
+            <if test="entity.icon != null">#{entity.icon},</if>
+            <if test="entity.classifier != null">#{entity.classifier},</if>
+            <if test="entity.versions != null">#{entity.versions},</if>
+            <if test="entity.deleted != null">#{entity.deleted},</if>
+            <if test="entity.createUser != null">#{entity.createUser},</if>
+            <if test="entity.updateUser != null">#{entity.updateUser},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入数据源类型-->
+    <insert id="batchInsert">
+        insert into <include refid="tableName"/>
+        (
+            `type_code`,
+            `type_name`,
+            `icon`,
+            `classifier`,
+        `versions`,
+            `deleted`,
+            `create_user`,
+            `update_user`,
+            `create_time`,
+            `update_time`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.typeCode},
+            #{item.typeName},
+            #{item.icon},
+            #{item.classifier},
+            #{item.versions},
+            #{item.deleted},
+            #{item.createUser},
+            #{item.updateUser},
+            #{item.createTime},
+            #{item.updateTime}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据主键条件更新数据源类型-->
+    <update id="update">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.typeCode != null">
+                `type_code` = #{entity.typeCode},
+            </if>
+            <if test="entity.typeName != null">
+                `type_name` = #{entity.typeName},
+            </if>
+            <if test="entity.icon != null">
+                `icon` = #{entity.icon},
+            </if>
+            <if test="entity.classifier != null">
+                `classifier` = #{entity.classifier},
+            </if>
+            <if test="entity.versions != null">
+                `versions` = #{entity.versions},
+            </if>
+            <if test="entity.deleted != null">
+                `deleted` = #{entity.deleted},
+            </if>
+            <if test="entity.createUser != null">
+                `create_user` = #{entity.createUser},
+            </if>
+            <if test="entity.updateUser != null">
+                `update_user` = #{entity.updateUser},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            <choose>
+                <when test="condition.typeCode != null">
+                    `type_code` = #{condition.typeCode}
+                </when>
+                <when test="condition.typeCodes != null">
+                    `type_code` in <foreach collection="condition.typeCodes" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                </when>
+                <otherwise>
+                    1!=1
+                </otherwise>
+            </choose>
+        </where>
+    </update>
+
+    <!--根据主键获取数据源类型详情-->
+    <select id="detail" resultMap="ExtResultMap">
+        SELECT DISTINCT
+        MT.`type_code`,
+        MT.`type_name`,
+        MT.`icon`,
+        MT.`classifier`,
+        MT.`versions`,
+        MT.`deleted`,
+        MT.`create_user`,
+        MT.`update_user`,
+        MT.`create_time`,
+        MT.`update_time`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            MT.`type_code` = #{typeCode}
+        </where>
+    </select>
+
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.typeCode != null and condition.typeCode != ''">
+                        AND MT.`type_code` = #{condition.typeCode}
+                    </if>
+                    <if test="condition.typeCodeIn != null and condition.typeCodeIn.size() > 0">
+                        AND MT.`type_code` IN <foreach collection="condition.typeCodeIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.typeCodeContains != null and condition.typeCodeContains != ''">
+                        AND MT.`type_code` LIKE concat('%', #{condition.typeCodeContains}, '%')
+                    </if>
+                    <if test="condition.typeName != null and condition.typeName != ''">
+                        AND MT.`type_name` = #{condition.typeName}
+                    </if>
+                    <if test="condition.typeNameContains != null and condition.typeNameContains != ''">
+                        AND MT.`type_name` LIKE concat('%', #{condition.typeNameContains}, '%')
+                    </if>
+                    <if test="condition.classifier != null and condition.classifier != ''">
+                        AND MT.`classifier` = #{condition.classifier}
+                    </if>
+                    <if test="condition.deleted != null">
+                        AND MT.`deleted` = #{condition.deleted}
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+
+    <!--根据主键条件删除数据源类型-->
+    <delete id="delete">
+        DELETE FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </delete>
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <if test="condition.columns != null">
+            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
+        </if>
+        <if test="condition.columns == null">
+            MT.`type_code`,
+            MT.`type_name`,
+            MT.`icon`,
+            MT.`classifier`,
+            MT.`versions`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        </if>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="condition.orderBy != null">
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+</mapper>

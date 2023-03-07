@@ -1,0 +1,56 @@
+{
+    "variables": {
+    },
+    "sources": [
+        {
+            "name": "jdbc",
+            "config": {
+                "resultTable": "spark_000021",
+                "database": "dip_dmp_meta",
+                "query": "select * from dip_dmp_meta.dmp_meta_database limit 10",
+                "options": {
+                }
+            }
+        }
+    ],
+    "transformations": [
+        {
+            "name": "sql",
+            "config": {
+                "sourceTable": "",
+                "resultTable": "spark_00001",
+                "sql": "select a.id, b.name, a.te, b.fsdfa, c.name from ods.dwd_test_hive_mars_driving_cycle a join test.aaa b on a.id=b.id join (select name, address, id from dw.test) c on a.id=c.id where dt='2021-08-30' limit 100"
+            }
+        },
+        {
+            "name": "sql",
+            "config": {
+                "sourceTable": "",
+                "resultTable": "spark_00002",
+                "sql": "select * from metadata__dip_dmp_meta.dmp_meta_datasource"
+            }
+        },
+        {
+            "name": "sql",
+            "config": {
+                "sourceTable": "",
+                "resultTable": "spark_00003",
+                "sql": "select * from spark_00001 where dt='2021-08-30' limit 100"
+            }
+        }
+    ],
+    "sinks": [
+        {
+            "name": "file",
+            "config": {
+                "sourceTable": "spark_00001",
+                "path": "/Users/xishihao/data/testjson",
+                "serializer": "json",
+                "partitionBy": [
+                    "dt"
+                ],
+                "saveMode": "overwrite"
+            }
+        }
+    ]
+}
