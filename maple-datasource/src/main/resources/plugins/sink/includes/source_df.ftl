@@ -5,7 +5,7 @@ ${prefix}Query = VariableUtils.replaceVariables(${prefix}Query, ${prefix}Variabl
 <#else>
 val ${prefix}Query = <@str content=config.sourceQuery/>
 </#if>
-spark.sql(${prefix}Query)
+spark.sql(${prefix}Query)<#if (config.numPartitions > 0)>.repartition(${config.numPartitions})</#if>
 <#else>
-spark.read.table("${config.sourceTable}")
+spark.read.table("${config.sourceTable}")<#if (config.numPartitions > 0)>.repartition(${config.numPartitions})</#if>
 </#if>

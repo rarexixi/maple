@@ -1,9 +1,12 @@
 <template>
-    <a-menu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" @click="clickMenu" theme="dark" mode="horizontal">
+    <a-menu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" @click="clickMenu" mode="inline" theme="dark">
         <template v-for="(menu1) in menus">
             <template v-if="menu1.type === 'menu-item'">
                 <a-menu-item :key="menu1.path">
-                    <router-link :to="menu1.path">{{menu1.name}}</router-link>
+                    <router-link :to="menu1.path">
+                        <component v-if="menu1.icon" :is="menu1.icon" />
+                        <span>{{menu1.name}}</span>
+                    </router-link>
                 </a-menu-item>
             </template>
             <template v-else>

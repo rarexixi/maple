@@ -88,8 +88,18 @@ export default defineComponent({
     <a-form-item name="sourceQuery" label="来源语句" :label-col="layout.labelCols.large">
       <a-textarea v-model:value="value.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }"/>
     </a-form-item>
-    <a-form-item name="preQueries" label="预执行sql" :label-col="layout.labelCols.large">
-      <input-string-array v-model:value="value.preQueries" :separator="'\n'"/>
+    <a-form-item v-for="(item, index) in value.preQueries" :key="index" :label-col="layout.labelCols.large"
+                 :wrapper-col="index === 0 ? {} : layout.wrapperColsWithLabel.large"
+                 :label="index === 0 ? '预执行SQL' : ''" :name="['domains', index]">
+      <a-textarea v-model:value="value.preQueries[index]" placeholder="预先要执行的SQL语句，一般为delete或者truncate语句"
+                  style="width: calc(100% - 28px); margin-right: 8px"/>
+      <MinusCircleOutlined @click="() => value.preQueries.splice(index, 1)"/>
+    </a-form-item>
+    <a-form-item :label-col="layout.labelCols.large" :wrapper-col="layout.wrapperColsWithLabel.large">
+      <a-button type="dashed" @click="() => value.preQueries.push('')">
+        <PlusOutlined/>
+        添加预执行SQL
+      </a-button>
     </a-form-item>
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
       <input-string-map v-model:value="value.options"/>

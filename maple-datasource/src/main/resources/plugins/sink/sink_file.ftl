@@ -6,9 +6,6 @@
 </#if>
 val ${prefix}Path = <#if (config.path?matches(".*\\$\\{.*?}.*", "s"))>VariableUtils.replaceVariables("${path}", ${prefix}Variables.asJava)<#else>"${path}"</#if>
 <#include "./includes/source_df.ftl">
-<#if (config.numPartitions > 0)>
-  .repartition(${config.numPartitions})
-</#if>
   .write.format("${config.serializer}")
 <#assign keys = config.options?keys>
 <#list keys as key>

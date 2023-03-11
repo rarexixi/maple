@@ -9,6 +9,7 @@ import JdbcSink from "@/components/sink/JdbcSink.vue"
 import ManagedJdbcSink from "@/components/sink/ManagedJdbcSink.vue"
 import FileSink from "@/components/sink/FileSink.vue"
 import AddPlugin from "@/components/AddPlugin.vue"
+import DeletePlugin from "@/components/DeletePlugin.vue"
 import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 import {MinusOutlined} from "@ant-design/icons-vue";
@@ -19,6 +20,7 @@ export default defineComponent({
   components: {
     InputStringMap,
     AddPlugin,
+    DeletePlugin,
     JdbcSource,
     ManagedJdbcSource,
     FileSource,
@@ -106,8 +108,8 @@ export default defineComponent({
     }
 
     const variables = reactive({})
-    watch(codeView, () => {
-      if (codeView.value) {
+    const getCode = (showCode: boolean) => {
+      if (showCode) {
         const requestConfig = {
           url: "/ftl/get-code",
           method: 'POST',
@@ -117,12 +119,14 @@ export default defineComponent({
           code.value = response
         })
       }
-    })
+    }
+    watch(codeView, () => getCode(codeView.value))
     return {
       variables,
       mapleConfig,
       code,
       codeView,
+      getCode,
       pageConfig,
       pluginNames,
       addPlugin,
@@ -134,134 +138,100 @@ export default defineComponent({
 </script>
 
 <template>
-  <div style="width: 100%; overflow: hidden;">
-    <a-row :gutter="[16,16]">
-      <a-col :span="12" style="height: calc(100vh - 80px); overflow: auto">
-        <a-typography-title :level="3">输入</a-typography-title>
-        <template v-for="(item, index) in mapleConfig.sources">
-          <a-card>
-            <template #title>
+  <a-breadcrumb separator="/">
+    <a-breadcrumb-item>数据计算配置</a-breadcrumb-item>
+  </a-breadcrumb>
+  <a-row>
+    <a-col :span="12" style="height: calc(100vh - 42px); padding: 5px; overflow: auto;">
+      <a-typography-title :level="4">全局变量</a-typography-title>
+      <input-string-map v-model:value="mapleConfig.variables"/>
+
+      <a-divider/>
+
+      <a-typography-title :level="4">输入</a-typography-title>
+      <template v-for="(item, index) in mapleConfig.sources">
+        <a-card>
+          <template #title>
+            <a-button type="link" @click="pageConfig.sources[index].expand=!pageConfig.sources[index].expand">
               {{index + 1}}
-              <add-plugin :types="pluginNames.sources" btn-text="插入" @add="name => addPlugin('source', name, index)"/>
-              <a-tooltip title="删除">
-                <a-button @click="delPlugin('source', index)" type="link" danger>
-                  <template #icon>
-                    <minus-outlined/>
-                  </template>
-                </a-button>
-              </a-tooltip>
-              <template v-if="item.name === 'jdbc'">
-                jdbc ｜ 注册表名：{{ item.config.resultTable }}
+              <template #icon>
+                <up-outlined v-if="pageConfig.sources[index].expand" />
+                <down-outlined v-else />
               </template>
-              <template v-if="item.name === 'managed_jdbc'">
-                managed_jdbc ｜ 注册表名：{{ item.config.resultTable }}
-              </template>
-              <template v-else-if="item.name === 'file'">
-                file ｜ 注册表名：{{ item.config.path }}
-              </template>
-            </template>
-            <template #extra>
-              <a-switch v-model:checked="pageConfig.sources[index].expand" checked-children="展开" un-checked-children="隐藏"/>
-            </template>
-            <template v-if="item.name === 'jdbc'">
-              <jdbc-source v-model:value="item.config" v-show="pageConfig.sources[index].expand"/>
-            </template>
-            <template v-if="item.name === 'managed_jdbc'">
-              <managed-jdbc-source v-model:value="item.config" v-show="pageConfig.sources[index].expand"/>
-            </template>
-            <template v-else-if="item.name === 'file'">
-              <file-source v-model:value="item.config" v-show="pageConfig.sources[index].expand"/>
-            </template>
-          </a-card>
-        </template>
-        <add-plugin :types="pluginNames.sources" @add="name => addPlugin('source', name)"/>
+            </a-button>
+            <add-plugin :types="pluginNames.sources" btn-text="插入" @add="name => addPlugin('source', name, index)"/>
+            <delete-plugin :types="pluginNames.sources" @delete="delPlugin('source', index)"/>
+            注册表名：{{ item.config.resultTable }}
+          </template>
+          <template #extra>{{item.name}}</template>
+          <component :is="item.name.replace('_', '-') + '-source'" v-model:value="item.config" v-show="pageConfig.sources[index].expand" />
+        </a-card>
+      </template>
+      <add-plugin :types="pluginNames.sources" @add="name => addPlugin('source', name)"/>
 
-        <a-divider/>
+      <a-divider/>
 
-        <a-typography-title :level="3">转换</a-typography-title>
-        <template v-for="(item, index) in mapleConfig.transformations">
-          <a-card>
-            <template #title>
+      <a-typography-title :level="4">转换</a-typography-title>
+      <template v-for="(item, index) in mapleConfig.transformations">
+        <a-card>
+          <template #title>
+            <a-button type="link" @click="pageConfig.transformations[index].expand=!pageConfig.transformations[index].expand">
               {{index + 1}}
-              <add-plugin :types="pluginNames.transformations" btn-text="插入" @add="name => addPlugin('transformation', name, index)"/>
-              <a-tooltip title="删除">
-                <a-button @click="delPlugin('transformation', index)" type="link" danger>
-                  <template #icon>
-                    <minus-outlined/>
-                  </template>
-                </a-button>
-              </a-tooltip>
-              <template v-if="item.name === 'sql'">
-                sql ｜ 注册表名：{{ item.config.targetDatabase }}.{{ item.config.targetTable }}
+              <template #icon>
+                <up-outlined v-if="pageConfig.transformations[index].expand" />
+                <down-outlined v-else />
               </template>
-            </template>
-            <template #extra>
-              <a-switch v-model:checked="pageConfig.transformations[index].expand" checked-children="展开" un-checked-children="隐藏"/>
-            </template>
-            <template v-if="item.name === 'sql'">
-              <sql-transformation v-model:value="item.config" v-show="pageConfig.transformations[index].expand"/>
-            </template>
-          </a-card>
-        </template>
-        <add-plugin :types="pluginNames.transformations" @add="name => addPlugin('transformation', name)"/>
+            </a-button>
+            <add-plugin :types="pluginNames.transformations" btn-text="插入" @add="name => addPlugin('transformation', name, index)"/>
+            <delete-plugin :types="pluginNames.transformations" @delete="delPlugin('transformation', index)"/>
+            注册表名：{{ item.config.resultTable }}
+          </template>
+          <template #extra>{{item.name}}</template>
+          <component :is="item.name.replace('_', '-') + '-transformation'" v-model:value="item.config" v-show="pageConfig.transformations[index].expand" />
+        </a-card>
+      </template>
+      <add-plugin :types="pluginNames.transformations" @add="name => addPlugin('transformation', name)"/>
 
-        <a-divider/>
+      <a-divider/>
 
-        <a-typography-title :level="3">输出</a-typography-title>
-        <template v-for="(item, index) in mapleConfig.sinks">
-          <a-card>
-            <template #title>
+      <a-typography-title :level="4">输出</a-typography-title>
+      <template v-for="(item, index) in mapleConfig.sinks">
+        <a-card>
+          <template #title>
+            <a-button type="link" @click="pageConfig.sinks[index].expand=!pageConfig.sinks[index].expand">
               {{index + 1}}
-              <add-plugin :types="pluginNames.sinks" btn-text="插入" @add="name => addPlugin('sink', name, index)"/>
-              <a-tooltip title="删除">
-                <a-button @click="delPlugin('sink', index)" type="link" danger>
-                  <template #icon>
-                    <minus-outlined/>
-                  </template>
-                </a-button>
-              </a-tooltip>
-              <template v-if="item.name === 'hive'">
-                hive ｜ 输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
+              <template #icon>
+                <up-outlined v-if="pageConfig.sinks[index].expand" />
+                <down-outlined v-else />
               </template>
-              <template v-else-if="item.name === 'jdbc'">
-                jdbc ｜ 输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
-              </template>
-              <template v-else-if="item.name === 'managed_jdbc'">
-                managed_jdbc ｜ 输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
-              </template>
-              <template v-else-if="item.name === 'file'">
-                file ｜ 写入路径: {{ item.config.path }}
-              </template>
+            </a-button>
+            <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name, index)"/>
+            <delete-plugin :types="pluginNames.sinks" @delete="delPlugin('sink', index)"/>
+            <template v-if="item.name === 'file'">
+              写入路径: {{ item.config.path }}
             </template>
-            <template #extra>
-              <a-switch v-model:checked="pageConfig.sinks[index].expand" checked-children="展开" un-checked-children="隐藏"/>
+            <template v-else>
+              输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
             </template>
-            <template v-if="item.name === 'hive'">
-              <hive-sink v-model:value="item.config" v-show="pageConfig.sinks[index].expand"/>
-            </template>
-            <template v-else-if="item.name === 'jdbc'">
-              <jdbc-sink v-model:value="item.config" v-show="pageConfig.sinks[index].expand"/>
-            </template>
-            <template v-else-if="item.name === 'managed_jdbc'">
-              <managed-jdbc-sink v-model:value="item.config" v-show="pageConfig.sinks[index].expand"/>
-            </template>
-            <template v-else-if="item.name === 'file'">
-              <file-sink v-model:value="item.config" v-show="pageConfig.sinks[index].expand"/>
-            </template>
-          </a-card>
-        </template>
-        <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name)"/>
-      </a-col>
-      <a-col :span="12">
-        <a-typography-title :level="3">
-          生成对象
-          <a-switch v-model:checked="codeView" checked-children="代码" un-checked-children="JSON"/>
-        </a-typography-title>
-        <textarea v-if="codeView" v-html="code" style="background-color: #ffffff; padding: 10px; height: calc(100vh - 120px); width: 100%; overflow: auto"/>
-        <textarea v-else v-html="JSON.stringify(mapleConfig, null, 4)" style="background-color: #ffffff; padding: 10px; height: calc(100vh - 120px); width: 100%; overflow: auto"/>
-      </a-col>
-    </a-row>
-  </div>
+          </template>
+          <template #extra>{{item.name}}</template>
+          <component :is="item.name.replace('_', '-') + '-sink'" v-model:value="item.config" v-show="pageConfig.sinks[index].expand" />
+        </a-card>
+      </template>
+      <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name)"/>
+    </a-col>
+    <a-col :span="12">
+      <a-radio-group v-model:value="codeView" style="margin: 5px 0;">
+        <a-radio-button :value="false">JSON</a-radio-button>
+        <a-radio-button :value="true">Scala</a-radio-button>
+      </a-radio-group>
+      <a-button type="link" v-if="codeView" @click="() => getCode(true)">
+        <template #icon><reload-outlined /></template>
+      </a-button>
+      <a-textarea v-if="codeView" v-model:value="code" style="height: calc(100vh - 82px); width: 100%; overflow: auto"/>
+      <textarea v-else v-html="JSON.stringify(mapleConfig, null, 4)" style="height: calc(100vh - 82px); width: 100%; overflow: auto"/>
+    </a-col>
+  </a-row>
 </template>
 
 <style lang="less" scoped>
@@ -271,7 +241,10 @@ pre {
 }
 
 :deep(.ant-card-body) {
-  padding: 14px 8px 0 !important;
+  padding: 0 8px !important;
+}
+:deep(.ant-card-body .ant-form) {
+  margin-top: 14px;
 }
 
 .ant-card {

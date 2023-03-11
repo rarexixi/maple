@@ -171,6 +171,7 @@ const Databases: Array<any> = [{
 const CacheLevels: Array<any> = []
 
 const SampleConfig: any = {
+    "variables": {},
     "sources": [
         {
             "name": "managed_jdbc",
@@ -266,6 +267,7 @@ const SampleConfig: any = {
                 "sourceQuery": "",
                 "numPartitions": 0,
                 "options": {
+                    "connectionCollation": "utf8mb4_unicode_ci",
                     "isolationLevel": "NONE",
                     "batchsize": "5000"
                 },
@@ -291,8 +293,6 @@ const SampleConfig: any = {
                 "sourceQuery": "select * from source_table_01",
                 "numPartitions": 0,
                 "options": {
-                    "isolationLevel": "NONE",
-                    "batchsize": "5000"
                 },
                 "targetDatasource": "test_postgresql",
                 "targetDatabase": "postgresql_test_db",

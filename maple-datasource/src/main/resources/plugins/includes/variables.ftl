@@ -2,7 +2,7 @@
 <#assign keys = config.variables?keys>
 val ${prefix}Variables = Map(
   <#list keys as key>
-  "${key}" -> "${config.variables[key]}"<#sep>,</#sep>
+  "${key}" -> "${config.variables[key]?j_string}"<#sep>,</#sep>
   </#list>
 ) ++ globalVariables
 <#else>

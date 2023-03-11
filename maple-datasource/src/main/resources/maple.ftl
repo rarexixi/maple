@@ -21,14 +21,14 @@ def getDatasource(name: String): NamedDatasource = {
 }
 
 
-def executeQueries(url: String, user: String, password: String, sqls: Seq[String], queryTimeout: Int = 0): Unit = {
+def executeQueries(url: String, user: String, password: String, sqls: Seq[String], variables: Map[String, String, queryTimeout: Int = 0): Unit = {
   var conn: Option[java.sql.Connection] = None
   try {
     conn = Some(java.sql.DriverManager.getConnection(url, user, password))
     sqls.foreach(sql => {
       var statement: Option[java.sql.PreparedStatement] = None
       try {
-        statement = Some(conn.get.prepareStatement(sql))
+        statement = Some(conn.get.prepareStatement(VariableUtils.replaceVariables(sql, variables.asJava)))
         if (queryTimeout > 0) {
           statement.get.setQueryTimeout(queryTimeout)
         }
@@ -52,8 +52,8 @@ def executeQueries(url: String, user: String, password: String, sqls: Seq[String
 }
 
 
-def executeDatasourceQueries(datasource: NamedDatasource, sqls: Seq[String]): Unit = {
-  executeQueries(datasource.getUrl, datasource.getUser, datasource.getPassword, sqls)
+def executeDatasourceQueries(datasource: NamedDatasource, sqls: Seq[String], variables: Map[String, String]): Unit = {
+  executeQueries(datasource.getUrl, datasource.getUser, datasource.getPassword, sqls, variables)
 }
 
 
@@ -61,14 +61,13 @@ val globalVariables = Map(
 <#if variables??>
 <#assign keys = variables?keys>
   <#list keys as key>
-  "${key}" -> "${variables[key]}"<#sep>,</#sep>
+  "${key}" -> "${variables[key]?j_string}"<#sep>,</#sep>
   </#list>
 </#if>
 )
 
-
 <#list sources as source>
-// ========= source ${source?index + 1} =========
+// ===================================== source ${source?index + 1} =====================================
   <#assign config = source.config>
   <#assign prefix = "source" + (source?index + 1)>
   <#if (source.name == "jdbc")>
@@ -81,7 +80,7 @@ val globalVariables = Map(
   </#if>
 </#list>
 <#list transformations as transform>
-// ========= transform ${transform?index + 1} =========
+// ===================================== transform ${transform?index + 1} =====================================
   <#assign config = transform.config>
   <#assign prefix = "transform" + (transform?index + 1)>
   <#if (transform.name == "sql")>
@@ -90,7 +89,7 @@ val globalVariables = Map(
   </#if>
 </#list>
 <#list sinks as sink>
-// ========= sink ${sink?index + 1} =========
+// ===================================== sink ${sink?index + 1} =====================================
   <#assign config = sink.config>
   <#assign prefix = "sink" + (sink?index + 1)>
   <#if (sink.name == "jdbc")>

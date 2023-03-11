@@ -29,7 +29,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-popconfirm @confirm="confirm" :icon="null" ok-text="确定" placement="right" :show-cancel="false">
+  <a-popconfirm @confirm="confirm" ok-text="确定" placement="right" :show-cancel="false">
     <template #title>
       <a-typography-title :level="5">请选择类型</a-typography-title>
       <a-radio-group v-model:value="type">
@@ -38,10 +38,12 @@ export default defineComponent({
         </template>
       </a-radio-group>
     </template>
-    <a-button type="link">
-      <template #icon>
-        <plus-outlined/>
-      </template>
-    </a-button>
+    <a-tooltip title="插入">
+      <a-button type="link">
+        <template #icon>
+          <plus-outlined/>
+        </template>
+      </a-button>
+    </a-tooltip>
   </a-popconfirm>
 </template>

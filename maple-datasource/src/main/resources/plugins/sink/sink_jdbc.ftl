@@ -8,7 +8,7 @@ val ${prefix}PreQueries = Seq(
 <@str_nowrap content=query/><#sep>,</#sep>
 </#list>
 )
-executeQueries(${prefix}Url, ${prefix}User, ${prefix}Password, ${prefix}PreQueries)
+executeQueries(${prefix}Url, ${prefix}User, ${prefix}Password, ${prefix}PreQueries, ${prefix}Variables)
 </#if>
 <#include "./includes/source_df.ftl">
   .write.format("jdbc")

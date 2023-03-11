@@ -1,8 +1,5 @@
 <#include "../includes/variables.ftl">
-<#if (config.query?matches(".*\\$\\{.*?}.*", "s"))>var<#else>val</#if> ${prefix}Query =
-  """
-    |${config.query?replace("\n", "\n    |")}
-    |""".stripMargin
+<#if (config.query?matches(".*\\$\\{.*?}.*", "s"))>var<#else>val</#if> ${prefix}Query = <@str content=config.query/>
 <#if (config.query?matches(".*\\$\\{.*?}.*", "s"))>
 ${prefix}Query = VariableUtils.replaceVariables(${prefix}Query, ${prefix}Variables.asJava)
 </#if>

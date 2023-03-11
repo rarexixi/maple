@@ -6,7 +6,7 @@ val ${prefix}PreQueries = Seq(
 <@str_nowrap content=query/><#sep>,</#sep>
 </#list>
 )
-executeDatasourceQueries(${prefix}Datasource, ${prefix}PreQueries)
+executeDatasourceQueries(${prefix}Datasource, ${prefix}PreQueries, ${prefix}Variables)
 </#if>
 <#include "./includes/source_df.ftl">
   .write.format("jdbc")

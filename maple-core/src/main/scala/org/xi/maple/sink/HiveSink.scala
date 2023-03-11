@@ -28,7 +28,8 @@ class HiveSink extends MapleSink[HiveSinkConfig] {
       val fileFormat = HiveSinkUtils.getTableFileFormat(spark, targetTable)
 
       logger.info(s"Write $fileFormat into target table: $targetTable, location: $location, file format: $fileFormat")
-      val writer = HiveSinkUtils.getSaveWriter(ds, targetFields.filter(field => !partitionsColumns.contains(field.name)), targetTable,
+      val targetFieldsWithoutPartition = targetFields.filter(field => !partitionsColumns.contains(field.name))
+      val writer = HiveSinkUtils.getSaveWriter(dsSource, targetFieldsWithoutPartition, targetTable,
         config.getStrongCheck, config.getSaveMode, config.getOptions)
       fileFormat match {
         case HiveSinkUtils.FileFormat.PARQUET => writer.parquet(location)
@@ -42,7 +43,7 @@ class HiveSink extends MapleSink[HiveSinkConfig] {
         HiveSinkUtils.refreshPartition(spark, targetTable, partition)
       }
     } else {
-      val writer = HiveSinkUtils.getSaveWriter(ds, targetFields, targetTable,
+      val writer = HiveSinkUtils.getSaveWriter(dsSource, targetFields, targetTable,
         config.getStrongCheck, config.getSaveMode, config.getOptions)
       logger.info(s"InsertInto data to hive table: $targetTable")
       writer.format("hive").insertInto(targetTable)
