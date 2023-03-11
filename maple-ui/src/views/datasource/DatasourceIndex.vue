@@ -6,10 +6,10 @@
   <div class="search-form">
     <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
       <a-form-item label="Id">
-        <a-input-number v-model:value="searchParams.id" allow-clear/>
+        <a-input-number v-model:value="searchParams.id" allow-clear />
       </a-form-item>
       <a-form-item label="名称">
-        <a-input v-model:value.trim="searchParams.nameContains" allow-clear/>
+        <a-input v-model:value.trim="searchParams.nameContains" allow-clear />
       </a-form-item>
       <a-form-item label="类型">
         <a-select v-model:value="searchParams.datasourceType" allow-clear placeholder="全部" style="width: 120px">
@@ -21,7 +21,7 @@
       <a-form-item>
         <a-button type="primary" html-type="submit">
           <template #icon>
-            <search-outlined/>
+            <search-outlined />
           </template>
           搜索
         </a-button>
@@ -40,81 +40,78 @@
         </template>
         <a-button type="primary">
           <template #icon>
-            <plus-outlined/>
+            <plus-outlined />
           </template>
           添加
-          <down-outlined/>
+          <down-outlined />
         </a-button>
       </a-dropdown>
       <template v-if="selectedRowKeys.length > 0">
         <a-button @click="enableSelected" type="success">
           <template #icon>
-            <check-outlined/>
+            <check-outlined />
           </template>
           启用
         </a-button>
         <a-button @click="disableSelected" type="warning">
           <template #icon>
-            <stop-outlined/>
+            <stop-outlined />
           </template>
           禁用
         </a-button>
         <a-button @click="deleteSelected" type="danger">
           <template #icon>
-            <delete-outlined/>
+            <delete-outlined />
           </template>
           删除
         </a-button>
       </template>
     </div>
-    <a-table :columns="columns" :data-source="dataPageList.list" :row-selection="rowSelection" :pagination="false"
-             :row-class-name="(record, index) => (index % 2 === 1 ? 'table-striped' : null)" row-key="id" size="small">
+    <a-table :columns="columns" :data-source="dataPageList.list" :row-selection="rowSelection" :pagination="false" :row-class-name="(record, index) => (index % 2 === 1 ? 'table-striped' : null)" row-key="id" size="small">
       <template #bodyCell="{column, record, index}">
         <div class="table-operations" v-if="column.key === 'action'">
           <a-popconfirm :title="`确定${record.deleted === 1 ? '启用' : '禁用'}吗？`" ok-text="确定" cancel-text="取消" @confirm="switchDeleted(record)">
             <a v-if="record.deleted" class="enable">
-              <check-outlined/>
-              <stop-outlined/>
+              <check-outlined />
+              <stop-outlined />
             </a>
             <a v-else class="disable">
-              <check-outlined/>
-              <stop-outlined/>
+              <check-outlined />
+              <stop-outlined />
             </a>
           </a-popconfirm>
           <a @click="edit(record, index)" class="text-primary">
-            <edit-outlined/>
+            <edit-outlined />
           </a>
           <a @click="edit(record, index, true)" class="text-primary">
-            <copy-outlined/>
+            <copy-outlined />
           </a>
           <a-popconfirm title="确定删除吗？" ok-text="确定" cancel-text="取消" @confirm="del(record)">
             <a class="text-danger">
-              <delete-outlined/>
+              <delete-outlined />
             </a>
           </a-popconfirm>
         </div>
       </template>
     </a-table>
-    <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total" :page-size-options="pageSizeOptions" show-size-changer
-                  show-quick-jumper></a-pagination>
+    <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total" :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper></a-pagination>
   </div>
-  <datasource-add-or-edit :pk="editPk" :datasource-type-version="datasourceTypeVersion" :visible="addOrEditDrawerVisible" :operateType="operateType"
-                          @save="save"/>
+  <datasource-add-or-edit :pk="editPk" :datasource-type-version="datasourceTypeVersion" :visible="addOrEditDrawerVisible" :operateType="operateType" @save="save" />
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, provide, onMounted} from "vue"
+import { defineComponent, reactive, provide, onMounted } from "vue"
 import common from '@/composables/common'
-import {listSearch, pageListSearch, execSelected} from '@/composables/requests'
+import { listSearch, pageListSearch, execSelected } from '@/composables/requests'
 import DatasourceAddOrEdit from './DatasourceAddOrEdit.vue'
-import {getSelection} from './composables/datasourceSelect'
-import {getOperations} from './composables/datasourceOperate'
+import { getSelection } from './composables/datasourceSelect'
+import { getOperations } from './composables/datasourceOperate'
 
 const pksField = 'ids'
 
 
 export default defineComponent({
-  components: {DatasourceAddOrEdit},
+  components: { DatasourceAddOrEdit },
   name: "DatasourceIndex",
   setup() {
     const searchParams = reactive<any>({
@@ -123,8 +120,8 @@ export default defineComponent({
       datasourceTypeContains: '',
     })
 
-    const {pageNum, pageSize, dataPageList, search} = pageListSearch({url: '/datasource/page-list', method: 'GET'}, searchParams)
-    const {rowSelection, selectedRowKeys, selectedRows, emptySelected} = getSelection(dataPageList)
+    const { pageNum, pageSize, dataPageList, search } = pageListSearch({ url: '/datasource/page-list', method: 'GET' }, searchParams)
+    const { rowSelection, selectedRowKeys, selectedRows, emptySelected } = getSelection(dataPageList)
 
     const datasourceTypeSearchParams = reactive<any>({})
     const typeMap = reactive<any>({})
@@ -135,9 +132,9 @@ export default defineComponent({
         versions: item.versions.split(",").map((v: string) => v.trim())
       }
     })
-    const getDatasourceTypeSelectList = listSearch({url: '/datasource-type/list', method: 'GET'}, datasourceTypeSearchParams, convertList)
+    const getDatasourceTypeSelectList = listSearch({ url: '/datasource-type/list', method: 'GET' }, datasourceTypeSearchParams, convertList)
 
-    const {editPk, datasourceTypeVersion, addOrEditDrawerVisible, operateType, add, del, edit, switchDeleted, save} = getOperations(dataPageList, search)
+    const { editPk, datasourceTypeVersion, addOrEditDrawerVisible, operateType, add, del, edit, switchDeleted, save } = getOperations(dataPageList, search)
     provide('closeAddOrEditDrawer', () => addOrEditDrawerVisible.value = false)
     provide('typeMap', typeMap)
 
@@ -148,11 +145,11 @@ export default defineComponent({
 
 
     const columns = [
-      {title: 'ID', dataIndex: 'id', key: 'id'},
-      {title: '名称', dataIndex: 'name', key: 'name'},
-      {title: '描述', dataIndex: 'description', key: 'description'},
-      {title: '类型', dataIndex: 'datasourceType', key: 'datasourceType', customRender: (data: any) => typeMap[data.record.datasourceType]},
-      {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 160},
+      { title: 'ID', dataIndex: 'id', key: 'id' },
+      { title: '名称', dataIndex: 'name', key: 'name' },
+      { title: '描述', dataIndex: 'description', key: 'description' },
+      { title: '类型', dataIndex: 'datasourceType', key: 'datasourceType', customRender: (data: any) => typeMap[data.record.datasourceType] },
+      { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 160 },
     ]
 
     return {
@@ -174,15 +171,15 @@ export default defineComponent({
       save,
       switchDeleted,
       del,
-      disableSelected: execSelected({url: '/datasource/disable', method: 'PATCH'}, selectedRowKeys, pksField, '禁用', () => {
+      disableSelected: execSelected({ url: '/datasource/disable', method: 'PATCH' }, selectedRowKeys, pksField, '禁用', () => {
         selectedRows.value.forEach((item: any) => item.deleted = 1)
         emptySelected()
       }),
-      enableSelected: execSelected({url: '/datasource/enable', method: 'PATCH'}, selectedRowKeys, pksField, '启用', () => {
+      enableSelected: execSelected({ url: '/datasource/enable', method: 'PATCH' }, selectedRowKeys, pksField, '启用', () => {
         selectedRows.value.forEach((item: any) => item.deleted = 0)
         emptySelected()
       }),
-      deleteSelected: execSelected({url: '/datasource/delete', method: 'DELETE'}, selectedRowKeys, pksField, '删除', () => {
+      deleteSelected: execSelected({ url: '/datasource/delete', method: 'DELETE' }, selectedRowKeys, pksField, '删除', () => {
         search()
         emptySelected()
       })

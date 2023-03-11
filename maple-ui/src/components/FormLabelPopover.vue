@@ -1,6 +1,6 @@
 <script type="ts">
-import {defineComponent} from "vue";
-import {InfoCircleOutlined} from "@ant-design/icons-vue";
+import { defineComponent } from "vue";
+import { InfoCircleOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
@@ -25,6 +25,6 @@ export default defineComponent({
     <template #content>
       <p>{{ tips }}</p>
     </template>
-    <info-circle-outlined/>
+    <info-circle-outlined />
   </a-popover>
 </template>

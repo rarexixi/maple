@@ -1,5 +1,5 @@
 <script lang="ts">
-import {defineComponent, reactive, ref, toRaw, watch} from "vue"
+import { defineComponent, reactive, ref, toRaw, watch } from "vue"
 import JdbcSource from "@/components/source/JdbcSource.vue"
 import ManagedJdbcSource from "@/components/source/ManagedJdbcSource.vue"
 import FileSource from "@/components/source/FileSource.vue"
@@ -12,8 +12,8 @@ import AddPlugin from "@/components/AddPlugin.vue"
 import DeletePlugin from "@/components/DeletePlugin.vue"
 import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
-import {MinusOutlined} from "@ant-design/icons-vue";
-import {request} from "@/utils/request-utils";
+import { MinusOutlined } from "@ant-design/icons-vue";
+import { request } from "@/utils/request-utils";
 
 
 export default defineComponent({
@@ -49,7 +49,7 @@ export default defineComponent({
     for (let config in SampleData.SampleConfig) {
       let arr = SampleData.SampleConfig[config]
       for (let i = 0; i < arr.length; i++) {
-        pageConfig[config].push({expand: true})
+        pageConfig[config].push({ expand: true })
       }
     }
 
@@ -91,10 +91,10 @@ export default defineComponent({
       let pluginPageConfig = getTargetPluginPageConfig(type)
       if (index < 0 || index >= plugins.length) {
         plugins.push(plugin);
-        pluginPageConfig.push({expand: true});
+        pluginPageConfig.push({ expand: true });
       } else {
         plugins.splice(index, 0, plugin);
-        pluginPageConfig.splice(index, 0, {expand: true});
+        pluginPageConfig.splice(index, 0, { expand: true });
       }
     }
 
@@ -144,12 +144,12 @@ export default defineComponent({
   <a-row>
     <a-col :span="12" style="height: calc(100vh - 42px); padding: 5px; overflow: auto;">
       <a-typography-title :level="4">全局变量</a-typography-title>
-      <input-string-map v-model:value="mapleConfig.variables"/>
+      <input-string-map v-model:value="mapleConfig.variables" />
 
-      <a-divider/>
+      <a-divider />
 
       <a-typography-title :level="4">输入</a-typography-title>
-      <template v-for="(item, index) in mapleConfig.sources">
+      <template v-for="(item, index) in mapleConfig.sources" :key="index">
         <a-card>
           <template #title>
             <a-button type="link" @click="pageConfig.sources[index].expand=!pageConfig.sources[index].expand">
@@ -159,20 +159,20 @@ export default defineComponent({
                 <down-outlined v-else />
               </template>
             </a-button>
-            <add-plugin :types="pluginNames.sources" btn-text="插入" @add="name => addPlugin('source', name, index)"/>
-            <delete-plugin :types="pluginNames.sources" @delete="delPlugin('source', index)"/>
+            <add-plugin :types="pluginNames.sources" btn-text="插入" @add="name => addPlugin('source', name, index)" />
+            <delete-plugin :types="pluginNames.sources" @delete="delPlugin('source', index)" />
             注册表名：{{ item.config.resultTable }}
           </template>
           <template #extra>{{item.name}}</template>
           <component :is="item.name.replace('_', '-') + '-source'" v-model:value="item.config" v-show="pageConfig.sources[index].expand" />
         </a-card>
       </template>
-      <add-plugin :types="pluginNames.sources" @add="name => addPlugin('source', name)"/>
+      <add-plugin :types="pluginNames.sources" @add="name => addPlugin('source', name)" />
 
-      <a-divider/>
+      <a-divider />
 
       <a-typography-title :level="4">转换</a-typography-title>
-      <template v-for="(item, index) in mapleConfig.transformations">
+      <template v-for="(item, index) in mapleConfig.transformations" :key="index">
         <a-card>
           <template #title>
             <a-button type="link" @click="pageConfig.transformations[index].expand=!pageConfig.transformations[index].expand">
@@ -182,20 +182,20 @@ export default defineComponent({
                 <down-outlined v-else />
               </template>
             </a-button>
-            <add-plugin :types="pluginNames.transformations" btn-text="插入" @add="name => addPlugin('transformation', name, index)"/>
-            <delete-plugin :types="pluginNames.transformations" @delete="delPlugin('transformation', index)"/>
+            <add-plugin :types="pluginNames.transformations" btn-text="插入" @add="name => addPlugin('transformation', name, index)" />
+            <delete-plugin :types="pluginNames.transformations" @delete="delPlugin('transformation', index)" />
             注册表名：{{ item.config.resultTable }}
           </template>
           <template #extra>{{item.name}}</template>
           <component :is="item.name.replace('_', '-') + '-transformation'" v-model:value="item.config" v-show="pageConfig.transformations[index].expand" />
         </a-card>
       </template>
-      <add-plugin :types="pluginNames.transformations" @add="name => addPlugin('transformation', name)"/>
+      <add-plugin :types="pluginNames.transformations" @add="name => addPlugin('transformation', name)" />
 
-      <a-divider/>
+      <a-divider />
 
       <a-typography-title :level="4">输出</a-typography-title>
-      <template v-for="(item, index) in mapleConfig.sinks">
+      <template v-for="(item, index) in mapleConfig.sinks" :key="index">
         <a-card>
           <template #title>
             <a-button type="link" @click="pageConfig.sinks[index].expand=!pageConfig.sinks[index].expand">
@@ -205,8 +205,8 @@ export default defineComponent({
                 <down-outlined v-else />
               </template>
             </a-button>
-            <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name, index)"/>
-            <delete-plugin :types="pluginNames.sinks" @delete="delPlugin('sink', index)"/>
+            <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name, index)" />
+            <delete-plugin :types="pluginNames.sinks" @delete="delPlugin('sink', index)" />
             <template v-if="item.name === 'file'">
               写入路径: {{ item.config.path }}
             </template>
@@ -218,7 +218,7 @@ export default defineComponent({
           <component :is="item.name.replace('_', '-') + '-sink'" v-model:value="item.config" v-show="pageConfig.sinks[index].expand" />
         </a-card>
       </template>
-      <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name)"/>
+      <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name)" />
     </a-col>
     <a-col :span="12">
       <a-radio-group v-model:value="codeView" style="margin: 5px 0;">
@@ -228,14 +228,13 @@ export default defineComponent({
       <a-button type="link" v-if="codeView" @click="() => getCode(true)">
         <template #icon><reload-outlined /></template>
       </a-button>
-      <a-textarea v-if="codeView" v-model:value="code" style="height: calc(100vh - 82px); width: 100%; overflow: auto"/>
-      <textarea v-else v-html="JSON.stringify(mapleConfig, null, 4)" style="height: calc(100vh - 82px); width: 100%; overflow: auto"/>
+      <a-textarea v-if="codeView" v-model:value="code" style="height: calc(100vh - 82px); width: 100%; overflow: auto" />
+      <textarea v-else v-html="JSON.stringify(mapleConfig, null, 4)" style="height: calc(100vh - 82px); width: 100%; overflow: auto" />
     </a-col>
   </a-row>
 </template>
 
 <style lang="less" scoped>
-
 pre {
   font-size: 12px;
 }
@@ -252,7 +251,8 @@ pre {
 }
 
 textarea {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
   font-size: 12px;
 }
 </style>

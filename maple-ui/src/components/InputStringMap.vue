@@ -1,14 +1,14 @@
 <script lang="ts">
-import {defineComponent, ref, toRefs, watch} from "vue"
+import { defineComponent, ref, toRefs, watch } from "vue"
 
 export default defineComponent({
   props: {
-    value: {type: Object, isRequired: true},
-    separator: {type: String, isRequired: false, default: '\n'},
+    value: { type: Object, isRequired: true },
+    separator: { type: String, isRequired: false, default: '\n' },
   },
   emits: ['update:value'],
-  setup(props, {emit}) {
-    const {value} = toRefs(props)
+  setup(props, { emit }) {
+    const { value } = toRefs(props)
 
     const getMapValue = (): string => {
       const arr: string[] = [] as string[]
@@ -44,5 +44,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-textarea v-model:value="map" @blur="onValueBlur" :auto-size="{ minRows: 2, maxRows: 20 }"/>
+  <a-textarea v-model:value="map" :placeholder="'key1=value1\nkey2=value2\n...'" @blur="onValueBlur" :auto-size="{ minRows: 2, maxRows: 20 }" />
 </template>

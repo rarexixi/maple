@@ -1,7 +1,7 @@
-import type {ColumnProps} from "ant-design-vue/lib/table"
-import type {UnwrapRef} from "vue"
-import {computed, ref, unref} from "vue"
-import type {PageInfo} from "@/composables/models";
+import type { ColumnProps } from "ant-design-vue/lib/table"
+import type { UnwrapRef } from "vue"
+import { computed, ref, unref } from "vue"
+import type { PageInfo } from "@/composables/models";
 
 type Key = ColumnProps['key']
 

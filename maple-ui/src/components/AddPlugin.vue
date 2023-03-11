@@ -1,6 +1,6 @@
 <script type="ts">
-import {defineComponent, ref} from "vue"
-import {PlusOutlined} from "@ant-design/icons-vue";
+import { defineComponent, ref } from "vue"
+import { PlusOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
@@ -13,7 +13,7 @@ export default defineComponent({
     }
   },
   emits: ['add'],
-  setup(props, {emit}) {
+  setup(props, { emit }) {
 
     const type = ref(props.types[0]);
 
@@ -33,7 +33,7 @@ export default defineComponent({
     <template #title>
       <a-typography-title :level="5">请选择类型</a-typography-title>
       <a-radio-group v-model:value="type">
-        <template v-for="type in types">
+        <template v-for="type in types" :key="type">
           <a-radio :value="type">{{ type }}</a-radio>
         </template>
       </a-radio-group>
@@ -41,7 +41,7 @@ export default defineComponent({
     <a-tooltip title="插入">
       <a-button type="link">
         <template #icon>
-          <plus-outlined/>
+          <plus-outlined />
         </template>
       </a-button>
     </a-tooltip>

@@ -1,6 +1,6 @@
 <script type="ts">
-import {defineComponent, ref} from "vue"
-import {MinusOutlined} from "@ant-design/icons-vue";
+import { defineComponent, ref } from "vue"
+import { MinusOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
@@ -13,7 +13,7 @@ export default defineComponent({
     }
   },
   emits: ['delete'],
-  setup(props, {emit}) {
+  setup(props, { emit }) {
 
     const type = ref(props.types[0]);
 
@@ -34,7 +34,7 @@ export default defineComponent({
     <a-tooltip title="删除">
       <a-button type="link" danger>
         <template #icon>
-          <minus-outlined/>
+          <minus-outlined />
         </template>
       </a-button>
     </a-tooltip>

@@ -1,17 +1,17 @@
-import {Modal, notification} from 'ant-design-vue'
-import type {ColumnProps} from 'ant-design-vue/lib/table'
-import type {AxiosRequestConfig} from 'axios'
-import type {Ref, UnwrapRef} from "vue"
-import {ref, reactive, createVNode, watch} from "vue"
+import { Modal, notification } from 'ant-design-vue'
+import type { ColumnProps } from 'ant-design-vue/lib/table'
+import type { AxiosRequestConfig } from 'axios'
+import type { Ref, UnwrapRef } from "vue"
+import { ref, reactive, createVNode, watch } from "vue"
 import common from './common'
-import type {PageInfo, SearchPageParams} from '@/composables/models'
-import {request} from '@/utils/request-utils'
-import {ExclamationCircleOutlined} from '@ant-design/icons-vue'
+import type { PageInfo, SearchPageParams } from '@/composables/models'
+import { request } from '@/utils/request-utils'
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 
 export function listSearch(listRequestConfig: AxiosRequestConfig, searchParams: UnwrapRef<any>, convertList: (list: any[]) => any[] = (list: any[]) => list) {
     const dataList = ref<any[]>([])
     const search = () => {
-        request({...listRequestConfig, params: {...searchParams}}).then(response => {
+        request({ ...listRequestConfig, params: { ...searchParams } }).then(response => {
             dataList.value = convertList(response)
         })
     }
@@ -26,7 +26,7 @@ export function pageListSearch(pageListRequestConfig: AxiosRequestConfig, search
     const pageNum = ref(1)
     const pageSize = ref(10)
     const search = () => {
-        request({...pageListRequestConfig, params: {...searchParams, pageNum: pageNum.value, pageSize: pageSize.value}}).then(response => {
+        request({ ...pageListRequestConfig, params: { ...searchParams, pageNum: pageNum.value, pageSize: pageSize.value } }).then(response => {
             dataPageList.list = convertList(response.list)
             dataPageList.total = response.total
             dataPageList.pageNum = response.pageNum
@@ -51,7 +51,7 @@ type Key = ColumnProps['key']
 export function execSelected(requestConfig: AxiosRequestConfig, selectedRowKeys: Ref<Key[]>, paramName: string, operateMessage: string, successCallback: () => void = () => undefined) {
     return () => {
         if (selectedRowKeys.value.length === 0) {
-            notification.warning({message: `${operateMessage}列表不能为空`})
+            notification.warning({ message: `${operateMessage}列表不能为空` })
             return
         }
         Modal.confirm({
@@ -63,9 +63,9 @@ export function execSelected(requestConfig: AxiosRequestConfig, selectedRowKeys:
             onOk() {
                 const params: any = {}
                 params[paramName] = selectedRowKeys.value
-                request({...requestConfig, params}).then(response => {
+                request({ ...requestConfig, params }).then(response => {
                     if (response > 0) {
-                        notification.success({message: `${operateMessage}成功`})
+                        notification.success({ message: `${operateMessage}成功` })
                     }
                     if (successCallback) successCallback()
                 })

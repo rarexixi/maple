@@ -2,15 +2,14 @@
 <template>
   <span>
     <a-input type="text" :value="value.number" style="width: 100px" @change="onNumberChange" />
-    <a-select :value="value.currency" :options="[{ value: 'rmb', label: 'RMB' }, { value: 'dollar', label: 'Dollar' }]"
-              style="width: 80px; margin: 0 8px" @change="onCurrencyChange"></a-select>
+    <a-select :value="value.currency" :options="[{ value: 'rmb', label: 'RMB' }, { value: 'dollar', label: 'Dollar' }]" style="width: 80px; margin: 0 8px" @change="onCurrencyChange"></a-select>
   </span>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import {Form} from "ant-design-vue";
+import { Form } from "ant-design-vue";
 
 export type Currency = 'rmb' | 'dollar';
 

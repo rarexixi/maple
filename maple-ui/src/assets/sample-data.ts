@@ -1,4 +1,4 @@
-import {listSearch} from "@/composables/requests";
+import { listSearch } from "@/composables/requests";
 
 const getBaseSource = () => ({
     variables: {},
@@ -118,22 +118,22 @@ const FileSerializers: Array<string> = ["parquet", "orc", "csv", "text", "json"]
 
 const Layout = {
     cols: {
-        small: {xs: 24, sm: 24, md: 12, lg: 12, xl: 8},
+        small: { xs: 24, sm: 24, md: 12, lg: 12, xl: 8 },
     },
     labelCols: {
-        small: {xs: 24, sm: 8, md: 10, lg: 10, xl: 9},
+        small: { xs: 24, sm: 8, md: 10, lg: 10, xl: 9 },
         medium: {},
-        large: {xs: 24, sm: 8, md: 5, lg: 5, xl: 3},
+        large: { xs: 24, sm: 8, md: 5, lg: 5, xl: 3 },
     },
     wrapperColsWithLabel: {
-        small: {xs: 24, sm: 8, md: 10, lg: 10, xl: 9},
+        small: { xs: 24, sm: 8, md: 10, lg: 10, xl: 9 },
         medium: {},
         large: {
-            xs: {span: 24, offset: 0},
-            sm: {span: 16, offset: 8},
-            md: {span: 19, offset: 5},
-            lg: {span: 19, offset: 5},
-            xl: {span: 21, offset: 3}
+            xs: { span: 24, offset: 0 },
+            sm: { span: 16, offset: 8 },
+            md: { span: 19, offset: 5 },
+            lg: { span: 19, offset: 5 },
+            xl: { span: 21, offset: 3 }
         },
     },
 }
@@ -153,7 +153,7 @@ const StorageLevels = [
     { value: 'OFF_HEAP', label: 'OFF_HEAP', },
 ]
 
-const getDatasourceSelectList = listSearch({url: '/datasource/list', method: 'GET'}, {})
+const getDatasourceSelectList = listSearch({ url: '/datasource/list', method: 'GET' }, {})
 
 getDatasourceSelectList.search()
 

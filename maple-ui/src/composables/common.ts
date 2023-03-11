@@ -1,11 +1,11 @@
-import type {PageInfo} from "@/composables/models"
+import type { PageInfo } from "@/composables/models"
 
-const SortEnum = {ASC: 'ASC', DESC: 'DESC'}
+const SortEnum = { ASC: 'ASC', DESC: 'DESC' }
 const PageSizeOptions = ['10', '20', '50', '100']
-const DefaultSearchParams = {defaultPageNum: 1, defaultPageSize: 50}
+const DefaultSearchParams = { defaultPageNum: 1, defaultPageSize: 50 }
 
 export declare type OperationType = | 0 | 1 | 2 | 3
-const DataOperationType = {default: 0, create: 1, copy: 2, update: 3}
+const DataOperationType = { default: 0, create: 1, copy: 2, update: 3 }
 
 function getDefaultPageInfo(): PageInfo {
     return {

@@ -1,6 +1,6 @@
 <script lang="ts">
-import {defineComponent, reactive} from "vue"
-import type {PropType} from "vue"
+import { defineComponent, reactive } from "vue"
+import type { PropType } from "vue"
 import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 import InputStringArray from "@/components/InputStringArray.vue";
@@ -18,9 +18,9 @@ interface FileSinkValue {
 }
 
 export default defineComponent({
-  components: {InputStringArray, InputStringMap},
+  components: { InputStringArray, InputStringMap },
   props: {
-    value: {type: Object as PropType<FileSinkValue>, isRequired: true},
+    value: { type: Object as PropType<FileSinkValue>, isRequired: true },
   },
   emits: ['update:value'],
   setup() {
@@ -43,16 +43,16 @@ export default defineComponent({
 <template>
   <a-form :model="value" :validate-messages="validateMessages">
     <a-form-item name="variables" label="变量" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value.variables"/>
+      <input-string-map v-model:value="value.variables" />
     </a-form-item>
     <a-form-item name="path" label="写入路径" :rules="[{ required: true }]" :label-col="layout.labelCols.large">
-      <a-input v-model:value="value.path"/>
+      <a-input v-model:value="value.path" />
     </a-form-item>
     <a-row>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="serializer" label="文件格式" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
           <a-select v-model:value="value.serializer" placeholder="请选择文件格式">
-            <template v-for="serializer in fileSerializers">
+            <template v-for="serializer in fileSerializers" :key="serializer">
               <a-select-option :value="serializer">{{ serializer }}</a-select-option>
             </template>
           </a-select>
@@ -68,27 +68,26 @@ export default defineComponent({
       </a-col>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="numPartitions" label="分区数" :rules="[{ type: 'number', min: 0, max: 99 }]" :label-col="layout.labelCols.small">
-          <a-input-number v-model:value="value.numPartitions"/>
+          <a-input-number v-model:value="value.numPartitions" />
         </a-form-item>
       </a-col>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="sourceTable" label="来源表" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
-          <a-input v-model:value="value.sourceTable"/>
+          <a-input v-model:value="value.sourceTable" />
         </a-form-item>
       </a-col>
     </a-row>
     <a-form-item name="path" label="来源语句" :rules="[{ required: true }]" :label-col="layout.labelCols.large">
-      <a-textarea v-model:value="value.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }"/>
+      <a-textarea v-model:value="value.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }" />
     </a-form-item>
     <a-form-item name="partitionBy" label="分区字段" :label-col="layout.labelCols.large">
-      <input-string-array v-model:value="value.partitionBy"/>
+      <input-string-array v-model:value="value.partitionBy" />
     </a-form-item>
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value.options"/>
+      <input-string-map v-model:value="value.options" />
     </a-form-item>
   </a-form>
 </template>
 
 <style scoped>
-
 </style>

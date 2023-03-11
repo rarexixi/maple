@@ -1,7 +1,7 @@
-import {createApp} from "vue"
+import { createApp } from "vue"
 import App from './App.vue'
 import router from './router'
-import Antd, {message, Button, Input, InputNumber, RadioGroup, Textarea, Switch, Select} from 'ant-design-vue'
+import Antd, { message, Button, Input, InputNumber, RadioGroup, Textarea, Switch, Select } from 'ant-design-vue'
 import * as AntdIcons from '@ant-design/icons-vue'
 
 import 'ant-design-vue/dist/antd.css'
@@ -13,7 +13,7 @@ const app = createApp(App)
 
 app.use(Antd)
 app.use(router)
-app.use(Antd, {size: 'small'});
+app.use(Antd, { size: 'small' });
 
 app.mount('#app')
 app.config.globalProperties.$message = message
