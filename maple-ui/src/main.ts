@@ -1,7 +1,7 @@
 import { createApp } from "vue"
 import App from './App.vue'
 import router from './router'
-import Antd, { message, Button, Input, InputNumber, RadioGroup, Textarea, Switch, Select } from 'ant-design-vue'
+import Antd, { message, Input } from 'ant-design-vue'
 import * as AntdIcons from '@ant-design/icons-vue'
 
 import 'ant-design-vue/dist/antd.css'

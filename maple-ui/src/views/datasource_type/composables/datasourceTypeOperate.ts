@@ -1,9 +1,9 @@
 import common from "@/composables/common"
-import type {PageInfo} from "@/composables/models"
-import {request} from "@/utils/request-utils"
-import type {AxiosRequestConfig} from "axios"
-import type {UnwrapRef} from "vue"
-import {reactive, ref} from "vue"
+import type { PageInfo } from "@/composables/models"
+import { request } from "@/utils/request-utils"
+import type { AxiosRequestConfig } from "axios"
+import type { UnwrapRef } from "vue"
+import { reactive, ref } from "vue"
 
 export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () => void) {
     const operateType = ref(common.DataOperationType.default)
@@ -51,8 +51,8 @@ export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () =>
     const switchDeleted = (item: any) => {
         const params: any = getPkParams(item)
         const requestConfig: AxiosRequestConfig = item.deleted === 1
-            ? {url: '/datasource-type/enable', method: 'PATCH', params}
-            : {url: '/datasource-type/disable', method: 'PATCH', params}
+            ? { url: '/datasource-type/enable', method: 'PATCH', params }
+            : { url: '/datasource-type/disable', method: 'PATCH', params }
         request(requestConfig).then(response => {
             if (response > 0) item.deleted = item.deleted === 1 ? 0 : 1
         })
@@ -60,11 +60,11 @@ export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () =>
 
     const del = (item: any) => {
         const params: any = getPkParams(item)
-        const requestConfig: AxiosRequestConfig = {url: '/datasource-type/delete', method: 'DELETE', params}
+        const requestConfig: AxiosRequestConfig = { url: '/datasource-type/delete', method: 'DELETE', params }
         request(requestConfig).then(response => {
             if (response > 0 && operateCallback) operateCallback()
         })
     }
 
-    return {editPk, addOrEditDrawerVisible: visible, operateType, add, del, edit, switchDeleted, save}
+    return { editPk, addOrEditDrawerVisible: visible, operateType, add, del, edit, switchDeleted, save }
 }

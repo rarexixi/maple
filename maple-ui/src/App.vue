@@ -26,6 +26,7 @@ export default defineComponent({
   <a-config-provider :locale="zhCN" :component-size="'small'">
     <a-layout :style="{ height: '100vh', overflow: 'auto' }" class="layout">
       <a-layout-sider v-model:collapsed="collapsed" collapsible>
+        <div class="logo" />
         <nav-menu :menus="menus"></nav-menu>
       </a-layout-sider>
       <a-layout-content :style="{ overflow: 'auto' }">
@@ -36,6 +37,11 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+}
 </style>
 
 

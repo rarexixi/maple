@@ -4,27 +4,27 @@
       <a-row>
         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <a-form-item ref="typeCode" :wrapper-col="{span:24}" label="类型编码" name="typeCode">
-            <a-input v-model:value.trim="detail.typeCode" type="text"/>
+            <a-input v-model:value.trim="detail.typeCode" type="text" />
           </a-form-item>
         </a-col>
         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <a-form-item ref="typeName" label="类型名称" name="typeName">
-            <a-input v-model:value.trim="detail.typeName" type="text"/>
+            <a-input v-model:value.trim="detail.typeName" type="text" />
           </a-form-item>
         </a-col>
         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <a-form-item ref="classifier" label="分类" name="classifier">
-            <a-input v-model:value.trim="detail.classifier" type="text"/>
+            <a-input v-model:value.trim="detail.classifier" type="text" />
           </a-form-item>
         </a-col>
         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <a-form-item ref="versions" label="版本" name="versions">
-            <a-input v-model:value.trim="detail.versions" type="text"/>
+            <a-input v-model:value.trim="detail.versions" type="text" />
           </a-form-item>
         </a-col>
         <a-col :span="24">
           <a-form-item ref="icon" label="图标地址" name="icon">
-            <a-input v-model:value.trim="detail.icon" type="text"/>
+            <a-input v-model:value.trim="detail.icon" type="text" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -35,22 +35,21 @@
             {{ index + 1 }}
             <a-button type="link" @click="removeConfigKey(configKey)" danger>
               <template #icon>
-                <MinusCircleOutlined/>
+                <MinusCircleOutlined />
               </template>
             </a-button>
           </a-form-item>
           <a-form-item label="版本" :name="['configKeys', index, 'versions']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.versions"/>
+            <a-input v-model:value="configKey.versions" />
           </a-form-item>
-          <a-form-item label="配置编码" :name="['configKeys', index, 'keyCode']" :label-col="subFormLabelCol"
-                       :rules="[{ required: true, message: '配置编码不能为空', trigger: 'blur' }]">
-            <a-input v-model:value="configKey.keyCode"/>
+          <a-form-item label="配置编码" :name="['configKeys', index, 'keyCode']" :label-col="subFormLabelCol" :rules="[{ required: true, message: '配置编码不能为空', trigger: 'blur' }]">
+            <a-input v-model:value="configKey.keyCode" />
           </a-form-item>
           <a-form-item label="配置名" :name="['configKeys', index, 'keyName']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.keyName" style="width: 120px"/>
+            <a-input v-model:value="configKey.keyName" style="width: 120px" />
           </a-form-item>
           <a-form-item label="默认值" :name="['configKeys', index, 'defaultValue']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.defaultValue"/>
+            <a-input v-model:value="configKey.defaultValue" />
           </a-form-item>
           <a-form-item label="类型" :name="['configKeys', index, 'valueType']" :label-col="subFormLabelCol">
             <a-select v-model:value="configKey.valueType" style="width: 120px">
@@ -61,19 +60,19 @@
             </a-select>
           </a-form-item>
           <a-form-item label="必填" :name="['configKeys', index, 'required']" :label-col="subFormLabelCol">
-            <a-switch v-model:checked="configKey.required" :checked-value="1" :un-checked-value="0"/>
+            <a-switch v-model:checked="configKey.required" :checked-value="1" :un-checked-value="0" />
           </a-form-item>
           <a-form-item label="校验正则" :name="['configKeys', index, 'valueRegex']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.valueRegex" style="width: 250px"/>
+            <a-input v-model:value="configKey.valueRegex" style="width: 250px" />
           </a-form-item>
           <a-form-item label="配置说明" :name="['configKeys', index, 'description']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.description" style="width: 250px"/>
+            <a-input v-model:value="configKey.description" style="width: 250px" />
           </a-form-item>
         </a-space>
       </div>
       <a-form-item>
         <a-button type="dashed" block @click="addConfigKey">
-          <PlusOutlined/>
+          <PlusOutlined />
           添加配置项
         </a-button>
       </a-form-item>
@@ -86,19 +85,19 @@
 </template>
 
 <script lang="ts">
-import {notification} from 'ant-design-vue'
-import type {ValidateErrorEntity} from 'ant-design-vue/es/form/interface'
-import type {AxiosRequestConfig} from 'axios'
-import {defineComponent, inject, reactive, ref, toRaw, toRefs, watch} from "vue"
+import { notification } from 'ant-design-vue'
+import type { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
+import type { AxiosRequestConfig } from 'axios'
+import { defineComponent, inject, reactive, ref, toRaw, toRefs, watch } from "vue"
 import common from '@/composables/common'
-import {request} from '@/utils/request-utils'
+import { request } from '@/utils/request-utils'
 
 const rules = {
   typeCode: [
-    {required: true, message: '类型编码不能为空', trigger: 'blur'}
+    { required: true, message: '类型编码不能为空', trigger: 'blur' }
   ],
   classifier: [
-    {required: true, message: '分类不能为空', trigger: 'blur'}
+    { required: true, message: '分类不能为空', trigger: 'blur' }
   ],
 }
 
@@ -137,8 +136,8 @@ export default defineComponent({
       default: () => false
     },
   },
-  setup(props, {emit}) {
-    const {pk, operateType, visible} = toRefs(props)
+  setup(props, { emit }) {
+    const { pk, operateType, visible } = toRefs(props)
     const title = ref<string>('')
     const formRef = ref()
     const detail = reactive<any>({
@@ -170,7 +169,7 @@ export default defineComponent({
         else if (operateType.value === common.DataOperationType.update)
           title.value = '编辑数据源类型'
 
-        request({url: '/datasource-type/detail', method: 'GET', params: pk.value}).then(response => {
+        request({ url: '/datasource-type/detail', method: 'GET', params: pk.value }).then(response => {
           detail.typeCode = response.typeCode
           detail.typeName = response.typeName
           detail.icon = response.icon
@@ -186,8 +185,8 @@ export default defineComponent({
     const save = () => {
       formRef.value.validate().then(() => {
         const requestConfig: AxiosRequestConfig = operateType.value === common.DataOperationType.update
-          ? {url: '/datasource-type/update', method: "PATCH", data: toRaw(detail), params: pk.value}
-          : {url: '/datasource-type/add', method: "POST", data: toRaw(detail)}
+          ? { url: '/datasource-type/update', method: "PATCH", data: toRaw(detail), params: pk.value }
+          : { url: '/datasource-type/add', method: "POST", data: toRaw(detail) }
         request(requestConfig).then(response => {
           notification.success({
             message: "保存成功"
