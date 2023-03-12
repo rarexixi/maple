@@ -23,7 +23,7 @@
     </div>
     <a-table :columns="columns" :data-source="dataList" :row-selection="rowSelection" :scroll="{ x: 1300 }"
       :pagination="false" :row-class-name="(_record: any, index: number) => (index % 2 === 1 ? 'table-striped' : null)"
-      row-key="typeCode" size="small">
+      row-key="typeCode">
       <template #bodyCell="{ column, record, index }">
         <div class="table-operations" v-if="column.key === 'action'">
           <a-popconfirm :title="`确定${record.deleted === 1 ? '启用' : '禁用'}吗？`" @confirm="() => switchDeleted(record)">

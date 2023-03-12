@@ -138,4 +138,12 @@ VALUES ('mysql', '*', 'driverClassName', '驱动类名', 1, 'com.mysql.jdbc.Driv
        ('sqlserver', '*', 'password', '密码', 5, '', 'PASSWORD', 0, '', ''),
        ('sqlserver', '*', 'databaseName', '数据库名', 6, '', 'STRING', 0, '', '');
 
-
+INSERT INTO maple_datasource.maple_datasource (id, name, description, datasource_type, version, datasource_config)
+VALUES (1, 'test_mysql', '测试mysql', 'mysql', '5.7',
+        '{"driverClassName":"com.mysql.jdbc.Driver","address":"localhost:3306","username":"xi_root","password":"123456","databaseName":"test_mysql_db"}'),
+       (2, 'test_postgresql', '测试postgresql', 'postgresql', '14',
+        '{"driverClassName":"org.postgresql.Driver","address":"localhost:5432","username":"xi_root","password":"123456","databaseName":"test_postgresql_db"}'),
+       (3, 'test_oracle', '测试oracle', 'oracle', '12c',
+        '{"driverClassName":"oracle.jdbc.driver.OracleDriver","address":"localhost:1521","username":"xi_root","password":"123456","serviceName":"orcl"}'),
+       (4, 'test_sqlserver', '测试sqlserver', 'sqlserver', '2019',
+        '{"driverClassName":"com.microsoft.sqlserver.jdbc.SQLServerDriver","address":"localhost:1433","params":"{\\"encrypt\\":\\"true\\",\\"trustServerCertificate\\":\\"true\\"}","username":"xi_root","password":"123456","databaseName":"test_sqlserver_db"}');

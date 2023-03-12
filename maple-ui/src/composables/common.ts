@@ -1,7 +1,7 @@
 import type { PageInfo } from "@/composables/models"
 
 const SortEnum = { ASC: 'ASC', DESC: 'DESC' }
-const PageSizeOptions = ['10', '20', '50', '100']
+const PageSizeOptions = ['1', '20', '50', '100']
 const DefaultSearchParams = { defaultPageNum: 1, defaultPageSize: 50 }
 
 export declare type OperationType = | 0 | 1 | 2 | 3

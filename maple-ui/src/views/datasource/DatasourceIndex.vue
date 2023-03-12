@@ -41,8 +41,7 @@
       </template>
     </div>
     <a-table :columns="columns" :data-source="dataPageList.list" :row-selection="rowSelection" :pagination="false"
-      :row-class-name="(_record: any, index: number) => (index % 2 === 1 ? 'table-striped' : null)" row-key="id"
-      size="small">
+      :row-class-name="(_record: any, index: number) => (index % 2 === 1 ? 'table-striped' : null)" row-key="id">
       <template #bodyCell="{ column, record, index }">
         <div class="table-operations" v-if="column.key === 'action'">
           <a-popconfirm :title="`确定${record.deleted === 1 ? '启用' : '禁用'}吗？`" @confirm="() => switchDeleted(record)">
@@ -58,7 +57,7 @@
       </template>
     </a-table>
     <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total"
-      :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper></a-pagination>
+      :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper size="small"></a-pagination>
   </div>
   <datasource-add-or-edit :pk="editPk" :type-version="typeVersion" :visible="addOrEditDrawerVisible"
     :operateType="operateType" @save="save" />
@@ -72,7 +71,7 @@ import DatasourceAddOrEdit from './DatasourceAddOrEdit.vue'
 import { getSelection } from './composables/datasourceSelect'
 import { getOperations } from './composables/datasourceOperate'
 
-const pksField = 'ids'
+const pksField = 'idIn'
 
 
 export default defineComponent({
@@ -115,7 +114,7 @@ export default defineComponent({
       { title: 'ID', dataIndex: 'id', key: 'id' },
       { title: '名称', dataIndex: 'name', key: 'name' },
       { title: '描述', dataIndex: 'description', key: 'description' },
-      { title: '类型', dataIndex: 'datasourceType', key: 'datasourceType', customRender: (data: any) => typeMap[data.record.datasourceType] },
+      { title: '类型', dataIndex: 'datasourceType', key: 'datasourceType', customRender: (data: any) => `${typeMap[data.record.datasourceType]} ${data.record.version}` },
       { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 160 },
     ]
 

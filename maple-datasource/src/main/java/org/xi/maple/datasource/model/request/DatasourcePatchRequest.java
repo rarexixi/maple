@@ -16,5 +16,5 @@ public class DatasourcePatchRequest extends BaseEntity {
 
     private Integer id;
 
-    private Collection<Integer> ids;
+    private Collection<Integer> idIn;
 }

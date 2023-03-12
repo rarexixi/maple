@@ -9,7 +9,7 @@
       <a-form-item ref="description" label="描述" name="description">
         <a-input v-model:value.trim="detail.description" type="text" />
       </a-form-item>
-      <template v-for="(item, index) in datasourceTypeDetail.configKeys" :key="index">
+      <template v-for="(item, _index) in datasourceTypeDetail.configKeys" :key="index">
         <a-form-item :ref="item.keyCode" :label="item.keyName" :name="['datasourceConfig', item.keyCode]"
           :rules="getRules(item)">
           <template v-if="item.valueType === 'STRING'">

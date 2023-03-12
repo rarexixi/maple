@@ -16,5 +16,5 @@ public class DatasourceTypePatchRequest extends BaseEntity {
 
     private String typeCode;
 
-    private Collection<String> typeCodes;
+    private Collection<String> typeCodeIn;
 }
