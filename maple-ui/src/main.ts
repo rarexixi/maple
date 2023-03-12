@@ -13,7 +13,6 @@ const app = createApp(App)
 
 app.use(Antd)
 app.use(router)
-app.use(Antd, { size: 'small' });
 
 app.mount('#app')
 app.config.globalProperties.$message = message

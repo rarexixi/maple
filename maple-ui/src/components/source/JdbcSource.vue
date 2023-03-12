@@ -22,6 +22,7 @@ export default defineComponent({
   components: { InputStringMap, FormLabelPopover },
   props: {
     value: { type: Object as PropType<JdbcSourceValue>, isRequired: true },
+    name: String,
   },
   emits: ['update:value'],
   setup(props, { emit }) {
@@ -42,52 +43,52 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-form :model="value" :validate-messages="validateMessages">
+  <a-form :name="name" :model="value" :validate-messages="validateMessages">
     <a-form-item name="variables" label="变量" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value.variables" />
+      <input-string-map v-model:value="value!.variables" />
     </a-form-item>
     <a-row>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="resultTable" label="注册表名" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
-          <a-input v-model:value="value.resultTable" />
+          <a-input v-model:value="value!.resultTable" />
         </a-form-item>
       </a-col>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="persist" label="开启缓存" :label-col="layout.labelCols.small">
-          <a-switch v-model:checked="value.persist" />
+          <a-switch v-model:checked="value!.persist" />
         </a-form-item>
       </a-col>
-      <a-col v-bind="layout.cols.small" v-show="value.persist">
+      <a-col v-bind="layout.cols.small" v-show="value!.persist">
         <a-form-item name="storageLevel" label="缓存级别" :label-col="layout.labelCols.small">
-          <a-select v-model:value="value.storageLevel" :options="storageLevels"></a-select>
+          <a-select v-model:value="value!.storageLevel" :options="storageLevels"></a-select>
         </a-form-item>
       </a-col>
     </a-row>
     <a-form-item name="url" label="jdbc url" :rules="[{ required: true }]" :label-col="layout.labelCols.large">
-      <a-input v-model:value="value.url" />
+      <a-input v-model:value="value!.url" />
     </a-form-item>
     <a-row>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="driver" label="驱动类名" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
-          <a-input v-model:value="value.driver" />
+          <a-input v-model:value="value!.driver" />
         </a-form-item>
       </a-col>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="user" label="用户名" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
-          <a-input v-model:value="value.user" />
+          <a-input v-model:value="value!.user" />
         </a-form-item>
       </a-col>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="password" label="密码" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
-          <a-input-password v-model:value="value.password" />
+          <a-input-password v-model:value="value!.password" />
         </a-form-item>
       </a-col>
     </a-row>
     <a-form-item name="query" label="查询语句" :label-col="layout.labelCols.large">
-      <a-textarea v-model:value="value.query" :auto-size="{ minRows: 2, maxRows: 20 }" />
+      <a-textarea v-model:value="value!.query" :auto-size="{ minRows: 2, maxRows: 20 }" />
     </a-form-item>
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value.options" />
+      <input-string-map v-model:value="value!.options" />
     </a-form-item>
   </a-form>
 </template>

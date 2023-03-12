@@ -79,7 +79,6 @@ export default defineComponent({
       ...toRefs(state),
       // selectedKeys: ref<string[]>(['1']),
       clickMenu: (e: MenuInfo) => {
-        console.log(e)
         router.push({ path: e.key });
       }
     }

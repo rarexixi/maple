@@ -21,7 +21,7 @@
           </template>
           <template v-else-if="item.valueType === 'TEXT'">
             <a-textarea v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description"
-              :auto-size="{ minRows: 5, maxRows: 100 }" />
+              :auto-size="{ minRows: 3, maxRows: 100 }" />
           </template>
           <template v-else-if="item.valueType === 'PASSWORD'">
             <a-input-password v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description" />
@@ -98,7 +98,7 @@ export default defineComponent({
       detail.datasourceConfig = {}
     }
     const closeAddOrEditDrawer = inject<(newVal: boolean) => void>('closeAddOrEditDrawer')
-    const typeMap = inject<Map<string, string>>('typeMap')
+    const typeMap = inject<any>('typeMap')
     const closeDrawer = () => {
       resetForm()
       if (closeAddOrEditDrawer) closeAddOrEditDrawer(false)
@@ -119,15 +119,15 @@ export default defineComponent({
       if (!newVal) return
       if (operateType.value === common.DataOperationType.default) return
       if (operateType.value === common.DataOperationType.create) {
-        title.value = `添加数据源配置`
+        title.value = `添加数据源`
         detail.datasourceType = typeVersion.value[0]
         detail.version = typeVersion.value[1]
         getDatasourceTypeDetail({})
       } else {
         if (operateType.value === common.DataOperationType.copy)
-          title.value = '复制数据源配置'
+          title.value = '复制数据源'
         else if (operateType.value === common.DataOperationType.update)
-          title.value = '编辑数据源配置'
+          title.value = '编辑数据源'
 
         request({ url: '/datasource/detail', method: 'GET', params: pk.value }).then(response => {
           if (operateType.value !== common.DataOperationType.copy) {

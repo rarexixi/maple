@@ -17,6 +17,7 @@ export default defineComponent({
   components: { InputStringMap, FormLabelPopover },
   props: {
     value: { type: Object as PropType<SqlTransformationValue>, isRequired: true },
+    name: String,
   },
   emits: ['update:value'],
   setup(props, { emit }) {
@@ -37,32 +38,31 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-form :model="value" :wrapper-col="{xs:24,sm:24}" :validate-messages="validateMessages">
+  <a-form :name="name" :model="value" :wrapper-col="{ xs: 24, sm: 24 }" :validate-messages="validateMessages">
     <a-form-item name="variables" label="变量" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value.variables" />
+      <input-string-map v-model:value="value!.variables" />
     </a-form-item>
     <a-row>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="resultTable" label="注册表名" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
-          <a-input v-model:value="value.resultTable" />
+          <a-input v-model:value="value!.resultTable" />
         </a-form-item>
       </a-col>
       <a-col v-bind="layout.cols.small">
         <a-form-item name="persist" label="开启缓存" :label-col="layout.labelCols.small">
-          <a-switch v-model:checked="value.persist" />
+          <a-switch v-model:checked="value!.persist" />
         </a-form-item>
       </a-col>
-      <a-col v-bind="layout.cols.small" v-show="value.persist">
+      <a-col v-bind="layout.cols.small" v-show="value!.persist">
         <a-form-item name="storageLevel" label="缓存级别" :label-col="layout.labelCols.small">
-          <a-select v-model:value="value.storageLevel" :options="storageLevels"></a-select>
+          <a-select v-model:value="value!.storageLevel" :options="storageLevels"></a-select>
         </a-form-item>
       </a-col>
     </a-row>
     <a-form-item name="sql" label="SQL" :rules="[{ required: true }]" :label-col="layout.labelCols.large">
-      <a-textarea v-model:value="value.sql" :auto-size="{ minRows: 2, maxRows: 20 }" />
+      <a-textarea v-model:value="value!.sql" :auto-size="{ minRows: 2, maxRows: 20 }" />
     </a-form-item>
   </a-form>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

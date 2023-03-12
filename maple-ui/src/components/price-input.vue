@@ -1,7 +1,7 @@
 <template>
   <span>
-    <a-input type="text" :value="value.number" style="width: 100px" @change="onNumberChange" />
-    <a-select :value="value.currency" style="width: 80px; margin: 0 8px" :options="[
+    <a-input type="text" :value="value!.number" style="width: 100px" @change="onNumberChange" />
+    <a-select :value="value!.currency" style="width: 80px; margin: 0 8px" :options="[
       { value: 'rmb', label: 'RMB' },
       { value: 'dollar', label: 'Dollar' },
     ]" @change="onCurrencyChange"></a-select>
@@ -19,6 +19,7 @@ interface PriceValue {
   number: number;
   currency: Currency;
 }
+
 export default defineComponent({
   props: {
     value: { type: Object as PropType<PriceValue>, isRequired: true },

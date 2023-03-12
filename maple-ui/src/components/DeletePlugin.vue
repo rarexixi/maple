@@ -1,11 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
-import { MinusOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
-  components: {
-    MinusOutlined
-  },
   emits: ['delete'],
   setup(props, { emit }) {
 

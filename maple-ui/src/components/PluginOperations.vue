@@ -1,19 +1,17 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue"
-import { MinusOutlined } from "@ant-design/icons-vue";
 // import AddPlugin from "@/components/AddPlugin.vue"
 import DeletePlugin from "@/components/DeletePlugin.vue"
 
 export default defineComponent({
   components: {
-    MinusOutlined,
     // AddPlugin,
     DeletePlugin,
   },
   props: {
     value: { type: Object, isRequired: true },
     index: { type: Number, isRequired: true },
-    types: { type: Array<String>, isRequired: true },
+    // types: { type: Array<String>, isRequired: true },
   },
   emits: ['update:value', 'add', 'delete'],
   setup(props, { emit }) {
@@ -44,9 +42,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-button type="link" @click="() => triggerChange(!value.expand)">
-    {{ index + 1 }}
-    <up-outlined v-if="value.expand" />
+  <a-button type="link" @click="() => triggerChange(!value?.expand)">
+    {{ index! + 1 }}
+    <up-outlined v-if="value?.expand" />
     <down-outlined v-else />
   </a-button>
   <!-- <add-plugin :types="types" @add="addPlugin" /> -->

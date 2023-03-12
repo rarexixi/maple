@@ -1,11 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue"
-import { PlusOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
-  components: {
-    PlusOutlined
-  },
   props: {
     types: {
       type: Array<String>,
