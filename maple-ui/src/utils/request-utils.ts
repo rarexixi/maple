@@ -2,7 +2,6 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CreateAxiosDefau
 import axios from 'axios'
 import { notification } from 'ant-design-vue';
 import * as qs from "qs";
-import * as cookieUtils from './cookie-utils'
 
 const axiosRequest: AxiosInstance = (() => {
     const axiosRequest = axios.create({

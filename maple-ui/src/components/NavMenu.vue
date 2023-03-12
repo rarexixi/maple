@@ -5,31 +5,31 @@
         <a-menu-item :key="menu1.path">
           <router-link :to="menu1.path">
             <component v-if="menu1.icon" :is="menu1.icon" />
-            <span>{{menu1.name}}</span>
+            <span>{{ menu1.name }}</span>
           </router-link>
         </a-menu-item>
       </template>
       <template v-else>
         <a-sub-menu :key="menu1.path">
           <template #title>
-            <span>{{menu1.name}}</span>
+            <span>{{ menu1.name }}</span>
           </template>
           <template v-for="(menu2) in menu1.children">
             <template v-if="menu2.type === 'menu-item'">
               <a-menu-item :key="menu2.path">
-                <router-link :to="menu2.path">{{menu2.name}}</router-link>
+                <router-link :to="menu2.path">{{ menu2.name }}</router-link>
               </a-menu-item>
             </template>
             <template v-else>
               <a-sub-menu :key="menu2.path">
                 <template #title>
                   <span>
-                    <span>{{menu2.name}}</span>
+                    <span>{{ menu2.name }}</span>
                   </span>
                 </template>
                 <template v-for="(menu3) in menu2.children" :key="menu3.path">
                   <a-menu-item>
-                    <router-link :to="menu3.path">{{menu3.name}}</router-link>
+                    <router-link :to="menu3.path">{{ menu3.name }}</router-link>
                   </a-menu-item>
                 </template>
               </a-sub-menu>
@@ -44,7 +44,7 @@
 <script lang="ts">
 import router from '@/router';
 import type { VNodeChild } from 'vue'
-import { defineComponent, reactive, ref, toRefs } from 'vue'
+import { defineComponent, reactive, toRefs } from 'vue'
 
 interface MenuInfo {
   key: string;
@@ -53,11 +53,19 @@ interface MenuInfo {
   domEvent: MouseEvent;
 }
 
+export interface MenuItem {
+  type: String,
+  path: any,
+  icon: String,
+  name: String,
+  children: Array<MenuItem>,
+}
+
 export default defineComponent({
   name: 'NavMenu',
   props: {
     menus: {
-      type: Array,
+      type: Array<MenuItem>,
       default: () => []
     }
   },

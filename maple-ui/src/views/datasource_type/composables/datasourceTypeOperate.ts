@@ -1,5 +1,4 @@
 import common from "@/composables/common"
-import type { PageInfo } from "@/composables/models"
 import { request } from "@/utils/request-utils"
 import type { AxiosRequestConfig } from "axios"
 import type { UnwrapRef } from "vue"

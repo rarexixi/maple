@@ -1,7 +1,6 @@
 <template>
   <a-breadcrumb separator="/">
     <a-breadcrumb-item>数据源配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item>数据源配置列表</a-breadcrumb-item>
   </a-breadcrumb>
   <div class="search-form">
     <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
@@ -19,12 +18,7 @@
         </a-select>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">
-          <template #icon>
-            <search-outlined />
-          </template>
-          搜索
-        </a-button>
+        <a-button type="primary" html-type="submit"><search-outlined />搜索</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -38,65 +32,36 @@
             </a-sub-menu>
           </a-menu>
         </template>
-        <a-button type="primary">
-          <template #icon>
-            <plus-outlined />
-          </template>
-          添加
-          <down-outlined />
-        </a-button>
+        <a-button type="primary"><plus-outlined />添加<down-outlined /></a-button>
       </a-dropdown>
       <template v-if="selectedRowKeys.length > 0">
-        <a-button @click="enableSelected" type="success">
-          <template #icon>
-            <check-outlined />
-          </template>
-          启用
-        </a-button>
-        <a-button @click="disableSelected" type="warning">
-          <template #icon>
-            <stop-outlined />
-          </template>
-          禁用
-        </a-button>
-        <a-button @click="deleteSelected" type="danger">
-          <template #icon>
-            <delete-outlined />
-          </template>
-          删除
-        </a-button>
+        <a-button @click="enableSelected" type="success"><check-outlined />启用</a-button>
+        <a-button @click="disableSelected" type="warning"><stop-outlined />禁用</a-button>
+        <a-button @click="deleteSelected" type="danger"><delete-outlined />删除</a-button>
       </template>
     </div>
-    <a-table :columns="columns" :data-source="dataPageList.list" :row-selection="rowSelection" :pagination="false" :row-class-name="(record, index) => (index % 2 === 1 ? 'table-striped' : null)" row-key="id" size="small">
-      <template #bodyCell="{column, record, index}">
+    <a-table :columns="columns" :data-source="dataPageList.list" :row-selection="rowSelection" :pagination="false"
+      :row-class-name="(_record: any, index: number) => (index % 2 === 1 ? 'table-striped' : null)" row-key="id"
+      size="small">
+      <template #bodyCell="{ column, record, index }">
         <div class="table-operations" v-if="column.key === 'action'">
-          <a-popconfirm :title="`确定${record.deleted === 1 ? '启用' : '禁用'}吗？`" ok-text="确定" cancel-text="取消" @confirm="switchDeleted(record)">
-            <a v-if="record.deleted" class="enable">
-              <check-outlined />
-              <stop-outlined />
-            </a>
-            <a v-else class="disable">
-              <check-outlined />
-              <stop-outlined />
-            </a>
+          <a-popconfirm :title="`确定${record.deleted === 1 ? '启用' : '禁用'}吗？`" @confirm="() => switchDeleted(record)">
+            <a v-if="record.deleted" class="enable"><check-outlined /><stop-outlined /></a>
+            <a v-else class="disable"><check-outlined /><stop-outlined /></a>
           </a-popconfirm>
-          <a @click="edit(record, index)" class="text-primary">
-            <edit-outlined />
-          </a>
-          <a @click="edit(record, index, true)" class="text-primary">
-            <copy-outlined />
-          </a>
-          <a-popconfirm title="确定删除吗？" ok-text="确定" cancel-text="取消" @confirm="del(record)">
-            <a class="text-danger">
-              <delete-outlined />
-            </a>
+          <a @click="() => edit(record, index)" class="text-primary"><edit-outlined /></a>
+          <a @click="() => edit(record, index, true)" class="text-primary"><copy-outlined /></a>
+          <a-popconfirm title="确定删除吗？" ok-text="确定" cancel-text="取消" @confirm="() => del(record)">
+            <a class="text-danger"><delete-outlined /></a>
           </a-popconfirm>
         </div>
       </template>
     </a-table>
-    <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total" :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper></a-pagination>
+    <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total"
+      :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper></a-pagination>
   </div>
-  <datasource-add-or-edit :pk="editPk" :datasource-type-version="datasourceTypeVersion" :visible="addOrEditDrawerVisible" :operateType="operateType" @save="save" />
+  <datasource-add-or-edit :pk="editPk" :type-version="typeVersion" :visible="addOrEditDrawerVisible"
+    :operateType="operateType" @save="save" />
 </template>
 
 <script lang="ts">
@@ -123,7 +88,9 @@ export default defineComponent({
     const { pageNum, pageSize, dataPageList, search } = pageListSearch({ url: '/datasource/page-list', method: 'GET' }, searchParams)
     const { rowSelection, selectedRowKeys, selectedRows, emptySelected } = getSelection(dataPageList)
 
-    const datasourceTypeSearchParams = reactive<any>({})
+    const datasourceTypeSearchParams = reactive<any>({
+      deleted: 0
+    })
     const typeMap = reactive<any>({})
     const convertList = (list: any[]) => list.map(item => {
       typeMap[item.typeCode] = item.typeName
@@ -134,7 +101,7 @@ export default defineComponent({
     })
     const getDatasourceTypeSelectList = listSearch({ url: '/datasource-type/list', method: 'GET' }, datasourceTypeSearchParams, convertList)
 
-    const { editPk, datasourceTypeVersion, addOrEditDrawerVisible, operateType, add, del, edit, switchDeleted, save } = getOperations(dataPageList, search)
+    const { editPk, typeVersion, addOrEditDrawerVisible, operateType, add, del, edit, switchDeleted, save } = getOperations(dataPageList, search)
     provide('closeAddOrEditDrawer', () => addOrEditDrawerVisible.value = false)
     provide('typeMap', typeMap)
 
@@ -165,7 +132,7 @@ export default defineComponent({
       operateType,
       addOrEditDrawerVisible,
       editPk,
-      datasourceTypeVersion,
+      typeVersion,
       add,
       edit,
       save,
@@ -188,5 +155,4 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

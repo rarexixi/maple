@@ -1,21 +1,21 @@
 <script lang="ts">
-import { defineComponent, reactive } from "vue"
+import { defineComponent } from "vue"
 import type { PropType } from "vue"
 import FormLabelPopover from "@/components/FormLabelPopover.vue"
 import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface HiveSinkValue {
-  sourceTable: String,
-  sourceQuery: String,
-  targetDatabase: String,
-  targetTable: String,
   variables: Map<string, string>,
-  saveMode: String,
-  strongCheck: Boolean,
-  writeAsFile: Boolean,
-  numPartitions: Number,
-  options: Map<string, string>,
+  sourceTable: string,
+  sourceQuery: string,
+  options: any,
+  targetDatabase: string,
+  targetTable: string,
+  saveMode: string,
+  strongCheck: boolean,
+  writeAsFile: boolean,
+  numPartitions: number,
 }
 
 export default defineComponent({

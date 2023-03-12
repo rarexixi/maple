@@ -8,7 +8,7 @@ import { reactive, ref } from "vue"
 export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback: () => void) {
     const operateType = ref(common.DataOperationType.default)
     const visible = ref(false)
-    const datasourceTypeVersion = ref('')
+    const typeVersion = ref(['', ''])
     const editPk = reactive({
         id: undefined
     })
@@ -16,7 +16,7 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
 
     const add = (dsType: any) => {
         editPk.id = undefined
-        datasourceTypeVersion.value = dsType.keyPath
+        typeVersion.value = dsType.keyPath
         editIndex.value = -1
         operateType.value = common.DataOperationType.create
         visible.value = true
@@ -68,5 +68,5 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
         })
     }
 
-    return { editPk, datasourceTypeVersion, addOrEditDrawerVisible: visible, operateType, add, del, edit, switchDeleted, save }
+    return { editPk, typeVersion, addOrEditDrawerVisible: visible, operateType, add, del, edit, switchDeleted, save }
 }

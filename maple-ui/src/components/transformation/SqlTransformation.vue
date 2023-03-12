@@ -6,10 +6,11 @@ import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface SqlTransformationValue {
-  resultTable: String,
-  sql: String,
-  cache: Boolean,
-  variables: Object,
+  variables: object,
+  resultTable: string,
+  persist: boolean,
+  storageLevel: string,
+  sql: string,
 }
 
 export default defineComponent({

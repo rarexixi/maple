@@ -26,5 +26,6 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-textarea v-model:value="arr" placeholder="value1,value2,value3,..." @blur="onValueBlur" :auto-size="{ minRows: 2, maxRows: 20 }" />
+  <a-textarea v-model:value="arr" placeholder="value1,value2,value3,..." @blur="onValueBlur"
+    :auto-size="{ minRows: 1, maxRows: 20 }" />
 </template>

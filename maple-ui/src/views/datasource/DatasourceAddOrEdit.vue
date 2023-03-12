@@ -1,6 +1,8 @@
 <template>
-  <a-drawer :visible="visible" :title="title + ' ' + typeMap[detail.datasourceType] + ' ' + detail.version" @close="closeDrawer" width="600px">
-    <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{span: 4}" :wrapper-col="{span: 20}">
+  <a-drawer :visible="visible" :title="`${title} ${typeMap[detail.datasourceType]} ${detail.version}`"
+    @close="closeDrawer" width="600px">
+    <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{ span: 4 }"
+      :wrapper-col="{ span: 20 }">
       <a-form-item ref="name" label="名称" name="name">
         <a-input v-model:value.trim="detail.name" type="text" />
       </a-form-item>
@@ -8,15 +10,18 @@
         <a-input v-model:value.trim="detail.description" type="text" />
       </a-form-item>
       <template v-for="(item, index) in datasourceTypeDetail.configKeys" :key="index">
-        <a-form-item :ref="item.keyCode" :label="item.keyName" :name="['datasourceConfig', item.keyCode]" :rules="getRules(item)">
+        <a-form-item :ref="item.keyCode" :label="item.keyName" :name="['datasourceConfig', item.keyCode]"
+          :rules="getRules(item)">
           <template v-if="item.valueType === 'STRING'">
             <a-input v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description" />
           </template>
           <template v-else-if="item.valueType === 'JSON'">
-            <a-textarea v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description" :auto-size="{ minRows: 5, maxRows: 100}" />
+            <a-textarea v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description"
+              :auto-size="{ minRows: 5, maxRows: 100 }" />
           </template>
           <template v-else-if="item.valueType === 'TEXT'">
-            <a-textarea v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description" :auto-size="{ minRows: 5, maxRows: 100}" />
+            <a-textarea v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description"
+              :auto-size="{ minRows: 5, maxRows: 100 }" />
           </template>
           <template v-else-if="item.valueType === 'PASSWORD'">
             <a-input-password v-model:value="detail.datasourceConfig[item.keyCode]" :placeholder="item.description" />
@@ -62,7 +67,7 @@ export default defineComponent({
       required: false,
       default: () => undefined
     },
-    datasourceTypeVersion: {
+    typeVersion: {
       type: Array,
       default: () => ({})
     },
@@ -76,7 +81,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const { pk, datasourceTypeVersion, operateType, visible } = toRefs(props)
+    const { pk, typeVersion, operateType, visible } = toRefs(props)
     const title = ref<string>('')
     const formRef = ref()
     const detail = reactive<any>({
@@ -115,8 +120,8 @@ export default defineComponent({
       if (operateType.value === common.DataOperationType.default) return
       if (operateType.value === common.DataOperationType.create) {
         title.value = `添加数据源配置`
-        detail.datasourceType = datasourceTypeVersion.value[0]
-        detail.version = datasourceTypeVersion.value[1]
+        detail.datasourceType = typeVersion.value[0]
+        detail.version = typeVersion.value[1]
         getDatasourceTypeDetail({})
       } else {
         if (operateType.value === common.DataOperationType.copy)
@@ -194,5 +199,4 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

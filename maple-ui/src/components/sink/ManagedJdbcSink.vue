@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, reactive } from "vue"
+import { defineComponent } from "vue"
 import type { PropType } from "vue"
 import FormLabelPopover from "@/components/FormLabelPopover.vue"
 import InputStringArray from "@/components/InputStringArray.vue"
@@ -7,16 +7,16 @@ import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface FileSourceValue {
-  sourceTable: String,
-  sourceQuery: String,
-  targetDatasource: String,
-  targetDatabase: String,
-  targetTable: String,
   variables: Map<string, string>,
-  saveMode: String,
-  preQueries: Array<String>,
-  numPartitions: Number,
-  options: Map<string, string>,
+  sourceTable: string,
+  sourceQuery: string,
+  options: any,
+  targetDatasource: string,
+  targetDatabase: string,
+  targetTable: string,
+  saveMode: string,
+  preQueries: Array<string>,
+  numPartitions: number,
 }
 
 export default defineComponent({
@@ -48,7 +48,8 @@ export default defineComponent({
     </a-form-item>
     <a-row>
       <a-col v-bind="layout.cols.small">
-        <a-form-item name="targetDatasource" label="数据源" :rules="[{ required: true }]" :label-col="layout.labelCols.small">
+        <a-form-item name="targetDatasource" label="数据源" :rules="[{ required: true }]"
+          :label-col="layout.labelCols.small">
           <a-select v-model:value="value.targetDatasource" placeholder="请选择数据库">
             <template v-for="ds in datasourceList" :key="ds.name">
               <a-select-option :value="ds.name">{{ ds.name }}</a-select-option>
@@ -75,7 +76,8 @@ export default defineComponent({
         </a-form-item>
       </a-col>
       <a-col v-bind="layout.cols.small">
-        <a-form-item name="numPartitions" label="分区数" :rules="[{ type: 'number', min: 0, max: 99 }]" :label-col="layout.labelCols.small">
+        <a-form-item name="numPartitions" label="分区数" :rules="[{ type: 'number', min: 0, max: 99 }]"
+          :label-col="layout.labelCols.small">
           <a-input-number v-model:value="value.numPartitions" />
         </a-form-item>
       </a-col>
@@ -88,8 +90,11 @@ export default defineComponent({
     <a-form-item name="sourceQuery" label="来源语句" :label-col="layout.labelCols.large">
       <a-textarea v-model:value="value.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }" />
     </a-form-item>
-    <a-form-item v-for="(item, index) in value.preQueries" :key="index" :label-col="layout.labelCols.large" :wrapper-col="index === 0 ? {} : layout.wrapperColsWithLabel.large" :label="index === 0 ? '预执行SQL' : ''" :name="['domains', index]">
-      <a-textarea v-model:value="value.preQueries[index]" placeholder="预先要执行的SQL语句，一般为delete或者truncate语句" style="width: calc(100% - 28px); margin-right: 8px" />
+    <a-form-item v-for="(item, index) in value.preQueries" :key="index" :label-col="layout.labelCols.large"
+      :wrapper-col="index === 0 ? {} : layout.wrapperColsWithLabel.large" :label="index === 0 ? '预执行SQL' : ''"
+      :name="['preQueries', index]">
+      <a-textarea v-model:value="value.preQueries[index]" placeholder="预先要执行的SQL语句，一般为delete或者truncate语句"
+        style="width: calc(100% - 28px); margin-right: 8px" />
       <MinusCircleOutlined @click="() => value.preQueries.splice(index, 1)" />
     </a-form-item>
     <a-form-item :label-col="layout.labelCols.large" :wrapper-col="layout.wrapperColsWithLabel.large">
@@ -101,8 +106,6 @@ export default defineComponent({
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
       <input-string-map v-model:value="value.options" />
     </a-form-item>
-  </a-form>
-</template>
+  </a-form></template>
 
-<style scoped>
-</style>
+<style scoped></style>

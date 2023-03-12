@@ -1,20 +1,20 @@
 <script lang="ts">
-import { defineComponent, reactive } from "vue"
+import { defineComponent } from "vue"
 import type { PropType } from "vue"
 import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 import InputStringArray from "@/components/InputStringArray.vue";
 
 interface FileSinkValue {
-  sourceTable: String,
-  sourceQuery: String,
-  path: String,
-  serializer: String,
   variables: Map<string, string>,
-  saveMode: String,
-  partitionBy: Array<String>,
-  numPartitions: Number,
-  options: Map<string, string>,
+  sourceTable: string,
+  sourceQuery: string,
+  options: any,
+  path: string,
+  serializer: string,
+  saveMode: string,
+  partitionBy: Array<string>,
+  numPartitions: number,
 }
 
 export default defineComponent({

@@ -1,9 +1,9 @@
 <template>
   <a-drawer :visible="visible" :title="title" @close="closeDrawer" width="60%">
-    <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{style: { width: '80px' }}">
+    <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{ style: { width: '80px' } }">
       <a-row>
         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-          <a-form-item ref="typeCode" :wrapper-col="{span:24}" label="类型编码" name="typeCode">
+          <a-form-item ref="typeCode" :wrapper-col="{ span: 24 }" label="类型编码" name="typeCode">
             <a-input v-model:value.trim="detail.typeCode" type="text" />
           </a-form-item>
         </a-col>
@@ -30,10 +30,11 @@
       </a-row>
       <h3>数据源配置管理</h3>
       <div style="width: 100%; overflow-x: auto;">
-        <a-space v-for="(configKey, index) in detail.configKeys" style="width: 1750px; overflow-x: auto" :key="configKey.id">
+        <a-space v-for="(configKey, index) in detail.configKeys" style="width: 1750px; overflow-x: auto"
+          :key="configKey.id">
           <a-form-item>
             {{ index + 1 }}
-            <a-button type="link" @click="removeConfigKey(configKey)" danger>
+            <a-button type="link" @click="() => removeConfigKey(configKey)" danger>
               <template #icon>
                 <MinusCircleOutlined />
               </template>
@@ -42,7 +43,8 @@
           <a-form-item label="版本" :name="['configKeys', index, 'versions']" :label-col="subFormLabelCol">
             <a-input v-model:value="configKey.versions" />
           </a-form-item>
-          <a-form-item label="配置编码" :name="['configKeys', index, 'keyCode']" :label-col="subFormLabelCol" :rules="[{ required: true, message: '配置编码不能为空', trigger: 'blur' }]">
+          <a-form-item label="配置编码" :name="['configKeys', index, 'keyCode']" :label-col="subFormLabelCol"
+            :rules="[{ required: true, message: '配置编码不能为空', trigger: 'blur' }]">
             <a-input v-model:value="configKey.keyCode" />
           </a-form-item>
           <a-form-item label="配置名" :name="['configKeys', index, 'keyName']" :label-col="subFormLabelCol">
@@ -237,5 +239,4 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -1,27 +1,18 @@
-<script type="ts">
-import { defineComponent, ref } from "vue"
+<script lang="ts">
+import { defineComponent } from "vue"
 import { MinusOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
     MinusOutlined
   },
-  props: {
-    types: {
-      type: Array,
-      isRequired: true
-    }
-  },
   emits: ['delete'],
   setup(props, { emit }) {
 
-    const type = ref(props.types[0]);
-
     const confirm = () => {
-      emit('delete', type.value);
+      emit('delete');
     }
     return {
-      type,
       confirm,
     }
   },

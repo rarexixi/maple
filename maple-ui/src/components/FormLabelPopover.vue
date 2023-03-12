@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 import { defineComponent } from "vue";
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
 

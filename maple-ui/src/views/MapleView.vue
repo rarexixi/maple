@@ -9,7 +9,7 @@ import JdbcSink from "@/components/sink/JdbcSink.vue"
 import ManagedJdbcSink from "@/components/sink/ManagedJdbcSink.vue"
 import FileSink from "@/components/sink/FileSink.vue"
 import AddPlugin from "@/components/AddPlugin.vue"
-import DeletePlugin from "@/components/DeletePlugin.vue"
+import PluginOperations from "@/components/PluginOperations.vue"
 import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 import { MinusOutlined } from "@ant-design/icons-vue";
@@ -20,7 +20,7 @@ export default defineComponent({
   components: {
     InputStringMap,
     AddPlugin,
-    DeletePlugin,
+    PluginOperations,
     JdbcSource,
     ManagedJdbcSource,
     FileSource,
@@ -118,6 +118,8 @@ export default defineComponent({
         request(requestConfig).then(response => {
           code.value = response
         })
+      } else {
+        code.value = ''
       }
     }
     watch(codeView, () => getCode(codeView.value))
@@ -150,21 +152,15 @@ export default defineComponent({
 
       <a-typography-title :level="4">输入</a-typography-title>
       <template v-for="(item, index) in mapleConfig.sources" :key="index">
-        <a-card>
+        <add-plugin :types="pluginNames.sources" @add="(name: string) => addPlugin('source', name, index)" />
+        <a-card :extra="item.name">
           <template #title>
-            <a-button type="link" @click="pageConfig.sources[index].expand=!pageConfig.sources[index].expand">
-              {{index + 1}}
-              <template #icon>
-                <up-outlined v-if="pageConfig.sources[index].expand" />
-                <down-outlined v-else />
-              </template>
-            </a-button>
-            <add-plugin :types="pluginNames.sources" btn-text="插入" @add="name => addPlugin('source', name, index)" />
-            <delete-plugin :types="pluginNames.sources" @delete="delPlugin('source', index)" />
+            <plugin-operations v-model:value="pageConfig.sources[index]" :index="index"
+              @delete="() => delPlugin('source', index)" />
             注册表名：{{ item.config.resultTable }}
           </template>
-          <template #extra>{{item.name}}</template>
-          <component :is="item.name.replace('_', '-') + '-source'" v-model:value="item.config" v-show="pageConfig.sources[index].expand" />
+          <component :is="item.name.replace('_', '-') + '-source'" v-model:value="item.config"
+            v-show="pageConfig.sources[index].expand" />
         </a-card>
       </template>
       <add-plugin :types="pluginNames.sources" @add="name => addPlugin('source', name)" />
@@ -173,40 +169,28 @@ export default defineComponent({
 
       <a-typography-title :level="4">转换</a-typography-title>
       <template v-for="(item, index) in mapleConfig.transformations" :key="index">
-        <a-card>
+        <add-plugin :types="pluginNames.transformations" @add="(name: string) => addPlugin('transformation', name, index)" />
+        <a-card :extra="item.name">
           <template #title>
-            <a-button type="link" @click="pageConfig.transformations[index].expand=!pageConfig.transformations[index].expand">
-              {{index + 1}}
-              <template #icon>
-                <up-outlined v-if="pageConfig.transformations[index].expand" />
-                <down-outlined v-else />
-              </template>
-            </a-button>
-            <add-plugin :types="pluginNames.transformations" btn-text="插入" @add="name => addPlugin('transformation', name, index)" />
-            <delete-plugin :types="pluginNames.transformations" @delete="delPlugin('transformation', index)" />
+            <plugin-operations v-model:value="pageConfig.transformations[index]" :index="index"
+              @delete="() => delPlugin('transformation', index)" />
             注册表名：{{ item.config.resultTable }}
           </template>
-          <template #extra>{{item.name}}</template>
-          <component :is="item.name.replace('_', '-') + '-transformation'" v-model:value="item.config" v-show="pageConfig.transformations[index].expand" />
+          <component :is="item.name.replace('_', '-') + '-transformation'" v-model:value="item.config"
+            v-show="pageConfig.transformations[index].expand" />
         </a-card>
       </template>
-      <add-plugin :types="pluginNames.transformations" @add="name => addPlugin('transformation', name)" />
+      <add-plugin :types="pluginNames.transformations" @add="(name: string) => addPlugin('transformation', name)" />
 
       <a-divider />
 
       <a-typography-title :level="4">输出</a-typography-title>
       <template v-for="(item, index) in mapleConfig.sinks" :key="index">
-        <a-card>
+        <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name, index)" />
+        <a-card :extra="item.name">
           <template #title>
-            <a-button type="link" @click="pageConfig.sinks[index].expand=!pageConfig.sinks[index].expand">
-              {{index + 1}}
-              <template #icon>
-                <up-outlined v-if="pageConfig.sinks[index].expand" />
-                <down-outlined v-else />
-              </template>
-            </a-button>
-            <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name, index)" />
-            <delete-plugin :types="pluginNames.sinks" @delete="delPlugin('sink', index)" />
+            <plugin-operations v-model:value="pageConfig.sinks[index]" :index="index"
+              @delete="() => delPlugin('sink', index)" />
             <template v-if="item.name === 'file'">
               写入路径: {{ item.config.path }}
             </template>
@@ -214,11 +198,11 @@ export default defineComponent({
               输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
             </template>
           </template>
-          <template #extra>{{item.name}}</template>
-          <component :is="item.name.replace('_', '-') + '-sink'" v-model:value="item.config" v-show="pageConfig.sinks[index].expand" />
+          <component :is="item.name.replace('_', '-') + '-sink'" v-model:value="item.config"
+            v-show="pageConfig.sinks[index].expand" />
         </a-card>
       </template>
-      <add-plugin :types="pluginNames.sinks" @add="name => addPlugin('sink', name)" />
+      <add-plugin :types="pluginNames.sinks" @add="(name: string) => addPlugin('sink', name)" />
     </a-col>
     <a-col :span="12">
       <a-radio-group v-model:value="codeView" style="margin: 5px 0;">
@@ -228,8 +212,9 @@ export default defineComponent({
       <a-button type="link" v-if="codeView" @click="() => getCode(true)">
         <template #icon><reload-outlined /></template>
       </a-button>
-      <a-textarea v-if="codeView" v-model:value="code" style="height: calc(100vh - 82px); width: 100%; overflow: auto" />
-      <textarea v-else v-html="JSON.stringify(mapleConfig, null, 4)" style="height: calc(100vh - 82px); width: 100%; overflow: auto" />
+      <pre v-if="codeView" v-html="code" style="height: calc(100vh - 82px); width: 100%; overflow: auto" />
+      <pre v-else v-html="JSON.stringify(mapleConfig, null, 4)"
+        style="height: calc(100vh - 82px); width: 100%; overflow: auto" />
     </a-col>
   </a-row>
 </template>
@@ -242,13 +227,11 @@ pre {
 :deep(.ant-card-body) {
   padding: 0 8px !important;
 }
+
 :deep(.ant-card-body .ant-form) {
   margin-top: 14px;
 }
 
-.ant-card {
-  margin-bottom: 10px;
-}
 
 textarea {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,

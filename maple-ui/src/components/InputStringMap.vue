@@ -44,5 +44,6 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-textarea v-model:value="map" :placeholder="'key1=value1\nkey2=value2\n...'" @blur="onValueBlur" :auto-size="{ minRows: 2, maxRows: 20 }" />
+  <a-textarea v-model:value="map" :placeholder="'key1=value1\nkey2=value2\n...'" @blur="onValueBlur"
+    :auto-size="{ minRows: 3, maxRows: 20 }" />
 </template>

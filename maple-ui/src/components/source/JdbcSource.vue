@@ -6,15 +6,16 @@ import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface JdbcSourceValue {
-  resultTable: String,
-  url: String,
-  driver: String,
-  user: String,
-  password: String,
-  query: String,
-  cache: Boolean,
-  variables: Object,
-  options: Object,
+  variables: any,
+  resultTable: string,
+  persist: boolean,
+  storageLevel: string,
+  options: any,
+  url: string,
+  driver: string,
+  user: string,
+  password: string,
+  query: string,
 }
 
 export default defineComponent({

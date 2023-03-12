@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, reactive } from "vue"
+import { defineComponent } from "vue"
 import type { PropType } from "vue"
 import FormLabelPopover from "@/components/FormLabelPopover.vue"
 import InputStringArray from "@/components/InputStringArray.vue"
@@ -7,12 +7,14 @@ import InputStringMap from "@/components/InputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface FileSourceValue {
-  variables: Object,
-  resultTable: String,
-  path: String,
-  serializer: String,
-  columnNames: String[],
-  options: Object,
+  variables: any,
+  resultTable: string,
+  persist: boolean,
+  storageLevel: string,
+  options: any,
+  path: string,
+  serializer: string,
+  columnNames: string[],
 }
 
 export default defineComponent({
