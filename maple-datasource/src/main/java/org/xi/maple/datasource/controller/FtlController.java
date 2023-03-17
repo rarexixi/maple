@@ -25,14 +25,30 @@ public class FtlController {
     @Value("${freemarker.template.path}")
     private String templatePath;
 
-    @PostMapping("/get-code")
-    public ResponseEntity<String> getCode(@RequestBody Map<String, Object> dataModel) throws IOException, TemplateException {
+    @PostMapping("/get-group-code")
+    public ResponseEntity<String> getGroupCode(@RequestBody Map<String, Object> dataModel) throws IOException, TemplateException {
         Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_32);
         cfg.setDirectoryForTemplateLoading(new File(templatePath));
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        Template ftl = cfg.getTemplate("maple.ftl");
+        Template ftl = cfg.getTemplate("maple-group.ftl");
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(65535);
+             OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
+            ftl.process(dataModel, out);
+            String result = outputStream.toString("UTF-8");
+            return ResponseEntity.created(URI.create("")).body(result);
+        }
+    }
+
+    @PostMapping("/get-array-code")
+    public ResponseEntity<String> getArrayCode(@RequestBody Map<String, Object> dataModel) throws IOException, TemplateException {
+        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_32);
+        cfg.setDirectoryForTemplateLoading(new File(templatePath));
+        cfg.setDefaultEncoding("UTF-8");
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+        Template ftl = cfg.getTemplate("maple-array.ftl");
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(65535);
              OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
             ftl.process(dataModel, out);

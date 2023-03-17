@@ -1,26 +1,49 @@
 <script lang="ts">
-import { defineComponent, ref } from "vue"
+import { computed, defineComponent, reactive, ref } from "vue"
 
 export default defineComponent({
   props: {
-    types: {
-      type: Array<String>,
-      isRequired: true
+    pluginType: {
+      type: String,
+      isRequired: true,
+      default: () => 'sources'
     }
   },
   emits: ['add'],
   setup(props, { emit }) {
 
-    const type = ref(props.types?.[0]);
+    const pluginGroup = reactive({
+      sources: ['jdbc', 'managed_jdbc', 'file'],
+      transformations: ['sql'],
+      sinks: ['hive', 'jdbc', 'managed_jdbc', 'file'],
+    })
+
+    const plugins = computed(() => {
+      switch (props.pluginType) {
+        case 'source':
+          return pluginGroup.sources
+        case 'transformation':
+          return pluginGroup.transformations
+        case 'sink':
+          return pluginGroup.sinks
+        default:
+          return ['']
+      }
+    })
+
+    const pluginName = ref(plugins.value[0]);
+
 
     const confirm = () => {
-      emit('add', type.value);
+      emit('add', pluginName.value);
     }
+
     return {
-      type,
+      plugins,
+      pluginName,
       confirm,
     }
-  },
+  }
 })
 </script>
 
@@ -28,9 +51,9 @@ export default defineComponent({
   <a-popconfirm @confirm="confirm" ok-text="确定" placement="right" :show-cancel="false">
     <template #title>
       <a-typography-title :level="5">请选择类型</a-typography-title>
-      <a-radio-group v-model:value="type">
-        <template v-for="typeName in types" :key="type">
-          <a-radio :value="typeName">{{ typeName }}</a-radio>
+      <a-radio-group v-model:value="pluginName">
+        <template v-for="name in plugins" :key="type">
+          <a-radio :value="name">{{ name }}</a-radio>
         </template>
       </a-radio-group>
     </template>
