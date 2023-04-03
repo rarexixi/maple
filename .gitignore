@@ -52,11 +52,14 @@ yarn-error.log*
 *.sln
 *.sw?
 
-schedule-app
-migrate_schedule_data
-
 /zip
 
-codegen.jar
-application.properties
-application-*.properties
+*.jar
+*.log
+.metals
+
+metastore_db
+
+core-site.xml
+hdfs-site.xml
+hive-site.xml
