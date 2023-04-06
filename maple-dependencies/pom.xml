@@ -16,12 +16,18 @@
 
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <scala.version>2.12.17</scala.version>
+
         <spark.version>3.3.1</spark.version>
+        <scala.version>2.12.15</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+
+        <freemarker.version>2.3.32</freemarker.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
-        <commons-text.version>1.9</commons-text.version>
+        <commons-text.version>1.10.0</commons-text.version>
+        <poi.version>5.2.3</poi.version>
         <fastjson.version>1.2.78</fastjson.version>
-        <mysql.version>8.0.27</mysql.version>
+        <easyexcel.version>3.1.4</easyexcel.version>
+        <mysql.version>8.0.28</mysql.version>
     </properties>
 
     <repositories>
@@ -57,27 +63,33 @@
 
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.12</artifactId>
+                <artifactId>spark-core_${scala.binary.version}</artifactId>
                 <version>${spark.version}</version>
                 <!-- <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.12</artifactId>
+                <artifactId>spark-sql_${scala.binary.version}</artifactId>
                 <version>${spark.version}</version>
                 <!-- <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-hive_2.12</artifactId>
+                <artifactId>spark-hive_${scala.binary.version}</artifactId>
                 <version>${spark.version}</version>
                 <!-- <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-repl_2.12</artifactId>
+                <artifactId>spark-repl_${scala.binary.version}</artifactId>
                 <version>${spark.version}</version>
                 <!-- <scope>provided</scope>-->
+            </dependency>
+
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -90,15 +102,31 @@
                 <version>${commons-text.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>
