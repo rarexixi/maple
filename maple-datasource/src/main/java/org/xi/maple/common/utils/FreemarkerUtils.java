@@ -15,7 +15,7 @@ public class FreemarkerUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(FreemarkerUtils.class);
 
-    static final Configuration configuration = new Configuration(Configuration.VERSION_2_3_32);
+    static final Configuration configuration = new Configuration(Configuration.VERSION_2_3_31);
 
     /**
      * 执行生成，异常时返回空字符串

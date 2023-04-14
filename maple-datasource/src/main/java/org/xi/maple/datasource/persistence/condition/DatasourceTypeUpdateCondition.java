@@ -1,4 +1,4 @@
-package org.xi.maple.datasource.presentation.condition;
+package org.xi.maple.datasource.persistence.condition;
 
 import org.xi.maple.common.models.UpdateCondition;
 

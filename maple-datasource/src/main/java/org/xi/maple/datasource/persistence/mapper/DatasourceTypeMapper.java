@@ -1,9 +1,9 @@
-package org.xi.maple.datasource.presentation.mapper;
+package org.xi.maple.datasource.persistence.mapper;
 
-import org.xi.maple.datasource.presentation.condition.DatasourceTypeSelectCondition;
-import org.xi.maple.datasource.presentation.condition.DatasourceTypeUpdateCondition;
-import org.xi.maple.datasource.presentation.entity.DatasourceTypeEntity;
-import org.xi.maple.datasource.presentation.entity.DatasourceTypeEntityExt;
+import org.xi.maple.datasource.persistence.condition.DatasourceTypeSelectCondition;
+import org.xi.maple.datasource.persistence.condition.DatasourceTypeUpdateCondition;
+import org.xi.maple.datasource.persistence.entity.DatasourceTypeEntity;
+import org.xi.maple.datasource.persistence.entity.DatasourceTypeEntityExt;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

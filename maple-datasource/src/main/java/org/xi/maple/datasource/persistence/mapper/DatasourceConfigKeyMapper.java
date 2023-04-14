@@ -1,8 +1,8 @@
-package org.xi.maple.datasource.presentation.mapper;
+package org.xi.maple.datasource.persistence.mapper;
 
-import org.xi.maple.datasource.presentation.condition.DatasourceConfigKeySelectCondition;
-import org.xi.maple.datasource.presentation.condition.DatasourceConfigKeyUpdateCondition;
-import org.xi.maple.datasource.presentation.entity.DatasourceConfigKeyEntity;
+import org.xi.maple.datasource.persistence.condition.DatasourceConfigKeySelectCondition;
+import org.xi.maple.datasource.persistence.condition.DatasourceConfigKeyUpdateCondition;
+import org.xi.maple.datasource.persistence.entity.DatasourceConfigKeyEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

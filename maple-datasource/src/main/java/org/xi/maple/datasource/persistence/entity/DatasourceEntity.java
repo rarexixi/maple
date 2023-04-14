@@ -1,12 +1,6 @@
-package org.xi.maple.datasource.presentation.entity;
+package org.xi.maple.datasource.persistence.entity;
 
 import org.xi.maple.datasource.model.BaseEntity;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
 
 import lombok.Getter;
 import lombok.Setter;

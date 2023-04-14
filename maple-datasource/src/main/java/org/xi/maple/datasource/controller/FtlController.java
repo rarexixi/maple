@@ -27,7 +27,7 @@ public class FtlController {
 
     @PostMapping("/get-group-code")
     public ResponseEntity<String> getGroupCode(@RequestBody Map<String, Object> dataModel) throws IOException, TemplateException {
-        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_32);
+        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_31);
         cfg.setDirectoryForTemplateLoading(new File(templatePath));
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
@@ -43,7 +43,7 @@ public class FtlController {
 
     @PostMapping("/get-array-code")
     public ResponseEntity<String> getArrayCode(@RequestBody Map<String, Object> dataModel) throws IOException, TemplateException {
-        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_32);
+        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_31);
         cfg.setDirectoryForTemplateLoading(new File(templatePath));
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);

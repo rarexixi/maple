@@ -1,4 +1,4 @@
-package org.xi.maple.datasource.presentation.condition;
+package org.xi.maple.datasource.persistence.condition;
 
 import org.xi.maple.common.models.UpdateCondition;
 
@@ -9,14 +9,14 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 数据源配置更新条件
+ * 数据源配置项更新条件
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */
 @Getter
 @Setter
 @ToString
-public class DatasourceUpdateCondition extends UpdateCondition {
+public class DatasourceConfigKeyUpdateCondition extends UpdateCondition {
 
     /**
      * Id
@@ -27,4 +27,6 @@ public class DatasourceUpdateCondition extends UpdateCondition {
      * Id列表
      */
     private Collection<Integer> ids;
+
+    private String datasourceType;
 }

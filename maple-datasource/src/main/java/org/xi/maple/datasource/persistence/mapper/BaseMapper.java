@@ -1,4 +1,4 @@
-package org.xi.maple.datasource.presentation.mapper;
+package org.xi.maple.datasource.persistence.mapper;
 
 import org.xi.maple.common.models.SelectCondition;
 import org.xi.maple.common.models.UpdateCondition;

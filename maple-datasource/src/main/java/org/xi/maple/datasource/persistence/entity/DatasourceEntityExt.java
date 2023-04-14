@@ -1,7 +1,4 @@
-package org.xi.maple.datasource.presentation.entity;
-
-import java.math.BigDecimal;
-import java.util.Collection;
+package org.xi.maple.datasource.persistence.entity;
 
 import lombok.Getter;
 import lombok.Setter;

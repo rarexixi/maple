@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.xi.maple.datasource.presentation.mapper.DatasourceMapper">
+<mapper namespace="org.xi.maple.datasource.persistence.mapper.DatasourceMapper">
 
-    <resultMap id="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceEntity">
+    <resultMap id="BaseResultMap" type="org.xi.maple.datasource.persistence.entity.DatasourceEntity">
         <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
@@ -16,7 +16,7 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
-    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.datasource.presentation.entity.DatasourceEntityExt">
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.datasource.persistence.entity.DatasourceEntityExt">
     </resultMap>
 
     <sql id="tableName">`maple_datasource`</sql>

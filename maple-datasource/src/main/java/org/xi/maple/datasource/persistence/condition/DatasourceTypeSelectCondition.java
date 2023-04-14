@@ -1,11 +1,7 @@
-package org.xi.maple.datasource.presentation.condition;
+package org.xi.maple.datasource.persistence.condition;
 
 import org.xi.maple.common.models.SelectCondition;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collection;
 
 import lombok.Getter;
