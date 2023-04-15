@@ -30,7 +30,7 @@
         <mysql.version>8.0.28</mysql.version>
 
         <mybatis-spring-boot-starter.version>3.0.1</mybatis-spring-boot-starter.version>
-        <pagehelper-spring-boot-starter>1.4.6</pagehelper-spring-boot-starter>
+        <pagehelper-spring-boot-starter.version>1.4.6</pagehelper-spring-boot-starter.version>
 
     </properties>
 
