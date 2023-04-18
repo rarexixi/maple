@@ -1,6 +1,5 @@
 package org.xi.maple.datasource.service;
 
-import org.xi.maple.common.models.PageList;
 import org.xi.maple.datasource.model.request.DatasourceTypeAddRequest;
 import org.xi.maple.datasource.model.request.DatasourceTypePatchRequest;
 import org.xi.maple.datasource.model.request.DatasourceTypeQueryRequest;
@@ -8,7 +7,6 @@ import org.xi.maple.datasource.model.request.DatasourceTypeSaveRequest;
 import org.xi.maple.datasource.model.response.DatasourceTypeDetailResponse;
 import org.xi.maple.datasource.model.response.DatasourceTypeListItemResponse;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

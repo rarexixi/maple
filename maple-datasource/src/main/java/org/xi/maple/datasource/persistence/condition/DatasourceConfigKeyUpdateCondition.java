@@ -1,6 +1,6 @@
 package org.xi.maple.datasource.persistence.condition;
 
-import org.xi.maple.common.models.UpdateCondition;
+import org.xi.maple.common.model.UpdateCondition;
 
 import java.util.Collection;
 

@@ -2,7 +2,7 @@ package org.xi.maple.datasource.aspect;
 
 import org.xi.maple.common.annotation.SetField;
 import org.xi.maple.common.annotation.SetFieldTypes;
-import org.xi.maple.common.models.MapleUser;
+import org.xi.maple.common.model.MapleUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;

@@ -1,8 +1,9 @@
 package org.xi.maple.datasource.controller;
 
+import com.alibaba.excel.EasyExcel;
+import org.apache.commons.lang3.StringUtils;
 import org.xi.maple.common.annotation.SetFieldTypes;
-import org.xi.maple.common.models.PageList;
-import org.xi.maple.common.utils.ExcelUtils;
+import org.xi.maple.common.model.PageList;
 import org.xi.maple.datasource.model.request.DatasourceAddRequest;
 import org.xi.maple.datasource.model.request.DatasourcePatchRequest;
 import org.xi.maple.datasource.model.request.DatasourceQueryRequest;
@@ -19,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
+import java.net.URLEncoder;
 import java.util.List;
 
 @CrossOrigin
@@ -88,8 +89,9 @@ public class DatasourceController {
     @GetMapping("/export")
     public ResponseEntity<?> export(HttpServletResponse response, DatasourceQueryRequest queryRequest,
                                     @RequestParam(value = "exportName", defaultValue = "数据源配置", required = false) String exportName) throws IOException {
-
-        ExcelUtils.export(response, datasourceService.getList(queryRequest), DatasourceListItemResponse.class, exportName, "数据源配置");
-        return null;
+        String fileName = StringUtils.isBlank(exportName) ? "数据源配置" : exportName;
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName + ".xlsx", "utf-8"));
+        EasyExcel.write(response.getOutputStream(), DatasourceListItemResponse.class).sheet().doWrite(datasourceService.getList(queryRequest));
+        return ResponseEntity.ok(null);
     }
 }

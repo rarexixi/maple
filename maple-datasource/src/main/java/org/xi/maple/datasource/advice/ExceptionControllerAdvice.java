@@ -2,7 +2,7 @@ package org.xi.maple.datasource.advice;
 
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.exception.MapleException;
-import org.xi.maple.common.models.ResponseError;
+import org.xi.maple.common.model.ResponseError;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;

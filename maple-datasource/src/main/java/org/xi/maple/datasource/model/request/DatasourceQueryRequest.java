@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.xi.maple.common.constant.SortConstants;
-import org.xi.maple.common.models.QueryRequest;
+import org.xi.maple.common.model.QueryRequest;
 
 import java.util.Collection;
 

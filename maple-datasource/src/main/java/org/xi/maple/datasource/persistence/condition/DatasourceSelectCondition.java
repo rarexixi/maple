@@ -1,6 +1,6 @@
 package org.xi.maple.datasource.persistence.condition;
 
-import org.xi.maple.common.models.SelectCondition;
+import org.xi.maple.common.model.SelectCondition;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

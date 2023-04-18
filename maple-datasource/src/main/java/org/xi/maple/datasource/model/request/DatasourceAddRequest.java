@@ -1,11 +1,9 @@
 package org.xi.maple.datasource.model.request;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.xi.maple.common.utils.JsonUtils;
+import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.datasource.model.BaseEntity;
 
 import javax.validation.constraints.NotBlank;

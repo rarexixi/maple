@@ -1,6 +1,6 @@
 package org.xi.maple.datasource.service;
 
-import org.xi.maple.common.models.PageList;
+import org.xi.maple.common.model.PageList;
 import org.xi.maple.datasource.model.request.DatasourceAddRequest;
 import org.xi.maple.datasource.model.request.DatasourcePatchRequest;
 import org.xi.maple.datasource.model.request.DatasourceQueryRequest;
