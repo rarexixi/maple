@@ -21,7 +21,7 @@ public class SubmitJobRequest {
     private String fromApp;
 
     /**
-     * 唯一ID
+     * 作业唯一标识
      */
     private String uniqueId;
 
@@ -31,14 +31,19 @@ public class SubmitJobRequest {
     private String jobComment;
 
     /**
-     * 引擎ID
-     */
-    private String engineId;
-
-    /**
      * 引擎类型
      */
     private String engineType;
+
+    /**
+     * 版本
+     */
+    private String engineVersion;
+
+    /**
+     * 集群
+     */
+    private String cluster;
 
     /**
      * 提交队列
@@ -49,11 +54,6 @@ public class SubmitJobRequest {
      * 优先级
      */
     private Integer priority;
-
-    /**
-     * 版本
-     */
-    private String engineVersion;
 
     /**
      * 作业类型 (sync, async)
@@ -69,11 +69,6 @@ public class SubmitJobRequest {
      * 执行结果类型 (text, path)
      */
     private String resultType;
-
-    /**
-     * 状态 (SUBMITTED, ACCEPTED, RUNNING, FINISHED, FAILED, KILLED)
-     */
-    private String status;
 
     /**
      * 用户组

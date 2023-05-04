@@ -1,6 +1,5 @@
 package org.xi.maple.api.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,13 +19,13 @@ public class JobController {
 
     final JobService jobService;
 
-    @Autowired
     public JobController(JobService jobService) {
         this.jobService = jobService;
     }
 
     @PostMapping("submit")
     public ResponseEntity<Integer> submitJob(@RequestBody SubmitJobRequest submitJobRequest) {
+
         Integer id = jobService.submitJob(submitJobRequest);
         return ResponseEntity.ok(id);
     }

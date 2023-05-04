@@ -84,11 +84,12 @@ create table `engine_type`
     `name`        varchar(32)  default ''                not null comment '类型名称',
     `version`     varchar(32)  default ''                not null comment '类型版本',
     `home`        varchar(256) default ''                not null comment '引擎目录',
-    `group`       varchar(32)                            not null comment '用户组',
-    `user`        varchar(32)                            not null comment '用户',
+    `group`       varchar(32)  default ''                not null comment '用户组',
+    `user`        varchar(32)  default ''                not null comment '用户',
 
     `create_time` datetime     default current_timestamp not null comment '创建时间',
     `update_time` datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+
     primary key (`id`),
     index idx_engine_version (`name`, `version`),
     unique uniq_engine_version (`name`, `version`)
@@ -107,45 +108,68 @@ create table `maple_engine_instance`
     `engine_category` varchar(32)  default ''                not null comment '引擎种类', # spark, flink
     `engine_type`     varchar(32)  default ''                not null comment '引擎类型', # once，permanent
     `version`         varchar(32)  default ''                not null comment '版本',
-    `job_num`         int unsigned default 0                 not null comment '执行的作业次数',
-    `running_num`     int unsigned default 0                 not null comment '执行中的作业数量',
+    `job_count`       int unsigned default 0                 not null comment '执行的作业次数',
+    `running_count`   int unsigned default 0                 not null comment '执行中的作业数量',
     `heartbeat_time`  datetime     default current_timestamp not null comment '心跳时间',
     `status`          varchar(16)  default ''                not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, FINISHED, FAILED, KILLED)',
     `job_cleaned`     tinyint      default 0                 not null comment '是否已清理作业',
-    `group`           varchar(32)                            not null comment '用户组',
-    `user`            varchar(32)                            not null comment '用户',
+    `group`           varchar(32)  default ''                not null comment '用户组',
+    `user`            varchar(32)  default ''                not null comment '用户',
 
     `create_time`     datetime     default current_timestamp not null comment '创建时间',
     `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
-    primary key (`address`),
+
+    primary key (`id`),
     index idx_engine_status (`status`)
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
     comment = '执行器实例';
 
+drop table if exists `maple`.`maple_job_queue`;
+create table `maple`.`maple_job_queue`
+(
+    `queue_name`    varchar(128) default ''                not null comment '',
+    `lock_name`     varchar(128) default ''                not null comment '',
+    `cluster`       varchar(128) default ''                not null comment '',
+    `cluster_queue` varchar(128) default ''                not null comment '',
+    `type`          varchar(128) default ''                not null comment '',
+
+    `create_time`   datetime     default current_timestamp not null comment '创建时间',
+    `update_time`   datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+    primary key (`queue_name`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '作业队列';
+
+# redis job-queue: from_app-group-job_type-run_priority
+# redis job-queue-lock: lock-from_app-group-job_type-run_priority
 drop table if exists `maple`.`maple_job`;
 create table `maple`.`maple_job`
 (
-    `id`              int                                    not null auto_increment comment '作业ID',
-    `job_name`        varchar(256) default ''                not null comment '作业名',
-    `from_app`        varchar(32)                            not null comment '来源应用',
-    `unique_id`       varchar(32)                            not null comment '作业唯一标识',
-    `job_comment`     varchar(64)                            not null comment '作业说明',
-    `engine_id`       int          default 0                 not null comment '引擎ID',
-    `engine_category` varchar(64)                            not null comment '引擎类型',
-    `engine_version`  varchar(32)  default ''                not null comment '版本',
-    `job_type`        varchar(32)  default ''                not null comment '作业类型 (sync, async)',
-    `content_type`    varchar(32)  default 'text'            not null comment '执行内容类型 (text, path)',
-    `result_type`     varchar(32)  default 'text'            not null comment '执行结果类型 (text, path)',
-    `status`          varchar(16)  default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)',
-    `group`           varchar(32)                            not null comment '用户组',
-    `user`            varchar(32)                            not null comment '用户',
-    `webhooks`        varchar(32)                            not null comment '回调地址',
-    `ext_info`        text                                   not null comment '扩展信息',
+    `id`              int                                     not null auto_increment comment '作业ID',
+    `job_name`        varchar(256)  default ''                not null comment '作业名',
+    `from_app`        varchar(16)                             not null comment '来源应用',
+    `unique_id`       varchar(32)                             not null comment '作业唯一标识',
+    `job_comment`     varchar(64)   default ''                not null comment '作业说明',
+    `engine_id`       int           default 0                 not null comment '引擎ID',
+    `engine_category` varchar(16)                             not null comment '引擎类型',
+    `engine_version`  varchar(8)                              not null comment '版本',
+    `queue`           varchar(128)                            not null comment '提交队列',
+    `priority`        tinyint                                 not null comment '初始优先级',
+    `run_priority`    tinyint                                 not null comment '运行优先级',
+    `job_type`        varchar(8)    default ''                not null comment '作业类型 (sync, async, once)',
+    `content_type`    varchar(8)    default 'text'            not null comment '执行内容类型 (text, path)',
+    `result_type`     varchar(8)    default 'text'            not null comment '执行结果类型 (text, path)',
+    `status`          varchar(16)   default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)',
+    `group`           varchar(32)   default ''                not null comment '用户组',
+    `user`            varchar(32)   default ''                not null comment '用户',
+    `webhooks`        varchar(1024) default ''                not null comment '回调地址',
+    `ext_info`        text                                    not null comment '扩展信息',
 
-    `create_time`     datetime     default current_timestamp not null comment '创建时间',
-    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+    `create_time`     datetime      default current_timestamp not null comment '创建时间',
+    `update_time`     datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
 
     primary key (`id`),
     index idx_job_name (`job_name`),

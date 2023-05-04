@@ -3,6 +3,7 @@ package org.xi.maple.redis.util;
 import org.redisson.api.RLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xi.maple.redis.model.MapleJobQueue;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,13 +14,42 @@ public class MapleRedisUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(MapleRedisUtil.class);
 
+    public static final String JOB_QUEUE_CACHE_NAME = "mq";
+
     /**
-     * 获取作业要添加的队列锁的key
+     * 获取用户组作业队列
      *
-     * @return redis 作业队列锁的 key
+     * @return redis 队列名
      */
-    public static String getJobQueueLock(String fromApp, String group, String jobType, String queueName, Integer priority) {
-        return String.format("maple-lock-%s%s%s%s%s", fromApp, group, jobType, queueName, priority);
+    public static MapleJobQueue getJobQueue(
+            String cluster,
+            String clusterQueue,
+            String fromApp,
+            String jobType,
+            String group,
+            Integer priority
+    ) {
+        String queueName = String.format("%s-%s-%s-%s", fromApp, jobType, group, priority);
+        // mgq (maple-group-queue), mgql (maple-group-queue-lock)
+        return new MapleJobQueue("mgq::" + queueName, "mgql::" + queueName, cluster, clusterQueue, jobType);
+    }
+
+    /**
+     * 获取用户作业队列
+     *
+     * @return redis 队列名
+     */
+    public static MapleJobQueue getUserJobQueue(
+            String cluster,
+            String clusterQueue,
+            String fromApp,
+            String jobType,
+            String user,
+            Integer priority
+    ) {
+        String queueName = String.format("%s-%s-%s-%s", fromApp, jobType, user, priority);
+        // muq (maple-user-queue), muql (maple-user-queue-lock)
+        return new MapleJobQueue("muq::" + queueName, "muql::" + queueName, cluster, clusterQueue, jobType);
     }
 
     /**
@@ -29,28 +59,9 @@ public class MapleRedisUtil {
      * @return redis 引擎锁的 key
      */
     public static String getEngineInstanceLock(Integer engineInstanceId) {
-        return String.format("maple-lock-engine-%s", engineInstanceId);
+        // mel (maple-engine-lock)
+        return String.format("mel::%s", engineInstanceId);
     }
-
-    /**
-     * 获取作业队列
-     *
-     * @return redis 队列名
-     */
-    public static String getJobQueue(String fromApp, String group, String jobType, String queueName, Integer priority) {
-        return String.format("maple-group-queue-%s%s%s%s%s", fromApp, group, jobType, queueName, priority);
-    }
-
-    /**
-     * 获取作业队列
-     *
-     * @param
-     * @return redis 队列名
-     */
-    public static String getUserJobQueue(String fromApp, String user, String jobType, String queueName, Integer priority) {
-        return String.format("maple-group-queue-%s%s%s%s%s", fromApp, user, jobType, queueName, priority);
-    }
-
 
     /**
      * 尝试获取锁，并执行，获取不到锁直接跳过
@@ -60,8 +71,7 @@ public class MapleRedisUtil {
      * @param runnable 执行的操作
      */
     public static void tryLockAndExecute(RLock lock, String lockName, Runnable runnable) {
-        tryLockAndExecute(lock, lockName, runnable, () -> {
-        });
+        tryLockAndExecute(lock, lockName, runnable, null);
     }
 
     /**
@@ -151,5 +161,4 @@ public class MapleRedisUtil {
             }
         }
     }
-
 }

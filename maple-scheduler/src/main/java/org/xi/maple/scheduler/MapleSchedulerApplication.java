@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
-public class MapleScheduler {
+public class MapleSchedulerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MapleScheduler.class);
+        SpringApplication.run(MapleSchedulerApplication.class);
     }
 }

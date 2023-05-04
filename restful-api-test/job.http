@@ -3,5 +3,20 @@ POST http://localhost:8080/job/submit
 Content-Type: application/json
 
 {
-  "": ""
+  "jobName": "test-xi",
+  "fromApp": "schedule",
+  "uniqueId": "1",
+  "jobComment": "测试作业",
+  "engineId": "",
+  "engineType": "spark",
+  "engineVersion": "3.3.1",
+  "jobType": "async",
+  "queue": "default",
+  "priority": 1,
+  "contentType": "path",
+  "resultType": "path",
+  "group": "xi",
+  "user": "",
+  "webhooks": "",
+  "extInfo": "{}"
 }

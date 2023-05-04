@@ -6,22 +6,24 @@ import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
+import org.xi.maple.common.constant.JobPriorityConstants;
 import org.xi.maple.common.constant.JobStatusConstants;
-import org.xi.maple.redis.model.QueueJobItem;
+import org.xi.maple.common.constant.JobTypeConstants;
+import org.xi.maple.redis.model.MapleClusterQueue;
+import org.xi.maple.redis.model.MapleJobQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
 import org.xi.maple.scheduler.model.EngineInstance;
-import org.xi.maple.scheduler.model.Job;
-import org.xi.maple.scheduler.model.MapleRedisQueue;
+import org.xi.maple.scheduler.persistence.entity.JobEntity;
+import org.xi.maple.scheduler.service.ClusterQueueService;
 import org.xi.maple.scheduler.service.EngineInstanceService;
+import org.xi.maple.scheduler.service.JobQueueService;
 import org.xi.maple.scheduler.service.JobService;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -29,12 +31,13 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * @author xishihao
+ */
 @Component
-public class ScheduledTasks {
+public class ScheduledTasks implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
-
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     final RedissonClient redissonClient;
 
@@ -43,34 +46,55 @@ public class ScheduledTasks {
     final ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     final JobService jobService;
-
     final EngineInstanceService engineInstanceService;
+    final ClusterQueueService clusterQueueService;
+    final JobQueueService jobQueueService;
 
     final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
-    @Autowired
-    public ScheduledTasks(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler, JobService jobService, EngineInstanceService engineInstanceService) {
+    public ScheduledTasks(RedissonClient redissonClient,
+                          ThreadPoolTaskExecutor threadPoolTaskExecutor,
+                          ThreadPoolTaskScheduler threadPoolTaskScheduler,
+                          JobService jobService,
+                          EngineInstanceService engineInstanceService,
+                          ClusterQueueService clusterQueueService,
+                          JobQueueService jobQueueService) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.jobService = jobService;
         this.engineInstanceService = engineInstanceService;
+        this.clusterQueueService = clusterQueueService;
+        this.jobQueueService = jobQueueService;
     }
 
+    public void clearScheduling() {
+        System.out.println("cancel jobs");
+        futureMap.values().forEach(scheduledFuture -> {
+            scheduledFuture.cancel(true);
+        });
+    }
+
+    /**
+     * 消费作业
+     */
     @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
-        List<MapleRedisQueue> queueList = getQueueAndLockList();
+        List<MapleJobQueue> queueList = jobQueueService.getJobQueues();
         if (queueList == null || queueList.isEmpty()) {
             return;
         }
 
-        for (MapleRedisQueue mapleRedisQueue : queueList) {
-            if (!futureMap.containsKey(mapleRedisQueue.getQueueName())) {
-                threadPoolTaskExecutor.execute(() -> consumeQueueJobs(mapleRedisQueue));
+        for (MapleJobQueue jobQueue : queueList) {
+            if (!futureMap.containsKey(jobQueue.getQueueName())) {
+                threadPoolTaskExecutor.execute(() -> consumeQueueJobs(jobQueue));
             }
         }
     }
 
+    /**
+     * 故障引擎的作业转移
+     */
     @Scheduled(fixedDelay = 5000)
     public void transferProblematicEngineJobs() {
         List<EngineInstance> instances = engineInstanceService.getProblematicEngines();
@@ -90,50 +114,70 @@ public class ScheduledTasks {
     /**
      * 消费排队中的作业
      *
-     * @param mapleRedisQueue redis 队列
+     * @param jobQueue redis 队列
      */
-    private void consumeQueueJobs(MapleRedisQueue mapleRedisQueue) {
+    private void consumeQueueJobs(MapleJobQueue jobQueue) {
         ScheduledFuture<?> scheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
-            RDeque<QueueJobItem> deque = redissonClient.getDeque(mapleRedisQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
-            RLock lock = redissonClient.getLock(mapleRedisQueue.getLockName());
+            RDeque<MapleJobQueue.QueueItem> deque =
+                    redissonClient.getDeque(jobQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
+            RLock lock = redissonClient.getLock(jobQueue.getLockName());
 
             AtomicBoolean continueRunning = new AtomicBoolean(true);
             while (!continueRunning.get()) {
-                MapleRedisUtil.tryLockAndExecute(lock, mapleRedisQueue.getLockName(), () -> {
-                    // todo 这里可以多消费几个
-                    QueueJobItem queueJobItem = deque.poll();
+                MapleRedisUtil.tryLockAndExecute(lock, jobQueue.getLockName(), () -> {
+                    // 消费作业
+                    MapleJobQueue.QueueItem queueJobItem = deque.getFirst();
                     if (queueJobItem == null) {
                         continueRunning.set(false);
                         return;
                     }
-                    Job job = jobService.getJobById(queueJobItem.getJobId());
-                    // todo 消费作业
+                    JobEntity job = jobService.getJobById(queueJobItem.getJobId());
+                    MapleClusterQueue cachedQueueInfo =
+                            clusterQueueService.getCachedQueueInfo(jobQueue.getCluster(), jobQueue.getClusterQueue());
+                    if (JobTypeConstants.ONCE.equals(jobQueue.getType()) && cachedQueueInfo.getPendingApps() > 0) {
+                        return;
+                    }
+
                     /*
                     1. lock
                     2. 选择引擎，提交任务
-                    3. 将引擎置为busy
-                    4. unlock
+                    3. 将引擎置执行任务数 + 1
+                    4. deque.poll();
+                    5. unlock
                      */
                 });
             }
         }, 5000);
-        futureMap.put(mapleRedisQueue.getQueueName(), scheduledFuture);
+        futureMap.put(jobQueue.getQueueName(), scheduledFuture);
     }
 
+    /**
+     * 将引擎下的作业推回队列
+     *
+     * @param engineInstance 引擎实例
+     */
     private void pushJobsBackToQueue(EngineInstance engineInstance) {
-        List<Job> jobs = jobService.getEngineRunningJobs(engineInstance.getId());
-        for (Job job : jobs) {
-            String queueName = MapleRedisUtil.getJobQueue(job.getFromApp(), job.getGroup(), job.getJobType(), job.getQueue(), job.getPriority());
-            String jobQueueLockName = MapleRedisUtil.getJobQueueLock(job.getFromApp(), job.getGroup(), job.getJobType(), job.getQueue(), job.getPriority());
-            MapleRedisUtil.waitLockAndExecute(redissonClient.getLock(jobQueueLockName), jobQueueLockName, 10, TimeUnit.SECONDS, () -> {
-                RDeque<QueueJobItem> deque = redissonClient.getDeque(queueName, JsonJacksonCodec.INSTANCE);
-                deque.addFirst(new QueueJobItem(job.getId(), System.currentTimeMillis()));
-                jobService.updateJobStatus(job.getId(), JobStatusConstants.ACCEPTED);
+        List<JobEntity> jobs = jobService.getEngineRunningJobs(engineInstance.getId());
+        for (JobEntity job : jobs) {
+            int priority = JobPriorityConstants.increasePriority(job.getRunPriority());
+            MapleJobQueue jobQueue = MapleRedisUtil.getJobQueue(job.getCluster(), job.getQueue(),
+                    job.getFromApp(), job.getJobType(), job.getGroup(), priority);
+            RLock lock = redissonClient.getLock(jobQueue.getLockName());
+            MapleRedisUtil.waitLockAndExecute(lock, jobQueue.getLockName(), 10, TimeUnit.SECONDS, () -> {
+                RDeque<MapleJobQueue.QueueItem> deque =
+                        redissonClient.getDeque(jobQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
+                // 将作业重新放回队列
+                deque.addFirst(new MapleJobQueue.QueueItem(job.getId(), System.currentTimeMillis()));
+                // 提高优先级，修改作业状态
+                job.setRunPriority(priority);
+                job.setStatus(JobStatusConstants.ACCEPTED);
+                jobService.updateJobById(job, job.getId());
             });
         }
     }
 
-    private List<MapleRedisQueue> getQueueAndLockList() {
-        return null;
+    @Override
+    public void run(String... args) throws Exception {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::clearScheduling));
     }
 }

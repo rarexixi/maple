@@ -5,15 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * redis 队列作业对象
- *
  * @author xishihao
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QueueJobItem {
+public class MapleClusterQueue {
 
-    private Integer jobId;
-    private Long timestamp;
+    private Integer pendingApps;
+
+    public static String getKey(String clusterName,String queueName) {
+        return clusterName + "--" + queueName;
+    }
 }

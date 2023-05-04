@@ -24,7 +24,7 @@ public class Job {
     private String fromApp;
 
     /**
-     * 唯一ID
+     * 作业唯一标识
      */
     private String uniqueId;
 
@@ -36,7 +36,7 @@ public class Job {
     /**
      * 引擎ID
      */
-    private String engineId;
+    private Integer engineId;
 
     /**
      * 引擎类型
@@ -44,19 +44,24 @@ public class Job {
     private String engineType;
 
     /**
+     * 版本
+     */
+    private String engineVersion;
+
+    /**
      * 提交队列
      */
     private String queue;
 
     /**
-     * 优先级
+     * 初始优先级
      */
     private Integer priority;
 
     /**
-     * 版本
+     * 运行优先级
      */
-    private String engineVersion;
+    private Integer runPriority;
 
     /**
      * 作业类型 (sync, async)

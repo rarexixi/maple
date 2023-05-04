@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.api.persistence.mapper.JobQueueMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.scheduler.persistence.entity.JobQueueEntity">
+        <result property="queueName" column="queue_name"/>
+        <result property="lockName" column="lock_name"/>
+        <result property="cluster" column="cluster"/>
+        <result property="clusterQueue" column="cluster_queue"/>
+        <result property="type" column="type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="tableName">`maple_job_queue`</sql>
+
+    <select id="select" resultMap="BaseResultMap">
+        SELECT
+            MT.`queue_name`,
+            MT.`lock_name`,
+            MT.`cluster`,
+            MT.`cluster_queue`,
+            MT.`type`,
+            MT.`create_time`,
+            MT.`update_time`
+        FROM <include refid="tableName"/> MT
+    </select>
+</mapper>

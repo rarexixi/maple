@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.api.persistence.mapper.JobQueueMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.api.persistence.entity.JobQueueEntity">
+        <result property="queueName" column="queue_name"/>
+        <result property="lockName" column="lock_name"/>
+        <result property="cluster" column="cluster"/>
+        <result property="clusterQueue" column="cluster_queue"/>
+        <result property="type" column="type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="tableName">`maple_job_queue`</sql>
+
+    <!--插入作业队列-->
+    <insert id="insert">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.queueName != null">`queue_name`,</if>
+            <if test="entity.lockName != null">`lock_name`,</if>
+            <if test="entity.cluster != null">`cluster`,</if>
+            <if test="entity.clusterQueue != null">`cluster_queue`,</if>
+            <if test="entity.type != null">`type`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.queueName != null">#{entity.queueName},</if>
+            <if test="entity.lockName != null">#{entity.lockName},</if>
+            <if test="entity.cluster != null">#{entity.cluster},</if>
+            <if test="entity.clusterQueue != null">#{entity.clusterQueue},</if>
+            <if test="entity.type != null">#{entity.type},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--根据主键条件更新作业队列-->
+    <update id="updateByPk">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.queueName != null">
+                `queue_name` = #{entity.queueName},
+            </if>
+            <if test="entity.lockName != null">
+                `lock_name` = #{entity.lockName},
+            </if>
+            <if test="entity.cluster != null">
+                `cluster` = #{entity.cluster},
+            </if>
+            <if test="entity.clusterQueue != null">
+                `cluster_queue` = #{entity.clusterQueue},
+            </if>
+            <if test="entity.type != null">
+                `type` = #{entity.type},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            <choose>
+                <when test="pk != null">
+                    `queue_name` = #{pk}
+                </when>
+                <otherwise>
+                    1!=1
+                </otherwise>
+            </choose>
+        </where>
+    </update>
+</mapper>

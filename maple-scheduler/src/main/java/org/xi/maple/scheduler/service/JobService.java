@@ -1,6 +1,6 @@
 package org.xi.maple.scheduler.service;
 
-import org.xi.maple.scheduler.model.Job;
+import org.xi.maple.scheduler.persistence.entity.JobEntity;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import java.util.List;
  */
 public interface JobService {
 
-    Job getJobById(Integer jobId);
+    JobEntity getJobById(Integer jobId);
 
-    int updateJobStatus(Integer jobId, String status);
+    int updateJobById(JobEntity entity, Integer jobId);
 
-    List<Job> getEngineRunningJobs(int engineId);
+    List<JobEntity> getEngineRunningJobs(int engineId);
 }

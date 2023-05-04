@@ -36,7 +36,7 @@ public class JobEntity {
     private String fromApp;
 
     /**
-     * 唯一ID
+     * 作业唯一标识
      */
     private String uniqueId;
 
@@ -48,7 +48,7 @@ public class JobEntity {
     /**
      * 引擎ID
      */
-    private String engineId;
+    private Integer engineId;
 
     /**
      * 引擎类型

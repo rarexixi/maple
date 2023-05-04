@@ -3,14 +3,21 @@ package org.xi.maple.api.service.impl;
 import org.redisson.api.RDeque;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.JsonJacksonCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.api.model.request.SubmitJobRequest;
+import org.xi.maple.api.model.response.JobDetailResponse;
+import org.xi.maple.api.persistence.entity.JobEntity;
+import org.xi.maple.api.persistence.mapper.JobMapper;
+import org.xi.maple.api.service.JobQueueService;
 import org.xi.maple.api.service.JobService;
-import org.xi.maple.redis.model.QueueJobItem;
+import org.xi.maple.common.constant.JobStatusConstants;
+import org.xi.maple.redis.model.MapleJobQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
 
 import java.util.concurrent.TimeUnit;
@@ -25,11 +32,44 @@ public class JobServiceImpl implements JobService {
 
     final RedissonClient redissonClient;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    final JobMapper jobMapper;
+    final JobQueueService jobQueueService;
 
     @Autowired
-    public JobServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+    public JobServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, JobMapper jobMapper, JobQueueService jobQueueService) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+        this.jobMapper = jobMapper;
+        this.jobQueueService = jobQueueService;
+    }
+
+    /**
+     * 获取作业状态
+     *
+     * @param jobId 作业ID
+     * @return 作业状态
+     */
+    @Override
+    public String getJobStatus(Integer jobId) {
+        JobEntity entity = jobMapper.detailById(jobId);
+        if (entity == null) {
+            throw new RuntimeException("");
+        }
+        return entity.getStatus();
+    }
+
+    /**
+     * 获取作业详情
+     *
+     * @param jobId 作业ID
+     * @return 作业详情
+     */
+    @Override
+    public JobDetailResponse getJobDetail(Integer jobId) {
+        JobEntity entity = jobMapper.detailById(jobId);
+        JobDetailResponse detail = new JobDetailResponse();
+        BeanUtils.copyProperties(entity, detail);
+        return detail;
     }
 
     /**
@@ -45,18 +85,20 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public Integer submitJob(SubmitJobRequest jobReq) {
-        final Integer id = addJob(jobReq);
+        final Integer jobId = addJob(jobReq);
         threadPoolTaskExecutor.execute(() -> {
-            String lockName = MapleRedisUtil.getJobQueueLock(jobReq.getFromApp(), jobReq.getGroup(), jobReq.getJobType(), jobReq.getQueue(), jobReq.getPriority());
-            RLock lock = redissonClient.getLock(lockName);
+            MapleJobQueue jobQueue = MapleRedisUtil.getJobQueue(jobReq.getCluster(), jobReq.getQueue(),
+                    jobReq.getFromApp(), jobReq.getJobType(), jobReq.getGroup(), jobReq.getPriority());
+            jobQueueService.addOrUpdate(jobQueue);
+            RLock lock = redissonClient.getLock(jobQueue.getLockName());
 
-            MapleRedisUtil.waitLockAndExecute(lock, lockName, 10, TimeUnit.SECONDS, () -> {
-                String queueName = MapleRedisUtil.getJobQueue(jobReq.getFromApp(), jobReq.getGroup(), jobReq.getJobType(), jobReq.getQueue(), jobReq.getPriority());
-                RDeque<QueueJobItem> deque = redissonClient.getDeque(queueName);
-                deque.addLast(new QueueJobItem(id, System.currentTimeMillis()));
-            }, () -> logger.error("Add to queue failed" + jobReq));
+            MapleRedisUtil.waitLockAndExecute(lock, jobQueue.getLockName(), 10, TimeUnit.SECONDS, () -> {
+                RDeque<MapleJobQueue.QueueItem> deque = redissonClient.getDeque(jobQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
+                deque.addLast(new MapleJobQueue.QueueItem(jobId, System.currentTimeMillis()));
+                updateJobStatus(jobId, JobStatusConstants.ACCEPTED);
+            }, () -> logger.error("Add to queue failed " + jobReq));
         });
-        return id;
+        return jobId;
     }
 
     /**
@@ -65,8 +107,31 @@ public class JobServiceImpl implements JobService {
      * @param submitJobRequest 作业提交请求对象
      * @return 作业 ID
      */
-
     private Integer addJob(SubmitJobRequest submitJobRequest) {
-        return 0;
+        JobEntity jobEntity = new JobEntity();
+        BeanUtils.copyProperties(submitJobRequest, jobEntity);
+        jobEntity.setStatus(JobStatusConstants.SUBMITTED);
+
+        int count = jobMapper.insert(jobEntity);
+        if (count < 1) {
+            throw new RuntimeException("");
+        }
+        return jobEntity.getId();
+    }
+
+    /**
+     * 修改作业状态
+     *
+     * @param jobId     作业ID
+     * @param jobStatus 作业状态
+     * @return 作业 ID
+     */
+    private void updateJobStatus(int jobId, String jobStatus) {
+        JobEntity jobEntity = new JobEntity();
+        jobEntity.setStatus(jobStatus);
+        int count = jobMapper.updateById(jobEntity, jobId);
+        if (count < 1) {
+            throw new RuntimeException("");
+        }
     }
 }

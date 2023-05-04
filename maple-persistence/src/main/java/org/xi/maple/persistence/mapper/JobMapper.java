@@ -1,8 +1,10 @@
 package org.xi.maple.persistence.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.xi.maple.persistence.entity.JobEntity;
 
+@Mapper
 public interface JobMapper extends InsertMapper<JobEntity> {
 
     /**
