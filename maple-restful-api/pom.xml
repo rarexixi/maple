@@ -49,6 +49,11 @@
         </dependency>
         <dependency>
             <groupId>org.xi</groupId>
+            <artifactId>maple-spring-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xi</groupId>
             <artifactId>maple-redis</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

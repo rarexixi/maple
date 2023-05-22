@@ -1,5 +1,5 @@
 ###
-POST http://localhost:8080/job/submit
+POST http://{{domain}}/job/submit
 Content-Type: application/json
 
 {
@@ -17,6 +17,7 @@ Content-Type: application/json
   "resultType": "path",
   "group": "xi",
   "user": "",
+  "configuration": "",
   "webhooks": "",
   "extInfo": "{}"
 }

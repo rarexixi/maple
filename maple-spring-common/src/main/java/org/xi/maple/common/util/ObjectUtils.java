@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ObjectUtils {
-
     public static <S, T> T copy(S source, Class<T> clazz, String... ignoreProperties) {
         if (source == null) {
             return null;

@@ -34,6 +34,11 @@ public class VariableUtils {
         return substitutor.replace(replaceDateTimeExpression(content, localDateTime));
     }
 
+    public static String replaceDateTimeVariables(String content, String execDateTime) {
+        LocalDateTime localDateTime = LocalDateTime.parse(execDateTime, DEFAULT_DATETIME_FORMATTER);
+        return replaceDateTimeExpression(content, localDateTime);
+    }
+
     public static String replaceDateTimeExpression(String content, LocalDateTime datetime) {
         Matcher matcher = DATETIME_PATTERN.matcher(content);
         StringBuffer sb = new StringBuffer(content.length());

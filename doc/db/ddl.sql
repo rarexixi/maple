@@ -77,8 +77,29 @@ create table `maple`.`maple_datasource`
 
 # region engine
 
-drop table if exists `engine_type`;
-create table `engine_type`
+drop table if exists `engine_category`;
+create table `engine_category`
+(
+    `id`          int                                    not null auto_increment comment '引擎ID',
+    `name`        varchar(32)  default ''                not null comment '类型名称',
+    `version`     varchar(32)  default ''                not null comment '类型版本',
+    `home`        varchar(256) default ''                not null comment '引擎目录',
+    `group`       varchar(32)  default ''                not null comment '用户组',
+    `user`        varchar(32)  default ''                not null comment '用户',
+
+    `create_time` datetime     default current_timestamp not null comment '创建时间',
+    `update_time` datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    index idx_engine_version (`name`, `version`),
+    unique uniq_engine_version (`name`, `version`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '执行器实例';
+
+drop table if exists `engine_category`;
+create table `engine_category`
 (
     `id`          int                                    not null auto_increment comment '引擎ID',
     `name`        varchar(32)  default ''                not null comment '类型名称',
@@ -153,6 +174,7 @@ create table `maple`.`maple_job`
     `from_app`        varchar(16)                             not null comment '来源应用',
     `unique_id`       varchar(32)                             not null comment '作业唯一标识',
     `job_comment`     varchar(64)   default ''                not null comment '作业说明',
+    `cluster_id`      int           default 0                 not null comment '提交集群',
     `engine_id`       int           default 0                 not null comment '引擎ID',
     `engine_category` varchar(16)                             not null comment '引擎类型',
     `engine_version`  varchar(8)                              not null comment '版本',
@@ -166,6 +188,7 @@ create table `maple`.`maple_job`
     `group`           varchar(32)   default ''                not null comment '用户组',
     `user`            varchar(32)   default ''                not null comment '用户',
     `webhooks`        varchar(1024) default ''                not null comment '回调地址',
+    `configuration`   text                                    not null comment '作业配置',
     `ext_info`        text                                    not null comment '扩展信息',
 
     `create_time`     datetime      default current_timestamp not null comment '创建时间',
@@ -181,7 +204,7 @@ create table `maple`.`maple_job`
   collate = utf8_unicode_ci
     comment = '执行作业';
 
-create table `job_content`
+create table `job_ext_info`
 (
     `id`      int        not null,
     `content` mediumtext not null comment '执行内容',

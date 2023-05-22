@@ -1,0 +1,29 @@
+
+### 执行请求
+
+POST http://{{domain}}/execute/sql/
+# Content-Type: application/json
+# Accept: application/json
+
+{
+  "jobId": 1,
+  "code": "show databases",
+  "runType": "",
+  "resultType": "json"
+}
+
+###
+
+POST http://{{domain}}/execute/sql/
+# Content-Type: application/json
+# Accept: application/json
+
+{
+  "jobId": 1,
+  "code": "select 1",
+  "runType": "",
+  "resultType": "json"
+}
+
+### 关闭程序
+GET http://{{domain}}/spark/close/

@@ -20,8 +20,6 @@ import org.xi.maple.common.constant.JobStatusConstants;
 import org.xi.maple.redis.model.MapleJobQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author xishihao
  */
@@ -91,8 +89,7 @@ public class JobServiceImpl implements JobService {
                     jobReq.getFromApp(), jobReq.getJobType(), jobReq.getGroup(), jobReq.getPriority());
             jobQueueService.addOrUpdate(jobQueue);
             RLock lock = redissonClient.getLock(jobQueue.getLockName());
-
-            MapleRedisUtil.waitLockAndExecute(lock, jobQueue.getLockName(), 10, TimeUnit.SECONDS, () -> {
+            MapleRedisUtil.waitLockAndExecute(lock, jobQueue.getLockName(), 10, 2, () -> {
                 RDeque<MapleJobQueue.QueueItem> deque = redissonClient.getDeque(jobQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
                 deque.addLast(new MapleJobQueue.QueueItem(jobId, System.currentTimeMillis()));
                 updateJobStatus(jobId, JobStatusConstants.ACCEPTED);

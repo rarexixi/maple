@@ -49,6 +49,11 @@ public class Job {
     private String engineVersion;
 
     /**
+     * 提交集群
+     */
+    private String cluster;
+
+    /**
      * 提交队列
      */
     private String queue;

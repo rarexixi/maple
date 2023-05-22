@@ -53,7 +53,7 @@ public class JobEntity {
     private String engineVersion;
 
     /**
-     * 集群
+     * 提交集群
      */
     private String cluster;
 

@@ -1,0 +1,23 @@
+###
+
+GET http://{{domain}}/api/v1/applications
+
+###
+
+GET http://{{domain}}/api/v1/applications/local-1684560307722/shutdown
+
+###
+
+GET http://{{domain}}/api/v1/jobs
+
+###
+
+GET http://{{domain}}/api/v1/metrics
+
+###
+
+GET http://{{domain}}/api/v1/storage
+
+###
+
+GET http://{{domain}}/api/v1/graph

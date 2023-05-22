@@ -22,7 +22,7 @@ public class JobQueueServiceImpl implements JobQueueService {
         this.jobQueueMapper = jobQueueMapper;
     }
 
-    @CacheEvict(cacheNames = {"maple"}, key = "'queue'", condition = "#result.type == 1")
+    @CacheEvict(cacheNames = {"maple"}, key = "'queue'", condition = "#result.type == T(org.xi.maple.common.constant.OperateResultType).NEW")
     @Transactional
     @Override
     public OperateResult<Integer> addOrUpdate(MapleJobQueue jobQueue) {

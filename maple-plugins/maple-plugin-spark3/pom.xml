@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.xi.maple.plugins</groupId>
-    <artifactId>spark3</artifactId>
+    <artifactId>maple-plugin-spark3</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>maple-spark-plugin</name>
-    <description>maple-spark-plugin</description>
+    <name>maple-plugin-spark3</name>
+    <description>maple-plugin-spark3</description>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -22,18 +22,6 @@
         <spark.shade.packageName>org.sparkproject</spark.shade.packageName>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.xi</groupId>
-                <artifactId>maple-dependencies</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
 
@@ -62,15 +50,6 @@
 
         <!-- endregion -->
 
-        <!-- region jetty -->
-
-        <!-- 防止 post 对象时，请求 415 -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.34</version>
-        </dependency>
-
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
@@ -81,9 +60,8 @@
                     <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
-
-        <!-- endregion -->
 
     </dependencies>
 

@@ -22,12 +22,13 @@
         <module>maple-dependencies</module>
         <module>maple-core</module>
         <module>maple-common</module>
+        <module>maple-spring-common</module>
         <module>maple-datasource</module>
         <module>maple-persistence</module>
         <module>maple-redis</module>
         <module>maple-restful-api</module>
         <module>maple-scheduler</module>
-        <module>maple-plugins/spark3</module>
+        <module>maple-plugins/maple-plugin-spark3</module>
     </modules>
 
     <repositories>

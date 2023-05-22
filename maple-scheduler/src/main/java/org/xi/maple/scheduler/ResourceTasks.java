@@ -17,6 +17,7 @@ import org.xi.maple.scheduler.model.YarnScheduler;
 import org.xi.maple.scheduler.service.ClusterQueueService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,11 @@ public class ResourceTasks {
         List<YarnCluster> clusters = getClusters();
         Map<String, MapleClusterQueue> queueMap = new HashMap<>();
         for (YarnCluster cluster : clusters) {
-            String clusterName = "";
+            String clusterName = cluster.getName();
             YarnScheduler yarnScheduler = getClusterQueueInfo(clusterName);
+            if (yarnScheduler == null) {
+                continue;
+            }
             List<YarnScheduler.Scheduler.SchedulerInfo.Queues.Queue> queues =
                     yarnScheduler.getScheduler().getSchedulerInfo().getQueues().getQueue();
 
@@ -62,12 +66,12 @@ public class ResourceTasks {
     }
 
     private List<YarnCluster> getClusters() {
-        return null;
+        return new ArrayList<>(0);
     }
 
     YarnScheduler getClusterQueueInfo(String clusterDomain) {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            HttpGet request = new HttpGet(String.format("http://%s:8088/ws/v1/cluster/scheduler", clusterDomain));
+            HttpGet request = new HttpGet(String.format("http://%s/ws/v1/cluster/scheduler", clusterDomain));
             request.addHeader("Content-Type", "application/json");
             HttpResponse response = client.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {

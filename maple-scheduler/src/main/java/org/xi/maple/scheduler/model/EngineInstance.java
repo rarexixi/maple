@@ -10,4 +10,5 @@ public class EngineInstance {
     private Integer id;
     private String status;
     private Integer cleaned;
+    private String address;
 }

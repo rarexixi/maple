@@ -1,6 +1,7 @@
 package org.xi.maple.common.model;
 
 import lombok.Getter;
+import org.xi.maple.common.constant.OperateResultType;
 
 /**
  * @author xishihao
@@ -8,23 +9,19 @@ import lombok.Getter;
 @Getter
 public class OperateResult<T> {
 
-    private int type;
+    private OperateResultType type;
     private T result;
 
-    private OperateResult(int type, T result) {
+    private OperateResult(OperateResultType type, T result) {
         this.type = type;
         this.result = result;
     }
 
     public static <T> OperateResult<T> newResult(T t) {
-        return new OperateResult<>(Type.NEW, t);
+        return new OperateResult<>(OperateResultType.NEW, t);
     }
 
     public static <T> OperateResult<T> updateResult(T t) {
-        return new OperateResult<>(Type.UPDATE, t);
-    }
-
-    public interface Type {
-        int NEW = 1, UPDATE = 0;
+        return new OperateResult<>(OperateResultType.UPDATE, t);
     }
 }

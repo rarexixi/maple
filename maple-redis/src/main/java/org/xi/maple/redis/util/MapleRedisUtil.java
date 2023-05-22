@@ -56,11 +56,26 @@ public class MapleRedisUtil {
      * 获取引擎锁
      *
      * @param engineInstanceId 引擎ID
-     * @return redis 引擎锁的 key
+     * @return redis 引擎实例锁的 key
      */
     public static String getEngineInstanceLock(Integer engineInstanceId) {
+        // mel (maple-engine-instance-lock)
+        return String.format("meil::%s", engineInstanceId);
+    }
+
+    /**
+     * 获取引擎锁
+     *
+     * @param user           用户
+     * @param cluster        集群
+     * @param engineCategory 引擎分类
+     * @param engineType     引擎类型
+     * @param engineVersion  引擎版本
+     * @return redis 引擎锁的 key
+     */
+    public static String getEngineLock(String user, String cluster, String engineCategory, String engineType, String engineVersion) {
         // mel (maple-engine-lock)
-        return String.format("mel::%s", engineInstanceId);
+        return String.format("mel::%s-%s-%s-%s-%s", user, cluster, engineCategory, engineType, engineVersion);
     }
 
     /**
@@ -71,7 +86,32 @@ public class MapleRedisUtil {
      * @param runnable 执行的操作
      */
     public static void tryLockAndExecute(RLock lock, String lockName, Runnable runnable) {
-        tryLockAndExecute(lock, lockName, runnable, null);
+        waitLockAndExecute(lock, lockName, 0, 2, TimeUnit.SECONDS, runnable, null);
+    }
+
+    /**
+     * 尝试获取锁，并执行，获取不到锁直接跳过
+     *
+     * @param lock      锁
+     * @param lockName  锁的名字
+     * @param leaseTime 锁超时释放时长（秒）
+     * @param runnable  执行的操作
+     */
+    public static void tryLockAndExecute(RLock lock, String lockName, long leaseTime, Runnable runnable) {
+        waitLockAndExecute(lock, lockName, 0, leaseTime, TimeUnit.SECONDS, runnable, null);
+    }
+
+    /**
+     * 尝试获取锁，并执行，获取不到锁直接跳过
+     *
+     * @param lock      锁
+     * @param lockName  锁的名字
+     * @param leaseTime 锁超时释放时长
+     * @param unit      时间单位
+     * @param runnable  执行的操作
+     */
+    public static void tryLockAndExecute(RLock lock, String lockName, long leaseTime, TimeUnit unit, Runnable runnable) {
+        waitLockAndExecute(lock, lockName, 0, leaseTime, unit, runnable, null);
     }
 
     /**
@@ -79,50 +119,54 @@ public class MapleRedisUtil {
      *
      * @param lock              锁
      * @param lockName          锁的名字
+     * @param leaseTime         锁超时释放时长
+     * @param unit              时间单位
      * @param runnable          执行的操作
      * @param lockFailOperation 获取锁失败时的操作
      */
-    public static void tryLockAndExecute(RLock lock, String lockName, Runnable runnable, Runnable lockFailOperation) {
-        if (runnable == null) {
-            return;
-        }
-        boolean hasLocked = false;
-        try {
-            hasLocked = lock.tryLock();
-            if (hasLocked) {
-                runnable.run();
-            } else {
-                if (lockFailOperation != null) {
-                    lockFailOperation.run();
-                }
-            }
-        } catch (Exception e) {
-            String msg = String.format("Lock [%s] failed", lockName);
-            logger.error(msg, e);
-        } finally {
-            if (hasLocked) {
-                try {
-                    lock.unlock();
-                } catch (Exception e) {
-                    // todo 释放锁失败操作
-                    String msg = String.format("Unlock [%s] failed", lockName);
-                    logger.error(msg, e);
-                }
-            }
-        }
+    public static void tryLockAndExecute(RLock lock, String lockName, long leaseTime, TimeUnit unit, Runnable runnable, Runnable lockFailOperation) {
+        waitLockAndExecute(lock, lockName, 0, leaseTime, unit, runnable, lockFailOperation);
     }
 
     /**
      * 在尝试获取锁，并执行，获取不到锁直接跳过
      *
-     * @param lock     锁
-     * @param lockName 锁的名字
-     * @param time     等待锁的最大时长
-     * @param unit     时间单位
-     * @param runnable 执行的操作
+     * @param lock      锁
+     * @param lockName  锁的名字
+     * @param time      等待锁的最大时长（秒）
+     * @param leaseTime 锁超时释放时长
+     * @param runnable  执行的操作
      */
-    public static void waitLockAndExecute(RLock lock, String lockName, long time, TimeUnit unit, Runnable runnable) {
-        waitLockAndExecute(lock, lockName, time, unit, runnable, null);
+    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, Runnable runnable) {
+        waitLockAndExecute(lock, lockName, time, leaseTime, TimeUnit.SECONDS, runnable, null);
+    }
+
+    /**
+     * 在尝试获取锁，并执行，获取不到锁直接跳过
+     *
+     * @param lock              锁
+     * @param lockName          锁的名字
+     * @param time              等待锁的最大时长
+     * @param leaseTime         锁超时释放时长
+     * @param runnable          执行的操作
+     * @param lockFailOperation 获取锁失败时的操作
+     */
+    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, Runnable runnable, Runnable lockFailOperation) {
+        waitLockAndExecute(lock, lockName, time, leaseTime, TimeUnit.SECONDS, runnable, lockFailOperation);
+    }
+
+    /**
+     * 在尝试获取锁，并执行，获取不到锁直接跳过
+     *
+     * @param lock      锁
+     * @param lockName  锁的名字
+     * @param time      等待锁的最大时长
+     * @param leaseTime 锁超时释放时长
+     * @param unit      时间单位
+     * @param runnable  执行的操作
+     */
+    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, TimeUnit unit, Runnable runnable) {
+        waitLockAndExecute(lock, lockName, time, leaseTime, unit, runnable, null);
     }
 
     /**
@@ -130,16 +174,19 @@ public class MapleRedisUtil {
      *
      * @param lock              锁
      * @param lockName          锁的名字
+     * @param time              等待锁的最大时长
+     * @param leaseTime         锁超时释放时长
+     * @param unit              时间单位
      * @param runnable          执行的操作
      * @param lockFailOperation 获取锁失败时的操作
      */
-    public static void waitLockAndExecute(RLock lock, String lockName, long time, TimeUnit unit, Runnable runnable, Runnable lockFailOperation) {
+    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, TimeUnit unit, Runnable runnable, Runnable lockFailOperation) {
         if (runnable == null) {
             return;
         }
         boolean hasLocked = false;
         try {
-            hasLocked = lock.tryLock(time, unit);
+            hasLocked = lock.tryLock(time, leaseTime, unit);
             if (hasLocked) {
                 runnable.run();
             } else {
