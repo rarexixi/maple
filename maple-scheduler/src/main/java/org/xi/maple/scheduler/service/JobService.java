@@ -1,6 +1,6 @@
 package org.xi.maple.scheduler.service;
 
-import org.xi.maple.scheduler.model.EngineInstance;
+import org.xi.maple.scheduler.persistence.entity.EngineInstanceEntity;
 import org.xi.maple.scheduler.persistence.entity.JobEntity;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public interface JobService {
      * @param job    作业
      * @param engine 引擎
      */
-    void submitJobToEngine(JobEntity job, EngineInstance engine);
+    void submitJobToEngine(JobEntity job, EngineInstanceEntity engine);
 
     /**
      * 提交作业到新的引擎

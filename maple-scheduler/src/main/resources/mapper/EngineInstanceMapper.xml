@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.scheduler.persistence.mapper.EngineInstanceMapper">
+
+    <resultMap id="ResultMap" type="org.xi.maple.scheduler.persistence.entity.EngineInstanceEntity">
+        <result property="id" column="id"/>
+        <result property="applicationId" column="application_id"/>
+        <result property="cluster" column="cluster"/>
+        <result property="clusterQueue" column="cluster_queue"/>
+        <result property="address" column="address"/>
+        <result property="engineCategory" column="engine_category"/>
+        <result property="engineVersion" column="engine_version"/>
+        <result property="engineType" column="engine_type"/>
+        <result property="jobCount" column="job_count"/>
+        <result property="runningCount" column="running_count"/>
+        <result property="heartbeatTime" column="heartbeat_time"/>
+        <result property="status" column="status"/>
+        <result property="jobCleaned" column="job_cleaned"/>
+        <result property="group" column="group"/>
+        <result property="user" column="user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="tableName">`maple_engine_instance`</sql>
+
+    <!--插入执行器实例-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">`id`,</if>
+            <if test="entity.applicationId != null">`application_id`,</if>
+            <if test="entity.cluster != null">`cluster`,</if>
+            <if test="entity.clusterQueue != null">`cluster_queue`,</if>
+            <if test="entity.address != null">`address`,</if>
+            <if test="entity.engineCategory != null">`engine_category`,</if>
+            <if test="entity.engineVersion != null">`engine_version`,</if>
+            <if test="entity.engineType != null">`engine_type`,</if>
+            <if test="entity.jobCount != null">`job_count`,</if>
+            <if test="entity.runningCount != null">`running_count`,</if>
+            <if test="entity.heartbeatTime != null">`heartbeat_time`,</if>
+            <if test="entity.status != null">`status`,</if>
+            <if test="entity.jobCleaned != null">`job_cleaned`,</if>
+            <if test="entity.group != null">`group`,</if>
+            <if test="entity.user != null">`user`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">#{entity.id},</if>
+            <if test="entity.applicationId != null">#{entity.applicationId},</if>
+            <if test="entity.cluster != null">#{entity.cluster},</if>
+            <if test="entity.cluster_queue != null">#{entity.clusterQueue},</if>
+            <if test="entity.address != null">#{entity.address},</if>
+            <if test="entity.engineCategory != null">#{entity.engineCategory},</if>
+            <if test="entity.engineVersion != null">#{entity.engineVersion},</if>
+            <if test="entity.engineType != null">#{entity.engineType},</if>
+            <if test="entity.jobCount != null">#{entity.jobCount},</if>
+            <if test="entity.runningCount != null">#{entity.runningCount},</if>
+            <if test="entity.heartbeatTime != null">#{entity.heartbeatTime},</if>
+            <if test="entity.status != null">#{entity.status},</if>
+            <if test="entity.jobCleaned != null">#{entity.jobCleaned},</if>
+            <if test="entity.group != null">#{entity.group},</if>
+            <if test="entity.user != null">#{entity.user},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <select id="getFreeEngine" resultMap="ResultMap">
+        SELECT MT.`id`,
+               MT.`application_id`,
+               MT.`cluster`,
+               MT.`cluster_queue`,
+               MT.`address`,
+               MT.`engine_category`,
+               MT.`engine_version`,
+               MT.`engine_type`,
+               MT.`job_count`,
+               MT.`running_count`,
+               MT.`heartbeat_time`,
+               MT.`status`,
+               MT.`job_cleaned`,
+               MT.`group`,
+               MT.`user`,
+               MT.`create_time`,
+               MT.`update_time`
+        FROM <include refid="tableName"/> MT
+        WHERE `cluster`=#{cluster} AND `cluster_queue`=#{clusterQueue}
+               AND `engine_category`=#{engineCategory} AND `engine_version`=#{engineVersion} AND `group`=#{group}
+               AND `status`='RUNNING' AND running_count=0
+        ORDER BY MT.`id` DESC
+        LIMIT 1
+    </select>
+</mapper>

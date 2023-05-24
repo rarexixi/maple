@@ -10,5 +10,5 @@ import org.xi.maple.common.mapper.UpdateByIdMapper;
  * @author xishihao
  */
 @Mapper
-public interface JobMapper extends InsertMapper<JobEntity>, UpdateByIdMapper<JobEntity>, SelectByIdMapper<JobEntity> {
+public interface JobMapper extends UpdateByIdMapper<JobEntity>, SelectByIdMapper<JobEntity> {
 }

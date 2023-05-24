@@ -24,9 +24,9 @@ public class JobEntity implements Serializable {
     private String jobName;
 
     /**
-     * 来源应用
+     * 作业类型 (sync, async, once)
      */
-    private String fromApp;
+    private String jobType;
 
     /**
      * 作业唯一标识
@@ -39,24 +39,34 @@ public class JobEntity implements Serializable {
     private String jobComment;
 
     /**
+     * 来源应用
+     */
+    private String fromApp;
+
+    /**
+     * 提交集群
+     */
+    private String cluster;
+
+    /**
+     * 集群队列
+     */
+    private String clusterQueue;
+
+    /**
      * 引擎ID
      */
     private Integer engineId;
 
     /**
-     * 引擎类型
+     * 引擎分类
      */
     private String engineCategory;
 
     /**
-     * 版本
+     * 引擎版本
      */
     private String engineVersion;
-
-    /**
-     * 提交队列
-     */
-    private String queue;
 
     /**
      * 初始优先级
@@ -67,11 +77,6 @@ public class JobEntity implements Serializable {
      * 运行优先级
      */
     private Integer runPriority;
-
-    /**
-     * 作业类型 (sync, async)
-     */
-    private String jobType;
 
     /**
      * 执行内容类型 (text, path)
@@ -102,6 +107,11 @@ public class JobEntity implements Serializable {
      * 回调地址
      */
     private String webhooks;
+
+    /**
+     * 作业配置
+     */
+    private String configuration;
 
     /**
      * 扩展信息

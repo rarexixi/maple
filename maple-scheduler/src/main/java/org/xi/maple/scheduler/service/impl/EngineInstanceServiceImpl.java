@@ -3,7 +3,8 @@ package org.xi.maple.scheduler.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.xi.maple.scheduler.model.EngineInstance;
+import org.xi.maple.scheduler.persistence.entity.EngineInstanceEntity;
+import org.xi.maple.scheduler.persistence.mapper.EngineInstanceMapper;
 import org.xi.maple.scheduler.service.EngineInstanceService;
 
 import java.util.ArrayList;
@@ -17,13 +18,19 @@ public class EngineInstanceServiceImpl implements EngineInstanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(EngineInstanceServiceImpl.class);
 
+    final EngineInstanceMapper engineInstanceMapper;
+
+    public EngineInstanceServiceImpl(EngineInstanceMapper engineInstanceMapper) {
+        this.engineInstanceMapper = engineInstanceMapper;
+    }
+
     /**
      * 获取故障引擎列表
      *
      * @return 故障引擎列表
      */
     @Override
-    public List<EngineInstance> getProblematicEngines() {
+    public List<EngineInstanceEntity> getProblematicEngines() {
         return new ArrayList<>();
     }
 
@@ -39,7 +46,7 @@ public class EngineInstanceServiceImpl implements EngineInstanceService {
     }
 
     @Override
-    public EngineInstance getFreeEngine(String cluster, String queue, String engineCategory, String engineVersion, String group) {
-        return null;
+    public EngineInstanceEntity getFreeEngine(String cluster, String queue, String engineCategory, String engineVersion, String group) {
+        return engineInstanceMapper.getFreeEngine(cluster, queue, engineCategory, engineVersion, group);
     }
 }

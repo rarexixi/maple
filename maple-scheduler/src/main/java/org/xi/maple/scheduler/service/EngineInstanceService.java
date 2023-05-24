@@ -1,7 +1,6 @@
 package org.xi.maple.scheduler.service;
 
-import org.xi.maple.scheduler.model.EngineInstance;
-import org.xi.maple.scheduler.model.Job;
+import org.xi.maple.scheduler.persistence.entity.EngineInstanceEntity;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public interface EngineInstanceService {
      *
      * @return 故障引擎列表
      */
-    List<EngineInstance> getProblematicEngines();
+    List<EngineInstanceEntity> getProblematicEngines();
 
     /**
      * 完成清理作业
@@ -35,6 +34,6 @@ public interface EngineInstanceService {
      * @param group          分组
      * @return 引擎实例
      */
-    EngineInstance getFreeEngine(String cluster, String queue, String engineCategory, String engineVersion, String group);
+    EngineInstanceEntity getFreeEngine(String cluster, String queue, String engineCategory, String engineVersion, String group);
 
 }

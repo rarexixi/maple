@@ -9,29 +9,54 @@ import java.time.LocalDateTime;
 public class JobQueueEntity implements Serializable {
 
     /**
-     * QueueName
+     * 作业队列名
      */
     private String queueName;
 
     /**
-     * LockName
+     * 作业队列锁名
      */
     private String lockName;
 
     /**
-     * Cluster
+     * 提交集群
      */
     private String cluster;
 
     /**
-     * ClusterQueue
+     * 集群队列
      */
     private String clusterQueue;
 
     /**
-     * Type
+     * 引擎分类
      */
-    private String type;
+    private String engineCategory;
+
+    /**
+     * 引擎版本
+     */
+    private String engineVersion;
+
+    /**
+     * 引擎类型 (once，resident)
+     */
+    private String engineType;
+
+    /**
+     * 来源应用
+     */
+    private String fromApp;
+
+    /**
+     * 用户组
+     */
+    private String group;
+
+    /**
+     * 作业优先级
+     */
+    private Integer priority;
 
     /**
      * 创建时间

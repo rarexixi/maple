@@ -16,9 +16,9 @@ public class SubmitJobRequest {
     private String jobName;
 
     /**
-     * 来源应用
+     * 作业类型 (sync, async, once)
      */
-    private String fromApp;
+    private String jobType;
 
     /**
      * 作业唯一标识
@@ -31,34 +31,34 @@ public class SubmitJobRequest {
     private String jobComment;
 
     /**
-     * 引擎类型
+     * 来源应用
      */
-    private String engineType;
+    private String fromApp;
 
     /**
-     * 版本
-     */
-    private String engineVersion;
-
-    /**
-     * 集群
+     * 提交集群
      */
     private String cluster;
 
     /**
-     * 提交队列
+     * 集群队列
      */
-    private String queue;
+    private String clusterQueue;
 
     /**
-     * 优先级
+     * 引擎分类
+     */
+    private String engineCategory;
+
+    /**
+     * 引擎版本
+     */
+    private String engineVersion;
+
+    /**
+     * 初始优先级
      */
     private Integer priority;
-
-    /**
-     * 作业类型 (sync, async)
-     */
-    private String jobType;
 
     /**
      * 执行内容类型 (text, path)
@@ -84,6 +84,11 @@ public class SubmitJobRequest {
      * 回调地址
      */
     private String webhooks;
+
+    /**
+     * 作业配置
+     */
+    private String configuration;
 
     /**
      * 扩展信息

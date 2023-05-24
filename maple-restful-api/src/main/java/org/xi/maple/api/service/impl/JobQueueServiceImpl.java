@@ -28,7 +28,7 @@ public class JobQueueServiceImpl implements JobQueueService {
     public OperateResult<Integer> addOrUpdate(MapleJobQueue jobQueue) {
         JobQueueEntity entity = new JobQueueEntity();
         BeanUtils.copyProperties(jobQueue, entity);
-        if (jobQueueMapper.detailByPk(jobQueue.getQueueName()) != null) {
+        if (jobQueueMapper.detailByPk(jobQueue.getQueueName()) == null) {
             return OperateResult.newResult(jobQueueMapper.insert(entity));
         } else {
             return OperateResult.updateResult(jobQueueMapper.updateByPk(entity, jobQueue.getQueueName()));

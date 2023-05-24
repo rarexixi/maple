@@ -41,9 +41,10 @@ public class ResourceTasks {
      */
     @Scheduled(fixedDelay = 5000)
     public void cacheClusterQueueInfo() {
+        logger.info("Reloading cluster queue info...");
         List<YarnCluster> clusters = getClusters();
         Map<String, MapleClusterQueue> queueMap = new HashMap<>();
-        for (YarnCluster cluster : clusters) {
+        /*for (YarnCluster cluster : clusters) {
             String clusterName = cluster.getName();
             YarnScheduler yarnScheduler = getClusterQueueInfo(clusterName);
             if (yarnScheduler == null) {
@@ -61,7 +62,8 @@ public class ResourceTasks {
                 MapleClusterQueue value = new MapleClusterQueue(queue.getNumPendingApplications());
                 queueMap.put(key, value);
             }
-        }
+        }*/
+        queueMap.put(MapleClusterQueue.getKey("hadoop", "default"), new MapleClusterQueue(0));
         clusterQueueService.cacheQueueInfos(queueMap);
     }
 

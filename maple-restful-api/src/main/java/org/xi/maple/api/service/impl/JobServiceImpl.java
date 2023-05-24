@@ -16,6 +16,7 @@ import org.xi.maple.api.persistence.entity.JobEntity;
 import org.xi.maple.api.persistence.mapper.JobMapper;
 import org.xi.maple.api.service.JobQueueService;
 import org.xi.maple.api.service.JobService;
+import org.xi.maple.common.constant.EngineTypeConstants;
 import org.xi.maple.common.constant.JobStatusConstants;
 import org.xi.maple.redis.model.MapleJobQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
@@ -85,8 +86,9 @@ public class JobServiceImpl implements JobService {
     public Integer submitJob(SubmitJobRequest jobReq) {
         final Integer jobId = addJob(jobReq);
         threadPoolTaskExecutor.execute(() -> {
-            MapleJobQueue jobQueue = MapleRedisUtil.getJobQueue(jobReq.getCluster(), jobReq.getQueue(),
-                    jobReq.getFromApp(), jobReq.getJobType(), jobReq.getGroup(), jobReq.getPriority());
+            MapleJobQueue jobQueue = MapleRedisUtil.getJobQueue(jobReq.getCluster(), jobReq.getClusterQueue(),
+                    jobReq.getEngineCategory(), jobReq.getEngineVersion(), EngineTypeConstants.getEngineTypeByJob(jobReq.getJobType()),
+                    jobReq.getFromApp(), jobReq.getGroup(), jobReq.getPriority());
             jobQueueService.addOrUpdate(jobQueue);
             RLock lock = redissonClient.getLock(jobQueue.getLockName());
             MapleRedisUtil.waitLockAndExecute(lock, jobQueue.getLockName(), 10, 2, () -> {

@@ -3,6 +3,7 @@ package org.xi.maple.redis.util;
 import org.redisson.api.RLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xi.maple.common.constant.EngineTypeConstants;
 import org.xi.maple.redis.model.MapleJobQueue;
 
 import java.util.concurrent.TimeUnit;
@@ -14,42 +15,32 @@ public class MapleRedisUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(MapleRedisUtil.class);
 
-    public static final String JOB_QUEUE_CACHE_NAME = "mq";
-
     /**
      * 获取用户组作业队列
+     * 队列标识：cluster + queue + 引擎种类 + 引擎版本 + 任务类型(once,resident) + 来源应用 + group + 优先级
+     * 例：hadoop_prod-root.default-spark-3.2.3-once-schedule-maple-1
      *
-     * @return redis 队列名
+     * @param cluster        集群
+     * @param clusterQueue   集群队列
+     * @param engineCategory 引擎分类
+     * @param engineVersion  引擎版本
+     * @param engineType     引擎类型
+     * @param fromApp        来源应用
+     * @param group          用户组
+     * @param priority       优先级
+     * @return redis 队列信息
      */
     public static MapleJobQueue getJobQueue(
-            String cluster,
-            String clusterQueue,
-            String fromApp,
-            String jobType,
-            String group,
-            Integer priority
+            String cluster, String clusterQueue,
+            String engineCategory, String engineVersion, String engineType,
+            String fromApp, String group, Integer priority
     ) {
-        String queueName = String.format("%s-%s-%s-%s", fromApp, jobType, group, priority);
+        String queueName = EngineTypeConstants.isOnce(engineType)
+                ? String.join("-", cluster, clusterQueue, fromApp, group, priority.toString())
+                : String.join("-", cluster, clusterQueue, engineCategory, engineVersion, engineType, fromApp, group, priority.toString());
         // mgq (maple-group-queue), mgql (maple-group-queue-lock)
-        return new MapleJobQueue("mgq::" + queueName, "mgql::" + queueName, cluster, clusterQueue, jobType);
-    }
-
-    /**
-     * 获取用户作业队列
-     *
-     * @return redis 队列名
-     */
-    public static MapleJobQueue getUserJobQueue(
-            String cluster,
-            String clusterQueue,
-            String fromApp,
-            String jobType,
-            String user,
-            Integer priority
-    ) {
-        String queueName = String.format("%s-%s-%s-%s", fromApp, jobType, user, priority);
-        // muq (maple-user-queue), muql (maple-user-queue-lock)
-        return new MapleJobQueue("muq::" + queueName, "muql::" + queueName, cluster, clusterQueue, jobType);
+        return new MapleJobQueue("mgq::" + queueName, "mgql::" + queueName,
+                cluster, clusterQueue, engineCategory, engineVersion, engineType, fromApp, group, priority);
     }
 
     /**
@@ -59,23 +50,32 @@ public class MapleRedisUtil {
      * @return redis 引擎实例锁的 key
      */
     public static String getEngineInstanceLock(Integer engineInstanceId) {
-        // mel (maple-engine-instance-lock)
-        return String.format("meil::%s", engineInstanceId);
+        // meil (maple-engine-instance-lock)
+        return "meil::" + engineInstanceId;
     }
 
     /**
      * 获取引擎锁
      *
-     * @param user           用户
      * @param cluster        集群
+     * @param clusterQueue   集群队列
      * @param engineCategory 引擎分类
      * @param engineType     引擎类型
      * @param engineVersion  引擎版本
+     * @param fromApp        来源应用
+     * @param group          用户组
      * @return redis 引擎锁的 key
      */
-    public static String getEngineLock(String user, String cluster, String engineCategory, String engineType, String engineVersion) {
+    public static String getEngineLock(
+            String cluster, String clusterQueue,
+            String engineCategory, String engineType, String engineVersion,
+            String fromApp, String group
+    ) {
+        String queueName = EngineTypeConstants.isOnce(engineType)
+                ? String.join("-", cluster, clusterQueue, fromApp, group)
+                : String.join("-", cluster, clusterQueue, engineCategory, engineVersion, engineType, fromApp, group);
         // mel (maple-engine-lock)
-        return String.format("mel::%s-%s-%s-%s-%s", user, cluster, engineCategory, engineType, engineVersion);
+        return "mel::" + queueName;
     }
 
     /**
@@ -124,7 +124,10 @@ public class MapleRedisUtil {
      * @param runnable          执行的操作
      * @param lockFailOperation 获取锁失败时的操作
      */
-    public static void tryLockAndExecute(RLock lock, String lockName, long leaseTime, TimeUnit unit, Runnable runnable, Runnable lockFailOperation) {
+    public static void tryLockAndExecute(RLock lock, String lockName,
+                                         long leaseTime, TimeUnit unit,
+                                         Runnable runnable, Runnable lockFailOperation
+    ) {
         waitLockAndExecute(lock, lockName, 0, leaseTime, unit, runnable, lockFailOperation);
     }
 
@@ -151,7 +154,11 @@ public class MapleRedisUtil {
      * @param runnable          执行的操作
      * @param lockFailOperation 获取锁失败时的操作
      */
-    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, Runnable runnable, Runnable lockFailOperation) {
+    public static void waitLockAndExecute(
+            RLock lock, String lockName,
+            long time, long leaseTime,
+            Runnable runnable, Runnable lockFailOperation
+    ) {
         waitLockAndExecute(lock, lockName, time, leaseTime, TimeUnit.SECONDS, runnable, lockFailOperation);
     }
 
@@ -165,7 +172,11 @@ public class MapleRedisUtil {
      * @param unit      时间单位
      * @param runnable  执行的操作
      */
-    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, TimeUnit unit, Runnable runnable) {
+    public static void waitLockAndExecute(
+            RLock lock, String lockName,
+            long time, long leaseTime, TimeUnit unit,
+            Runnable runnable
+    ) {
         waitLockAndExecute(lock, lockName, time, leaseTime, unit, runnable, null);
     }
 
@@ -180,7 +191,11 @@ public class MapleRedisUtil {
      * @param runnable          执行的操作
      * @param lockFailOperation 获取锁失败时的操作
      */
-    public static void waitLockAndExecute(RLock lock, String lockName, long time, long leaseTime, TimeUnit unit, Runnable runnable, Runnable lockFailOperation) {
+    public static void waitLockAndExecute(
+            RLock lock, String lockName,
+            long time, long leaseTime, TimeUnit unit,
+            Runnable runnable, Runnable lockFailOperation
+    ) {
         if (runnable == null) {
             return;
         }

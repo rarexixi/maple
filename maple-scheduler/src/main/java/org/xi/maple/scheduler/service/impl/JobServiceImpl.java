@@ -3,7 +3,7 @@ package org.xi.maple.scheduler.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.xi.maple.scheduler.model.EngineInstance;
+import org.xi.maple.scheduler.persistence.entity.EngineInstanceEntity;
 import org.xi.maple.scheduler.persistence.entity.JobEntity;
 import org.xi.maple.scheduler.persistence.mapper.JobMapper;
 import org.xi.maple.scheduler.service.EngineInstanceService;
@@ -43,12 +43,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void submitJobToEngine(JobEntity job, EngineInstance engine) {
-
+    public void submitJobToEngine(JobEntity job, EngineInstanceEntity engine) {
+        System.out.println("submitJobToEngine");
     }
 
     @Override
     public void submitJobToNewEngine(JobEntity job) {
-
+        System.out.println("submitJobToNewEngine");
     }
 }

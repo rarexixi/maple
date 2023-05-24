@@ -20,7 +20,12 @@ public class MapleJobQueue implements Serializable {
     private String lockName;
     private String cluster;
     private String clusterQueue;
-    private String type;
+    private String engineCategory;
+    private String engineVersion;
+    private String engineType;
+    private String fromApp;
+    private String group;
+    private Integer priority;
 
     /**
      * redis 队列作业对象

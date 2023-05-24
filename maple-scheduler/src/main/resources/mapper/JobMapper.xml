@@ -1,75 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.xi.maple.api.persistence.mapper.JobMapper">
+<mapper namespace="org.xi.maple.scheduler.persistence.mapper.JobMapper">
 
-    <resultMap id="ResultMap" type="org.xi.maple.api.persistence.entity.JobEntity">
+    <resultMap id="ResultMap" type="org.xi.maple.scheduler.persistence.entity.JobEntity">
         <result property="id" column="id"/>
         <result property="jobName" column="job_name"/>
-        <result property="fromApp" column="from_app"/>
+        <result property="jobType" column="job_type"/>
         <result property="uniqueId" column="unique_id"/>
         <result property="jobComment" column="job_comment"/>
+        <result property="fromApp" column="from_app"/>
+        <result property="cluster" column="cluster"/>
+        <result property="clusterQueue" column="cluster_queue"/>
         <result property="engineId" column="engine_id"/>
         <result property="engineCategory" column="engine_category"/>
         <result property="engineVersion" column="engine_version"/>
-        <result property="jobType" column="job_type"/>
+        <result property="priority" column="priority"/>
+        <result property="runPriority" column="run_priority"/>
         <result property="contentType" column="content_type"/>
         <result property="resultType" column="result_type"/>
         <result property="status" column="status"/>
         <result property="group" column="group"/>
         <result property="user" column="user"/>
         <result property="webhooks" column="webhooks"/>
+        <result property="configuration" column="configuration"/>
         <result property="extInfo" column="ext_info"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="tableName">`maple_job`</sql>
-
-    <!--插入执行作业-->
-    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
-        insert into <include refid="tableName"/>
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="entity.id != null">`id`,</if>
-            <if test="entity.jobName != null">`job_name`,</if>
-            <if test="entity.fromApp != null">`from_app`,</if>
-            <if test="entity.uniqueId != null">`unique_id`,</if>
-            <if test="entity.jobComment != null">`job_comment`,</if>
-            <if test="entity.engineId != null">`engine_id`,</if>
-            <if test="entity.engineCategory != null">`engine_category`,</if>
-            <if test="entity.engineVersion != null">`engine_version`,</if>
-            <if test="entity.jobType != null">`job_type`,</if>
-            <if test="entity.contentType != null">`content_type`,</if>
-            <if test="entity.resultType != null">`result_type`,</if>
-            <if test="entity.status != null">`status`,</if>
-            <if test="entity.group != null">`group`,</if>
-            <if test="entity.user != null">`user`,</if>
-            <if test="entity.webhooks != null">`webhooks`,</if>
-            <if test="entity.extInfo != null">`ext_info`,</if>
-            <if test="entity.createTime != null">`create_time`,</if>
-            <if test="entity.updateTime != null">`update_time`,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="entity.id != null">#{entity.id},</if>
-            <if test="entity.jobName != null">#{entity.jobName},</if>
-            <if test="entity.fromApp != null">#{entity.fromApp},</if>
-            <if test="entity.uniqueId != null">#{entity.uniqueId},</if>
-            <if test="entity.jobComment != null">#{entity.jobComment},</if>
-            <if test="entity.engineId != null">#{entity.engineId},</if>
-            <if test="entity.engineCategory != null">#{entity.engineCategory},</if>
-            <if test="entity.engineVersion != null">#{entity.engineVersion},</if>
-            <if test="entity.jobType != null">#{entity.jobType},</if>
-            <if test="entity.contentType != null">#{entity.contentType},</if>
-            <if test="entity.resultType != null">#{entity.resultType},</if>
-            <if test="entity.status != null">#{entity.status},</if>
-            <if test="entity.group != null">#{entity.group},</if>
-            <if test="entity.user != null">#{entity.user},</if>
-            <if test="entity.webhooks != null">#{entity.webhooks},</if>
-            <if test="entity.extInfo != null">#{entity.extInfo},</if>
-            <if test="entity.createTime != null">#{entity.createTime},</if>
-            <if test="entity.updateTime != null">#{entity.updateTime},</if>
-        </trim>
-    </insert>
 
     <!--根据主键条件更新执行作业-->
     <update id="updateById">
@@ -78,14 +38,23 @@
             <if test="entity.jobName != null">
                 `job_name` = #{entity.jobName},
             </if>
-            <if test="entity.fromApp != null">
-                `from_app` = #{entity.fromApp},
+            <if test="entity.jobType != null">
+                `job_type` = #{entity.jobType},
             </if>
             <if test="entity.uniqueId != null">
                 `unique_id` = #{entity.uniqueId},
             </if>
             <if test="entity.jobComment != null">
                 `job_comment` = #{entity.jobComment},
+            </if>
+            <if test="entity.fromApp != null">
+                `from_app` = #{entity.fromApp},
+            </if>
+            <if test="entity.cluster != null">
+                `cluster` = #{entity.cluster},
+            </if>
+            <if test="entity.clusterQueue != null">
+                `cluster_queue` = #{entity.clusterQueue},
             </if>
             <if test="entity.engineId != null">
                 `engine_id` = #{entity.engineId},
@@ -96,8 +65,11 @@
             <if test="entity.engineVersion != null">
                 `engine_version` = #{entity.engineVersion},
             </if>
-            <if test="entity.jobType != null">
-                `job_type` = #{entity.jobType},
+            <if test="entity.priority != null">
+                `priority` = #{entity.priority},
+            </if>
+            <if test="entity.runPriority != null">
+                `run_priority` = #{entity.runPriority},
             </if>
             <if test="entity.contentType != null">
                 `content_type` = #{entity.contentType},
@@ -116,6 +88,9 @@
             </if>
             <if test="entity.webhooks != null">
                 `webhooks` = #{entity.webhooks},
+            </if>
+            <if test="entity.configuration != null">
+                `configuration` = #{entity.configuration},
             </if>
             <if test="entity.extInfo != null">
                 `ext_info` = #{entity.extInfo},
@@ -140,28 +115,31 @@
     </update>
 
     <!--根据主键获取执行作业详情-->
-    <select id="detailById" resultMap="ExtResultMap">
-        SELECT DISTINCT
-        MT.`id`,
-        MT.`job_name`,
-        MT.`from_app`,
-        MT.`unique_id`,
-        MT.`job_comment`,
-        MT.`engine_id`,
-        MT.`engine_category`,
-        MT.`engine_version`,
-        MT.`job_type`,
-        MT.`content_type`,
-        MT.`result_type`,
-        MT.`status`,
-        MT.`group`,
-        MT.`user`,
-        MT.`webhooks`,
-        MT.`ext_info`,
-        MT.`create_time`,
-        MT.`update_time`
-        FROM
-        <include refid="tableName"/> MT
+    <select id="detailById" resultMap="ResultMap">
+        SELECT MT.`id`,
+               MT.`job_name`,
+               MT.`job_type`,
+               MT.`unique_id`,
+               MT.`job_comment`,
+               MT.`from_app`,
+               MT.`cluster`,
+               MT.`cluster_queue`,
+               MT.`engine_id`,
+               MT.`engine_category`,
+               MT.`engine_version`,
+               MT.`priority`,
+               MT.`run_priority`,
+               MT.`content_type`,
+               MT.`result_type`,
+               MT.`status`,
+               MT.`group`,
+               MT.`user`,
+               MT.`webhooks`,
+               MT.`configuration`,
+               MT.`ext_info`,
+               MT.`create_time`,
+               MT.`update_time`
+        FROM <include refid="tableName"/> MT
         <where>
             MT.`id` = #{id}
         </where>

@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: maple-api
+  cache:
+    type: redis
   redis:
     # cluster:
     #   nodes:
