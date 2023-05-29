@@ -29,6 +29,7 @@
         <module>maple-restful-api</module>
         <module>maple-scheduler</module>
         <module>maple-plugins/maple-plugin-spark3</module>
+        <module>maple-plugins/maple-engine-common</module>
     </modules>
 
     <repositories>
