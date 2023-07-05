@@ -10,7 +10,7 @@ import org.xi.maple.model._
 import org.xi.maple.util.{JsonUtils, PluginUtil}
 
 import javax.validation.{Validation, Validator}
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object MapleExecution {
@@ -24,15 +24,15 @@ object MapleExecution {
 
     val checkResult = new CheckResult()
     sources.foreach(source => {
-      source.getConfig.setVariables(mapleData.getVariables)
+      source.getConfig.setVariables(mergeMap(source.getConfig.getVariables, mapleData.getVariables))
       checkResult.checkResultTable(source)
     })
     transformations.foreach(transformation => {
-      transformation.getConfig.setVariables(mapleData.getVariables)
+      transformation.getConfig.setVariables(mergeMap(transformation.getConfig.getVariables, mapleData.getVariables))
       checkResult.checkResultTable(transformation)
     })
     sinks.foreach(sink => {
-      sink.getConfig.setVariables(mapleData.getVariables)
+      sink.getConfig.setVariables(mergeMap(sink.getConfig.getVariables, mapleData.getVariables))
       checkResult.checkPluginConfig(sink)
     })
     checkResult.check()
@@ -41,43 +41,45 @@ object MapleExecution {
   }
 
   def execute[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](spark: SparkSession, sources: Array[MapleSource[SR]], transformations: Array[MapleTransform[TR]], sinks: Array[MapleSink[SK]]): Unit = {
-    if (sources != null && !sources.isEmpty) sources.foreach(source => sourceProcess(spark, source))
-    if (transformations != null && !transformations.isEmpty) transformations.foreach(transformation => transformProcess(spark, transformation))
-    if (sinks != null && !sinks.isEmpty) sinks.foreach(sink => sinkProcess(spark, sink))
+    if (sources != null) sources.foreach(source => sourceProcess(spark, source))
+    if (transformations != null) transformations.foreach(transformation => transformProcess(spark, transformation))
+    if (sinks != null) sinks.foreach(sink => sinkProcess(spark, sink))
 
     MapleTempData.clean(spark.sqlContext)
   }
 
-  def getPlugins[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig, T <: Object](mapleData: MapleArrayData): Array[Any] = {
+  def getPlugins[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](mapleData: MapleArrayData): Array[Any] = {
     val checkResult = new CheckResult()
     val plugins = new Array[Any](mapleData.getPlugins.length)
     for (i <- mapleData.getPlugins.indices) {
       val config = mapleData.getPlugins()(i)
+      var paramsConfig: MaplePluginConfig = null
       config.getType match {
         case "source" =>
           val source = PluginUtil.createSource[SR](config.getName, config.getConfig)
-          source.getConfig.setVariables(mapleData.getVariables)
+          paramsConfig = source.getConfig
           checkResult.checkResultTable(source)
           plugins(i) = source
         case "transformation" =>
           val transformation = PluginUtil.createTransform[TR](config.getName, config.getConfig)
-          transformation.getConfig.setVariables(mapleData.getVariables)
+          paramsConfig = transformation.getConfig
           checkResult.checkResultTable(transformation)
           plugins(i) = transformation
         case "sink" =>
           val sink = PluginUtil.createSink[SK](config.getName, config.getConfig)
-          sink.getConfig.setVariables(mapleData.getVariables)
+          paramsConfig = sink.getConfig
           checkResult.checkPluginConfig(sink)
           plugins(i) = sink
         case t: String =>
           throw new ConfigRuntimeException(s"[$t] is not a valid type")
       }
+      paramsConfig.setVariables(mergeMap(paramsConfig.getVariables, mapleData.getVariables))
     }
     checkResult.check()
     plugins
   }
 
-  def execute[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig, T <: Object](spark: SparkSession, plugins: Array[Any]): Unit = {
+  def execute[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](spark: SparkSession, plugins: Array[Any]): Unit = {
     if (plugins == null || plugins.isEmpty) return
     plugins.foreach {
       case source: MapleSource[SR] => sourceProcess(spark, source)
@@ -87,6 +89,16 @@ object MapleExecution {
     }
 
     MapleTempData.clean(spark.sqlContext)
+  }
+
+  private def mergeMap(map1: java.util.Map[String, String], map2: java.util.Map[String, String]): java.util.Map[String, String] = {
+    val map = if (map1 != null) map1 else new java.util.HashMap[String, String]()
+    if (map2 != null && !map2.isEmpty) {
+      map2.entrySet().forEach(entry => {
+        map.putIfAbsent(entry.getKey, entry.getValue)
+      })
+    }
+    map
   }
 
   private def sourceProcess[T <: SourceConfig](spark: SparkSession, source: MapleSource[T]): Unit = {
@@ -149,7 +161,7 @@ object MapleExecution {
       if (!violations.isEmpty) {
         success = false
         log.error(s"Configuration check error, ${JsonUtils.toJsonString(plugin.getConfig)}")
-        for (violation <- violations) {
+        for (violation <- violations.asScala) {
           if (violation.getMessageTemplate.startsWith("{") && violation.getMessageTemplate.endsWith("}")) {
             log.error(s"[${violation.getPropertyPath}] ${violation.getMessage}")
           } else {

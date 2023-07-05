@@ -15,7 +15,9 @@ public class MapleGroupData extends MaplePluginConfig implements Serializable {
     }
 
     public void setSources(MapleDataConfig[] sources) {
-        this.sources = sources;
+        if (sources != null) {
+            this.sources = sources;
+        }
     }
 
     public MapleDataConfig[] getTransformations() {
@@ -23,7 +25,9 @@ public class MapleGroupData extends MaplePluginConfig implements Serializable {
     }
 
     public void setTransformations(MapleDataConfig[] transformations) {
-        this.transformations = transformations;
+        if (transformations != null) {
+            this.transformations = transformations;
+        }
     }
 
     public MapleDataConfig[] getSinks() {
@@ -31,7 +35,9 @@ public class MapleGroupData extends MaplePluginConfig implements Serializable {
     }
 
     public void setSinks(MapleDataConfig[] sinks) {
-        this.sinks = sinks;
+        if (sinks != null) {
+            this.sinks = sinks;
+        }
     }
 
     public static MapleGroupData getData(String data) {
