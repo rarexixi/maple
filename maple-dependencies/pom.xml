@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.xi</groupId>
+    <groupId>org.xi.maple</groupId>
     <artifactId>maple-dependencies</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -12,13 +12,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
 
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
 
         <spark.version>3.3.1</spark.version>
-        <scala.version>2.12.15</scala.version>
+        <scala.version>2.12.17</scala.version>
         <scala.binary.version>2.12</scala.binary.version>
         <lombok.version>1.18.24</lombok.version>
 
@@ -34,7 +34,6 @@
         <redisson-spring-boot-starter.version>3.17.7</redisson-spring-boot-starter.version>
         <mybatis-spring-boot-starter.version>2.3.0</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>1.4.6</pagehelper-spring-boot-starter.version>
-
     </properties>
 
     <repositories>

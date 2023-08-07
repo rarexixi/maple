@@ -8,20 +8,20 @@
         <version>2.7.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>org.xi</groupId>
+    <groupId>org.xi.maple</groupId>
     <artifactId>maple-restful-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>maple-restful-api</name>
     <description>maple-restful-api</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <spring-cloud.version>2021.0.6</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.xi</groupId>
+                <groupId>org.xi.maple</groupId>
                 <artifactId>maple-dependencies</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
                 <type>pom</type>
@@ -43,17 +43,17 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.xi</groupId>
+            <groupId>org.xi.maple</groupId>
             <artifactId>maple-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.xi</groupId>
+            <groupId>org.xi.maple</groupId>
             <artifactId>maple-spring-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.xi</groupId>
+            <groupId>org.xi.maple</groupId>
             <artifactId>maple-redis</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.xi</groupId>
+    <groupId>org.xi.maple</groupId>
     <artifactId>maple</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -12,10 +12,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
+        <java.version>8</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.compilerVersion>8</maven.compiler.compilerVersion>
     </properties>
 
     <modules>
@@ -28,8 +28,9 @@
         <module>maple-redis</module>
         <module>maple-restful-api</module>
         <module>maple-scheduler</module>
-        <module>maple-plugins/maple-plugin-spark3</module>
-        <module>maple-plugins/maple-engine-common</module>
+        <module>maple-engine-plugins</module>
+        <module>maple-engine-manager</module>
+        <module>maple-engine-builder-base</module>
     </modules>
 
     <repositories>

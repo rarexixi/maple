@@ -4,20 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.xi</groupId>
-    <artifactId>maple-engine-common</artifactId>
+    <groupId>org.xi.maple</groupId>
+    <artifactId>maple-engine-spark3-builder</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <name>maple-engine-spark3-builder</name>
+    <description>maple-engine-spark3-builder</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.xi</groupId>
+                <groupId>org.xi.maple</groupId>
                 <artifactId>maple-dependencies</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
                 <type>pom</type>
@@ -31,14 +33,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.14</version>
-            <scope>compile</scope>
+            <groupId>org.xi.maple</groupId>
+            <artifactId>maple-engine-builder-base</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
 
 </project>

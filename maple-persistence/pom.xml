@@ -16,7 +16,7 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.xi</groupId>
+				<groupId>org.xi.maple</groupId>
 				<artifactId>maple-dependencies</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<type>pom</type>
@@ -26,9 +26,9 @@
 	</dependencyManagement>
 
     <properties>
-        <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>8</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
