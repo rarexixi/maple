@@ -13,6 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
+
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <maven.compiler.compilerVersion>8</maven.compiler.compilerVersion>
@@ -20,30 +21,17 @@
 
     <modules>
         <module>maple-dependencies</module>
-        <module>maple-core</module>
         <module>maple-common</module>
         <module>maple-spring-common</module>
         <module>maple-datasource</module>
-        <module>maple-persistence</module>
+        <module>maple-persistence-service</module>
+        <module>maple-persistence-models</module>
         <module>maple-redis</module>
         <module>maple-restful-api</module>
         <module>maple-scheduler</module>
         <module>maple-engine-plugins</module>
         <module>maple-engine-manager</module>
         <module>maple-engine-builder-base</module>
+        <module>maple-spring-dependencies</module>
     </modules>
-
-    <repositories>
-        <repository>
-            <id>aliyun</id>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>

@@ -3,21 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.xi.maple</groupId>
+        <artifactId>maple-spring-dependencies</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
 
-    <groupId>org.xi.maple</groupId>
     <artifactId>maple-plugin-spark3</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>maple-plugin-spark3</name>
     <description>maple-plugin-spark3</description>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <scala.version>2.12.17</scala.version>
-        <scala.binary.version>2.12</scala.binary.version>
-        <spark.version>3.3.2</spark.version>
         <jetty.version>9.4.44.v20210927</jetty.version>
         <spark.shade.packageName>org.sparkproject</spark.shade.packageName>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>

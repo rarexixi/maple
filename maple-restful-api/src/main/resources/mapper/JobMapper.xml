@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.xi.maple.api.persistence.mapper.JobMapper">
+<mapper namespace="org.xi.maple.datacalc.api.persistence.mapper.JobMapper">
 
-    <resultMap id="ResultMap" type="org.xi.maple.api.persistence.entity.JobEntity">
+    <resultMap id="ResultMap" type="org.xi.maple.datacalc.api.persistence.entity.JobEntity">
         <result property="id" column="id"/>
         <result property="jobName" column="job_name"/>
         <result property="jobType" column="job_type"/>

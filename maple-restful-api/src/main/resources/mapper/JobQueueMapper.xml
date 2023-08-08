@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.xi.maple.api.persistence.mapper.JobQueueMapper">
+<mapper namespace="org.xi.maple.datacalc.api.persistence.mapper.JobQueueMapper">
 
-    <resultMap id="ResultMap" type="org.xi.maple.api.persistence.entity.JobQueueEntity">
+    <resultMap id="ResultMap" type="org.xi.maple.datacalc.api.persistence.entity.JobQueueEntity">
         <result property="queueName" column="queue_name"/>
         <result property="lockName" column="lock_name"/>
         <result property="cluster" column="cluster"/>

@@ -16,8 +16,12 @@
 
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.compilerVersion>8</maven.compiler.compilerVersion>
 
-        <spark.version>3.3.1</spark.version>
+
+        <spring-boot.version>2.7.7</spring-boot.version>
+        <spring-cloud.version>2021.0.6</spring-cloud.version>
+        <spark.version>3.3.2</spark.version>
         <scala.version>2.12.17</scala.version>
         <scala.binary.version>2.12</scala.binary.version>
         <lombok.version>1.18.24</lombok.version>
@@ -52,12 +56,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <scope>provided</scope>
-            </dependency>
 
             <dependency>
                 <groupId>org.scala-lang</groupId>
