@@ -22,11 +22,9 @@ object MapleApp {
 
     val execType = argsMap.getOrElse("exec-type", "array")
     if ("group" == execType) {
-      val (sources, transformations, sinks) = MapleExecution.getPlugins(MapleGroupData.getData(config))
-      execute(spark => MapleExecution.execute(spark, sources, transformations, sinks))
+      execute(spark => MapleExecution.executeGroup(spark, MapleGroupData.getData(config)))
     } else {
-      val plugins = MapleExecution.getPlugins(MapleArrayData.getData(config))
-      execute(spark => MapleExecution.execute(spark, plugins))
+      execute(spark => MapleExecution.executeArray(spark, MapleArrayData.getData(config)))
     }
   }
 

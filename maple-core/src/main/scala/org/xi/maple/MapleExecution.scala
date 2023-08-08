@@ -12,80 +12,117 @@ import org.xi.maple.util.{JsonUtils, PluginUtil}
 import javax.validation.{Validation, Validator}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.util.control.Breaks
 
 object MapleExecution {
 
   private val log: Logger = LoggerFactory.getLogger(MapleExecution.getClass)
 
-  def getPlugins[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](mapleData: MapleGroupData): (Array[MapleSource[SR]], Array[MapleTransform[TR]], Array[MapleSink[SK]]) = {
-    val sources = mapleData.getSources.map(source => PluginUtil.createSource[SR](source.getName, source.getConfig))
-    val transformations = mapleData.getTransformations.map(sink => PluginUtil.createTransform[TR](sink.getName, sink.getConfig))
-    val sinks = mapleData.getSinks.map(sink => PluginUtil.createSink[SK](sink.getName, sink.getConfig))
-
-    val checkResult = new CheckResult()
-    sources.foreach(source => {
-      source.getConfig.setVariables(mergeMap(source.getConfig.getVariables, mapleData.getVariables))
-      checkResult.checkResultTable(source)
-    })
-    transformations.foreach(transformation => {
-      transformation.getConfig.setVariables(mergeMap(transformation.getConfig.getVariables, mapleData.getVariables))
-      checkResult.checkResultTable(transformation)
-    })
-    sinks.foreach(sink => {
-      sink.getConfig.setVariables(mergeMap(sink.getConfig.getVariables, mapleData.getVariables))
-      checkResult.checkPluginConfig(sink)
-    })
-    checkResult.check()
-
-    (sources, transformations, sinks)
+  private def getSourceAndCheck[SR <: SourceConfig](dc: MapleDataConfig,
+                                                    gv: java.util.Map[String, String],
+                                                    cr: CheckResult,
+                                                    consumer: MapleSource[SR] => Unit): (SR, () => Unit) = {
+    val plugin = PluginUtil.createSource[SR](dc.getName, dc.getConfig)
+    plugin.getConfig.setVariables(mergeMap(plugin.getConfig.getVariables, gv))
+    cr.checkResultTable(plugin.getConfig)
+    (plugin.getConfig, () => consumer(plugin))
   }
 
-  def execute[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](spark: SparkSession, sources: Array[MapleSource[SR]], transformations: Array[MapleTransform[TR]], sinks: Array[MapleSink[SK]]): Unit = {
-    if (sources != null) sources.foreach(source => sourceProcess(spark, source))
-    if (transformations != null) transformations.foreach(transformation => transformProcess(spark, transformation))
-    if (sinks != null) sinks.foreach(sink => sinkProcess(spark, sink))
+  private def getTransformAndCheck[TR <: TransformConfig](dc: MapleDataConfig,
+                                                          gv: java.util.Map[String, String],
+                                                          cr: CheckResult,
+                                                          consumer: MapleTransform[TR] => Unit): (TR, () => Unit) = {
+    val plugin = PluginUtil.createTransform[TR](dc.getName, dc.getConfig)
+    plugin.getConfig.setVariables(mergeMap(plugin.getConfig.getVariables, gv))
+    cr.checkResultTable(plugin.getConfig)
+    (plugin.getConfig, () => consumer(plugin))
+  }
+
+  private def getSinkAndCheck[SK <: SinkConfig](dc: MapleDataConfig,
+                                                gv: java.util.Map[String, String],
+                                                cr: CheckResult,
+                                                consumer: MapleSink[SK] => Unit): (SK, () => Unit) = {
+    val plugin = PluginUtil.createSink[SK](dc.getName, dc.getConfig)
+    plugin.getConfig.setVariables(mergeMap(plugin.getConfig.getVariables, gv))
+    cr.checkPluginConfig(plugin.getConfig)
+    (plugin.getConfig, () => consumer(plugin))
+  }
+
+  def executeGroup[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](spark: SparkSession,
+                                                                                mapleData: MapleGroupData,
+                                                                                terminateCondition: MaplePluginConfig => Boolean = null,
+                                                                                dsConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
+    val cr = new CheckResult()
+    val gv = mapleData.getVariables
+    val sources = mapleData.getSources.map { dc =>
+      getSourceAndCheck(dc, gv, cr, (plugin: MapleSource[SR]) => sourceProcess(spark, plugin, dsConsumer))
+    }
+    val transformations = mapleData.getTransformations.map { dc =>
+      getTransformAndCheck(dc, gv, cr, (plugin: MapleTransform[TR]) => transformProcess(spark, plugin, dsConsumer))
+    }
+    val sinks = mapleData.getSinks.map { dc =>
+      getSinkAndCheck(dc, gv, cr, (plugin: MapleSink[SK]) => sinkProcess(spark, plugin, dsConsumer))
+    }
+    cr.check()
+
+    var isTermination: Boolean = false
+    val terminable = terminateCondition != null
+
+    def consumePlugin[T <: MaplePluginConfig](plugins: Array[(T, () => Unit)]): Unit =
+      if (plugins != null && plugins.isEmpty && !isTermination) {
+        val loop = new Breaks
+        loop.breakable {
+          plugins.foreach { case (config, process) =>
+            process()
+            isTermination = terminable && terminateCondition(config)
+            if (isTermination) {
+              loop.break()
+            }
+          }
+        }
+        plugins.foreach { case (_, process) => process() }
+      }
+
+    consumePlugin(sources)
+    consumePlugin(transformations)
+    consumePlugin(sinks)
 
     MapleTempData.clean(spark.sqlContext)
   }
 
-  def getPlugins[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](mapleData: MapleArrayData): Array[Any] = {
-    val checkResult = new CheckResult()
-    val plugins = new Array[Any](mapleData.getPlugins.length)
-    for (i <- mapleData.getPlugins.indices) {
-      val config = mapleData.getPlugins()(i)
-      var paramsConfig: MaplePluginConfig = null
-      config.getType match {
+  def executeArray[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](spark: SparkSession,
+                                                                                mapleData: MapleArrayData,
+                                                                                terminateCondition: MaplePluginConfig => Boolean = null,
+                                                                                dsConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
+    if (mapleData.getPlugins == null || mapleData.getPlugins.isEmpty) {
+      throw new ConfigRuntimeException("plugins is empty")
+    }
+
+    val cr = new CheckResult()
+    val gv = mapleData.getVariables
+    val plugins = mapleData.getPlugins.map { dc =>
+      dc.getType match {
         case "source" =>
-          val source = PluginUtil.createSource[SR](config.getName, config.getConfig)
-          paramsConfig = source.getConfig
-          checkResult.checkResultTable(source)
-          plugins(i) = source
+          getSourceAndCheck(dc, gv, cr, (plugin: MapleSource[SR]) => sourceProcess(spark, plugin, dsConsumer))
         case "transformation" =>
-          val transformation = PluginUtil.createTransform[TR](config.getName, config.getConfig)
-          paramsConfig = transformation.getConfig
-          checkResult.checkResultTable(transformation)
-          plugins(i) = transformation
+          getTransformAndCheck(dc, gv, cr, (plugin: MapleTransform[TR]) => transformProcess(spark, plugin, dsConsumer))
         case "sink" =>
-          val sink = PluginUtil.createSink[SK](config.getName, config.getConfig)
-          paramsConfig = sink.getConfig
-          checkResult.checkPluginConfig(sink)
-          plugins(i) = sink
+          getSinkAndCheck(dc, gv, cr, (plugin: MapleSink[SK]) => sinkProcess(spark, plugin, dsConsumer))
         case t: String =>
           throw new ConfigRuntimeException(s"[$t] is not a valid type")
       }
-      paramsConfig.setVariables(mergeMap(paramsConfig.getVariables, mapleData.getVariables))
     }
-    checkResult.check()
-    plugins
-  }
+    cr.check()
 
-  def execute[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig](spark: SparkSession, plugins: Array[Any]): Unit = {
-    if (plugins == null || plugins.isEmpty) return
-    plugins.foreach {
-      case source: MapleSource[SR] => sourceProcess(spark, source)
-      case transform: MapleTransform[TR] => transformProcess(spark, transform)
-      case sink: MapleSink[SK] => sinkProcess(spark, sink)
-      case _ =>
+    val terminable = terminateCondition != null
+    val loop = new Breaks
+    loop.breakable {
+      plugins.foreach { case (config, process) =>
+        process()
+        if (terminable && terminateCondition(config)) {
+          loop.break()
+        }
+      }
     }
 
     MapleTempData.clean(spark.sqlContext)
@@ -101,13 +138,16 @@ object MapleExecution {
     map
   }
 
-  private def sourceProcess[T <: SourceConfig](spark: SparkSession, source: MapleSource[T]): Unit = {
+  private def sourceProcess[T <: SourceConfig](spark: SparkSession, source: MapleSource[T], dfConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
     source.prepare(spark)
     val ds: Dataset[Row] = source.getData(spark)
+    if (dfConsumer != null) {
+      dfConsumer(source.getConfig, ds)
+    }
     tempSaveResultTable(ds, source.getConfig)
   }
 
-  private def transformProcess[T <: TransformConfig](spark: SparkSession, transform: MapleTransform[T]): Unit = {
+  private def transformProcess[T <: TransformConfig](spark: SparkSession, transform: MapleTransform[T], dfConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
     transform.prepare(spark)
     val fromDs: Dataset[Row] = if (StringUtils.isNotBlank(transform.getConfig.getSourceTable)) {
       spark.read.table(transform.getConfig.getSourceTable)
@@ -115,10 +155,13 @@ object MapleExecution {
       null
     }
     val ds: Dataset[Row] = transform.process(spark, fromDs)
+    if (dfConsumer != null) {
+      dfConsumer(transform.getConfig, ds)
+    }
     tempSaveResultTable(ds, transform.getConfig)
   }
 
-  private def sinkProcess[T <: SinkConfig](spark: SparkSession, sink: MapleSink[T]): Unit = {
+  private def sinkProcess[T <: SinkConfig](spark: SparkSession, sink: MapleSink[T], dfConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
     sink.prepare(spark)
     val fromDs: Dataset[Row] = if (StringUtils.isBlank(sink.getConfig.getSourceQuery)) {
       spark.read.table(sink.getConfig.getSourceTable)
@@ -146,21 +189,21 @@ object MapleExecution {
 
     val validator: Validator = Validation.buildDefaultValidatorFactory().getValidator
 
-    def checkResultTable[T <: ResultTableConfig](plugin: MaplePlugin[T]): Unit = {
-      checkPluginConfig(plugin)
-      if (set.contains(plugin.getConfig.getResultTable)) {
-        log.error(s"Result table [${plugin.getConfig.getResultTable}] cannot be duplicate")
+    def checkResultTable[T <: MaplePluginConfig with ResultTableConfig](config: T): Unit = {
+      checkPluginConfig(config)
+      if (set.contains(config.getResultTable)) {
+        log.error(s"Result table [${config.getResultTable}] cannot be duplicate")
         success = false
       } else {
-        set.add(plugin.getConfig.getResultTable)
+        set.add(config.getResultTable)
       }
     }
 
-    def checkPluginConfig[T](plugin: MaplePlugin[T]): Unit = {
-      val violations = validator.validate(plugin.getConfig)
+    def checkPluginConfig[T](config: MaplePluginConfig): Unit = {
+      val violations = validator.validate(config)
       if (!violations.isEmpty) {
         success = false
-        log.error(s"Configuration check error, ${JsonUtils.toJsonString(plugin.getConfig)}")
+        log.error(s"Configuration check error, ${JsonUtils.toJsonString(config)}")
         for (violation <- violations.asScala) {
           if (violation.getMessageTemplate.startsWith("{") && violation.getMessageTemplate.endsWith("}")) {
             log.error(s"[${violation.getPropertyPath}] ${violation.getMessage}")
