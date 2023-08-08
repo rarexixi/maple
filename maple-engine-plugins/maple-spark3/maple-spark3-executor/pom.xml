@@ -10,10 +10,8 @@
         <relativePath/>
     </parent>
 
-    <artifactId>maple-plugin-spark3</artifactId>
+    <artifactId>maple-spark3-executor</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>maple-plugin-spark3</name>
-    <description>maple-plugin-spark3</description>
 
     <properties>
         <jetty.version>9.4.44.v20210927</jetty.version>

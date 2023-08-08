@@ -10,10 +10,8 @@
         <relativePath/>
     </parent>
 
-    <artifactId>maple-engine-spark3-builder</artifactId>
+    <artifactId>maple-spark3-builder</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>maple-engine-spark3-builder</name>
-    <description>maple-engine-spark3-builder</description>
 
     <properties>
     </properties>

@@ -9,12 +9,13 @@
         <relativePath/>
     </parent>
 
-    <artifactId>maple-engine-spark3</artifactId>
+    <artifactId>maple-spark3</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>maple-engine-spark3-builder</module>
-        <module>maple-engine-spark3-data-calc</module>
+        <module>maple-spark3-builder</module>
+        <module>maple-spark3-data-calc</module>
+        <module>maple-spark3-executor</module>
     </modules>
 </project>

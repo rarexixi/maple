@@ -14,8 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
-<!--        <module>maple-plugin-spark3</module>-->
-        <module>maple-engine-spark3</module>
         <module>maple-engine-common</module>
+        <module>maple-spark3</module>
     </modules>
 </project>

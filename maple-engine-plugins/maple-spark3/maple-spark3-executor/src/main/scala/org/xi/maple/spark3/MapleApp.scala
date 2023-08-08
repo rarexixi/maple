@@ -164,7 +164,7 @@ object MapleApp extends Logging {
     ExtendedApiRegister.createServletHandler(spark, "/shutdown", servlet, "")
   }
 
-  private def getJsonResultFromDataFrame[T <: Any](req: HttpServletRequest): T = {
+  private def getJsonResultFromDataFrame[T : Manifest](req: HttpServletRequest): T = {
     val body = req.getReader.lines().collect(Collectors.joining("\n"))
     implicit val formats: DefaultFormats.type = DefaultFormats
     Serialization.read[T](body)
