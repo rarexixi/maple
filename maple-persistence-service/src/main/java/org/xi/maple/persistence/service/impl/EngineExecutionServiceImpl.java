@@ -1,12 +1,13 @@
 package org.xi.maple.persistence.service.impl;
 
+import com.github.pagehelper.Page;
 import org.xi.maple.common.exception.MapleDataInsertException;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.PageList;
+import org.xi.maple.common.util.ObjectUtils;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateProcessRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
-import org.xi.maple.persistence.utils.ObjectUtils;
 import org.xi.maple.persistence.persistence.condition.EngineExecutionSelectCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
@@ -157,9 +158,10 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     public PageList<EngineExecutionListItemResponse> getPageList(EngineExecutionQueryRequest queryRequest, Integer pageNum, Integer pageSize) {
 
         EngineExecutionSelectCondition condition = ObjectUtils.copy(queryRequest, EngineExecutionSelectCondition.class);
-        PageInfo<EngineExecutionEntityExt> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> engineExecutionMapper.select(condition));
-
-        List<EngineExecutionListItemResponse> list = ObjectUtils.copy(pageInfo.getList(), EngineExecutionListItemResponse.class);
-        return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);
+        try(Page<Object> page = PageHelper.startPage(pageNum, pageSize)) {
+            PageInfo<EngineExecutionEntityExt> pageInfo = page.doSelectPageInfo(() -> engineExecutionMapper.select(condition));
+            List<EngineExecutionListItemResponse> list = ObjectUtils.copy(pageInfo.getList(), EngineExecutionListItemResponse.class);
+            return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);
+        }
     }
 }

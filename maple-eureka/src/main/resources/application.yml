@@ -1,0 +1,11 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: maple-eureka
+eureka:
+  client:
+    fetchRegistry: false
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: http://127.0.0.1:${server.port}/eureka/

@@ -25,13 +25,14 @@
         <module>maple-common</module>
         <module>maple-spring-common</module>
         <module>maple-datasource</module>
-        <module>maple-persistence-service</module>
         <module>maple-persistence-models</module>
+        <module>maple-persistence-service</module>
         <module>maple-redis</module>
         <module>maple-restful-api</module>
         <module>maple-scheduler</module>
         <module>maple-engine-plugins</module>
         <module>maple-engine-manager</module>
         <module>maple-engine-builder-base</module>
+        <module>maple-eureka</module>
     </modules>
 </project>
