@@ -102,10 +102,16 @@ create table `maple_engine_category`
 drop table if exists `maple_cluster`;
 create table `maple_cluster`
 (
-    `name`          varchar(16)            not null comment '集群名称',
-    `address`       varchar(16)            not null comment '集群地址',
-    `desc`          varchar(16) default '' not null comment '集群说明',
-    `configuration` text                   not null comment '集群配置',
+    `name`          varchar(16)                           not null comment '集群名称',
+    `address`       varchar(16)                           not null comment '集群地址',
+    `desc`          varchar(16) default ''                not null comment '集群说明',
+    `configuration` text                                  not null comment '集群配置',
+
+    `deleted`       tinyint     default 0                 not null comment '是否删除',
+    `create_user`   int         default 0                 not null comment '创建人',
+    `update_user`   int         default 0                 not null comment '修改人',
+    `create_time`   datetime    default current_timestamp not null comment '创建时间',
+    `update_time`   datetime    default current_timestamp not null on update current_timestamp comment '更新时间',
 
     primary key (`name`)
 ) engine = InnoDB
@@ -123,6 +129,64 @@ create table `maple_cluster_queue`
   default charset = utf8
   collate = utf8_unicode_ci
     comment = '集群队列配置';
+
+drop table if exists `maple`.`maple_engine_execution`;
+create table `maple`.`maple_engine_execution`
+
+(
+    `id`              int                                     not null auto_increment comment '执行ID',
+    `unique_id`       varchar(32)                             not null comment '执行标识',
+    `exec_name`       varchar(256)  default ''                not null comment '执行名称',
+    `exec_comment`    varchar(64)   default ''                not null comment '作业说明',
+    `content_type`    varchar(8)    default 'text'            not null comment '执行内容类型 (text, path)',
+    `content_path`    varchar(256)  default ''                not null comment '执行内容路径',
+    `from_app`        varchar(16)                             not null comment '来源应用',
+    `cluster`         varchar(16)                             not null comment '提交集群',
+    `cluster_queue`   varchar(128)  default ''                not null comment '集群队列',
+    `engine_category` varchar(16)   default ''                not null comment '引擎种类',
+    `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
+    `priority`        tinyint                                 not null comment '初始优先级',
+    `run_priority`    tinyint                                 not null comment '运行优先级',
+    `status`          varchar(16)   default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)',
+    `group`           varchar(32)   default ''                not null comment '用户组',
+    `user`            varchar(32)   default ''                not null comment '用户',
+    `webhooks`        varchar(1024) default ''                not null comment '回调地址',
+
+    `start_time`      datetime                                null comment '创建时间',
+    `end_time`        datetime                                null comment '停止时间',
+    `heartbeat_time`  datetime                                null comment '更新时间',
+    `create_time`     datetime      default current_timestamp not null comment '创建时间',
+    `update_time`     datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    unique uniq_exec_unique_id (`unique_id`),
+    index idx_exec_name (`exec_name`),
+    index idx_exec_from_app (`from_app`),
+    index idx_exec_cluster_queue (`cluster`, `cluster_queue`),
+    index idx_exec_engine (`engine_category`, `engine_version`),
+    index idx_exec_status (`status`),
+    index idx_exec_group (`group`),
+    index idx_exec_user (`user`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '引擎执行记录';
+
+drop table if exists `maple`.maple_engine_execution_ext_info;
+create table `maple`.`maple_engine_execution_ext_info`
+(
+    `id`            int        not null comment '执行ID',
+    `exec_content`  mediumtext null comment '执行内容',
+    `configuration` text       null comment '作业配置',
+    `ext_info`      text       null comment '扩展信息',
+    `process_info`  text       null comment '执行信息',
+    primary key (`id`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '引擎执行扩展信息';
+
+
 
 drop table if exists `maple_engine_instance`;
 create table `maple_engine_instance`
@@ -160,9 +224,8 @@ create table `maple`.`maple_job_queue`
     `lock_name`       varchar(128) default ''                not null comment '作业队列锁名',
     `cluster`         varchar(16)  default ''                not null comment '提交集群',
     `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
-    `engine_category` varchar(16)  default ''                not null comment '引擎分类',
+    `engine_category` varchar(16)  default ''                not null comment '引擎种类',
     `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
-    `engine_type`     varchar(16)  default ''                not null comment '引擎类型 (once，resident)',
     `from_app`        varchar(16)  default ''                not null comment '来源应用',
     `group`           varchar(16)  default ''                not null comment '用户组',
     `priority`        tinyint                                not null comment '作业优先级',
@@ -180,14 +243,14 @@ create table `maple`.`maple_job`
 (
     `id`              int                                     not null auto_increment comment '作业ID',
     `job_name`        varchar(256)  default ''                not null comment '作业名',
-    `job_type`        varchar(8)    default ''                not null comment '作业类型 (sync, async, once)',
+    `job_type`        varchar(8)    default ''                not null comment '作业类型 (sync, async)',
     `unique_id`       varchar(32)                             not null comment '作业唯一标识',
     `job_comment`     varchar(64)   default ''                not null comment '作业说明',
     `from_app`        varchar(16)                             not null comment '来源应用',
     `cluster`         varchar(16)                             not null comment '提交集群',
-    `cluster_queue`   varchar(128)                            not null comment '集群队列',
+    `cluster_queue`   varchar(128)  default ''                not null comment '集群队列',
     `engine_id`       int           default 0                 not null comment '引擎ID',
-    `engine_category` varchar(16)   default ''                not null comment '引擎分类',
+    `engine_category` varchar(16)   default ''                not null comment '引擎种类',
     `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
     `priority`        tinyint                                 not null comment '初始优先级',
     `run_priority`    tinyint                                 not null comment '运行优先级',

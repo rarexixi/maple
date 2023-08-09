@@ -22,7 +22,7 @@ public class MapleRedisUtil {
      *
      * @param cluster        集群
      * @param clusterQueue   集群队列
-     * @param engineCategory 引擎分类
+     * @param engineCategory 引擎种类
      * @param engineVersion  引擎版本
      * @param engineType     引擎类型
      * @param fromApp        来源应用
@@ -59,7 +59,7 @@ public class MapleRedisUtil {
      *
      * @param cluster        集群
      * @param clusterQueue   集群队列
-     * @param engineCategory 引擎分类
+     * @param engineCategory 引擎种类
      * @param engineType     引擎类型
      * @param engineVersion  引擎版本
      * @param fromApp        来源应用

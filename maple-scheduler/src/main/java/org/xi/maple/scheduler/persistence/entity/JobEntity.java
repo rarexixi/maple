@@ -59,7 +59,7 @@ public class JobEntity implements Serializable {
     private Integer engineId;
 
     /**
-     * 引擎分类
+     * 引擎种类
      */
     private String engineCategory;
 

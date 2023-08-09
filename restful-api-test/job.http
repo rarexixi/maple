@@ -33,7 +33,7 @@ Content-Type: application/json
 `cluster`         varchar(16)                             not null comment '提交集群',
 `cluster_queue`   varchar(128)                            not null comment '集群队列',
 `engine_id`       int           default 0                 not null comment '引擎ID',
-`engine_category` varchar(16)   default ''                not null comment '引擎分类',
+`engine_category` varchar(16)   default ''                not null comment '引擎种类',
 `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
 `priority`        tinyint                                 not null comment '初始优先级',
 `run_priority`    tinyint                                 not null comment '运行优先级',

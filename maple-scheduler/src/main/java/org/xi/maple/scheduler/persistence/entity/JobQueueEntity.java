@@ -29,7 +29,7 @@ public class JobQueueEntity implements Serializable {
     private String clusterQueue;
 
     /**
-     * 引擎分类
+     * 引擎种类
      */
     private String engineCategory;
 

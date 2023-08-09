@@ -1,0 +1,61 @@
+###
+POST http://localhost:8082/engine-execution/add
+Accept: application/json
+Content-Type: application/json
+
+{
+  "uniqueId": "1",
+  "execName":  "test1",
+  "execComment": "测试",
+  "contentType":  "text",
+  "contentPath": "",
+  "fromApp":  "schedule",
+  "cluster": "yarn-01",
+  "clusterQueue":  "default",
+  "engineCategory": "spark",
+  "engineVersion":  "3.3.2",
+  "priority": 3,
+  "status": "Submitted",
+  "group":  "dip",
+  "user": "xishihao",
+  "webhooks":  "",
+  "execContent": "",
+  "configuration":  "{}",
+  "extInfo": "{}",
+  "processInfo":  "{}"
+}
+
+###
+GET http://localhost:8082/engine-execution/heartbeat?id=2
+Accept: application/json
+Content-Type: application/json
+
+###
+PATCH http://localhost:8082/engine-execution/update-status
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 2,
+  "status": "Running"
+}
+
+###
+PATCH http://localhost:8082/engine-execution/update-process
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": 2,
+    "processInfo": "{\"progress\": 0.5}"
+}
+
+###
+GET http://localhost:8082/engine-execution/detail?id=2
+Accept: application/json
+Content-Type: application/json
+
+###
+GET http://localhost:8082/engine-execution/page-list
+Accept: application/json
+Content-Type: application/json
