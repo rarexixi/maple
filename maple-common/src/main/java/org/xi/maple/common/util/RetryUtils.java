@@ -1,6 +1,8 @@
 package org.xi.maple.common.util;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,13 +12,21 @@ import java.util.function.Supplier;
  * @author xishihao
  */
 public class RetryUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(RetryUtils.class);
 
-    public static <R> R retry(Supplier<R> supplier,
-                              int times,
-                              int retryDuration,
-                              R finalDefaultResult,
-                              String errMsg) throws InterruptedException {
+    /**
+     * 重试
+     *
+     * @param supplier           重试方法
+     * @param times              重试次数
+     * @param retryDuration      重试间隔
+     * @param finalDefaultResult 重试失败后的默认返回值
+     * @param errMsg             重试失败后的错误信息
+     * @param <R>                返回值类型
+     * @return 返回值
+     */
+    public static <R> R retry(Supplier<R> supplier, int times, int retryDuration, R finalDefaultResult, String errMsg) {
         if (times <= 0) {
             return finalDefaultResult;
         }
@@ -25,15 +35,22 @@ public class RetryUtils {
             return supplier.get();
         } catch (Exception e) {
             logger.error(errMsg);
-            Thread.sleep(retryDuration);
+            ActionUtils.executeQuietly(() -> Thread.sleep(retryDuration));
             return retry(supplier, times - 1, retryDuration, finalDefaultResult, errMsg);
         }
     }
 
-    public static <R> R retry(Supplier<R> supplier,
-                              int times,
-                              int retryDuration,
-                              String errMsg) throws InterruptedException {
+    /**
+     * 重试
+     *
+     * @param supplier      重试方法
+     * @param times         重试次数
+     * @param retryDuration 重试间隔
+     * @param errMsg        重试失败后的错误信息
+     * @param <R>           返回值类型
+     * @return 返回值
+     */
+    public static <R> R retry(Supplier<R> supplier, int times, int retryDuration, String errMsg) {
         if (times <= 0) {
             return supplier.get();
         }
@@ -42,15 +59,22 @@ public class RetryUtils {
             return supplier.get();
         } catch (Exception e) {
             logger.error(errMsg);
-            Thread.sleep(retryDuration);
+            ActionUtils.executeQuietly(() -> Thread.sleep(retryDuration));
             return retry(supplier, times - 1, retryDuration, errMsg);
         }
     }
 
-    public static <R> R retry(Supplier<ConditionResult<R>> supplier,
-                              int times,
-                              R finalDefaultResult,
-                              int retryDuration) throws InterruptedException {
+    /**
+     * 重试
+     *
+     * @param supplier           重试方法
+     * @param times              重试次数
+     * @param finalDefaultResult 重试失败后的默认返回值
+     * @param retryDuration      重试间隔
+     * @param <R>                返回值类型
+     * @return 返回值
+     */
+    public static <R> R retry(Supplier<ConditionResult<R>> supplier, int times, R finalDefaultResult, int retryDuration) {
         if (times <= 0) {
             return finalDefaultResult;
         }
@@ -59,13 +83,20 @@ public class RetryUtils {
         if (result.isSuccess()) {
             return result.getResult();
         }
-        Thread.sleep(retryDuration);
+        ActionUtils.executeQuietly(() -> Thread.sleep(retryDuration));
         return retry(supplier, times - 1, finalDefaultResult, retryDuration);
     }
 
-    public static <R> R retry(Supplier<ConditionResult<R>> supplier,
-                              int times,
-                              int retryDuration) throws InterruptedException {
+    /**
+     * 重试
+     *
+     * @param supplier      重试方法
+     * @param times         重试次数
+     * @param retryDuration 重试间隔
+     * @param <R>           返回值类型
+     * @return 返回值
+     */
+    public static <R> R retry(Supplier<ConditionResult<R>> supplier, int times, int retryDuration) {
         if (times <= 1) {
             return supplier.get().result;
         }
@@ -74,11 +105,13 @@ public class RetryUtils {
         if (result.isSuccess()) {
             return result.getResult();
         }
-        Thread.sleep(retryDuration);
+        ActionUtils.executeQuietly(() -> Thread.sleep(retryDuration));
         return retry(supplier, times - 1, retryDuration);
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ConditionResult<T> {
         private boolean success;
         private T result;

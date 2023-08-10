@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+/**
+ * @author xishihao
+ */
 public class FreemarkerUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(FreemarkerUtils.class);

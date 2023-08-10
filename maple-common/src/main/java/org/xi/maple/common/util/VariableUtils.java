@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author xishihao
+ */
 public class VariableUtils {
     private static Logger log = LoggerFactory.getLogger(VariableUtils.class);
     private static Pattern DATETIME_PATTERN = Pattern.compile("\\$\\{exec_time(\\s*[-+]\\s*\\d+[yMdHms]\\s*)*(\\|[^}]+?)?}");
@@ -21,6 +24,13 @@ public class VariableUtils {
     private static String DEFAULT_DATETIME_FORMATTER_STR = "yyyy-MM-dd HH:mm:ss";
     private static DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_FORMATTER_STR);
 
+    /**
+     * 替换变量
+     *
+     * @param content   内容
+     * @param variables 变量
+     * @return 替换后的内容
+     */
     public static String replaceVariables(String content, Map<String, String> variables) {
         LocalDateTime localDateTime = LocalDateTime.now();
         if (variables.containsKey("execTimestamp")) {
@@ -34,11 +44,25 @@ public class VariableUtils {
         return substitutor.replace(replaceDateTimeExpression(content, localDateTime));
     }
 
+    /**
+     * 替换时间变量
+     *
+     * @param content      内容
+     * @param execDateTime 执行时间
+     * @return 替换后的内容
+     */
     public static String replaceDateTimeVariables(String content, String execDateTime) {
         LocalDateTime localDateTime = LocalDateTime.parse(execDateTime, DEFAULT_DATETIME_FORMATTER);
         return replaceDateTimeExpression(content, localDateTime);
     }
 
+    /**
+     * 替换时间变量
+     *
+     * @param content  内容
+     * @param datetime 日期时间
+     * @return 替换后的内容
+     */
     public static String replaceDateTimeExpression(String content, LocalDateTime datetime) {
         Matcher matcher = DATETIME_PATTERN.matcher(content);
         StringBuffer sb = new StringBuffer(content.length());
@@ -56,6 +80,13 @@ public class VariableUtils {
         return sb.toString();
     }
 
+    /**
+     * 获取时间格式化结果
+     *
+     * @param time     时间
+     * @param variable 变量
+     * @return 格式化结果
+     */
     private static String getDateTimeFormatResult(LocalDateTime time, String variable) {
         int splitIndex = variable.indexOf("|");
         String increment;
@@ -83,6 +114,14 @@ public class VariableUtils {
         return DateTimeFormatter.ofPattern(format).format(resultDateTime);
     }
 
+    /**
+     * 获取计算后的时间
+     *
+     * @param time          时间
+     * @param incrementNum  增量
+     * @param incrementUnit 增量单位
+     * @return 时间
+     */
     private static LocalDateTime getDateTime(LocalDateTime time, int incrementNum, String incrementUnit) {
         switch (incrementUnit) {
             case "y":

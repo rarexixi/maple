@@ -7,6 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
+/**
+ * @author xishihao
+ */
 public class JsonUtils {
 
     public static <T> String toJsonString(T t) throws JsonProcessingException {
