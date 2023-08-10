@@ -7,11 +7,11 @@ import freemarker.template.TemplateExceptionHandler;
 import org.springframework.stereotype.Component;
 import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.builder.model.CommandGeneratorModel;
-import org.xi.maple.builder.model.JobCreateRequest;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.enginemanager.configuration.EngineProperties;
 import org.xi.maple.enginemanager.configuration.PluginProperties;
 import org.xi.maple.enginemanager.spi.EnginePluginService;
+import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 
 import java.io.*;
 import java.util.List;
@@ -29,9 +29,8 @@ public class EngineBuilder {
         this.pluginProperties = pluginProperties;
     }
 
-
-    public void execute(JobCreateRequest jobCreateRequest) throws IOException {
-        MapleConvertor convertor = enginePluginService.getConvertor(jobCreateRequest.getEngineCategory(), jobCreateRequest.getEngineVersion());
+    public void execute(EngineExecutionAddRequest execution) throws IOException {
+        MapleConvertor convertor = enginePluginService.getConvertor(execution.getEngineCategory(), execution.getEngineVersion());
         List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator();
         String startFile = null;
         for (CommandGeneratorModel generatorModel : commandGenerators) {
