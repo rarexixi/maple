@@ -1,10 +1,10 @@
-package org.xi.maple.datacalc.api.client.fallback;
+package org.xi.maple.scheduler.client.fallback;
 
 import org.springframework.stereotype.Service;
-import org.xi.maple.datacalc.api.client.EngineExecutionClient;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.scheduler.client.EngineExecutionClient;
 
 @Service
 public class EngineExecutionClientFallback implements EngineExecutionClient {

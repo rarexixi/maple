@@ -14,14 +14,12 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MapleJobQueue implements Serializable {
+public class MapleEngineExecutionQueue implements Serializable {
 
     private String queueName;
     private String lockName;
     private String cluster;
     private String clusterQueue;
-    private String engineCategory;
-    private String engineVersion;
     private String fromApp;
     private String group;
     private Integer priority;
@@ -36,7 +34,7 @@ public class MapleJobQueue implements Serializable {
     @AllArgsConstructor
     public static class QueueItem implements Serializable {
 
-        private Integer jobId;
+        private Integer execId;
         private Long timestamp;
     }
 }

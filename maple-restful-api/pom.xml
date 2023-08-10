@@ -24,11 +24,6 @@
         </dependency>
         <dependency>
             <groupId>org.xi.maple</groupId>
-            <artifactId>maple-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xi.maple</groupId>
             <artifactId>maple-spring-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -95,6 +90,12 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xi.maple</groupId>
+            <artifactId>maple-scheduler</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

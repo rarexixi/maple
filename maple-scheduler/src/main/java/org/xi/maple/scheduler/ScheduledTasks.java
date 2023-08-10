@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
-import org.xi.maple.common.constant.EngineTypeConstants;
 import org.xi.maple.common.constant.JobPriorityConstants;
 import org.xi.maple.common.constant.JobStatusConstants;
 import org.xi.maple.common.util.ActionUtils;
@@ -114,7 +113,7 @@ public class ScheduledTasks implements CommandLineRunner {
             // 提升故障作业级别
             int priority = JobPriorityConstants.increasePriority(job.getRunPriority());
             MapleJobQueue jobQueue = MapleRedisUtil.getJobQueue(job.getCluster(), job.getClusterQueue(),
-                    job.getEngineCategory(), job.getEngineVersion(), job.getJobType(),
+                    job.getEngineCategory(), job.getEngineVersion(),
                     job.getFromApp(), job.getGroup(), priority);
             jobQueueService.addOrUpdate(jobQueue);
             RLock lock = redissonClient.getLock(jobQueue.getLockName());
@@ -159,7 +158,6 @@ public class ScheduledTasks implements CommandLineRunner {
      * @param jobQueue redis 队列
      */
     private void consumeQueueJobs(MapleJobQueue jobQueue) {
-        boolean isOnceEngine = EngineTypeConstants.isOnce(jobQueue.getEngineType());
 
         RDeque<MapleJobQueue.QueueItem> deque = redissonClient.getDeque(jobQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
         RLock lock = redissonClient.getLock(jobQueue.getLockName());
@@ -176,41 +174,32 @@ public class ScheduledTasks implements CommandLineRunner {
                 }
                 JobEntity job = jobService.getJobById(queueJobItem.getJobId());
                 MapleClusterQueue cachedQueueInfo = clusterQueueService.getCachedQueueInfo(jobQueue.getCluster(), jobQueue.getClusterQueue());
-                if (isOnceEngine) {
-                    // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
-                    if (cachedQueueInfo.getPendingApps() > 0) {
-                        deque.addFirst(queueJobItem);
-                        continueRunning.set(false);
-                    } else {
-                        jobService.submitJobToNewEngine(job);
-                    }
-                } else {
-                    // 获取当前用户可以提交的引擎锁
-                    String engineLockName = MapleRedisUtil.getEngineLock(
-                            jobQueue.getCluster(), jobQueue.getClusterQueue(),
-                            jobQueue.getEngineCategory(), jobQueue.getEngineType(), jobQueue.getEngineVersion(),
-                            jobQueue.getFromApp(), jobQueue.getGroup());
-                    RLock engineLock = redissonClient.getLock(engineLockName);
 
-                    MapleRedisUtil.waitLockAndExecute(engineLock, engineLockName, 10, 2, () -> {
-                        EngineInstanceEntity engine =
-                                engineInstanceService.getFreeEngine(job.getCluster(), job.getClusterQueue(),
-                                        job.getEngineCategory(), job.getEngineVersion(), job.getGroup());
+                // 获取当前用户可以提交的引擎锁
+                String engineLockName = MapleRedisUtil.getEngineLock(
+                        jobQueue.getCluster(), jobQueue.getClusterQueue(),
+                        jobQueue.getEngineCategory(), jobQueue.getEngineVersion(),
+                        jobQueue.getFromApp(), jobQueue.getGroup());
+                RLock engineLock = redissonClient.getLock(engineLockName);
 
-                        if (engine == null) {
-                            // 没有空闲引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
-                            // 如果没有排队任务，新建引擎同时提交任务
-                            if (cachedQueueInfo.getPendingApps() > 0) {
-                                deque.addFirst(queueJobItem);
-                                continueRunning.set(false);
-                            } else {
-                                jobService.submitJobToNewEngine(job);
-                            }
+                MapleRedisUtil.waitLockAndExecute(engineLock, engineLockName, 10, 2, () -> {
+                    EngineInstanceEntity engine =
+                            engineInstanceService.getFreeEngine(job.getCluster(), job.getClusterQueue(),
+                                    job.getEngineCategory(), job.getEngineVersion(), job.getGroup());
+
+                    if (engine == null) {
+                        // 没有空闲引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
+                        // 如果没有排队任务，新建引擎同时提交任务
+                        if (cachedQueueInfo.getPendingApps() > 0) {
+                            deque.addFirst(queueJobItem);
+                            continueRunning.set(false);
                         } else {
-                            jobService.submitJobToEngine(job, engine);
+                            jobService.submitJobToNewEngine(job);
                         }
-                    });
-                }
+                    } else {
+                        jobService.submitJobToEngine(job, engine);
+                    }
+                });
             });
         }
     }

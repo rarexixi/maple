@@ -87,7 +87,7 @@ public class JobServiceImpl implements JobService {
         final Integer jobId = addJob(jobReq);
         threadPoolTaskExecutor.execute(() -> {
             MapleJobQueue jobQueue = MapleRedisUtil.getJobQueue(jobReq.getCluster(), jobReq.getClusterQueue(),
-                    jobReq.getEngineCategory(), jobReq.getEngineVersion(), EngineTypeConstants.getEngineTypeByJob(jobReq.getJobType()),
+                    jobReq.getEngineCategory(), jobReq.getEngineVersion(),
                     jobReq.getFromApp(), jobReq.getGroup(), jobReq.getPriority());
             jobQueueService.addOrUpdate(jobQueue);
             RLock lock = redissonClient.getLock(jobQueue.getLockName());

@@ -1,11 +1,15 @@
 package org.xi.maple.persistence.model.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.xi.maple.persistence.model.BaseEntity;
 
 import javax.validation.constraints.NotNull;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class EngineExecutionUpdateStatusRequest extends BaseEntity {
 
     /**

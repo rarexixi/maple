@@ -130,6 +130,25 @@ create table `maple_cluster_queue`
   collate = utf8_unicode_ci
     comment = '集群队列配置';
 
+drop table if exists `maple`.`maple_engine_execution_queue`;
+create table `maple`.`maple_engine_execution_queue`
+(
+    `queue_name`      varchar(128) default ''                not null comment '执行队列名',
+    `lock_name`       varchar(128) default ''                not null comment '队列锁名',
+    `cluster`         varchar(16)  default ''                not null comment '提交集群',
+    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
+    `from_app`        varchar(16)  default ''                not null comment '来源应用',
+    `group`           varchar(16)  default ''                not null comment '用户组',
+    `priority`        tinyint                                not null comment '队列优先级',
+
+    `create_time`     datetime     default current_timestamp not null comment '创建时间',
+    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+    primary key (`queue_name`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '执行队列';
+
 drop table if exists `maple`.`maple_engine_execution`;
 create table `maple`.`maple_engine_execution`
 
@@ -228,7 +247,7 @@ create table `maple`.`maple_job_queue`
     `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
     `from_app`        varchar(16)  default ''                not null comment '来源应用',
     `group`           varchar(16)  default ''                not null comment '用户组',
-    `priority`        tinyint                                not null comment '作业优先级',
+    `priority`        tinyint                                not null comment '队列优先级',
 
     `create_time`     datetime     default current_timestamp not null comment '创建时间',
     `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',

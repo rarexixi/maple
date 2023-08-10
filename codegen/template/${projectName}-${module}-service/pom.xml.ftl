@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>org.xi.maple</groupId>
-            <artifactId>maple-common</artifactId>
+            <artifactId>maple-spring-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
