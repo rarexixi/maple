@@ -7,7 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.util.*;
 
-public class SelectCondition implements Serializable {
+/**
+ * 数据库查询条件
+ *
+ * @author xishihao
+ */
+public abstract class SelectCondition implements Serializable {
 
     final List<String> columns = new LinkedList<>();
     private Map<String, String> orderBy = new LinkedHashMap<>();

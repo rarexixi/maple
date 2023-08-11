@@ -1,14 +1,14 @@
 package org.xi.maple.datasource.persistence.mapper;
 
 import org.xi.maple.common.model.SelectCondition;
-import org.xi.maple.common.model.UpdateCondition;
+import org.xi.maple.common.model.ManipulateCondition;
 import org.xi.maple.datasource.model.BaseEntity;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface BaseMapper<T extends BaseEntity, TE extends T, MC extends UpdateCondition, SC extends SelectCondition> {
+public interface BaseMapper<T extends BaseEntity, TE extends T, MC extends ManipulateCondition, SC extends SelectCondition> {
 
     /**
      * 添加

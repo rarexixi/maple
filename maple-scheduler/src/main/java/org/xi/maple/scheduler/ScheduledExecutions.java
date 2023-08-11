@@ -17,8 +17,8 @@ import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleClusterQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
-import org.xi.maple.scheduler.client.EngineExecutionClient;
-import org.xi.maple.scheduler.client.EngineExecutionQueueClient;
+import org.xi.maple.scheduler.client.EngineManagerClient;
+import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.service.ClusterQueueService;
 
 import java.util.List;
@@ -43,9 +43,8 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     final ClusterQueueService clusterQueueService;
 
-    final EngineExecutionClient engineExecutionClient;
-
-    final EngineExecutionQueueClient engineExecutionQueueClient;
+    final PersistenceClient persistenceClient;
+    final EngineManagerClient engineManagerClient;
 
     final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
@@ -53,14 +52,14 @@ public class ScheduledExecutions implements CommandLineRunner {
                                ThreadPoolTaskExecutor threadPoolTaskExecutor,
                                ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                ClusterQueueService clusterQueueService,
-                               EngineExecutionClient engineExecutionClient,
-                               EngineExecutionQueueClient engineExecutionQueueClient) {
+                               PersistenceClient persistenceClient,
+                               EngineManagerClient engineManagerClient) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.clusterQueueService = clusterQueueService;
-        this.engineExecutionClient = engineExecutionClient;
-        this.engineExecutionQueueClient = engineExecutionQueueClient;
+        this.persistenceClient = persistenceClient;
+        this.engineManagerClient = engineManagerClient;
     }
 
     /**
@@ -69,7 +68,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
         logger.info("Start to consume jobs...");
-        List<EngineExecutionQueue> queueList = engineExecutionQueueClient.getList(new EngineExecutionQueueQueryRequest());
+        List<EngineExecutionQueue> queueList = persistenceClient.getList(new EngineExecutionQueueQueryRequest());
         if (queueList == null || queueList.isEmpty()) {
             return;
         }
@@ -105,7 +104,7 @@ public class ScheduledExecutions implements CommandLineRunner {
                     continueRunning.set(false);
                     return;
                 }
-                EngineExecutionDetailResponse execution = engineExecutionClient.getById(queueItem.getExecId());
+                EngineExecutionDetailResponse execution = persistenceClient.getById(queueItem.getExecId());
                 MapleClusterQueue cachedQueueInfo = clusterQueueService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
                 // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
                 if (cachedQueueInfo.getPendingApps() > 0) {
@@ -119,7 +118,9 @@ public class ScheduledExecutions implements CommandLineRunner {
     }
 
     private void submitExecution(EngineExecutionDetailResponse execution) {
-        // todo
+        threadPoolTaskExecutor.submit(() -> {
+            engineManagerClient.execute(execution);
+        });
     }
 
     public void clearScheduling() {

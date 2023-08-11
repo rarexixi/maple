@@ -1,12 +1,12 @@
 package org.xi.maple.common.mapper;
 
 import org.apache.ibatis.annotations.Param;
-import org.xi.maple.common.model.DeleteCondition;
+import org.xi.maple.common.model.ManipulateCondition;
 
 /**
  * @author xishihao
  */
-public interface DeleteByConditionMapper<C extends DeleteCondition> {
+public interface DeleteByConditionMapper<C extends ManipulateCondition> {
 
     /**
      * 根据ID删除

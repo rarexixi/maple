@@ -3,7 +3,7 @@ package org.xi.maple.datacalc.api.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.xi.maple.datacalc.api.client.fallback.EngineExecutionQueueClientFallback;
+import org.xi.maple.datacalc.api.client.fallback.EngineExecutionQueueClientFallbackFactory;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
@@ -11,7 +11,7 @@ import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-@FeignClient(value = "maple-persistence-service", fallback = EngineExecutionQueueClientFallback.class)
+@FeignClient(value = "maple-persistence-service", fallbackFactory = EngineExecutionQueueClientFallbackFactory.class)
 public interface EngineExecutionQueueClient {
 
     @PostMapping("/add-or-update")

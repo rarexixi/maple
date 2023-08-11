@@ -1,6 +1,6 @@
 package org.xi.maple.datasource.persistence.condition;
 
-import org.xi.maple.common.model.UpdateCondition;
+import org.xi.maple.common.model.ManipulateCondition;
 
 import java.util.Collection;
 
@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class DatasourceUpdateCondition extends UpdateCondition {
+public class DatasourceUpdateCondition extends ManipulateCondition {
 
     /**
      * Id

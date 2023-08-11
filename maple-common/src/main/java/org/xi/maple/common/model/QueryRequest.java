@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author xishihao
  */
-public class QueryRequest implements Serializable {
+public abstract class QueryRequest implements Serializable {
 
     final Map<String, String> orderBy = new LinkedHashMap<>();
 

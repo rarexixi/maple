@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xi.maple.enginemanager.engine.builder.EngineBuilder;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ public class EngineExecutionController {
     EngineBuilder engineBuilder;
 
     @PostMapping("execute")
-    public void execute(EngineExecutionAddRequest execution) throws IOException {
+    public void execute(EngineExecutionDetailResponse execution) {
         engineBuilder.execute(execution);
     }
 }

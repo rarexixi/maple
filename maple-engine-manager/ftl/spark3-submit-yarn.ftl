@@ -34,7 +34,6 @@ ${sparkHome}/bin/spark-submit \
   --archives ${archives} \
 </#if>
 <#if conf??>
-  --conf \
 <#list conf?keys as key>
     --conf ${key}=${conf[key]}
 </#list>

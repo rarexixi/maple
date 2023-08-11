@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.xi.maple.datacalc.api.client.fallback.EngineExecutionClientFallback;
+import org.xi.maple.datacalc.api.client.fallback.EngineExecutionClientFallbackFactory;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
@@ -12,7 +12,7 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-@FeignClient(value = "maple-persistence-service", fallback = EngineExecutionClientFallback.class)
+@FeignClient(value = "maple-persistence-service", fallbackFactory = EngineExecutionClientFallbackFactory.class)
 public interface EngineExecutionClient {
 
     @PostMapping("/add")

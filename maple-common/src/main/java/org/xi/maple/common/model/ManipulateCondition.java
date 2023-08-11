@@ -3,7 +3,9 @@ package org.xi.maple.common.model;
 import java.io.Serializable;
 
 /**
+ * 数据库操作条件
+ *
  * @author xishihao
  */
-public class UpdateCondition implements Serializable {
+public abstract class ManipulateCondition implements Serializable {
 }
