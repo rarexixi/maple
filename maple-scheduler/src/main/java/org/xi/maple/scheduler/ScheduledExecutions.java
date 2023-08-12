@@ -44,6 +44,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     final ClusterQueueService clusterQueueService;
 
     final PersistenceClient persistenceClient;
+
     final EngineManagerClient engineManagerClient;
 
     final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
@@ -68,7 +69,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
         logger.info("Start to consume jobs...");
-        List<EngineExecutionQueue> queueList = persistenceClient.getList(new EngineExecutionQueueQueryRequest());
+        List<EngineExecutionQueue> queueList = persistenceClient.getExecQueueList(new EngineExecutionQueueQueryRequest());
         if (queueList == null || queueList.isEmpty()) {
             return;
         }
@@ -104,7 +105,7 @@ public class ScheduledExecutions implements CommandLineRunner {
                     continueRunning.set(false);
                     return;
                 }
-                EngineExecutionDetailResponse execution = persistenceClient.getById(queueItem.getExecId());
+                EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(queueItem.getExecId());
                 MapleClusterQueue cachedQueueInfo = clusterQueueService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
                 // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
                 if (cachedQueueInfo.getPendingApps() > 0) {

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EngineExecutionUpdateStatusRequest extends BaseEntity {
+public class EngineExecutionUpdateRequest extends BaseEntity {
 
     /**
      * 执行ID
@@ -19,7 +19,22 @@ public class EngineExecutionUpdateStatusRequest extends BaseEntity {
     private Integer id;
 
     /**
-     * 状态 (SUBMITTED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, LOST)
+     * 执行内容
      */
-    private String status;
+    private String execContent;
+
+    /**
+     * 作业配置
+     */
+    private String configuration;
+
+    /**
+     * 扩展信息
+     */
+    private String extInfo;
+
+    /**
+     * 执行信息
+     */
+    private String processInfo;
 }

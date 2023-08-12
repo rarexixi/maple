@@ -3,7 +3,7 @@ package org.xi.maple.persistence.controller;
 import org.xi.maple.common.model.PageList;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateProcessRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
@@ -48,10 +48,9 @@ public class EngineExecutionController {
         return ResponseEntity.ok(count);
     }
 
-
-    @PatchMapping("/update-process")
-    public ResponseEntity<Integer> updateProcessById(@Validated @RequestBody EngineExecutionUpdateProcessRequest updateRequest) {
-        int count = engineExecutionService.updateProcessById(updateRequest);
+    @PatchMapping("/update-ext-info")
+    public ResponseEntity<Integer> updateExtInfoById(@Validated @RequestBody EngineExecutionUpdateRequest updateRequest) {
+        int count = engineExecutionService.updateExtInfoById(updateRequest);
         return ResponseEntity.ok(count);
     }
 

@@ -1,3 +1,5 @@
+create database maple default character set utf8;
+
 # region datasource
 
 drop table if exists `maple`.`maple_datasource_type`;
@@ -166,7 +168,7 @@ create table `maple`.`maple_engine_execution`
     `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
     `priority`        tinyint                                 not null comment '初始优先级',
     `run_priority`    tinyint                                 not null comment '运行优先级',
-    `status`          varchar(16)   default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)',
+    `status`          varchar(16)   default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, LOST)',
     `group`           varchar(32)   default ''                not null comment '用户组',
     `user`            varchar(32)   default ''                not null comment '用户',
     `webhooks`        varchar(1024) default ''                not null comment '回调地址',

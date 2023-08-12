@@ -48,7 +48,6 @@ public interface EngineExecutionMapper extends
      */
     int heartbeatById(@Param("id") Integer id);
 
-
     /**
      * 根据执行ID更新引擎执行状态
      *
@@ -61,10 +60,9 @@ public interface EngineExecutionMapper extends
     /**
      * 根据执行ID更新引擎执行信息
      *
-     * @param id          引擎执行记录ID
-     * @param processInfo 执行信息
+     * @param extInfoEntity 引擎执行记录扩展实体
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateProcessById(@Param("id") Integer id, @Param("processInfo") String processInfo);
+    int updateExtInfoById(@Param("entity") EngineExecutionExtInfoEntity extInfoEntity);
 }

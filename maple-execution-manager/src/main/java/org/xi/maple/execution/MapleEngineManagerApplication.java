@@ -1,19 +1,14 @@
-package org.xi.maple.datacalc.api;
+package org.xi.maple.execution;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-/**
- * @author xishihao
- */
-@EnableCaching
 @EnableFeignClients
 @SpringBootApplication
-public class MapleRestfulApiApplication {
+public class MapleEngineManagerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MapleRestfulApiApplication.class, args);
+        SpringApplication.run(MapleEngineManagerApplication.class, args);
     }
 }

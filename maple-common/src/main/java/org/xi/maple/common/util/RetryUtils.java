@@ -20,7 +20,7 @@ public class RetryUtils {
      *
      * @param supplier           重试方法
      * @param times              重试次数
-     * @param retryDuration      重试间隔
+     * @param retryDuration      重试间隔(ms)
      * @param finalDefaultResult 重试失败后的默认返回值
      * @param errMsg             重试失败后的错误信息
      * @param <R>                返回值类型
@@ -45,7 +45,7 @@ public class RetryUtils {
      *
      * @param supplier      重试方法
      * @param times         重试次数
-     * @param retryDuration 重试间隔
+     * @param retryDuration 重试间隔(ms)
      * @param errMsg        重试失败后的错误信息
      * @param <R>           返回值类型
      * @return 返回值
@@ -70,7 +70,7 @@ public class RetryUtils {
      * @param supplier           重试方法
      * @param times              重试次数
      * @param finalDefaultResult 重试失败后的默认返回值
-     * @param retryDuration      重试间隔
+     * @param retryDuration      重试间隔(ms)
      * @param <R>                返回值类型
      * @return 返回值
      */
@@ -92,7 +92,7 @@ public class RetryUtils {
      *
      * @param supplier      重试方法
      * @param times         重试次数
-     * @param retryDuration 重试间隔
+     * @param retryDuration 重试间隔(ms)
      * @param <R>           返回值类型
      * @return 返回值
      */

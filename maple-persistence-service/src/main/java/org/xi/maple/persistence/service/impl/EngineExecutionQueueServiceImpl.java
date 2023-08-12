@@ -1,6 +1,8 @@
 package org.xi.maple.persistence.service.impl;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.common.util.ObjectUtils;
@@ -40,6 +42,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @CacheEvict(cacheNames = {"maple"}, key = "'exec-queue'", condition = "#result.type == T(org.xi.maple.common.constant.OperateResultType).NEW")
     @Override
     public OperateResult<Integer> addOrUpdate(EngineExecutionQueueSaveRequest saveRequest) {
         EngineExecutionQueueEntity entity = ObjectUtils.copy(saveRequest, EngineExecutionQueueEntity.class);
@@ -86,6 +89,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      * @param queryRequest 搜索条件
      * @return 符合条件的执行队列列表
      */
+    @Cacheable(cacheNames = {"maple"}, key = "'exec-queue'")
     @Override
     @Transactional(readOnly = true)
     public List<EngineExecutionQueue> getList(EngineExecutionQueueQueryRequest queryRequest) {

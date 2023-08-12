@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.JobStatusConstants;
-import org.xi.maple.datacalc.api.client.EngineExecutionClient;
-import org.xi.maple.datacalc.api.client.EngineExecutionQueueClient;
+import org.xi.maple.datacalc.api.client.PersistenceClient;
 import org.xi.maple.datacalc.api.service.EngineExecutionService;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
@@ -29,20 +28,18 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
 
     final RedissonClient redissonClient;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    final EngineExecutionClient engineExecutionClient;
-    final EngineExecutionQueueClient executionQueueClient;
+    final PersistenceClient persistenceClient;
 
     @Autowired
-    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, EngineExecutionClient engineExecutionClient, EngineExecutionQueueClient executionQueueClient) {
+    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
-        this.engineExecutionClient = engineExecutionClient;
-        this.executionQueueClient = executionQueueClient;
+        this.persistenceClient = persistenceClient;
     }
 
     @Override
     public String getExecutionStatus(Integer jobId) {
-        EngineExecutionDetailResponse detail = engineExecutionClient.getById(jobId);
+        EngineExecutionDetailResponse detail = persistenceClient.getExecutionById(jobId);
         if (detail == null) {
             throw new RuntimeException("");
         }
@@ -51,7 +48,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
 
     @Override
     public EngineExecutionDetailResponse detail(Integer id) {
-        return engineExecutionClient.getById(id);
+        return persistenceClient.getExecutionById(id);
     }
 
     /**
@@ -67,16 +64,16 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      */
     @Override
     public Integer submit(EngineExecutionAddRequest submitReq) {
-        final Integer id = engineExecutionClient.add(submitReq);
+        final Integer id = persistenceClient.addExecution(submitReq);
         threadPoolTaskExecutor.execute(() -> {
             MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getClusterQueue(),
                     submitReq.getFromApp(), submitReq.getGroup(), submitReq.getPriority());
-            executionQueueClient.addOrUpdate(execQueue);
+            persistenceClient.addOrUpdateExecQueue(execQueue);
             RLock lock = redissonClient.getLock(execQueue.getLockName());
             MapleRedisUtil.waitLockAndExecute(lock, execQueue.getLockName(), 10, 2, () -> {
                 RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(execQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
                 deque.addLast(new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
-                engineExecutionClient.updateStatusById(new EngineExecutionUpdateStatusRequest(id, JobStatusConstants.ACCEPTED));
+                persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, JobStatusConstants.ACCEPTED));
             }, () -> logger.error("Add to queue failed " + submitReq));
         });
         return id;

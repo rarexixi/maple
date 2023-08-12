@@ -1,47 +1,86 @@
 # 总体架构
 
-启动引擎的角色可以分为 `group` 和 `user`
+## 服务说明
 
-启动的引擎可以分为一次性的和常驻的
+### maple-restful-api 入口服务
 
-一次性的主要是为了跑任务，常驻的主要是为了交互式开发
+用于接收任务请求
 
-user 必须属于某个 group
+### maple-scheduler 调度器
 
-group 上配置空闲引擎的个数/比例，以及 group 下用户是否可以启用自己的引擎
-每个引擎可以接收的任务上限
+用于消费和管理任务
 
-# 用户请求任务
+### maple-execution-manager 执行管理器
 
-请求需要带上 group、user、对接应用、作业类型、请求唯一ID、请求描述，请求类型，执行类型，webhook(回调地址)
+负责引擎的创建，任务执行
 
-1. 将写入数据库，返回任务 ID
-2. 将任务 ID 放到 redis 队列，返回给用户任务 ID
+### maple-persistence-service 持久化服务
 
-## 常驻任务
+用于数据库访问
 
-![](./assets/img/img1.svg)
+## 引擎执行
 
-调度器持续消费 redis 队列
+### 执行状态
 
-队列标识：cluster + queue + 引擎种类 + 引擎版本 + 任务类型(once,resident) + 来源应用 + group + 优先级
-例：hadoop-root.default-spark-3.2.3-once-schedule-maple-1
+- SUBMITTED：新建任务，刚存储到数据库
 
-**消费任务**
+- ACCEPTED：进入队列
 
-1. 加锁
-2. 获取空闲引擎
-   1. 如果不存在空闲引擎，判断队列是否有资源，有资源则启动新引擎，否则直接返回
-   2. 如果存在空闲引擎，直接提交任务
-3. 释放锁
+- STARTING: 正在启动，从队列消费后为该状态
 
-**引擎执行**
+- START_FAILED：启动失败
 
-执行完成后，通过 webhook 通知到调用方
+- RUNNING：运行中
 
-1. 加锁
-2. 将引擎任务数 - 1
-3. 释放锁
+- SUCCEED：成功
+
+- FAILED：失败
+
+- KILLED：运行中被杀
+
+- LOST：连接丢失（心跳超时不上报）
+
+**状态流转**
+
+![](./assets/img/engine_execution_status.svg) 
+
+## 用户请求任务
+
+请求信息包括：请求唯一ID、group、user、对接应用、作业类型、请求描述，请求类型，执行类型，webhook(回调地址)
+
+### 执行流程
+
+![](./assets/img/engine_execution.svg)
+
+1. 用户发起引擎执行作业请求
+
+2. 添加作业状态为 SUBMITTED
+   
+   1. 将作业信息存储到数据库，获取到作业ID
+   
+   2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
+
+3. scheduler 持续消费 redis 队列，根据作业ID拿到执行详细信息
+
+4. scheduler 将执行请求发送到 execution-manager，修改作业状态为 STARTING
+
+5. execution-manager 根据引擎的类型，加载对应插件，获取到执行命令生成对象（包括模板地址，输出文件地址，模板数据对象）
+
+6. execution-manager 根据执行命令生成对象，生成对应的脚本，并启动
+
+如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
+
+由引擎自己回写状态，并在任务执行完成前定时上报心跳
+
+启动完成后修改状态为 RUNNING
+
+运行成功后，修改状态为 SUCCEED
+
+运行失败后，修改状态为 FAILED
+
+调用 execution-manager kill 引擎，修改状态为 KILLED
+
+scheduler 定时监控 RUNNING 中的任务，心跳超时修改状态为 LOST
 
 ## 单次任务
 

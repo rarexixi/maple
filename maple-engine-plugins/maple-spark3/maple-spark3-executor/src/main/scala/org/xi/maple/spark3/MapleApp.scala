@@ -5,7 +5,6 @@ import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.ui.ExtendedApiRegister
 import org.json4s.DefaultFormats
 import org.json4s.jackson.{JsonMethods, Serialization}
-import org.xi.maple.engine.common._
 import org.xi.maple.spark3.common.{Logging, ParamsUtils}
 import org.xi.maple.spark3.model.{AddUdfRequest, ExecuteRequest}
 
@@ -19,17 +18,13 @@ object MapleApp extends Logging {
   private var spark: SparkSession = _
   private var sc: SparkContext = _
   private var latch: CountDownLatch = _
-  private val engineUpdateService: EngineUpdateService = EngineUpdateService.getInstance(ParamsUtils.updateEngineUrl)
-  private val jobUpdateService: JobUpdateService = JobUpdateService.getInstance(ParamsUtils.updateEngineUrl)
 
   def main(args: Array[String]): Unit = {
 
     val sparkConf = createSparkConf()
     spark = SparkSession.builder.config(sparkConf).getOrCreate()
     sc = spark.sparkContext
-
-    val model = new EngineUpdateModel().setId(ParamsUtils.engineId).setAddress(sc.uiWebUrl.getOrElse(""))
-    engineUpdateService.update(model)
+    val url = sc.uiWebUrl
 
     if (ParamsUtils.isOnce) {
       exec(jobId = 0, "")
@@ -45,8 +40,6 @@ object MapleApp extends Logging {
     sc.setJobGroup(groupId = jobId.toString, description = sql, interruptOnCancel = true)
     val df = spark.sql(sql)
     val path = """/tmp/maple/""" + UUID.randomUUID().toString
-    val model = new JobUpdateModel().setId(jobId).setResult(path)
-    jobUpdateService.update(model)
     df.write.mode("overwrite").parquet(path)
     sc.clearJobGroup()
     path

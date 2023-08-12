@@ -1,10 +1,7 @@
 package org.xi.maple.persistence.service;
 
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateProcessRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
 
@@ -61,7 +58,7 @@ public interface EngineExecutionService {
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateProcessById(EngineExecutionUpdateProcessRequest updateRequest);
+    int updateExtInfoById(EngineExecutionUpdateRequest updateRequest);
 
     /**
      * 根据执行ID获取引擎执行记录详情

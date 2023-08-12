@@ -1,19 +1,18 @@
 package org.xi.maple.persistence.service.impl;
 
 import com.github.pagehelper.Page;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.xi.maple.common.exception.MapleDataInsertException;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.PageList;
 import org.xi.maple.common.util.ObjectUtils;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateProcessRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
 import org.xi.maple.persistence.persistence.condition.EngineExecutionSelectCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
 import org.xi.maple.persistence.persistence.mapper.EngineExecutionMapper;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
 import org.xi.maple.persistence.service.EngineExecutionService;
@@ -113,6 +112,8 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @Transactional
+    @CacheEvict(cacheNames = {"maple-execution"}, key = "#updateRequest.id")
     @Override
     public int updateStatusById(EngineExecutionUpdateStatusRequest updateRequest) {
         return engineExecutionMapper.updateStatusById(updateRequest.getId(), updateRequest.getStatus());
@@ -125,9 +126,12 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @Transactional
+    @CacheEvict(cacheNames = {"maple-execution"}, key = "#updateRequest.id")
     @Override
-    public int updateProcessById(EngineExecutionUpdateProcessRequest updateRequest) {
-        return engineExecutionMapper.updateProcessById(updateRequest.getId(), updateRequest.getProcessInfo());
+    public int updateExtInfoById(EngineExecutionUpdateRequest updateRequest) {
+        EngineExecutionExtInfoEntity entity = ObjectUtils.copy(updateRequest, EngineExecutionExtInfoEntity.class);
+        return engineExecutionMapper.updateExtInfoById(entity);
     }
 
     /**
@@ -137,6 +141,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 引擎执行记录详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @Cacheable(cacheNames = {"maple-execution"}, key = "#id")
     @Override
     public EngineExecutionDetailResponse getById(Integer id) {
         EngineExecutionEntityExt entity = engineExecutionMapper.detailById(id);
@@ -158,7 +163,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     public PageList<EngineExecutionListItemResponse> getPageList(EngineExecutionQueryRequest queryRequest, Integer pageNum, Integer pageSize) {
 
         EngineExecutionSelectCondition condition = ObjectUtils.copy(queryRequest, EngineExecutionSelectCondition.class);
-        try(Page<Object> page = PageHelper.startPage(pageNum, pageSize)) {
+        try (Page<Object> page = PageHelper.startPage(pageNum, pageSize)) {
             PageInfo<EngineExecutionEntityExt> pageInfo = page.doSelectPageInfo(() -> engineExecutionMapper.select(condition));
             List<EngineExecutionListItemResponse> list = ObjectUtils.copy(pageInfo.getList(), EngineExecutionListItemResponse.class);
             return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);

@@ -203,13 +203,16 @@
         </where>
     </update>
 
-    <update id="updateProcessById">
+    <update id="updateExtInfoById">
         UPDATE <include refid="extTableName"/>
         <set>
-            `process_info` = #{processInfo}
+            <if test="entity.execContent != null">`exec_content` = #{entity.execContent},</if>
+            <if test="entity.configuration != null">`configuration` = #{entity.processInfo},</if>
+            <if test="entity.extInfo != null">`ext_info` = #{entity.processInfo},</if>
+            <if test="entity.processInfo != null">`process_info` = #{entity.processInfo},</if>
         </set>
         <where>
-            `id` = #{id}
+            `id` = #{entity.id}
         </where>
     </update>
 
