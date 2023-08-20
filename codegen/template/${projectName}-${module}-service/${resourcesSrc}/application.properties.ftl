@@ -37,8 +37,5 @@ pagehelper.params="count=countSql"
 pagehelper.support-methods-arguments=true
 # endregion
 
-dmp.module=${projectName}-${module}
-dmp.auth.anonymous-urls=/actuator/info
-
 # /actuator/info 显示信息
 info.app.name=<@mapperEl$ 'spring.application.name'/>

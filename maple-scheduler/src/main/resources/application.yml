@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8050
 
 spring:
   application:
-    name: maple-api
+    name: maple-scheduler
   cache:
     type: redis
   redis:

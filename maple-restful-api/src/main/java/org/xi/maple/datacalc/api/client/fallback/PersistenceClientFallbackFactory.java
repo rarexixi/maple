@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
@@ -45,7 +46,7 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
             }
 
             @Override
-            public Integer addOrUpdateExecQueue(MapleEngineExecutionQueue engineExecutionQueue) {
+            public OperateResult<Integer> addOrUpdateExecQueue(MapleEngineExecutionQueue engineExecutionQueue) {
                 return null;
             }
 

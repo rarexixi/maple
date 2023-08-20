@@ -18,22 +18,24 @@ import java.util.Collection;
 @Mapper
 public interface ${className}Mapper extends
         InsertMapper<${className}Entity>,
-        SelectByConditionMapper<${className}Entity, ${className}SelectCondition>,
 <#if (table.hasUniPk)>
     <#list pks as column>
         <#include "/include/column/properties.ftl">
     </#list>
     <#if (fieldType == "Integer") && (fieldName == "id")>
-        SelectByIdMapper<${className}EntityExt>
-        UpdateByIdMapper<${className}Entity>
-        DeleteByIdMapper
+        DeleteByIdMapper,
+        UpdateByIdMapper<${className}Entity>,
+        SelectByIdMapper<${className}EntityExt>,
     <#else>
-        SelectByPkMapper<${className}EntityExt, ${fieldType}>
-        UpdateByPkMapper<${className}Entity, ${fieldType}>
-        DeleteByPkMapper<${fieldType}>
+        DeleteByPkMapper<${fieldType}>,
+        UpdateByPkMapper<${className}Entity, ${fieldType}>,
+        SelectByPkMapper<${className}EntityExt, ${fieldType}>,
     </#if>
 <#else>
-        UpdateByConditionMapper<${className}Entity, ${className}UpdateCondition>
-        DeleteByConditionMapper<${className}DeleteeCondition>
+        DeleteByPkConditionMapper,
+        DeleteByConditionMapper<${className}UpdateCondition>,
+        UpdateByConditionMapper<${className}Entity, ${className}UpdateCondition>,
 </#if>
+        SelectByConditionMapper<${className}Entity, ${className}SelectCondition>,
+        CountByConditionMapper<EngineExecutionSelectCondition>
 }

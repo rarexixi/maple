@@ -119,9 +119,10 @@ public class ScheduledExecutions implements CommandLineRunner {
     }
 
     private void submitExecution(EngineExecutionDetailResponse execution) {
-        threadPoolTaskExecutor.submit(() -> {
-            engineManagerClient.execute(execution);
-        });
+        logger.info("submit execution: {}", execution);
+        // threadPoolTaskExecutor.submit(() -> {
+        //     engineManagerClient.execute(execution);
+        // });
     }
 
     public void clearScheduling() {

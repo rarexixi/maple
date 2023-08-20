@@ -20,25 +20,7 @@
     </resultMap>
 
     <sql id="tableName">`${table.tableName}`</sql>
-<#if (table.hasUniPk)>
-    <#list pks as column>
-        <#include "/include/column/properties.ftl">
-    </#list>
-    <#if (fieldType == "Integer") && (fieldName == "id")>
-        SelectByIdMapper<${className}Entity>
-        SelectByIdMapper<${className}Entity>
-        UpdateByIdMapper<${className}Entity>
-        DeleteByIdMapper
-    <#else>
-        SelectByPkMapper<${className}Entity, ${fieldType}>
-        SelectByPkMapper<${className}Entity, ${fieldType}>
-        UpdateByPkMapper<${className}Entity, ${fieldType}>
-        DeleteByPkMapper<${fieldType}>
-    </#if>
-<#else>
-        UpdateByConditionMapper<${className}Entity, ${className}UpdateCondition>
-        DeleteByConditionMapper<${className}DeleteeCondition>
-</#if>
+
     <!--插入${tableComment}-->
     <insert id="insert"<#if table.hasAutoIncUniPk> useGeneratedKeys="true" keyProperty="entity.${table.uniPk.targetName?uncap_first}"</#if>>
         insert into <include refid="tableName"/>
@@ -77,22 +59,12 @@
         </foreach>
     </insert>
 
-    <!--根据主键条件删除${tableComment}-->
-    <delete id="delete">
+    <!--根据<#if (table.hasUniPk)>${uniPkComment}<#else>主键条件</#if>删除${tableComment}-->
+    <delete id="<#if (table.hasUniPk)><#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>deleteById<#else>deleteByPk</#if><#else>deleteByCondition</#if>">
         DELETE FROM <include refid="tableName"/>
         <where>
         <#if (table.hasUniPk)>
-            <choose>
-                <when test="condition.${uniPkFieldName} != null">
-                    `${uniPk.columnName}` = <@mapperEl 'condition.' + uniPkFieldName/>
-                </when>
-                <when test="condition.${uniPkFieldName}s != null">
-                    `${uniPk.columnName}` in <foreach collection="condition.${uniPkFieldName}s" item="it" open="(" close=")" separator=","><@mapperEl 'it'/></foreach>
-                </when>
-                <otherwise>
-                    1!=1
-                </otherwise>
-            </choose>
+            `${uniPk.columnName}` = <@mapperEl uniPkFieldName/>
         <#else>
         <#list pks as column>
             <#include "/include/column/properties.ftl">
@@ -102,8 +74,8 @@
         </where>
     </delete>
 
-    <!--根据主键条件更新${tableComment}-->
-    <update id="update">
+    <!--根据<#if (table.hasUniPk)>${uniPkComment}<#else>主键条件</#if>更新${tableComment}-->
+    <update id="<#if (table.hasUniPk)><#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>updateById<#else>updateByPk</#if><#else>updateByCondition</#if>">
         UPDATE <include refid="tableName"/>
         <set>
             <#list table.columns as column>
@@ -118,17 +90,7 @@
         </set>
         <where>
         <#if (table.hasUniPk)>
-            <choose>
-                <when test="condition.${uniPkFieldName} != null">
-                    `${uniPk.columnName}` = <@mapperEl 'condition.' + uniPkFieldName/>
-                </when>
-                <when test="condition.${uniPkFieldName}s != null">
-                    `${uniPk.columnName}` in <foreach collection="condition.${uniPkFieldName}s" item="it" open="(" close=")" separator=","><@mapperEl 'it'/></foreach>
-                </when>
-                <otherwise>
-                    1!=1
-                </otherwise>
-            </choose>
+            `${uniPk.columnName}` = <@mapperEl uniPkFieldName/>
         <#else>
         <#list pks as column>
             <#include "/include/column/properties.ftl">
@@ -139,16 +101,16 @@
     </update>
 
     <!--根据主键获取${tableComment}详情-->
-    <select id="detail" resultMap="ExtResultMap">
-        SELECT DISTINCT
+    <select id="<#if (table.hasUniPk)><#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>detailById<#else>detailByPk</#if><#else>detailByCondition</#if>" resultMap="ExtResultMap">
+        SELECT
         <#assign fkIndex = 0>
         <#list table.columns as column>
         <#include "/include/column/properties.ftl">
-        MT.`${column.columnName}`<#if column?has_next>,</#if>
+            MT.`${column.columnName}`<#if column?has_next>,</#if>
         <#if (column.fkSelect)>
         <#assign tmpName = ('T' + fkIndex)>
         <#assign fkIndex = (1 + fkIndex)>
-        `${tmpName}`.`${column.fkSelectColumn.textColumnName}` `${columnExceptKey}_text`<#if column?has_next>,</#if>
+            `${tmpName}`.`${column.fkSelectColumn.textColumnName}` `${columnExceptKey}_text`<#if column?has_next>,</#if>
         </#if>
         </#list>
         FROM
@@ -160,10 +122,14 @@
             </#list>
         </#if>
         <where>
+        <#if (table.hasUniPk)>
+            `${uniPk.columnName}` = <@mapperEl uniPkFieldName/>
+        <#else>
         <#list pks as column>
             <#include "/include/column/properties.ftl">
             <#if (column_index > 0)>AND </#if>MT.`${column.columnName}` = <@mapperEl fieldName/>
         </#list>
+        </#if>
         </where>
     </select>
 

@@ -3,6 +3,7 @@ package org.xi.maple.scheduler.configuration;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
@@ -27,13 +28,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfiguration {
 
     @Bean
-    public RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) {
+    public RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties, ObjectMapper objectMapper) {
 
         RedisSerializationContext.SerializationPair<String> keySerializer =
                 RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string());
 
         RedisSerializationContext.SerializationPair<?> valueSerializer =
-                RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer());
+                RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer(objectMapper));
 
         RedisCacheConfiguration config =
                 RedisCacheConfiguration.defaultCacheConfig()
@@ -60,11 +61,11 @@ public class RedisConfiguration {
 
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer(objectMapper);
         // key采用String的序列化方式
         template.setKeySerializer(stringRedisSerializer);
         // hash的key也采用String的序列化方式
@@ -77,11 +78,10 @@ public class RedisConfiguration {
         return template;
     }
 
-    private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
+    private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer(ObjectMapper objectMapper) {
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_ARRAY);
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         return jackson2JsonRedisSerializer;
     }

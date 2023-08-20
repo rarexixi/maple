@@ -84,7 +84,7 @@ public class ControllerAspect {
      *
      * @param method 方法
      * @param args   实际参数
-     * @param user   DMP用户
+     * @param user   用户
      */
     private void setUsers(final Method method, final Object[] args, final MapleUser user) {
         Parameter[] parameters = method.getParameters();
@@ -106,7 +106,7 @@ public class ControllerAspect {
      *
      * @param types 更新的类型列表
      * @param obj   更新的对象
-     * @param user  DMP用户
+     * @param user  用户
      */
     private void setUsers(final String[] types, final Object obj, final MapleUser user, Map<String, Object> fieldValueMap) {
         if (obj == null) {

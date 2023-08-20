@@ -17,5 +17,6 @@ public interface EngineExecutionQueueMapper extends
         SelectByConditionMapper<EngineExecutionQueueEntity, EngineExecutionQueueSelectCondition>,
         SelectByPkMapper<EngineExecutionQueueEntity, String>,
         UpdateByPkMapper<EngineExecutionQueueEntity, String>,
-        DeleteByPkMapper<String> {
+        DeleteByPkMapper<String>,
+        CountByConditionMapper<EngineExecutionQueueSelectCondition> {
 }

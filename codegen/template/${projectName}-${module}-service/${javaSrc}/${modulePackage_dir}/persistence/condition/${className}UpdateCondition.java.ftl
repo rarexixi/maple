@@ -26,11 +26,4 @@ public class ${className}UpdateCondition extends UpdateCondition {
      */
     private ${fieldType} ${fieldName};
     </#list>
-    <#if (table.hasUniPk)>
-
-    /**
-     * ${columnFullComment}列表
-     */
-    private Collection<${fieldType}> ${fieldName}s;
-    </#if>
 }

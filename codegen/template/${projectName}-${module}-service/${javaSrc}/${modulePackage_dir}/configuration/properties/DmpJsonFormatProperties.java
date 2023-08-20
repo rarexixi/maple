@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "dmp.json-format")
+@ConfigurationProperties(prefix = "maple.json-format")
 public class MapleJsonFormatProperties {
 
     private String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";

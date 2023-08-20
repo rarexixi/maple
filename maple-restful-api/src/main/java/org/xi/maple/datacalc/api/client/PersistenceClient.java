@@ -3,6 +3,7 @@ package org.xi.maple.datacalc.api.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.datacalc.api.client.fallback.PersistenceClientFallbackFactory;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
@@ -34,7 +35,7 @@ public interface PersistenceClient {
 
 
     @PostMapping("/engine-execution-queue/add-or-update")
-    Integer addOrUpdateExecQueue(@Validated @RequestBody MapleEngineExecutionQueue engineExecutionQueue);
+    OperateResult<Integer> addOrUpdateExecQueue(@Validated @RequestBody MapleEngineExecutionQueue engineExecutionQueue);
 
     @DeleteMapping("/engine-execution-queue/delete")
     Integer deleteExecQueue(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);

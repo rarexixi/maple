@@ -1,5 +1,7 @@
 package org.xi.maple.persistence.advice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.model.ResponseError;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @CrossOrigin
 public class ExceptionControllerAdvice {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
 
     // region 参数校验异常
 
@@ -93,6 +97,7 @@ public class ExceptionControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseError> ExceptionHandler(Exception e) {
+        logger.error("", e);
         String error = e.getMessage();
         return getError(HttpStatus.INTERNAL_SERVER_ERROR, error);
     }

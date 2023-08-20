@@ -22,29 +22,16 @@
     <#assign uniPkCanBeRange = (!uniPk.validStatus && (uniPk.dataType?contains("int") || uniPk.dataType == "double" || uniPk.dataType == "float" || uniPk.dataType == "decimal" || uniPk.dataType == "numeric" || uniPk.dataType?contains("date") || uniPk.dataType?contains("time")))>
     <#assign uniPkCanBeNull = uniPk.nullable>
 
-    <#assign uniPkIsContent = (uniPk.content || uniPk.dataType?contains("text"))>
     <#assign uniPkIsInteger = (uniPk.dataType?contains("int"))>
-    <#assign uniPkIsDecimal = (uniPk.dataType == "double" || uniPk.dataType == "float" || uniPk.dataType == "decimal" || uniPk.dataType == "numeric")>
     <#assign uniPkIsString = (uniPk.dataType?ends_with("char"))>
-    <#assign uniPkIsDate = (uniPk.dataType == "date")>
-    <#assign uniPkIsTime = (uniPk.dataType == "time")>
-    <#assign uniPkIsDateTime = (uniPk.dataType?contains("date") || uniPk.dataType?contains("time"))>
     <#assign uniPkFieldBasicType = uniPkFieldType>
-    <#if (uniPkFieldType=="Boolean")>
-        <#assign uniPkFieldBasicType = "boolean">
-    <#elseif (uniPkFieldType=="Character")>
+    <#if (uniPkFieldType=="Character")>
         <#assign uniPkFieldBasicType = "char">
-    <#elseif (uniPkFieldType=="Byte")>
-        <#assign uniPkFieldBasicType = "byte">
     <#elseif (uniPkFieldType=="Short")>
         <#assign uniPkFieldBasicType = "short">
     <#elseif (uniPkFieldType=="Integer")>
         <#assign uniPkFieldBasicType = "int">
     <#elseif (uniPkFieldType=="Long")>
         <#assign uniPkFieldBasicType = "long">
-    <#elseif (uniPkFieldType=="Float")>
-        <#assign uniPkFieldBasicType = "float">
-    <#elseif (uniPkFieldType=="Double")>
-        <#assign uniPkFieldBasicType = "double">
     </#if>
 </#if>

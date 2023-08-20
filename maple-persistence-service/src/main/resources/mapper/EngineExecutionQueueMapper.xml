@@ -14,14 +14,9 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
-    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionQueueEntityExt">
-    </resultMap>
 
     <sql id="tableName">`maple_engine_execution_queue`</sql>
-        SelectByPkMapper<EngineExecutionQueueEntity, String>
-        SelectByPkMapper<EngineExecutionQueueEntity, String>
-        UpdateByPkMapper<EngineExecutionQueueEntity, String>
-        DeleteByPkMapper<String>
+
     <!--插入执行队列-->
     <insert id="insert">
         insert into <include refid="tableName"/>
@@ -49,57 +44,16 @@
         </trim>
     </insert>
 
-    <!--todo 插入具体的列-->
-    <!--批量插入执行队列-->
-    <insert id="batchInsert">
-        insert into <include refid="tableName"/>
-        (
-            `queue_name`,
-            `lock_name`,
-            `cluster`,
-            `cluster_queue`,
-            `from_app`,
-            `group`,
-            `priority`,
-            `create_time`,
-            `update_time`
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-        (
-            #{item.queueName},
-            #{item.lockName},
-            #{item.cluster},
-            #{item.clusterQueue},
-            #{item.fromApp},
-            #{item.group},
-            #{item.priority},
-            #{item.createTime},
-            #{item.updateTime}
-        )
-        </foreach>
-    </insert>
-
     <!--根据主键条件删除执行队列-->
-    <delete id="delete">
+    <delete id="deleteByPk">
         DELETE FROM <include refid="tableName"/>
         <where>
-            <choose>
-                <when test="condition.queueName != null">
-                    `queue_name` = #{condition.queueName}
-                </when>
-                <when test="condition.queueNames != null">
-                    `queue_name` in <foreach collection="condition.queueNames" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                </when>
-                <otherwise>
-                    1!=1
-                </otherwise>
-            </choose>
+            `queue_name` = #{pk}
         </where>
     </delete>
 
     <!--根据主键条件更新执行队列-->
-    <update id="update">
+    <update id="updateByPk">
         UPDATE <include refid="tableName"/>
         <set>
             <if test="entity.queueName != null">
@@ -131,22 +85,12 @@
             </if>
         </set>
         <where>
-            <choose>
-                <when test="condition.queueName != null">
-                    `queue_name` = #{condition.queueName}
-                </when>
-                <when test="condition.queueNames != null">
-                    `queue_name` in <foreach collection="condition.queueNames" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                </when>
-                <otherwise>
-                    1!=1
-                </otherwise>
-            </choose>
+            `queue_name` = #{pk}
         </where>
     </update>
 
     <!--根据主键获取执行队列详情-->
-    <select id="detail" resultMap="ExtResultMap">
+    <select id="detailByPk" resultMap="BaseResultMap">
         SELECT DISTINCT
         MT.`queue_name`,
         MT.`lock_name`,
@@ -160,7 +104,7 @@
         FROM
         <include refid="tableName"/> MT
         <where>
-            MT.`queue_name` = #{queueName}
+            MT.`queue_name` = #{pk}
         </where>
     </select>
 
@@ -370,7 +314,7 @@
             </if>
         </where>
     </sql>
-    <select id="select" resultMap="ExtResultMap">
+    <select id="select" resultMap="BaseResultMap">
         SELECT
         <if test="condition.columns != null">
             <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>

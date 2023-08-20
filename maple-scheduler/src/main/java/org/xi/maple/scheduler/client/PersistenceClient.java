@@ -1,8 +1,10 @@
 package org.xi.maple.scheduler.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveRequest;
@@ -35,7 +37,7 @@ public interface PersistenceClient {
     // region engine-execution-queue
 
     @PostMapping("/engine-execution-queue/add-or-update")
-    Integer addOrUpdateExecQueue(@Validated @RequestBody EngineExecutionQueueSaveRequest engineExecutionQueue);
+    OperateResult<Integer> addOrUpdateExecQueue(@Validated @RequestBody EngineExecutionQueueSaveRequest engineExecutionQueue);
 
     @DeleteMapping("/engine-execution-queue/delete")
     Integer deleteExecQueue(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
@@ -44,7 +46,7 @@ public interface PersistenceClient {
     EngineExecutionQueue getExecQueueByName(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
 
     @GetMapping("/engine-execution-queue/list")
-    List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest);
+    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryRequest queryRequest);
 
     // endregion
 }
