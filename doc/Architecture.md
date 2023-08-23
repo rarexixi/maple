@@ -28,7 +28,7 @@
 
 - STARTING: 正在启动，从队列消费后为该状态
 
-- START_FAILED：启动失败
+- STARTED_FAILED：启动失败
 
 - RUNNING：运行中
 
@@ -68,7 +68,7 @@
 
 6. execution-manager 根据执行命令生成对象，生成对应的脚本，并启动
 
-如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
+如果启动失败，由 execution-manager 将作业状态更新为 STARTED_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
 
 由引擎自己回写状态，并在任务执行完成前定时上报心跳
 

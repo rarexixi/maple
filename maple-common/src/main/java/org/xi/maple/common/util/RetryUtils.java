@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -80,7 +81,7 @@ public class RetryUtils {
         }
 
         ConditionResult<R> result = supplier.get();
-        if (result.isSuccess()) {
+        if (result.success()) {
             return result.getResult();
         }
         ActionUtils.executeQuietly(() -> Thread.sleep(retryDuration));
@@ -102,7 +103,7 @@ public class RetryUtils {
         }
 
         ConditionResult<R> result = supplier.get();
-        if (result.isSuccess()) {
+        if (result.success()) {
             return result.getResult();
         }
         ActionUtils.executeQuietly(() -> Thread.sleep(retryDuration));
@@ -113,7 +114,11 @@ public class RetryUtils {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ConditionResult<T> {
-        private boolean success;
+        private Function<T, Boolean> successCondition;
         private T result;
+
+        public boolean success() {
+            return successCondition.apply(result);
+        }
     }
 }

@@ -19,7 +19,7 @@ public class EngineExecutionUpdateStatusRequest extends BaseEntity {
     private Integer id;
 
     /**
-     * 状态 (SUBMITTED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, LOST)
+     * 状态 (SUBMITTED, ACCEPTED, STARTING, STARTED_FAILED, RUNNING, SUCCEED, FAILED, KILLED, LOST)
      */
     private String status;
 }

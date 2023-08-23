@@ -1,9 +1,14 @@
 package org.xi.maple.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author xishihao
  */
 public class ActionUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(ActionUtils.class);
 
     @FunctionalInterface
     public interface Action {
@@ -21,7 +26,8 @@ public class ActionUtils {
         }
         try {
             action.run();
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            logger.error("执行失败", t);
         }
     }
 }

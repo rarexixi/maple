@@ -68,18 +68,17 @@ public class ScheduledExecutions implements CommandLineRunner {
      */
     @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
-        logger.info("Start to consume jobs...");
+        logger.info("开始消费队列...");
         List<EngineExecutionQueue> queueList = persistenceClient.getExecQueueList(new EngineExecutionQueueQueryRequest());
         if (queueList == null || queueList.isEmpty()) {
+            logger.warn("队列列表为空");
             return;
         }
 
         for (EngineExecutionQueue executionQueue : queueList) {
             if (!futureMap.containsKey(executionQueue.getQueueName())) {
-                ScheduledFuture<?> scheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
-                    logger.info("正在消费队列作业 <{}> ...", executionQueue.getQueueName());
-                    consumeQueueJobs(executionQueue);
-                }, 5000);
+                ScheduledFuture<?> scheduledFuture =
+                        threadPoolTaskScheduler.scheduleWithFixedDelay(() -> consumeQueueJobs(executionQueue), 5000);
                 futureMap.put(executionQueue.getQueueName(), scheduledFuture);
             }
         }
@@ -91,6 +90,7 @@ public class ScheduledExecutions implements CommandLineRunner {
      * @param executionQueue redis 队列
      */
     private void consumeQueueJobs(EngineExecutionQueue executionQueue) {
+        logger.info("正在消费队列作业 <{}> ...", executionQueue.getQueueName());
 
         RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(executionQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
         RLock lock = redissonClient.getLock(executionQueue.getLockName());

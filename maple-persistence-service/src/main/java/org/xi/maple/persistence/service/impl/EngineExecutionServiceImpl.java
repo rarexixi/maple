@@ -1,10 +1,14 @@
 package org.xi.maple.persistence.service.impl;
 
 import com.github.pagehelper.Page;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleDataInsertException;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
+import org.xi.maple.common.exception.MapleOperationForbiddenException;
 import org.xi.maple.common.model.PageList;
 import org.xi.maple.common.util.ObjectUtils;
 import org.xi.maple.persistence.model.request.*;
@@ -34,6 +38,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Service("engineExecutionService")
 public class EngineExecutionServiceImpl implements EngineExecutionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EngineExecutionServiceImpl.class);
 
     final EngineExecutionMapper engineExecutionMapper;
 
@@ -116,6 +122,40 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     @CacheEvict(cacheNames = {"maple-execution"}, key = "#updateRequest.id")
     @Override
     public int updateStatusById(EngineExecutionUpdateStatusRequest updateRequest) {
+        EngineExecutionEntityExt entity = engineExecutionMapper.detailById(updateRequest.getId());
+        if (entity == null) {
+            throw new MapleDataNotFoundException("引擎执行记录不存在");
+        }
+        if (EngineExecutionStatus.isFinalStatus(entity.getStatus())) {
+            logger.error("引擎执行已结束，id: {}", updateRequest.getId());
+            return 0;
+        }
+
+        String oldStatus = entity.getStatus();
+
+        switch (updateRequest.getStatus()) {
+            case EngineExecutionStatus.SUBMITTED:
+                return 0;
+            case EngineExecutionStatus.ACCEPTED:
+                if (!EngineExecutionStatus.SUBMITTED.equals(oldStatus)) {
+                    return 0;
+                }
+                break;
+            case EngineExecutionStatus.STARTING:
+                if (!EngineExecutionStatus.SUBMITTED .equals(oldStatus) && !EngineExecutionStatus.ACCEPTED.equals(oldStatus)) {
+                    return 0;
+                }
+                break;
+            case EngineExecutionStatus.STARTED_FAILED:
+            case EngineExecutionStatus.RUNNING:
+            case EngineExecutionStatus.SUCCEED:
+            case EngineExecutionStatus.FAILED:
+            case EngineExecutionStatus.KILLED:
+            case EngineExecutionStatus.LOST:
+                break;
+            default:
+                throw new MapleOperationForbiddenException("未知状态");
+        }
         return engineExecutionMapper.updateStatusById(updateRequest.getId(), updateRequest.getStatus());
     }
 

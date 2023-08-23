@@ -70,11 +70,11 @@ public class EngineBuilder {
                 process = processBuilder.start();
                 int exitcode = process.waitFor();
                 if (exitcode != 0) {
-                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
                 }
             } catch (Throwable t) {
                 logger.error("Execution[" + execution.getId() + "] starts failed!", t);
-                updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+                updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
             } finally {
                 if (process != null && process.isAlive()) {
                     ActionUtils.executeQuietly(process::destroyForcibly);
@@ -83,6 +83,13 @@ public class EngineBuilder {
         });
     }
 
+    /**
+     * 修改执行状态，状态变更逻辑已在接口实现
+     *
+     * @param id     执行ID
+     * @param status 变更状态
+     * @return 修改的数据量
+     */
     private Integer updateExecutionStatus(Integer id, String status) {
         Supplier<Integer> updateStatus = () -> persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, status));
         return RetryUtils.retry(updateStatus, 3, 1000, String.format("更新状态失败, id: %d, status: %s", id, status));
@@ -122,7 +129,16 @@ public class EngineBuilder {
                 .build();
     }
 
-
+    /**
+     * 生成最终的可执行文件
+     *
+     * @param execHome  生成目录地址
+     * @param ftlPath   模板路径
+     * @param fileName  生成的文件
+     * @param dataModel 模板数据模型
+     * @throws IOException
+     * @throws TemplateException
+     */
     private void generateFile(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
         String pluginHome = engineManagerProperties.getPluginHome();
         Path path = Paths.get(execHome, fileName);
