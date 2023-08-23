@@ -77,7 +77,7 @@ public class ScheduledExecutions implements CommandLineRunner {
         for (EngineExecutionQueue executionQueue : queueList) {
             if (!futureMap.containsKey(executionQueue.getQueueName())) {
                 ScheduledFuture<?> scheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
-                    logger.info("Consuming {} jobs...", executionQueue.getQueueName());
+                    logger.info("正在消费队列作业 <{}> ...", executionQueue.getQueueName());
                     consumeQueueJobs(executionQueue);
                 }, 5000);
                 futureMap.put(executionQueue.getQueueName(), scheduledFuture);
@@ -102,13 +102,18 @@ public class ScheduledExecutions implements CommandLineRunner {
                 MapleEngineExecutionQueue.QueueItem queueItem = deque.poll();
                 // 如果队列为空，直接返回
                 if (queueItem == null) {
+                    logger.info("作业执行队列为空 <{}> ", executionQueue.getQueueName());
                     continueRunning.set(false);
                     return;
                 }
                 EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(queueItem.getExecId());
                 MapleClusterQueue cachedQueueInfo = clusterQueueService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
                 // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
-                if (cachedQueueInfo.getPendingApps() > 0) {
+                if (cachedQueueInfo == null) {
+                    logger.error("队列不存在，cluster: {}, queue: {}", executionQueue.getCluster(), executionQueue.getClusterQueue());
+                    // todo 修改作业状态
+                } else if (cachedQueueInfo.getPendingApps() > 0) {
+                    logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", executionQueue.getCluster(), executionQueue.getClusterQueue());
                     deque.addFirst(queueItem);
                     continueRunning.set(false);
                 } else {
