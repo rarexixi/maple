@@ -30,14 +30,11 @@
         <commons-text.version>1.10.0</commons-text.version>
         <poi.version>5.2.3</poi.version>
         <freemarker.version>2.3.31</freemarker.version>
-        <fastjson.version>1.2.78</fastjson.version>
         <easyexcel.version>3.1.4</easyexcel.version>
         <mysql.version>8.0.28</mysql.version>
         <redisson.version>3.17.7</redisson.version>
         <mybatis.version>3.5.11</mybatis.version>
-        <redisson-spring-boot-starter.version>3.17.7</redisson-spring-boot-starter.version>
-        <mybatis-spring-boot-starter.version>2.3.0</mybatis-spring-boot-starter.version>
-        <pagehelper-spring-boot-starter.version>1.4.6</pagehelper-spring-boot-starter.version>
+        <kubernetes-client.version>6.4.1</kubernetes-client.version>
     </properties>
 
     <repositories>
@@ -131,11 +128,6 @@
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>${easyexcel.version}</version>
             </dependency>
@@ -155,30 +147,11 @@
                 <artifactId>redisson</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
+
             <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>${redisson-spring-boot-starter.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-actuator</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-data-redis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot-starter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.pagehelper</groupId>
-                <artifactId>pagehelper-spring-boot-starter</artifactId>
-                <version>${pagehelper-spring-boot-starter.version}</version>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${kubernetes-client.version}</version>
             </dependency>
 
         </dependencies>
