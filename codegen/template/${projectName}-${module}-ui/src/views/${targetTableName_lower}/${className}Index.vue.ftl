@@ -1,5 +1,5 @@
 <#include "/include/table/properties.ftl">
-<#macro mapperEl$ value>${r"${"}${value}}</#macro>
+<#macro $ value>${r"$"}{${value}}</#macro>
 <template>
     <a-breadcrumb separator="/">
         <a-breadcrumb-item>${tableComment}管理</a-breadcrumb-item>
@@ -106,7 +106,7 @@
                     <#if table.validStatusColumn??>
                     <#assign column = table.validStatusColumn>
                     <#include "/include/column/properties.ftl">
-                    <a-popconfirm :title="`确定<@mapperEl$ "record.${fieldName} === 1 ? '启用' : '禁用'"/>吗？`" ok-text="确定" cancel-text="取消" @confirm="switchDeleted(record)">
+                    <a-popconfirm :title="`确定<@$ "record.${fieldName} === 1 ? '启用' : '禁用'"/>吗？`" ok-text="确定" cancel-text="取消" @confirm="switchDeleted(record)">
                         <a v-if="record.deleted" class="enable">
                             <check-outlined />
                             <stop-outlined />

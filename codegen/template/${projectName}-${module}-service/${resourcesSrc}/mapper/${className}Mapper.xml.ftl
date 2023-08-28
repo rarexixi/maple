@@ -1,6 +1,6 @@
 <#include "/include/table/properties.ftl">
 <#macro mapperEl value>${r"#{"}${value}}</#macro>
-<#macro mapperEl$ value>${r"${"}${value}}</#macro>
+<#macro $ value>${r"$"}{${value}}</#macro>
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -203,7 +203,7 @@
     <select id="select" resultMap="ExtResultMap">
         SELECT
         <if test="condition.columns != null">
-            <foreach collection="condition.columns" item="it" separator=",">MT.`<@mapperEl$ 'it'/>`</foreach>
+            <foreach collection="condition.columns" item="it" separator=",">MT.`<@$ 'it'/>`</foreach>
         </if>
         <if test="condition.columns == null">
             <#list table.columns as column>
@@ -213,7 +213,7 @@
         FROM <include refid="tableName"/> MT
         <include refid="where"/>
         <if test="condition.orderBy != null">
-            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.<@mapperEl$ 'key'/> <@mapperEl$ 'val'/></foreach>
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.<@$ 'key'/> <@$ 'val'/></foreach>
         </if>
     </select>
 

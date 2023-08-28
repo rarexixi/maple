@@ -1,4 +1,4 @@
-<#macro mapperEl$ value>${r"${"}${value}}</#macro>
+<#macro $ value>${r"$"}{${value}}</#macro>
 server.port=${servicePort}
 spring.application.name=${projectName}-${module}-service
 spring.jackson.date-format=java.text.SimpleDateFormat
@@ -38,4 +38,4 @@ pagehelper.support-methods-arguments=true
 # endregion
 
 # /actuator/info 显示信息
-info.app.name=<@mapperEl$ 'spring.application.name'/>
+info.app.name=<@$ 'spring.application.name'/>
