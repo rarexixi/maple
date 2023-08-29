@@ -1,4 +1,4 @@
-package org.xi.maple.k8s.flink.crds;
+package org.xi.maple.execution.k8s.flink.crds;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.fabric8.kubernetes.api.model.Pod;

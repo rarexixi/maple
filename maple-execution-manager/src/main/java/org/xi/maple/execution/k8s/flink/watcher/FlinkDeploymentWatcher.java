@@ -1,8 +1,8 @@
-package org.xi.maple.k8s.flink.watcher;
+package org.xi.maple.execution.k8s.flink.watcher;
 
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
-import org.xi.maple.k8s.flink.crds.FlinkDeployment;
+import org.xi.maple.execution.k8s.flink.crds.FlinkDeployment;
 
 public class FlinkDeploymentWatcher implements Watcher<FlinkDeployment> {
     @Override

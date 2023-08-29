@@ -29,6 +29,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- 这里需要放在 spring-cloud-dependencies 上指定，用于覆盖 SpringCloud 中的版本 -->
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client-bom</artifactId>
+                <version>${kubernetes-fabric8-client.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>

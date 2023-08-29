@@ -34,6 +34,5 @@
         <module>maple-engine-plugins</module>
         <module>maple-engine-builder-base</module>
         <module>maple-execution-manager</module>
-        <module>maple-k8s-informer</module>
     </modules>
 </project>
