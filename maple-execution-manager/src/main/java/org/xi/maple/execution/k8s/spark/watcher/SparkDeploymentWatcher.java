@@ -1,9 +1,8 @@
-package org.xi.maple.k8s.spark.watcher;
+package org.xi.maple.execution.k8s.spark.watcher;
 
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
-import org.xi.maple.k8s.flink.crds.FlinkDeployment;
-import org.xi.maple.k8s.spark.crds.SparkDeployment;
+import org.xi.maple.execution.k8s.spark.crds.SparkDeployment;
 
 public class SparkDeploymentWatcher implements Watcher<SparkDeployment> {
     @Override

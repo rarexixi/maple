@@ -1,8 +1,7 @@
-package org.xi.maple.k8s.spark.eventhandler;
+package org.xi.maple.execution.k8s.spark.eventhandler;
 
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
-import org.xi.maple.k8s.flink.crds.FlinkDeployment;
-import org.xi.maple.k8s.spark.crds.SparkDeployment;
+import org.xi.maple.execution.k8s.spark.crds.SparkDeployment;
 
 public class SparkDeploymentEventHandler implements ResourceEventHandler<SparkDeployment> {
     @Override
@@ -17,7 +16,8 @@ public class SparkDeploymentEventHandler implements ResourceEventHandler<SparkDe
 
     @Override
     public void onUpdate(SparkDeployment oldObj, SparkDeployment newObj) {
-
+        String execId = oldObj.getMetadata().getLabels().getOrDefault("maple-id", "0");
+        String state = String.valueOf(newObj.getStatus().getApplicationState().get("state"));
     }
 
     @Override
