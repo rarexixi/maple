@@ -25,7 +25,6 @@ import java.util.List;
  * @author 郗世豪（rarexixi@gmail.com）
  */
 @Service("engineExecutionQueueService")
-@Transactional
 public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueService {
 
     final EngineExecutionQueueMapper engineExecutionQueueMapper;
@@ -42,6 +41,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @Transactional
     @CacheEvict(cacheNames = {"maple"}, key = "'exec-queue'", condition = "#result.type == T(org.xi.maple.common.constant.OperateResultType).NEW")
     @Override
     public OperateResult<Integer> addOrUpdate(EngineExecutionQueueSaveRequest saveRequest) {
@@ -61,6 +61,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @Transactional
     @Override
     public int delete(String queueName) {
         return engineExecutionQueueMapper.deleteByPk(queueName);

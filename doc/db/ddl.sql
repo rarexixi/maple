@@ -79,8 +79,8 @@ create table `maple`.`maple_datasource`
 
 # region engine
 
-drop table if exists `maple_engine_category`;
-create table `maple_engine_category`
+drop table if exists `maple`.`maple_engine_category`;
+create table `maple`.`maple_engine_category`
 (
     `id`          int                                    not null auto_increment comment '引擎ID',
     `name`        varchar(32)  default ''                not null comment '类型名称',
@@ -101,10 +101,11 @@ create table `maple_engine_category`
     comment = '执行器实例';
 
 
-drop table if exists `maple_cluster`;
-create table `maple_cluster`
+drop table if exists `maple`.`maple_cluster`;
+create table `maple`.`maple_cluster`
 (
-    `name`          varchar(16)                           not null comment '集群名称',
+    `name`          varchar(32)                           not null comment '集群名称',
+    `type`          varchar(16)                           not null comment '集群类型',
     `address`       varchar(16)                           not null comment '集群地址',
     `desc`          varchar(16) default ''                not null comment '集群说明',
     `configuration` text                                  not null comment '集群配置',
@@ -119,10 +120,10 @@ create table `maple_cluster`
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
-    comment = '集群配置';
+    comment = '集群';
 
-drop table if exists `maple_cluster_queue`;
-create table `maple_cluster_queue`
+drop table if exists `maple`.`maple_cluster_queue`;
+create table `maple`.`maple_cluster_queue`
 (
     `cluster_name` varchar(16) not null comment '集群名称',
     `queue_name`   varchar(16) not null comment '队列名称',
@@ -130,21 +131,21 @@ create table `maple_cluster_queue`
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
-    comment = '集群队列配置';
+    comment = '集群队列';
 
 drop table if exists `maple`.`maple_engine_execution_queue`;
 create table `maple`.`maple_engine_execution_queue`
 (
-    `queue_name`      varchar(128) default ''                not null comment '执行队列名',
-    `lock_name`       varchar(128) default ''                not null comment '队列锁名',
-    `cluster`         varchar(16)  default ''                not null comment '提交集群',
-    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
-    `from_app`        varchar(16)  default ''                not null comment '来源应用',
-    `group`           varchar(16)  default ''                not null comment '用户组',
-    `priority`        tinyint                                not null comment '队列优先级',
+    `queue_name`    varchar(128) default ''                not null comment '执行队列名',
+    `lock_name`     varchar(128) default ''                not null comment '队列锁名',
+    `cluster`       varchar(16)  default ''                not null comment '提交集群',
+    `cluster_queue` varchar(128) default ''                not null comment '集群队列',
+    `from_app`      varchar(16)  default ''                not null comment '来源应用',
+    `group`         varchar(16)  default ''                not null comment '用户组',
+    `priority`      tinyint                                not null comment '队列优先级',
 
-    `create_time`     datetime     default current_timestamp not null comment '创建时间',
-    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+    `create_time`   datetime     default current_timestamp not null comment '创建时间',
+    `update_time`   datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
     primary key (`queue_name`)
 ) engine = InnoDB
   default charset = utf8

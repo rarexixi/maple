@@ -1,6 +1,7 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.persistence.mapper;
 
+import ${commonPackage}.mapper.*;
 import ${modulePackage}.persistence.condition.${className}SelectCondition;
 import ${modulePackage}.persistence.condition.${className}UpdateCondition;
 import ${modulePackage}.persistence.entity.${className}Entity;
@@ -37,5 +38,5 @@ public interface ${className}Mapper extends
         UpdateByConditionMapper<${className}Entity, ${className}UpdateCondition>,
 </#if>
         SelectByConditionMapper<${className}Entity, ${className}SelectCondition>,
-        CountByConditionMapper<EngineExecutionSelectCondition>
+        CountByConditionMapper<${className}SelectCondition> {
 }

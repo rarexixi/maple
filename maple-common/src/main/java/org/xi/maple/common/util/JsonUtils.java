@@ -18,85 +18,90 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * @author xishihao
  */
 public class JsonUtils {
 
+    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = getDateTimeObjectMapper();
 
     public static <T> String toJsonString(T t) throws JsonProcessingException {
-        if (t == null) {
-            return null;
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(t);
+        return customToJsonString(t, DEFAULT_OBJECT_MAPPER);
     }
 
     public static <T> String toJsonString(T t, String defaultValue) {
         try {
-            return toJsonString(t);
+            return customToJsonString(t, DEFAULT_OBJECT_MAPPER);
         } catch (JsonProcessingException e) {
             return defaultValue;
         }
     }
 
-    public static <T> T parseObject(String json, Class<T> clazz) throws IOException {
-        if (StringUtils.isBlank(json)) {
-            return null;
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // 匹配不上的字段忽略
-        return mapper.readValue(json, clazz);
-    }
-
-    public static <T> T parseObject(String json, Class<T> clazz, T defaultValue) {
-        try {
-            return parseObject(json, clazz);
-        } catch (IOException e) {
-            return defaultValue;
-        }
-    }
-
-    public static <T> String toJsonString(T t, ObjectMapper mapper) throws JsonProcessingException {
-        if (t == null) {
+    public static <T> String customToJsonString(T t, ObjectMapper mapper) throws JsonProcessingException {
+        if (t == null || mapper == null) {
             return null;
         }
         return mapper.writeValueAsString(t);
     }
 
-    public static <T> T parseObject(String json, Class<T> clazz, ObjectMapper mapper) throws IOException {
-        if (StringUtils.isBlank(json)) {
+    public static <T> T parseObject(String json, Class<T> clazz) throws IOException {
+        return customParseObject(json, clazz, DEFAULT_OBJECT_MAPPER);
+    }
+
+    public static <T> T parseObject(String json, Class<T> clazz, T defaultValue) {
+        try {
+            return customParseObject(json, clazz, DEFAULT_OBJECT_MAPPER);
+        } catch (IOException e) {
+            return defaultValue;
+        }
+    }
+
+    public static <T> T customParseObject(String json, Class<T> clazz, ObjectMapper mapper) throws IOException {
+        if (StringUtils.isBlank(json) || mapper == null) {
             return null;
         }
         return mapper.readValue(json, clazz);
     }
 
+    public static <T> T convertValue(Object fromValue, Class<T> clazz) {
+        return customConvertValue(fromValue, clazz, DEFAULT_OBJECT_MAPPER);
+    }
+
+    public static <T> T convertValue(Object fromValue, Class<T> clazz, T defaultValue) {
+        try {
+            return customConvertValue(fromValue, clazz, DEFAULT_OBJECT_MAPPER);
+        } catch (Throwable ignored) {
+            return defaultValue;
+        }
+    }
+
+    public static <T> T customConvertValue(Object fromValue, Class<T> clazz, ObjectMapper mapper) {
+        if (fromValue == null || mapper == null) {
+            return null;
+        }
+        return mapper.convertValue(fromValue, clazz);
+    }
+
     public static ObjectMapper getDateTimeObjectMapper(MapleJsonFormatProperties jsonFormatProperties) {
-
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern(jsonFormatProperties.getDateTimeFormat());
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(jsonFormatProperties.getDateFormat());
-        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(jsonFormatProperties.getTimeFormat());
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormat));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(dateFormat));
-        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(timeFormat));
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormat));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormat));
-        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(timeFormat));
-        objectMapper.registerModule(javaTimeModule);
-        return objectMapper;
+        return getDateTimeObjectMapper(jsonFormatProperties.getDateTimeFormat(),
+                jsonFormatProperties.getDateFormat(),
+                jsonFormatProperties.getTimeFormat());
     }
 
     public static ObjectMapper getDateTimeObjectMapper() {
+        return getDateTimeObjectMapper(MapleJsonFormatProperties.DATETIME_FORMAT,
+                MapleJsonFormatProperties.DATE_FORMAT,
+                MapleJsonFormatProperties.TIME_FORMAT);
+    }
 
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern(MapleJsonFormatProperties.DATETIME_FORMAT);
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(MapleJsonFormatProperties.DATE_FORMAT);
-        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(MapleJsonFormatProperties.TIME_FORMAT);
+    public static ObjectMapper getDateTimeObjectMapper(String datetimeFormatStr, String dateFormatStr, String timeFormatStr) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern(datetimeFormatStr);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(dateFormatStr);
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(timeFormatStr);
+
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormat));
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(dateFormat));
@@ -104,7 +109,10 @@ public class JsonUtils {
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormat));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormat));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(timeFormat));
+
+        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(javaTimeModule);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // 匹配不上的字段忽略
         return objectMapper;
     }
 }

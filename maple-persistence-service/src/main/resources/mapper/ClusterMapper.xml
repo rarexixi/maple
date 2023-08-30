@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.persistence.persistence.mapper.ClusterMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEntity">
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="address" column="address"/>
+        <result property="desc" column="desc"/>
+        <result property="configuration" column="configuration"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_cluster`</sql>
+
+    <!--插入集群-->
+    <insert id="insert">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.name != null">`name`,</if>
+            <if test="entity.type != null">`type`,</if>
+            <if test="entity.address != null">`address`,</if>
+            <if test="entity.desc != null">`desc`,</if>
+            <if test="entity.configuration != null">`configuration`,</if>
+            <if test="entity.deleted != null">`deleted`,</if>
+            <if test="entity.createUser != null">`create_user`,</if>
+            <if test="entity.updateUser != null">`update_user`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.name != null">#{entity.name},</if>
+            <if test="entity.type != null">#{entity.type},</if>
+            <if test="entity.address != null">#{entity.address},</if>
+            <if test="entity.desc != null">#{entity.desc},</if>
+            <if test="entity.configuration != null">#{entity.configuration},</if>
+            <if test="entity.deleted != null">#{entity.deleted},</if>
+            <if test="entity.createUser != null">#{entity.createUser},</if>
+            <if test="entity.updateUser != null">#{entity.updateUser},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入集群-->
+    <insert id="batchInsert">
+        insert into <include refid="tableName"/>
+        (
+            `name`,
+            `type`,
+            `address`,
+            `desc`,
+            `configuration`,
+            `deleted`,
+            `create_user`,
+            `update_user`,
+            `create_time`,
+            `update_time`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.name},
+            #{item.type},
+            #{item.address},
+            #{item.desc},
+            #{item.configuration},
+            #{item.deleted},
+            #{item.createUser},
+            #{item.updateUser},
+            #{item.createTime},
+            #{item.updateTime}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据集群名称删除集群-->
+    <delete id="deleteByPk">
+        DELETE FROM <include refid="tableName"/>
+        <where>
+            `name` = #{name}
+        </where>
+    </delete>
+
+    <!--根据集群名称更新集群-->
+    <update id="updateByPk">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.name != null">
+                `name` = #{entity.name},
+            </if>
+            <if test="entity.type != null">
+                `type` = #{entity.type},
+            </if>
+            <if test="entity.address != null">
+                `address` = #{entity.address},
+            </if>
+            <if test="entity.desc != null">
+                `desc` = #{entity.desc},
+            </if>
+            <if test="entity.configuration != null">
+                `configuration` = #{entity.configuration},
+            </if>
+            <if test="entity.deleted != null">
+                `deleted` = #{entity.deleted},
+            </if>
+            <if test="entity.createUser != null">
+                `create_user` = #{entity.createUser},
+            </if>
+            <if test="entity.updateUser != null">
+                `update_user` = #{entity.updateUser},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            `name` = #{name}
+        </where>
+    </update>
+
+    <!--根据主键获取集群详情-->
+    <select id="detailByPk" resultMap="ExtResultMap">
+        SELECT
+            MT.`name`,
+            MT.`type`,
+            MT.`address`,
+            MT.`desc`,
+            MT.`configuration`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            `name` = #{name}
+        </where>
+    </select>
+
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.name != null and condition.name != ''">
+                        AND MT.`name` = #{condition.name}
+                    </if>
+                    <if test="condition.nameIn != null and condition.nameIn.size() > 0">
+                        AND MT.`name` IN
+                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.nameNotIn != null and condition.nameNotIn.size() > 0">
+                        AND MT.`name` NOT IN
+                        <foreach collection="condition.nameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.nameIsNotEmpty != null and condition.nameIsNotEmpty == true">
+                        AND MT.`name` IS NOT NULL AND `name` != ''
+                    </if>
+                    <if test="condition.nameIsEmpty != null and condition.nameIsEmpty == true">
+                        AND (MT.`name` IS NULL OR MT.`name` = '')
+                    </if>
+                    <if test="condition.nameStartWith != null and condition.nameStartWith != ''">
+                        AND MT.`name` LIKE concat(#{condition.nameStartWith}, '%')
+                    </if>
+                    <if test="condition.nameEndWith != null and condition.nameEndWith != ''">
+                        AND MT.`name` LIKE concat('%', #{condition.nameEndWith})
+                    </if>
+                    <if test="condition.nameContains != null and condition.nameContains != ''">
+                        AND MT.`name` LIKE concat('%', #{condition.nameContains}, '%')
+                    </if>
+                    <if test="condition.type != null and condition.type != ''">
+                        AND MT.`type` = #{condition.type}
+                    </if>
+                    <if test="condition.typeIn != null and condition.typeIn.size() > 0">
+                        AND MT.`type` IN
+                        <foreach collection="condition.typeIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.typeNotIn != null and condition.typeNotIn.size() > 0">
+                        AND MT.`type` NOT IN
+                        <foreach collection="condition.typeNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.typeIsNotEmpty != null and condition.typeIsNotEmpty == true">
+                        AND MT.`type` IS NOT NULL AND `type` != ''
+                    </if>
+                    <if test="condition.typeIsEmpty != null and condition.typeIsEmpty == true">
+                        AND (MT.`type` IS NULL OR MT.`type` = '')
+                    </if>
+                    <if test="condition.typeStartWith != null and condition.typeStartWith != ''">
+                        AND MT.`type` LIKE concat(#{condition.typeStartWith}, '%')
+                    </if>
+                    <if test="condition.typeEndWith != null and condition.typeEndWith != ''">
+                        AND MT.`type` LIKE concat('%', #{condition.typeEndWith})
+                    </if>
+                    <if test="condition.typeContains != null and condition.typeContains != ''">
+                        AND MT.`type` LIKE concat('%', #{condition.typeContains}, '%')
+                    </if>
+                    <if test="condition.address != null and condition.address != ''">
+                        AND MT.`address` = #{condition.address}
+                    </if>
+                    <if test="condition.addressIn != null and condition.addressIn.size() > 0">
+                        AND MT.`address` IN
+                        <foreach collection="condition.addressIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.addressNotIn != null and condition.addressNotIn.size() > 0">
+                        AND MT.`address` NOT IN
+                        <foreach collection="condition.addressNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.addressIsNotEmpty != null and condition.addressIsNotEmpty == true">
+                        AND MT.`address` IS NOT NULL AND `address` != ''
+                    </if>
+                    <if test="condition.addressIsEmpty != null and condition.addressIsEmpty == true">
+                        AND (MT.`address` IS NULL OR MT.`address` = '')
+                    </if>
+                    <if test="condition.addressStartWith != null and condition.addressStartWith != ''">
+                        AND MT.`address` LIKE concat(#{condition.addressStartWith}, '%')
+                    </if>
+                    <if test="condition.addressEndWith != null and condition.addressEndWith != ''">
+                        AND MT.`address` LIKE concat('%', #{condition.addressEndWith})
+                    </if>
+                    <if test="condition.addressContains != null and condition.addressContains != ''">
+                        AND MT.`address` LIKE concat('%', #{condition.addressContains}, '%')
+                    </if>
+                    <if test="condition.desc != null and condition.desc != ''">
+                        AND MT.`desc` = #{condition.desc}
+                    </if>
+                    <if test="condition.descIn != null and condition.descIn.size() > 0">
+                        AND MT.`desc` IN
+                        <foreach collection="condition.descIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.descNotIn != null and condition.descNotIn.size() > 0">
+                        AND MT.`desc` NOT IN
+                        <foreach collection="condition.descNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.descIsNotEmpty != null and condition.descIsNotEmpty == true">
+                        AND MT.`desc` IS NOT NULL AND `desc` != ''
+                    </if>
+                    <if test="condition.descIsEmpty != null and condition.descIsEmpty == true">
+                        AND (MT.`desc` IS NULL OR MT.`desc` = '')
+                    </if>
+                    <if test="condition.descStartWith != null and condition.descStartWith != ''">
+                        AND MT.`desc` LIKE concat(#{condition.descStartWith}, '%')
+                    </if>
+                    <if test="condition.descEndWith != null and condition.descEndWith != ''">
+                        AND MT.`desc` LIKE concat('%', #{condition.descEndWith})
+                    </if>
+                    <if test="condition.descContains != null and condition.descContains != ''">
+                        AND MT.`desc` LIKE concat('%', #{condition.descContains}, '%')
+                    </if>
+                    <if test="condition.deleted != null">
+                        AND MT.`deleted` = #{condition.deleted}
+                    </if>
+                    <if test="condition.createUser != null">
+                        AND MT.`create_user` = #{condition.createUser}
+                    </if>
+                    <if test="condition.createUserIn != null and condition.createUserIn.size() > 0">
+                        AND MT.`create_user` IN
+                        <foreach collection="condition.createUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createUserNotIn != null and condition.createUserNotIn.size() > 0">
+                        AND MT.`create_user` NOT IN
+                        <foreach collection="condition.createUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createUserMin != null">
+                        <![CDATA[
+                        AND MT.`create_user` >= #{condition.createUserMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createUserMax != null">
+                        <![CDATA[
+                        AND MT.`create_user` <= #{condition.createUserMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateUser != null">
+                        AND MT.`update_user` = #{condition.updateUser}
+                    </if>
+                    <if test="condition.updateUserIn != null and condition.updateUserIn.size() > 0">
+                        AND MT.`update_user` IN
+                        <foreach collection="condition.updateUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updateUserNotIn != null and condition.updateUserNotIn.size() > 0">
+                        AND MT.`update_user` NOT IN
+                        <foreach collection="condition.updateUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updateUserMin != null">
+                        <![CDATA[
+                        AND MT.`update_user` >= #{condition.updateUserMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateUserMax != null">
+                        <![CDATA[
+                        AND MT.`update_user` <= #{condition.updateUserMax}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMin != null">
+                        <![CDATA[
+                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMax != null">
+                        <![CDATA[
+                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMin != null">
+                        <![CDATA[
+                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMax != null">
+                        <![CDATA[
+                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        ]]>
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <if test="condition.columns != null">
+            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
+        </if>
+        <if test="condition.columns == null">
+            MT.`name`,
+            MT.`type`,
+            MT.`address`,
+            MT.`desc`,
+            MT.`configuration`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        </if>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="condition.orderBy != null">
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+</mapper>

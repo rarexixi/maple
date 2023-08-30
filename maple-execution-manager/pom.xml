@@ -75,5 +75,6 @@
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
         </dependency>
+
     </dependencies>
 </project>
