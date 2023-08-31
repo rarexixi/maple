@@ -71,7 +71,6 @@ public class EngineInformer {
             kubernetesClient.close();
         }
         kubernetesClient = getKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
-        kubernetesClient.close();
         k8sClients.put(cluster.getName(), kubernetesClient);
         refreshExecStatus(kubernetesClient);
     }
@@ -90,7 +89,6 @@ public class EngineInformer {
                 kubernetesClient = k8sClients.get(cluster.getName());
             } else {
                 kubernetesClient = getKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
-                kubernetesClient.close();
                 k8sClients.put(cluster.getName(), kubernetesClient);
             }
             refreshExecStatus(kubernetesClient);

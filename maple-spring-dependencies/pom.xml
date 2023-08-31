@@ -15,6 +15,9 @@
     <packaging>pom</packaging>
 
     <properties>
+        <spring-boot.version>2.7.7</spring-boot.version>
+        <spring-cloud.version>2021.0.6</spring-cloud.version>
+
         <redisson-spring-boot-starter.version>3.17.7</redisson-spring-boot-starter.version>
         <mybatis-spring-boot-starter.version>2.3.0</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>1.4.6</pagehelper-spring-boot-starter.version>

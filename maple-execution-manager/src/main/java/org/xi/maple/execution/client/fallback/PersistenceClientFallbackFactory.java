@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.*;
+import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
@@ -58,6 +59,11 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest) {
+                return null;
+            }
+
+            @Override
+            public ClusterDetailResponse getByName(String name) {
                 return null;
             }
 
