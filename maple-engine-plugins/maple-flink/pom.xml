@@ -4,18 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.xi.maple</groupId>
-        <artifactId>maple-spring-dependencies</artifactId>
+        <artifactId>maple-engine-plugins</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
-    <artifactId>maple-engine-plugins</artifactId>
+    <artifactId>maple-flink</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>maple-engine-common</module>
-        <module>maple-spark3</module>
-        <module>maple-flink</module>
+        <module>maple-flink-builder</module>
     </modules>
 </project>

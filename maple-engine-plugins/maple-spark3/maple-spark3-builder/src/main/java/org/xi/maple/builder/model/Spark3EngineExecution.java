@@ -7,6 +7,9 @@ import java.util.Map;
 
 @Data
 public class Spark3EngineExecution {
+
+    private Map<String, String> envs;
+
     // --master MASTER_URL         spark://host:port, mesos://host:port, yarn, k8s://https://host:port, or local (Default: local[*]).
     @JsonProperty(value="master")
     private String master;

@@ -1,1 +1,2 @@
-org.xi.maple.builder.convertor.Spark3Convertor
+org.xi.maple.builder.convertor.Spark3K8sConvertor
+org.xi.maple.builder.convertor.Spark3YarnConvertor

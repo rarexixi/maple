@@ -3,6 +3,9 @@ package org.xi.maple.execution.builder.spi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xi.maple.builder.annotation.ClusterCategory;
+import org.xi.maple.builder.annotation.EngineCategory;
+import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.convertor.MapleConvertor;
 
 import java.io.File;
@@ -22,8 +25,8 @@ public class EnginePluginService {
 
     Map<String, MapleConvertor> convertorMap;
 
-    public MapleConvertor getConvertor(String engineCategory, String engineVersion) {
-        return convertorMap.get(engineCategory + "::" + engineVersion);
+    public MapleConvertor getConvertor(String clusterCategory, String engineCategory, String engineVersion) {
+        return convertorMap.get(clusterCategory + "::" + engineCategory + "::" + engineVersion);
     }
 
     public void refreshPluginConvertors() {
@@ -55,8 +58,14 @@ public class EnginePluginService {
             classLoader = new URLClassLoader(pluginJars);
             ServiceLoader<MapleConvertor> loader = ServiceLoader.load(MapleConvertor.class, classLoader);
             for (MapleConvertor convertor : loader) {
-                Annotation[] annotations = convertor.getClass().getAnnotations(); // 获取类级别的注解
-                convertors.put("", convertor);
+                Class<? extends MapleConvertor> convertorClass = convertor.getClass();
+                // todo
+                ClusterCategory clusterCategory = convertorClass.getAnnotation(ClusterCategory.class);
+                EngineCategory engineCategory = convertorClass.getAnnotation(EngineCategory.class);
+                EngineVersion engineVersion = convertorClass.getAnnotation(EngineVersion.class);
+                for (String version : engineVersion.value()) {
+                    convertors.put(clusterCategory.value() + "::" + engineCategory.value() + "::" + version, convertor);
+                }
             }
         } catch (Exception e) {
             logger.error("Load plugin failed", e);
