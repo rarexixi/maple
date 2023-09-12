@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <artifactId>maple-spark3-executor</artifactId>
+    <artifactId>maple-spark-executor</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>

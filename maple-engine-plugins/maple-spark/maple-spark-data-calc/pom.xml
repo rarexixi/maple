@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <artifactId>maple-spark3-data-calc</artifactId>
+    <artifactId>maple-spark-data-calc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>

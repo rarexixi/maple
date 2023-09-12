@@ -41,11 +41,12 @@ public class EngineInformer {
     /**
      * 集群名称 -> KubernetesClient
      */
-    private Map<String, KubernetesClient> k8sClients = new HashMap<>();
+    private final Map<String, KubernetesClient> k8sClients;
 
     private final PersistenceClient client;
 
     public EngineInformer(PersistenceClient client) {
+        this.k8sClients = new HashMap<>();
         this.client = client;
     }
 
@@ -61,16 +62,16 @@ public class EngineInformer {
     }
 
 
-    public void refreshClusterConfig(String name) {
-        ClusterDetailResponse cluster = client.getByName(name);
-
-        KubernetesClient kubernetesClient;
-        if (k8sClients.containsKey(cluster.getName())) {
-            kubernetesClient = k8sClients.remove(name);
-            kubernetesClient.informers().stopAllRegisteredInformers();
-            kubernetesClient.close();
+    public void refreshClusterConfig(String clusterName) {
+        ClusterDetailResponse cluster = client.getByName(clusterName);
+        if (k8sClients.containsKey(clusterName)) {
+            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
+                kubernetesClient.informers().stopAllRegisteredInformers();
+            } catch (Throwable t) {
+                logger.error("close kubernetes client error, clusterName: " + clusterName, t);
+            }
         }
-        kubernetesClient = getKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
+        KubernetesClient kubernetesClient = getKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
         k8sClients.put(cluster.getName(), kubernetesClient);
         refreshExecStatus(kubernetesClient);
     }
