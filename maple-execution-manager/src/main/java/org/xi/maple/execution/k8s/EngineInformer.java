@@ -5,6 +5,8 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
+import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -104,28 +106,34 @@ public class EngineInformer {
      * @return KubernetesClient
      */
     private KubernetesClient getKubernetesClient(String master, String configJson) {
-        Config config = new ConfigBuilder().withMasterUrl(master).build();
-        Map<String, Object> map = JsonUtils.parseObject(configJson, Map.class, null);
-        if (map == null) {
+        KubeConfigWithType kubeConfig = JsonUtils.parseObject(configJson, KubeConfigWithType.class, null);
+        if (kubeConfig == null) {
+            Config config = new ConfigBuilder().withMasterUrl(master).build();
             return new KubernetesClientBuilder().withConfig(config).build();
         }
-        for (String key : map.keySet()) {
-            String methodName = "set" + kebabToPascal(key);
-            if (!configSetMethodMap.containsKey(methodName)) {
-                continue;
+        if ("file".equals(kubeConfig.getType())) {
+            if (StringUtils.isNotBlank(kubeConfig.getKubeConfigFile())) {
+                Config config = Config.fromKubeconfig(kubeConfig.getKubeConfigFile());
+                config.setMasterUrl(master);
+                return new KubernetesClientBuilder().withConfig(config).build();
             }
-            Method method = configSetMethodMap.get(methodName);
-            try {
-                Object parameter = JsonUtils.convertValue(map.get(key), method.getParameterTypes()[0], null);
-                if (parameter != null) {
-                    method.invoke(config, parameter);
-                }
-            } catch (Exception e) {
-                logger.error("set config error", e);
-            }
+        } else {
+            Config config = kubeConfig.getConfig();
+            config.setMasterUrl(master);
+            return new KubernetesClientBuilder().withConfig(config).build();
         }
+
+        Config config = new ConfigBuilder().withMasterUrl(master).build();
         return new KubernetesClientBuilder().withConfig(config).build();
     }
+
+    @Data
+    public static class KubeConfigWithType {
+        private String type;
+        private String kubeConfigFile;
+        private Config config;
+    }
+
 
     /**
      * kebab-case to pascal-case
