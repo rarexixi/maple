@@ -65,42 +65,42 @@ public class ClusterSelectCondition extends SelectCondition {
     /**
      * 集群类型
      */
-    private String type;
+    private String category;
 
     /**
      * 集群类型列表
      */
-    private Collection<String> typeIn;
+    private Collection<String> categoryIn;
 
     /**
      * 排除的集群类型列表
      */
-    private Collection<String> typeNotIn;
+    private Collection<String> categoryNotIn;
 
     /**
      * 集群类型不为空
      */
-    private Boolean typeIsNotEmpty;
+    private Boolean categoryIsNotEmpty;
 
     /**
      * 集群类型为空
      */
-    private Boolean typeIsEmpty;
+    private Boolean categoryIsEmpty;
 
     /**
      * 集群类型开始
      */
-    private String typeStartWith;
+    private String categoryStartWith;
 
     /**
      * 集群类型结束
      */
-    private String typeEndWith;
+    private String categoryEndWith;
 
     /**
      * 集群类型包含
      */
-    private String typeContains;
+    private String categoryContains;
 
     /**
      * 集群地址

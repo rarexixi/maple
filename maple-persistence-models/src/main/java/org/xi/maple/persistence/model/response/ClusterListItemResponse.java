@@ -19,7 +19,7 @@ public class ClusterListItemResponse implements Serializable {
     /**
      * 集群类型
      */
-    private String type;
+    private String category;
 
     /**
      * 集群地址

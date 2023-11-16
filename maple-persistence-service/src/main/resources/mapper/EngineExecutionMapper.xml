@@ -28,6 +28,7 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt">
+        <result property="clusterCategory" column="cluster_category"/>
         <result property="execContent" column="exec_content"/>
         <result property="configuration" column="configuration"/>
         <result property="extInfo" column="ext_info"/>
@@ -226,6 +227,7 @@
                MT.`content_path`,
                MT.`from_app`,
                MT.`cluster`,
+               CLUSTER.`category` as `cluster_category`,
                MT.`cluster_queue`,
                MT.`engine_category`,
                MT.`engine_version`,
@@ -246,6 +248,7 @@
                EXT.`process_info`
         FROM <include refid="tableName"/> MT
               JOIN <include refid="extTableName"/> EXT on MT.`id` = EXT.`id`
+              JOIN `maple_cluster` CLUSTER on MT.`cluster` = CLUSTER.`name`
         <where>
             MT.`id` = #{id} AND EXT.`id` = #{id}
         </where>

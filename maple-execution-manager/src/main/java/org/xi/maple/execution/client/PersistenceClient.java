@@ -50,7 +50,7 @@ public interface PersistenceClient {
 
     // endregion
 
-    // region engine-execution
+    // region cluster
 
     @GetMapping("/cluster/detail")
     ClusterDetailResponse getByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);

@@ -20,7 +20,7 @@ public class ClusterQueryRequest extends QueryRequest {
 
     private String nameContains;
 
-    private String type;
+    private String category;
 
     private Integer deleted;
 

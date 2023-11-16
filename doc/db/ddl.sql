@@ -105,8 +105,8 @@ drop table if exists `maple`.`maple_cluster`;
 create table `maple`.`maple_cluster`
 (
     `name`          varchar(32)                           not null comment '集群名称',
-    `type`          varchar(16)                           not null comment '集群类型',
-    `address`       varchar(16)                           not null comment '集群地址',
+    `category`      varchar(16)                           not null comment '集群类型',
+    `address`       varchar(256)                          not null comment '集群地址',
     `desc`          varchar(16) default ''                not null comment '集群说明',
     `configuration` text                                  not null comment '集群配置',
 
@@ -163,7 +163,7 @@ create table `maple`.`maple_engine_execution`
     `content_type`    varchar(8)    default 'text'            not null comment '执行内容类型 (text, path)',
     `content_path`    varchar(256)  default ''                not null comment '执行内容路径',
     `from_app`        varchar(16)                             not null comment '来源应用',
-    `cluster`         varchar(16)                             not null comment '提交集群',
+    `cluster`         varchar(32)                             not null comment '提交集群',
     `cluster_queue`   varchar(128)  default ''                not null comment '集群队列',
     `engine_category` varchar(16)   default ''                not null comment '引擎种类',
     `engine_version`  varchar(16)   default ''                not null comment '引擎版本',

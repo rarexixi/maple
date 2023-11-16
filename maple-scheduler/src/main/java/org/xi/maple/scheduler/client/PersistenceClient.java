@@ -5,10 +5,9 @@ import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
+import org.xi.maple.persistence.model.request.*;
+import org.xi.maple.persistence.model.response.ClusterDetailResponse;
+import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.scheduler.client.fallback.PersistenceClientFallbackFactory;
@@ -47,6 +46,16 @@ public interface PersistenceClient {
 
     @GetMapping("/engine-execution-queue/list")
     List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryRequest queryRequest);
+
+    // endregion
+
+    // region cluster
+
+    @GetMapping("/cluster/detail")
+    ClusterDetailResponse getByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);
+
+    @GetMapping("/cluster/list")
+    List<ClusterListItemResponse> getClusterList(@RequestBody ClusterQueryRequest queryRequest);
 
     // endregion
 }

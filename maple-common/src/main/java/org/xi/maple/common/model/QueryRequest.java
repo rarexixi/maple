@@ -1,5 +1,6 @@
 package org.xi.maple.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.xi.maple.common.constant.SortConstants;
 import org.xi.maple.common.exception.MapleParamErrorException;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ public abstract class QueryRequest implements Serializable {
 
     final Map<String, String> orderBy = new LinkedHashMap<>();
 
+    @JsonIgnore
     public Map<String, String> getOrderBy() {
         return orderBy;
     }

@@ -84,7 +84,7 @@ public class EngineInformer {
     @Scheduled
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
-        request.setType(ClusterTypeConstants.K8s);
+        request.setCategory(ClusterTypeConstants.K8s);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
         for (ClusterListItemResponse cluster : clusters) {
             KubernetesClient kubernetesClient;

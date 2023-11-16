@@ -5,7 +5,7 @@
 
     <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEntity">
         <result property="name" column="name"/>
-        <result property="type" column="type"/>
+        <result property="category" column="category"/>
         <result property="address" column="address"/>
         <result property="desc" column="desc"/>
         <result property="configuration" column="configuration"/>
@@ -25,7 +25,7 @@
         insert into <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.name != null">`name`,</if>
-            <if test="entity.type != null">`type`,</if>
+            <if test="entity.category != null">`category`,</if>
             <if test="entity.address != null">`address`,</if>
             <if test="entity.desc != null">`desc`,</if>
             <if test="entity.configuration != null">`configuration`,</if>
@@ -37,7 +37,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.name != null">#{entity.name},</if>
-            <if test="entity.type != null">#{entity.type},</if>
+            <if test="entity.category != null">#{entity.category},</if>
             <if test="entity.address != null">#{entity.address},</if>
             <if test="entity.desc != null">#{entity.desc},</if>
             <if test="entity.configuration != null">#{entity.configuration},</if>
@@ -55,7 +55,7 @@
         insert into <include refid="tableName"/>
         (
             `name`,
-            `type`,
+            `category`,
             `address`,
             `desc`,
             `configuration`,
@@ -69,7 +69,7 @@
         <foreach collection="list" item="item" separator=",">
         (
             #{item.name},
-            #{item.type},
+            #{item.category},
             #{item.address},
             #{item.desc},
             #{item.configuration},
@@ -97,8 +97,8 @@
             <if test="entity.name != null">
                 `name` = #{entity.name},
             </if>
-            <if test="entity.type != null">
-                `type` = #{entity.type},
+            <if test="entity.category != null">
+                `category` = #{entity.category},
             </if>
             <if test="entity.address != null">
                 `address` = #{entity.address},
@@ -134,7 +134,7 @@
     <select id="detailByPk" resultMap="ExtResultMap">
         SELECT
             MT.`name`,
-            MT.`type`,
+            MT.`category`,
             MT.`address`,
             MT.`desc`,
             MT.`configuration`,
@@ -181,31 +181,31 @@
                     <if test="condition.nameContains != null and condition.nameContains != ''">
                         AND MT.`name` LIKE concat('%', #{condition.nameContains}, '%')
                     </if>
-                    <if test="condition.type != null and condition.type != ''">
-                        AND MT.`type` = #{condition.type}
+                    <if test="condition.category != null and condition.category != ''">
+                        AND MT.`category` = #{condition.category}
                     </if>
-                    <if test="condition.typeIn != null and condition.typeIn.size() > 0">
-                        AND MT.`type` IN
-                        <foreach collection="condition.typeIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.categoryIn != null and condition.categoryIn.size() > 0">
+                        AND MT.`category` IN
+                        <foreach collection="condition.categoryIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.typeNotIn != null and condition.typeNotIn.size() > 0">
-                        AND MT.`type` NOT IN
-                        <foreach collection="condition.typeNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.categoryNotIn != null and condition.categoryNotIn.size() > 0">
+                        AND MT.`category` NOT IN
+                        <foreach collection="condition.categoryNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.typeIsNotEmpty != null and condition.typeIsNotEmpty == true">
-                        AND MT.`type` IS NOT NULL AND `type` != ''
+                    <if test="condition.categoryIsNotEmpty != null and condition.categoryIsNotEmpty == true">
+                        AND MT.`category` IS NOT NULL AND `category` != ''
                     </if>
-                    <if test="condition.typeIsEmpty != null and condition.typeIsEmpty == true">
-                        AND (MT.`type` IS NULL OR MT.`type` = '')
+                    <if test="condition.categoryIsEmpty != null and condition.categoryIsEmpty == true">
+                        AND (MT.`category` IS NULL OR MT.`category` = '')
                     </if>
-                    <if test="condition.typeStartWith != null and condition.typeStartWith != ''">
-                        AND MT.`type` LIKE concat(#{condition.typeStartWith}, '%')
+                    <if test="condition.categoryStartWith != null and condition.categoryStartWith != ''">
+                        AND MT.`category` LIKE concat(#{condition.categoryStartWith}, '%')
                     </if>
-                    <if test="condition.typeEndWith != null and condition.typeEndWith != ''">
-                        AND MT.`type` LIKE concat('%', #{condition.typeEndWith})
+                    <if test="condition.categoryEndWith != null and condition.categoryEndWith != ''">
+                        AND MT.`category` LIKE concat('%', #{condition.categoryEndWith})
                     </if>
-                    <if test="condition.typeContains != null and condition.typeContains != ''">
-                        AND MT.`type` LIKE concat('%', #{condition.typeContains}, '%')
+                    <if test="condition.categoryContains != null and condition.categoryContains != ''">
+                        AND MT.`category` LIKE concat('%', #{condition.categoryContains}, '%')
                     </if>
                     <if test="condition.address != null and condition.address != ''">
                         AND MT.`address` = #{condition.address}
@@ -335,7 +335,7 @@
         </if>
         <if test="condition.columns == null">
             MT.`name`,
-            MT.`type`,
+            MT.`category`,
             MT.`address`,
             MT.`desc`,
             MT.`configuration`,

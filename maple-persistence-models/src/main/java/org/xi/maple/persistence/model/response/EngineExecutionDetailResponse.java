@@ -6,6 +6,11 @@ import lombok.Data;
 public class EngineExecutionDetailResponse extends EngineExecutionListItemResponse {
 
     /**
+     * 集群类型
+     */
+    private String clusterCategory;
+
+    /**
      * 执行内容
      */
     private String execContent;

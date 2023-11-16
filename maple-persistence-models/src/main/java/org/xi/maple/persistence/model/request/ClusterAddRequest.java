@@ -21,8 +21,8 @@ public class ClusterAddRequest extends BaseEntity {
     /**
      * 集群类型
      */
-    @NotBlank(message = "type(集群类型)不能为空")
-    private String type;
+    @NotBlank(message = "category(集群类型)不能为空")
+    private String category;
 
     /**
      * 集群地址

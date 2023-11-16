@@ -6,7 +6,7 @@
         <groupId>org.xi.maple</groupId>
         <artifactId>maple-engine-plugins</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>maple-flink</artifactId>

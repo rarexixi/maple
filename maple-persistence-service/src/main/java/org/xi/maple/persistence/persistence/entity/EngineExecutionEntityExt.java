@@ -18,6 +18,11 @@ import lombok.ToString;
 public class EngineExecutionEntityExt extends EngineExecutionEntity {
 
     /**
+     * 集群类型
+     */
+    private String clusterCategory;
+
+    /**
      * 执行内容
      */
     private String execContent;

@@ -50,7 +50,7 @@ public class EngineBuilder {
 
     public void execute(EngineExecutionDetailResponse execution) {
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
-        MapleConvertor convertor = enginePluginService.getConvertor(execution.getEngineCategory(), execution.getEngineVersion());
+        MapleConvertor convertor = enginePluginService.getConvertor(execution.getEngineCategory(), execution.getEngineCategory(), execution.getEngineVersion());
         List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
         String startFile = null;
         String execHome = getPath(engineManagerProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));

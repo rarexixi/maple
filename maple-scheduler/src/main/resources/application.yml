@@ -18,8 +18,3 @@ spring:
         max-wait: -1ms
         max-idle: 8
         min-idle: 0
-
-# region datasoruce
-cluster:
-  queue:
-    key: maple-cluster-queue-info

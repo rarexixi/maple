@@ -36,7 +36,7 @@ public class YarnApps {
     @Scheduled
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
-        request.setType(ClusterTypeConstants.YARN);
+        request.setCategory(ClusterTypeConstants.YARN);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
         for (ClusterListItemResponse cluster : clusters) {
             String[] masters = cluster.getAddress().split("[,;]");
