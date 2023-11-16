@@ -1,31 +1,32 @@
 package org.xi.maple.execution.k8s.flink.eventhandler;
 
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xi.maple.execution.k8s.BaseResourceEventHandler;
 import org.xi.maple.execution.k8s.flink.crds.FlinkDeployment;
+import org.xi.maple.execution.k8s.flink.crds.FlinkDeploymentSpec;
+import org.xi.maple.execution.k8s.flink.crds.FlinkDeploymentStatus;
 
-public class FlinkDeploymentEventHandler implements ResourceEventHandler<FlinkDeployment> {
+import java.util.Map;
+
+public class FlinkDeploymentEventHandler extends BaseResourceEventHandler<FlinkDeploymentSpec, FlinkDeploymentStatus, FlinkDeployment> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FlinkDeploymentEventHandler.class);
+
     @Override
-    public void onNothing() {
-        ResourceEventHandler.super.onNothing();
+    protected String getType() {
+        return "flink";
     }
 
     @Override
-    public void onAdd(FlinkDeployment obj) {
-        String execId = obj.getMetadata().getLabels().getOrDefault("maple-id", "0");
-
-        System.out.println("onAdd: " + obj.getMetadata().getName());
-    }
-
-    @Override
-    public void onUpdate(FlinkDeployment oldObj, FlinkDeployment newObj) {
-        String execId = oldObj.getMetadata().getLabels().getOrDefault("maple-id", "0");
-        String state = String.valueOf(newObj.getStatus().getJobStatus().get("state"));
-
-        System.out.println("onUpdate: " + newObj.getMetadata().getName());
-    }
-
-    @Override
-    public void onDelete(FlinkDeployment obj, boolean deletedFinalStateUnknown) {
-        System.out.println("onDelete: " + obj.getMetadata().getName());
+    public String getState(FlinkDeployment obj) {
+        if (obj.getStatus() == null || obj.getStatus().getJobStatus() == null) {
+            return null;
+        }
+        Map<String, Object> jobStatus = obj.getStatus().getJobStatus();
+        if (jobStatus.containsKey("state")) {
+            return String.valueOf(jobStatus.get("state"));
+        }
+        return null;
     }
 }

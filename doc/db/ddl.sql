@@ -77,6 +77,28 @@ create table `maple`.`maple_datasource`
 
 # endregion
 
+# region application
+
+drop table if exists `maple`.`maple_application`;
+create table `maple`.`maple_application`
+(
+    `id`            int                                    not null auto_increment comment '应用ID',
+    `app_name`      varchar(32)  default ''                not null comment '应用名称',
+    `access_key`    varchar(256) default ''                not null comment '应用访问密钥',
+    `callback_urls` text         default '{}'              not null comment '回调接口',
+
+    `create_time`   datetime     default current_timestamp not null comment '创建时间',
+    `update_time`   datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    index idx_engine_version (`app_name`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '访问程序';
+
+# endregion
+
 # region engine
 
 drop table if exists `maple`.`maple_engine_category`;
