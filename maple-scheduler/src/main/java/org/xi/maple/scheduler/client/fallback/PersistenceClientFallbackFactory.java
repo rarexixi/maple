@@ -5,10 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
+import org.xi.maple.persistence.model.request.*;
+import org.xi.maple.persistence.model.response.ClusterDetailResponse;
+import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.scheduler.client.PersistenceClient;
@@ -55,6 +54,16 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest) {
+                return null;
+            }
+
+            @Override
+            public ClusterDetailResponse getByName(String name) {
+                return null;
+            }
+
+            @Override
+            public List<ClusterListItemResponse> getClusterList(ClusterQueryRequest queryRequest) {
                 return null;
             }
         };
