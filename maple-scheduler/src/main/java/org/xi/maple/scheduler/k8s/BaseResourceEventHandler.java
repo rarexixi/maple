@@ -1,4 +1,4 @@
-package org.xi.maple.execution.k8s;
+package org.xi.maple.scheduler.k8s;
 
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;

@@ -1,4 +1,4 @@
-package org.xi.maple.execution.yarn;
+package org.xi.maple.scheduler.yarn;
 
 import lombok.Data;
 import org.slf4j.Logger;
@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.xi.maple.common.constant.ClusterTypeConstants;
-import org.xi.maple.execution.client.PersistenceClient;
+import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 

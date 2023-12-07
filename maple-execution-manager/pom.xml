@@ -12,8 +12,8 @@
 
     <artifactId>maple-execution-manager</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>maple-engine-manager</name>
-    <description>maple-engine-manager</description>
+    <name>maple-execution-manager</name>
+    <description>maple-execution-manager</description>
 
     <properties>
     </properties>

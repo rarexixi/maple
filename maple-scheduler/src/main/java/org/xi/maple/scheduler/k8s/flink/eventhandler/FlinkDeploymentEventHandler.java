@@ -1,11 +1,11 @@
-package org.xi.maple.execution.k8s.flink.eventhandler;
+package org.xi.maple.scheduler.k8s.flink.eventhandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xi.maple.execution.k8s.BaseResourceEventHandler;
-import org.xi.maple.execution.k8s.flink.crds.FlinkDeployment;
-import org.xi.maple.execution.k8s.flink.crds.FlinkDeploymentSpec;
-import org.xi.maple.execution.k8s.flink.crds.FlinkDeploymentStatus;
+import org.xi.maple.scheduler.k8s.BaseResourceEventHandler;
+import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
+import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentSpec;
+import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentStatus;
 
 import java.util.Map;
 

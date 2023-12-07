@@ -20,43 +20,11 @@ public interface PersistenceClient {
 
     // region engine-execution
 
-    @PostMapping("/engine-execution/add")
-    Integer addExecution(@Validated @RequestBody EngineExecutionAddRequest engineExecution);
-
-    @GetMapping("/engine-execution/detail")
-    EngineExecutionDetailResponse getExecutionById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id);
-
     @PatchMapping("/engine-execution/update-status")
     Integer updateExecutionStatusById(@Validated @RequestBody EngineExecutionUpdateStatusRequest updateStatusRequest);
 
     @PatchMapping("/engine-execution/update-ext-info")
     Integer updateExecutionExtInfoById(@RequestBody EngineExecutionUpdateRequest updateRequest);
-
-    // endregion
-
-    // region engine-execution-queue
-
-    @PostMapping("/engine-execution-queue/add-or-update")
-    Integer addOrUpdateExecQueue(@Validated @RequestBody EngineExecutionQueueSaveRequest saveRequest);
-
-    @DeleteMapping("/engine-execution-queue/delete")
-    Integer deleteExecQueue(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
-
-    @GetMapping("/engine-execution-queue/detail")
-    EngineExecutionQueue getExecQueueByName(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
-
-    @GetMapping("/engine-execution-queue/list")
-    List<EngineExecutionQueue> getExecQueueList(@RequestBody EngineExecutionQueueQueryRequest queryRequest);
-
-    // endregion
-
-    // region cluster
-
-    @GetMapping("/cluster/detail")
-    ClusterDetailResponse getByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);
-
-    @GetMapping("/cluster/list")
-    List<ClusterListItemResponse> getClusterList(@RequestBody ClusterQueryRequest queryRequest);
 
     // endregion
 }

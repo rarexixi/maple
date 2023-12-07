@@ -1,0 +1,328 @@
+package org.xi.maple.scheduler.service.impl;
+
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.StatusDetails;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
+import lombok.Data;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.xi.maple.common.constant.ClusterTypeConstants;
+import org.xi.maple.common.util.JsonUtils;
+import org.xi.maple.persistence.model.request.ClusterQueryRequest;
+import org.xi.maple.persistence.model.response.ClusterDetailResponse;
+import org.xi.maple.persistence.model.response.ClusterListItemResponse;
+import org.xi.maple.redis.model.MapleClusterQueue;
+import org.xi.maple.scheduler.client.PersistenceClient;
+import org.xi.maple.scheduler.constant.K8sResourceType;
+import org.xi.maple.scheduler.exception.ClusterNotConfiguredExceptionMaple;
+import org.xi.maple.scheduler.exception.EngineTypeNotSupportExceptionMaple;
+import org.xi.maple.scheduler.exception.MapleK8sException;
+import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
+import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentList;
+import org.xi.maple.scheduler.k8s.flink.eventhandler.FlinkDeploymentEventHandler;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkDeployment;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkDeploymentList;
+import org.xi.maple.scheduler.k8s.spark.eventhandler.SparkDeploymentEventHandler;
+import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueue;
+import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueueList;
+import org.xi.maple.scheduler.model.YarnCluster;
+import org.xi.maple.scheduler.service.K8sClusterService;
+
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * @author xishihao
+ */
+@Service
+public class K8sClusterServiceImpl implements K8sClusterService {
+
+    private static final Logger logger = LoggerFactory.getLogger(K8sClusterServiceImpl.class);
+
+    private static final String LABEL_EXEC = "maple-exec";
+    private static final String LABEL_ID = "maple-id";
+
+    private static final Map<String, Method> configSetMethodMap = getConfigSetMethodMap();
+
+    private final PersistenceClient client;
+
+    final static Map<String, MapleClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+    final static Map<String, SharedIndexInformer<VolcanoQueue>> k8sQueueInformer = new ConcurrentHashMap<>();
+
+    /**
+     * 集群名称 -> KubernetesClient
+     */
+    private final Map<String, KubernetesClient> k8sClients;
+
+    public K8sClusterServiceImpl(PersistenceClient client) {
+        this.client = client;
+        this.k8sClients = new HashMap<>();
+    }
+
+    /**
+     * 用于动态设置 K8s 配置，暂时没用到
+     *
+     * @return
+     */
+    private static Map<String, Method> getConfigSetMethodMap() {
+        Map<String, Method> methodMap = new HashMap<>();
+        Method[] methods = Config.class.getMethods();
+        for (Method method : methods) {
+            if (method.getName().startsWith("set") && method.getParameterCount() == 1) {
+                methodMap.put(method.getName(), method);
+            }
+        }
+        return methodMap;
+    }
+
+
+    @Override
+    public List<HasMetadata> deployEngine(String clusterName, MultipartFile yamlFile) {
+        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
+        try (InputStream is = yamlFile.getInputStream()) {
+            return kubernetesClient.load(is).serverSideApply();
+        } catch (Throwable t) {
+            throw new MapleK8sException(t);
+        }
+    }
+
+    @Override
+    public List<StatusDetails> deleteEngine(String clusterName, MultipartFile yamlFile) {
+        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
+        try (InputStream is = yamlFile.getInputStream()) {
+            return kubernetesClient.load(is).delete();
+        } catch (Throwable t) {
+            throw new MapleK8sException(t);
+        }
+    }
+
+    @Override
+    public List<HasMetadata> deployEngine(String clusterName, String yaml) {
+        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
+        try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
+            return kubernetesClient.load(is).serverSideApply();
+        } catch (Throwable t) {
+            throw new MapleK8sException(t);
+        }
+    }
+
+    @Override
+    public List<StatusDetails> deleteEngine(String clusterName, String yaml) {
+        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
+        try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
+            return kubernetesClient.load(is).delete();
+        } catch (Throwable t) {
+            throw new MapleK8sException(t);
+        }
+    }
+
+    @Override
+    public List<StatusDetails> deleteEngine(String clusterName, String namespace, String type, String name) {
+        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
+        try {
+            if (K8sResourceType.FLINK.is(type)) {
+                return kubernetesClient.resources(FlinkDeployment.class).inNamespace(namespace).withName(name).delete();
+            } else if (K8sResourceType.SPARK.is(type)) {
+                return kubernetesClient.resources(SparkDeployment.class).inNamespace(namespace).withName(name).delete();
+            }
+        } catch (Throwable t) {
+            throw new MapleK8sException(t);
+        }
+        throw new EngineTypeNotSupportExceptionMaple("engine type not support: " + type);
+    }
+
+    private KubernetesClient getKubernetesClient(String clusterName) {
+        if (!k8sClients.containsKey(clusterName)) {
+            throw new ClusterNotConfiguredExceptionMaple("Cluster [" + clusterName + "] not configured");
+        }
+        return k8sClients.get(clusterName);
+    }
+
+    @Override
+    public void cacheQueueInfos(Map<String, MapleClusterQueue> queues) {
+        CLUSTER_QUEUE_MAP.putAll(queues);
+    }
+
+    @Override
+    public void cacheQueueInfo(String clusterName, String queue, MapleClusterQueue queueInfo) {
+        String key = MapleClusterQueue.getKey(clusterName, queue);
+        CLUSTER_QUEUE_MAP.put(key, queueInfo);
+    }
+
+    @Override
+    public MapleClusterQueue getCachedQueueInfo(String clusterName, String queue) {
+        String key = MapleClusterQueue.getKey(clusterName, queue);
+        return CLUSTER_QUEUE_MAP.get(key);
+    }
+
+    private List<YarnCluster> getClusters() {
+        return new ArrayList<>(0);
+    }
+
+    public void refreshClusterConfig(String clusterName) {
+        ClusterDetailResponse cluster = client.getByName(clusterName);
+        if (k8sClients.containsKey(clusterName)) {
+            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
+                kubernetesClient.informers().stopAllRegisteredInformers();
+            } catch (Throwable t) {
+                logger.error("close kubernetes client error, clusterName: " + clusterName, t);
+            }
+        }
+        KubernetesClient kubernetesClient = createKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
+        k8sClients.put(cluster.getName(), kubernetesClient);
+        refreshExecStatus(clusterName, kubernetesClient);
+    }
+
+    /**
+     * 刷新引擎执行任务状态
+     */
+    @Scheduled
+    public void refreshClusters() {
+        ClusterQueryRequest request = new ClusterQueryRequest();
+        request.setCategory(ClusterTypeConstants.K8s);
+        List<ClusterListItemResponse> clusters = client.getClusterList(request);
+        for (ClusterListItemResponse cluster : clusters) {
+            KubernetesClient kubernetesClient;
+            if (k8sClients.containsKey(cluster.getName())) {
+                kubernetesClient = k8sClients.get(cluster.getName());
+            } else {
+                kubernetesClient = createKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
+                k8sClients.put(cluster.getName(), kubernetesClient);
+            }
+            refreshExecStatus(cluster.getName(), kubernetesClient);
+        }
+    }
+
+    /**
+     * kebab-case to pascal-case
+     *
+     * @param content 源字符串
+     * @return 大写驼峰字符串
+     */
+    public static String kebabToPascal(String content) {
+        if (null == content) return null;
+        int contentLength = content.length();
+        if (contentLength == 0) return content;
+
+        StringBuilder stringBuilder = new StringBuilder(contentLength);
+        char[] chars = content.toCharArray();
+        stringBuilder.append(Character.toUpperCase(chars[0]));
+        for (int i = 1; i < contentLength; i++) {
+            if (chars[i] == '-') {
+                if (++i < contentLength) {
+                    stringBuilder.append(Character.toUpperCase(chars[i]));
+                }
+            } else {
+                stringBuilder.append(chars[i]);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 刷新引擎执行任务状态
+     *
+     * @param kubernetesClient
+     */
+    public void refreshExecStatus(String clusterName, KubernetesClient kubernetesClient) {
+
+        SharedIndexInformer<FlinkDeployment> flinkInformer = kubernetesClient
+                .resources(FlinkDeployment.class, FlinkDeploymentList.class)
+                .withLabel("from-app", LABEL_EXEC)
+                .inform(new FlinkDeploymentEventHandler(), 10000L);
+
+        flinkInformer.start();
+
+        SharedIndexInformer<SparkDeployment> sparkInformer = kubernetesClient
+                .resources(SparkDeployment.class, SparkDeploymentList.class)
+                .withLabel("from-app", LABEL_EXEC)
+                .inform(new SparkDeploymentEventHandler(), 10000L);
+        sparkInformer.start();
+
+        SharedIndexInformer<VolcanoQueue> volcanoInformer = kubernetesClient
+                .resources(VolcanoQueue.class, VolcanoQueueList.class)
+                .inform(new ResourceEventHandler<>() {
+                    @Override
+                    public void onAdd(VolcanoQueue volcanoQueue) {
+                    }
+
+                    @Override
+                    public void onUpdate(VolcanoQueue volcanoQueue, VolcanoQueue newVolcanoQueue) {
+                    }
+
+                    @Override
+                    public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
+                        String key = MapleClusterQueue.getKey(clusterName, volcanoQueue.getMetadata().getName());
+                        CLUSTER_QUEUE_MAP.remove(key);
+                    }
+                }, 10000L);
+
+        volcanoInformer.start();
+
+    }
+
+    private void close() {
+        for (KubernetesClient kubernetesClient : k8sClients.values()) {
+            kubernetesClient.close();
+            kubernetesClient.informers().stopAllRegisteredInformers();
+        }
+    }
+
+    @PostConstruct
+    public void run() throws Exception {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
+
+    @Data
+    public static class KubeConfigWithType {
+        private String type;
+        private String kubeConfigFile;
+        private Config config;
+    }
+
+    /**
+     * 根据配置的 master 和 configJson 获取 KubernetesClient
+     *
+     * @param master     地址
+     * @param configJson 配置
+     * @return KubernetesClient
+     */
+    private KubernetesClient createKubernetesClient(String master, String configJson) {
+        KubeConfigWithType kubeConfig = JsonUtils.parseObject(configJson, KubeConfigWithType.class, null);
+        if (kubeConfig == null) {
+            Config config = new ConfigBuilder().withMasterUrl(master).build();
+            return new KubernetesClientBuilder().withConfig(config).build();
+        }
+        if ("file".equals(kubeConfig.getType())) {
+            if (StringUtils.isNotBlank(kubeConfig.getKubeConfigFile())) {
+                Config config = Config.fromKubeconfig(kubeConfig.getKubeConfigFile());
+                config.setMasterUrl(master);
+                return new KubernetesClientBuilder().withConfig(config).build();
+            }
+        } else {
+            Config config = kubeConfig.getConfig();
+            config.setMasterUrl(master);
+            return new KubernetesClientBuilder().withConfig(config).build();
+        }
+
+        Config config = new ConfigBuilder().withMasterUrl(master).build();
+        return new KubernetesClientBuilder().withConfig(config).build();
+    }
+}

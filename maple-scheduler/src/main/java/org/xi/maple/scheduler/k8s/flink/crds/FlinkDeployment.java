@@ -1,4 +1,4 @@
-package org.xi.maple.execution.k8s.flink.crds;
+package org.xi.maple.scheduler.k8s.flink.crds;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

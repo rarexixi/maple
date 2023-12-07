@@ -19,7 +19,7 @@ import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
 import org.xi.maple.scheduler.client.EngineManagerClient;
 import org.xi.maple.scheduler.client.PersistenceClient;
-import org.xi.maple.scheduler.service.ClusterQueueService;
+import org.xi.maple.scheduler.service.K8sClusterService;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +41,7 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     final ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    final ClusterQueueService clusterQueueService;
+    final K8sClusterService k8sClusterService;
 
     final PersistenceClient persistenceClient;
 
@@ -52,13 +52,13 @@ public class ScheduledExecutions implements CommandLineRunner {
     public ScheduledExecutions(RedissonClient redissonClient,
                                ThreadPoolTaskExecutor threadPoolTaskExecutor,
                                ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                               ClusterQueueService clusterQueueService,
+                               K8sClusterService k8sClusterService,
                                PersistenceClient persistenceClient,
                                EngineManagerClient engineManagerClient) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
-        this.clusterQueueService = clusterQueueService;
+        this.k8sClusterService = k8sClusterService;
         this.persistenceClient = persistenceClient;
         this.engineManagerClient = engineManagerClient;
     }
@@ -107,7 +107,7 @@ public class ScheduledExecutions implements CommandLineRunner {
                     return;
                 }
                 EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(queueItem.getExecId());
-                MapleClusterQueue cachedQueueInfo = clusterQueueService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
+                MapleClusterQueue cachedQueueInfo = k8sClusterService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
                 // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
                 if (cachedQueueInfo == null) {
                     logger.error("队列不存在，cluster: {}, queue: {}", executionQueue.getCluster(), executionQueue.getClusterQueue());

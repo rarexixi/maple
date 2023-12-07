@@ -28,8 +28,8 @@ public interface PersistenceClient {
     @GetMapping("/engine-execution/detail")
     EngineExecutionDetailResponse getExecutionById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id);
 
-    @PatchMapping("/engine-execution/update-info")
-    Integer updateExecutionById(@Validated @RequestBody EngineExecutionUpdateRequest updateRequest);
+    @PatchMapping("/engine-execution/update-ext-info")
+    Integer updateExecutionExtInfoById(@Validated @RequestBody EngineExecutionUpdateRequest updateRequest);
 
     // endregion
 

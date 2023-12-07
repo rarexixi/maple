@@ -1,11 +1,11 @@
-package org.xi.maple.execution.k8s.spark.eventhandler;
+package org.xi.maple.scheduler.k8s.spark.eventhandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xi.maple.execution.k8s.BaseResourceEventHandler;
-import org.xi.maple.execution.k8s.spark.crds.SparkDeployment;
-import org.xi.maple.execution.k8s.spark.crds.SparkDeploymentSpec;
-import org.xi.maple.execution.k8s.spark.crds.SparkDeploymentStatus;
+import org.xi.maple.scheduler.k8s.BaseResourceEventHandler;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkDeployment;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkDeploymentSpec;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkDeploymentStatus;
 
 import java.util.Map;
 

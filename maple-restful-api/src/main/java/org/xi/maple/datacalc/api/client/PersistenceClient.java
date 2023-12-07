@@ -30,7 +30,7 @@ public interface PersistenceClient {
     @PatchMapping("/engine-execution/update-status")
     Integer updateExecutionStatusById(@Validated @RequestBody EngineExecutionUpdateStatusRequest updateRequest);
 
-    @PatchMapping("/engine-execution/update-info")
+    @PatchMapping("/engine-execution/update-ext-info")
     Integer updateExecutionInfoById(@Validated @RequestBody EngineExecutionUpdateRequest updateRequest);
 
 

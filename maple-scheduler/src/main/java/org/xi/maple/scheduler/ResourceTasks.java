@@ -14,7 +14,7 @@ import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.redis.model.MapleClusterQueue;
 import org.xi.maple.scheduler.model.YarnCluster;
 import org.xi.maple.scheduler.model.YarnScheduler;
-import org.xi.maple.scheduler.service.ClusterQueueService;
+import org.xi.maple.scheduler.service.K8sClusterService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,10 +30,10 @@ public class ResourceTasks {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceTasks.class);
 
-    final ClusterQueueService clusterQueueService;
+    final K8sClusterService k8sClusterService;
 
-    public ResourceTasks(ClusterQueueService clusterQueueService) {
-        this.clusterQueueService = clusterQueueService;
+    public ResourceTasks(K8sClusterService k8sClusterService) {
+        this.k8sClusterService = k8sClusterService;
     }
 
     /**
@@ -64,7 +64,7 @@ public class ResourceTasks {
             }
         }*/
         queueMap.put(MapleClusterQueue.getKey("hadoop", "default"), new MapleClusterQueue(0));
-        clusterQueueService.cacheQueueInfos(queueMap);
+        k8sClusterService.cacheQueueInfos(queueMap);
     }
 
     private List<YarnCluster> getClusters() {
