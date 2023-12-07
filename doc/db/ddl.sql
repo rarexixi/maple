@@ -21,7 +21,7 @@ create table `maple`.`maple_datasource_type`
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
-    comment ='数据源类型';
+    comment = '数据源类型';
 
 drop table if exists `maple`.`maple_datasource_config_key`;
 create table `maple`.`maple_datasource_config_key`
@@ -49,7 +49,7 @@ create table `maple`.`maple_datasource_config_key`
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
-    comment ='数据源配置项';
+    comment = '数据源配置项';
 
 drop table if exists `maple`.`maple_datasource`;
 create table `maple`.`maple_datasource`
@@ -73,7 +73,7 @@ create table `maple`.`maple_datasource`
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
-    comment ='数据源配置';
+    comment = '数据源配置';
 
 # endregion
 
@@ -85,7 +85,7 @@ create table `maple`.`maple_application`
     `id`            int                                    not null auto_increment comment '应用ID',
     `app_name`      varchar(32)  default ''                not null comment '应用名称',
     `access_key`    varchar(256) default ''                not null comment '应用访问密钥',
-    `callback_urls` text         default '{}'              not null comment '回调接口',
+    `callback_urls` text                                   not null comment '回调接口',
 
     `create_time`   datetime     default current_timestamp not null comment '创建时间',
     `update_time`   datetime     default current_timestamp not null on update current_timestamp comment '更新时间',

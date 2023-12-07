@@ -23,9 +23,12 @@ import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.redis.model.MapleClusterQueue;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.K8sResourceType;
+import org.xi.maple.scheduler.constant.MapleConstants;
 import org.xi.maple.scheduler.exception.ClusterNotConfiguredExceptionMaple;
 import org.xi.maple.scheduler.exception.EngineTypeNotSupportExceptionMaple;
 import org.xi.maple.scheduler.exception.MapleK8sException;
+import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
+import org.xi.maple.scheduler.k8s.MapleResourceEventHandler;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentList;
 import org.xi.maple.scheduler.k8s.flink.eventhandler.FlinkDeploymentEventHandler;
@@ -56,12 +59,10 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     private static final Logger logger = LoggerFactory.getLogger(K8sClusterServiceImpl.class);
 
-    private static final String LABEL_EXEC = "maple-exec";
-    private static final String LABEL_ID = "maple-id";
-
     private static final Map<String, Method> configSetMethodMap = getConfigSetMethodMap();
 
     private final PersistenceClient client;
+    private final UpdateExecStatusFunc updateExecStatusFunc;
 
     final static Map<String, MapleClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
     final static Map<String, SharedIndexInformer<VolcanoQueue>> k8sQueueInformer = new ConcurrentHashMap<>();
@@ -71,8 +72,9 @@ public class K8sClusterServiceImpl implements K8sClusterService {
      */
     private final Map<String, KubernetesClient> k8sClients;
 
-    public K8sClusterServiceImpl(PersistenceClient client) {
+    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
         this.client = client;
+        this.updateExecStatusFunc = updateExecStatusFunc;
         this.k8sClients = new HashMap<>();
     }
 
@@ -182,7 +184,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
                 kubernetesClient.informers().stopAllRegisteredInformers();
             } catch (Throwable t) {
-                logger.error("close kubernetes client error, clusterName: " + clusterName, t);
+                logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
             }
         }
         KubernetesClient kubernetesClient = createKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
@@ -193,7 +195,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     /**
      * 刷新引擎执行任务状态
      */
-    @Scheduled
+    @Scheduled(fixedDelay = 5000)
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
         request.setCategory(ClusterTypeConstants.K8s);
@@ -245,35 +247,26 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
         SharedIndexInformer<FlinkDeployment> flinkInformer = kubernetesClient
                 .resources(FlinkDeployment.class, FlinkDeploymentList.class)
-                .withLabel("from-app", LABEL_EXEC)
-                .inform(new FlinkDeploymentEventHandler(), 10000L);
+                .withLabel(MapleConstants.LABEL_EXEC_KEY, MapleConstants.LABEL_EXEC_VALUE)
+                .inform(new FlinkDeploymentEventHandler(updateExecStatusFunc), 10000L);
 
         flinkInformer.start();
 
         SharedIndexInformer<SparkDeployment> sparkInformer = kubernetesClient
                 .resources(SparkDeployment.class, SparkDeploymentList.class)
-                .withLabel("from-app", LABEL_EXEC)
-                .inform(new SparkDeploymentEventHandler(), 10000L);
+                .withLabel(MapleConstants.LABEL_EXEC_KEY, MapleConstants.LABEL_EXEC_VALUE)
+                .inform(new SparkDeploymentEventHandler(updateExecStatusFunc), 10000L);
         sparkInformer.start();
 
         SharedIndexInformer<VolcanoQueue> volcanoInformer = kubernetesClient
                 .resources(VolcanoQueue.class, VolcanoQueueList.class)
-                .inform(new ResourceEventHandler<>() {
-                    @Override
-                    public void onAdd(VolcanoQueue volcanoQueue) {
-                    }
-
-                    @Override
-                    public void onUpdate(VolcanoQueue volcanoQueue, VolcanoQueue newVolcanoQueue) {
-                    }
-
+                .inform(new MapleResourceEventHandler<>() {
                     @Override
                     public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
                         String key = MapleClusterQueue.getKey(clusterName, volcanoQueue.getMetadata().getName());
                         CLUSTER_QUEUE_MAP.remove(key);
                     }
                 }, 10000L);
-
         volcanoInformer.start();
 
     }

@@ -23,52 +23,12 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
         return new PersistenceClient() {
 
             @Override
-            public Integer addExecution(EngineExecutionAddRequest engineExecution) {
-                return null;
-            }
-
-            @Override
-            public EngineExecutionDetailResponse getExecutionById(Integer id) {
-                return null;
-            }
-
-            @Override
             public Integer updateExecutionStatusById(EngineExecutionUpdateStatusRequest updateStatusRequest) {
                 return null;
             }
 
             @Override
             public Integer updateExecutionExtInfoById(EngineExecutionUpdateRequest updateRequest) {
-                return null;
-            }
-
-            @Override
-            public Integer addOrUpdateExecQueue(EngineExecutionQueueSaveRequest saveRequest) {
-                return null;
-            }
-
-            @Override
-            public Integer deleteExecQueue(String queueName) {
-                return null;
-            }
-
-            @Override
-            public EngineExecutionQueue getExecQueueByName(String queueName) {
-                return null;
-            }
-
-            @Override
-            public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest) {
-                return null;
-            }
-
-            @Override
-            public ClusterDetailResponse getByName(String name) {
-                return null;
-            }
-
-            @Override
-            public List<ClusterListItemResponse> getClusterList(ClusterQueryRequest queryRequest) {
                 return null;
             }
         };

@@ -26,6 +26,10 @@ public class EngineExecutionController {
     @PostMapping("submit")
     public ResponseEntity<Integer> submitJob(@RequestBody EngineExecutionAddRequest addRequest) {
 
+        String fromApp = addRequest.getFromApp();
+        String uniqueId = addRequest.getUniqueId();
+        String execName = addRequest.getExecName();
+
         Integer id = engineExecutionService.submit(addRequest);
         return ResponseEntity.ok(id);
     }

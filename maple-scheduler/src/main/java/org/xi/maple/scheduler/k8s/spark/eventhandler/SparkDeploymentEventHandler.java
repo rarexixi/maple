@@ -8,10 +8,20 @@ import org.xi.maple.scheduler.k8s.spark.crds.SparkDeploymentSpec;
 import org.xi.maple.scheduler.k8s.spark.crds.SparkDeploymentStatus;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 
 public class SparkDeploymentEventHandler extends BaseResourceEventHandler<SparkDeploymentSpec, SparkDeploymentStatus, SparkDeployment> {
 
     private static final Logger logger = LoggerFactory.getLogger(SparkDeploymentEventHandler.class);
+
+    public SparkDeploymentEventHandler(BiFunction<Integer, String, Integer> updateFunc) {
+        super(updateFunc);
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return logger;
+    }
 
     @Override
     protected String getType() {

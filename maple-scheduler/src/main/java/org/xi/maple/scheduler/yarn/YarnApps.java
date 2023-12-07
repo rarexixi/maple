@@ -1,6 +1,7 @@
 package org.xi.maple.scheduler.yarn;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.xi.maple.common.constant.ClusterTypeConstants;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
+import org.xi.maple.scheduler.constant.MapleConstants;
+import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
 
 import java.util.List;
 
@@ -20,14 +23,13 @@ public class YarnApps {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnApps.class);
 
-    private static final String TAG_EXEC = "maple-exec";
-    private static final String TAG_ID_PREFIX = "maple-id-";
-
     private final PersistenceClient client;
+    private final UpdateExecStatusFunc updateExecStatusFunc;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public YarnApps(PersistenceClient client) {
+    public YarnApps(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
         this.client = client;
+        this.updateExecStatusFunc = updateExecStatusFunc;
     }
 
     /**
@@ -55,7 +57,7 @@ public class YarnApps {
      * 刷新引擎执行任务状态
      */
     public void refreshExecStatus(String master) {
-        String getYarnAppsUrl = String.format("%s/ws/v1/cluster/apps?applicationTags=%s", master, TAG_EXEC);
+        String getYarnAppsUrl = String.format("%s/ws/v1/cluster/apps?applicationTags=%s", master, MapleConstants.TAG_EXEC);
 
         ResponseEntity<YarnApplications> forEntity = restTemplate.getForEntity(getYarnAppsUrl, YarnApplications.class);
         if (forEntity.getStatusCode() != HttpStatus.OK) {
@@ -68,11 +70,15 @@ public class YarnApps {
         for (YarnApplications.Apps.App app : body.getApps().getApp()) {
             String[] tags = app.applicationTags.split(",");
             for (String tag : tags) {
-                if (tag.startsWith(TAG_ID_PREFIX)) {
-                    String execId = tag.substring(TAG_ID_PREFIX.length());
+                if (tag.startsWith(MapleConstants.TAG_ID_PREFIX)) {
+                    String execIdStr = tag.substring(MapleConstants.TAG_ID_PREFIX_LEN);
+                    if (StringUtils.isBlank(execIdStr) || !StringUtils.isNumeric(execIdStr)) {
+                        break;
+                    }
+                    Integer execId = Integer.getInteger(execIdStr);
                     String state = app.state;
                     String finalStatus = app.finalStatus;
-                    // todo 更新状态
+                    updateExecStatusFunc.apply(execId, state);
                 }
             }
         }

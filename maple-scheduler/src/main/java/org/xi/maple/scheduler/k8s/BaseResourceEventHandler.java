@@ -1,30 +1,34 @@
 package org.xi.maple.scheduler.k8s;
 
 import io.fabric8.kubernetes.client.CustomResource;
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S, T>> implements ResourceEventHandler<A> {
+import java.util.function.BiFunction;
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseResourceEventHandler.class);
+public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S, T>> implements MapleResourceEventHandler<A> {
 
-    @Override
-    public void onNothing() {
-        ResourceEventHandler.super.onNothing();
+    protected final BiFunction<Integer, String, Integer> updateFunc;
+
+    public BaseResourceEventHandler(BiFunction<Integer, String, Integer> updateFunc) {
+        this.updateFunc = updateFunc;
     }
+
+    protected abstract Logger getLogger();
 
     @Override
     public void onAdd(A obj) {
+        Logger logger = getLogger();
         int execId = getExecId(obj);
         String mapleAppName = getAppName(obj);
         String state = getState(obj);
+        updateFunc.apply(execId, state);
 
         logger.info("{}[{}] from {} change state to {} in action[{}]", getType(), execId, mapleAppName, state, "ADD");
     }
 
     @Override
     public void onUpdate(A oldObj, A newObj) {
+        Logger logger = getLogger();
         int execId = getExecId(newObj);
         String mapleAppName = getAppName(newObj);
         String state = getState(newObj);
@@ -34,6 +38,7 @@ public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S,
 
     @Override
     public void onDelete(A obj, boolean deletedFinalStateUnknown) {
+        Logger logger = getLogger();
         int execId = getExecId(obj);
         String mapleAppName = getAppName(obj);
         String state = getState(obj);

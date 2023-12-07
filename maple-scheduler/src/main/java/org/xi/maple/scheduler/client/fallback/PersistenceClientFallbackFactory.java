@@ -33,6 +33,11 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
             }
 
             @Override
+            public Integer updateExecutionStatusById(EngineExecutionUpdateStatusRequest updateStatusRequest) {
+                return null;
+            }
+
+            @Override
             public Integer updateExecutionExtInfoById(EngineExecutionUpdateRequest updateRequest) {
                 return null;
             }

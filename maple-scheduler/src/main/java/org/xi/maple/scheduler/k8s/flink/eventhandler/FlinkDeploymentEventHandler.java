@@ -8,10 +8,21 @@ import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentSpec;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentStatus;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 
 public class FlinkDeploymentEventHandler extends BaseResourceEventHandler<FlinkDeploymentSpec, FlinkDeploymentStatus, FlinkDeployment> {
 
     private static final Logger logger = LoggerFactory.getLogger(FlinkDeploymentEventHandler.class);
+
+    public FlinkDeploymentEventHandler(BiFunction<Integer, String, Integer> updateFunc) {
+        super(updateFunc);
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return logger;
+    }
+
 
     @Override
     protected String getType() {
