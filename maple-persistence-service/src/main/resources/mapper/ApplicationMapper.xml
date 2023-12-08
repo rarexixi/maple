@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.persistence.persistence.mapper.ApplicationMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ApplicationEntity">
+        <result property="appName" column="app_name"/>
+        <result property="accessKey" column="access_key"/>
+        <result property="legalHosts" column="legal_hosts"/>
+        <result property="callbackUrls" column="callback_urls"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ApplicationEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_application`</sql>
+
+    <!--插入访问程序-->
+    <insert id="insert">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.appName != null">`app_name`,</if>
+            <if test="entity.accessKey != null">`access_key`,</if>
+            <if test="entity.legalHosts != null">`legal_hosts`,</if>
+            <if test="entity.callbackUrls != null">`callback_urls`,</if>
+            <if test="entity.deleted != null">`deleted`,</if>
+            <if test="entity.createUser != null">`create_user`,</if>
+            <if test="entity.updateUser != null">`update_user`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.appName != null">#{entity.appName},</if>
+            <if test="entity.accessKey != null">#{entity.accessKey},</if>
+            <if test="entity.legalHosts != null">#{entity.legalHosts},</if>
+            <if test="entity.callbackUrls != null">#{entity.callbackUrls},</if>
+            <if test="entity.deleted != null">#{entity.deleted},</if>
+            <if test="entity.createUser != null">#{entity.createUser},</if>
+            <if test="entity.updateUser != null">#{entity.updateUser},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入访问程序-->
+    <insert id="batchInsert">
+        insert into <include refid="tableName"/>
+        (
+            `app_name`,
+            `access_key`,
+            `legal_hosts`,
+            `callback_urls`,
+            `deleted`,
+            `create_user`,
+            `update_user`,
+            `create_time`,
+            `update_time`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.appName},
+            #{item.accessKey},
+            #{item.legalHosts},
+            #{item.callbackUrls},
+            #{item.deleted},
+            #{item.createUser},
+            #{item.updateUser},
+            #{item.createTime},
+            #{item.updateTime}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据应用名称删除访问程序-->
+    <delete id="deleteByPk">
+        DELETE FROM <include refid="tableName"/>
+        <where>
+            `app_name` = #{appName}
+        </where>
+    </delete>
+
+    <!--根据应用名称更新访问程序-->
+    <update id="updateByPk">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.appName != null">
+                `app_name` = #{entity.appName},
+            </if>
+            <if test="entity.accessKey != null">
+                `access_key` = #{entity.accessKey},
+            </if>
+            <if test="entity.legalHosts != null">
+                `legal_hosts` = #{entity.legalHosts},
+            </if>
+            <if test="entity.callbackUrls != null">
+                `callback_urls` = #{entity.callbackUrls},
+            </if>
+            <if test="entity.deleted != null">
+                `deleted` = #{entity.deleted},
+            </if>
+            <if test="entity.createUser != null">
+                `create_user` = #{entity.createUser},
+            </if>
+            <if test="entity.updateUser != null">
+                `update_user` = #{entity.updateUser},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            `app_name` = #{appName}
+        </where>
+    </update>
+
+    <!--根据主键获取访问程序详情-->
+    <select id="detailByPk" resultMap="ExtResultMap">
+        SELECT
+            MT.`app_name`,
+            MT.`access_key`,
+            MT.`legal_hosts`,
+            MT.`callback_urls`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            `app_name` = #{appName}
+        </where>
+    </select>
+
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.appName != null and condition.appName != ''">
+                        AND MT.`app_name` = #{condition.appName}
+                    </if>
+                    <if test="condition.appNameIn != null and condition.appNameIn.size() > 0">
+                        AND MT.`app_name` IN
+                        <foreach collection="condition.appNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.appNameNotIn != null and condition.appNameNotIn.size() > 0">
+                        AND MT.`app_name` NOT IN
+                        <foreach collection="condition.appNameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.appNameIsNotEmpty != null and condition.appNameIsNotEmpty == true">
+                        AND MT.`app_name` IS NOT NULL AND `app_name` != ''
+                    </if>
+                    <if test="condition.appNameIsEmpty != null and condition.appNameIsEmpty == true">
+                        AND (MT.`app_name` IS NULL OR MT.`app_name` = '')
+                    </if>
+                    <if test="condition.appNameStartWith != null and condition.appNameStartWith != ''">
+                        AND MT.`app_name` LIKE concat(#{condition.appNameStartWith}, '%')
+                    </if>
+                    <if test="condition.appNameEndWith != null and condition.appNameEndWith != ''">
+                        AND MT.`app_name` LIKE concat('%', #{condition.appNameEndWith})
+                    </if>
+                    <if test="condition.appNameContains != null and condition.appNameContains != ''">
+                        AND MT.`app_name` LIKE concat('%', #{condition.appNameContains}, '%')
+                    </if>
+                    <if test="condition.accessKey != null and condition.accessKey != ''">
+                        AND MT.`access_key` = #{condition.accessKey}
+                    </if>
+                    <if test="condition.accessKeyIn != null and condition.accessKeyIn.size() > 0">
+                        AND MT.`access_key` IN
+                        <foreach collection="condition.accessKeyIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.accessKeyNotIn != null and condition.accessKeyNotIn.size() > 0">
+                        AND MT.`access_key` NOT IN
+                        <foreach collection="condition.accessKeyNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.accessKeyIsNotEmpty != null and condition.accessKeyIsNotEmpty == true">
+                        AND MT.`access_key` IS NOT NULL AND `access_key` != ''
+                    </if>
+                    <if test="condition.accessKeyIsEmpty != null and condition.accessKeyIsEmpty == true">
+                        AND (MT.`access_key` IS NULL OR MT.`access_key` = '')
+                    </if>
+                    <if test="condition.accessKeyStartWith != null and condition.accessKeyStartWith != ''">
+                        AND MT.`access_key` LIKE concat(#{condition.accessKeyStartWith}, '%')
+                    </if>
+                    <if test="condition.accessKeyEndWith != null and condition.accessKeyEndWith != ''">
+                        AND MT.`access_key` LIKE concat('%', #{condition.accessKeyEndWith})
+                    </if>
+                    <if test="condition.accessKeyContains != null and condition.accessKeyContains != ''">
+                        AND MT.`access_key` LIKE concat('%', #{condition.accessKeyContains}, '%')
+                    </if>
+                    <if test="condition.legalHosts != null and condition.legalHosts != ''">
+                        AND MT.`legal_hosts` = #{condition.legalHosts}
+                    </if>
+                    <if test="condition.legalHostsIn != null and condition.legalHostsIn.size() > 0">
+                        AND MT.`legal_hosts` IN
+                        <foreach collection="condition.legalHostsIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.legalHostsNotIn != null and condition.legalHostsNotIn.size() > 0">
+                        AND MT.`legal_hosts` NOT IN
+                        <foreach collection="condition.legalHostsNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.legalHostsIsNotEmpty != null and condition.legalHostsIsNotEmpty == true">
+                        AND MT.`legal_hosts` IS NOT NULL AND `legal_hosts` != ''
+                    </if>
+                    <if test="condition.legalHostsIsEmpty != null and condition.legalHostsIsEmpty == true">
+                        AND (MT.`legal_hosts` IS NULL OR MT.`legal_hosts` = '')
+                    </if>
+                    <if test="condition.legalHostsStartWith != null and condition.legalHostsStartWith != ''">
+                        AND MT.`legal_hosts` LIKE concat(#{condition.legalHostsStartWith}, '%')
+                    </if>
+                    <if test="condition.legalHostsEndWith != null and condition.legalHostsEndWith != ''">
+                        AND MT.`legal_hosts` LIKE concat('%', #{condition.legalHostsEndWith})
+                    </if>
+                    <if test="condition.legalHostsContains != null and condition.legalHostsContains != ''">
+                        AND MT.`legal_hosts` LIKE concat('%', #{condition.legalHostsContains}, '%')
+                    </if>
+                    <if test="condition.callbackUrls != null and condition.callbackUrls != ''">
+                        AND MT.`callback_urls` = #{condition.callbackUrls}
+                    </if>
+                    <if test="condition.callbackUrlsIn != null and condition.callbackUrlsIn.size() > 0">
+                        AND MT.`callback_urls` IN
+                        <foreach collection="condition.callbackUrlsIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.callbackUrlsNotIn != null and condition.callbackUrlsNotIn.size() > 0">
+                        AND MT.`callback_urls` NOT IN
+                        <foreach collection="condition.callbackUrlsNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.callbackUrlsIsNotEmpty != null and condition.callbackUrlsIsNotEmpty == true">
+                        AND MT.`callback_urls` IS NOT NULL AND `callback_urls` != ''
+                    </if>
+                    <if test="condition.callbackUrlsIsEmpty != null and condition.callbackUrlsIsEmpty == true">
+                        AND (MT.`callback_urls` IS NULL OR MT.`callback_urls` = '')
+                    </if>
+                    <if test="condition.callbackUrlsStartWith != null and condition.callbackUrlsStartWith != ''">
+                        AND MT.`callback_urls` LIKE concat(#{condition.callbackUrlsStartWith}, '%')
+                    </if>
+                    <if test="condition.callbackUrlsEndWith != null and condition.callbackUrlsEndWith != ''">
+                        AND MT.`callback_urls` LIKE concat('%', #{condition.callbackUrlsEndWith})
+                    </if>
+                    <if test="condition.callbackUrlsContains != null and condition.callbackUrlsContains != ''">
+                        AND MT.`callback_urls` LIKE concat('%', #{condition.callbackUrlsContains}, '%')
+                    </if>
+                    <if test="condition.deleted != null">
+                        AND MT.`deleted` = #{condition.deleted}
+                    </if>
+                    <if test="condition.createUser != null">
+                        AND MT.`create_user` = #{condition.createUser}
+                    </if>
+                    <if test="condition.createUserIn != null and condition.createUserIn.size() > 0">
+                        AND MT.`create_user` IN
+                        <foreach collection="condition.createUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createUserNotIn != null and condition.createUserNotIn.size() > 0">
+                        AND MT.`create_user` NOT IN
+                        <foreach collection="condition.createUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createUserMin != null">
+                        <![CDATA[
+                        AND MT.`create_user` >= #{condition.createUserMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createUserMax != null">
+                        <![CDATA[
+                        AND MT.`create_user` <= #{condition.createUserMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateUser != null">
+                        AND MT.`update_user` = #{condition.updateUser}
+                    </if>
+                    <if test="condition.updateUserIn != null and condition.updateUserIn.size() > 0">
+                        AND MT.`update_user` IN
+                        <foreach collection="condition.updateUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updateUserNotIn != null and condition.updateUserNotIn.size() > 0">
+                        AND MT.`update_user` NOT IN
+                        <foreach collection="condition.updateUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updateUserMin != null">
+                        <![CDATA[
+                        AND MT.`update_user` >= #{condition.updateUserMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateUserMax != null">
+                        <![CDATA[
+                        AND MT.`update_user` <= #{condition.updateUserMax}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMin != null">
+                        <![CDATA[
+                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMax != null">
+                        <![CDATA[
+                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMin != null">
+                        <![CDATA[
+                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMax != null">
+                        <![CDATA[
+                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        ]]>
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <if test="condition.columns != null">
+            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
+        </if>
+        <if test="condition.columns == null">
+            MT.`app_name`,
+            MT.`access_key`,
+            MT.`legal_hosts`,
+            MT.`callback_urls`,
+            MT.`deleted`,
+            MT.`create_user`,
+            MT.`update_user`,
+            MT.`create_time`,
+            MT.`update_time`
+        </if>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="condition.orderBy != null">
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+</mapper>

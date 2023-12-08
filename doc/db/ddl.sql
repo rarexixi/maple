@@ -82,16 +82,18 @@ create table `maple`.`maple_datasource`
 drop table if exists `maple`.`maple_application`;
 create table `maple`.`maple_application`
 (
-    `id`            int                                    not null auto_increment comment '应用ID',
-    `app_name`      varchar(32)  default ''                not null comment '应用名称',
-    `access_key`    varchar(256) default ''                not null comment '应用访问密钥',
-    `callback_urls` text                                   not null comment '回调接口',
+    `app_name`      varchar(32)                             not null comment '应用名称',
+    `access_key`    varchar(256)  default ''                not null comment '应用访问密钥',
+    `legal_hosts`   varchar(1500) default '*'               not null comment '允许请求的IP',
+    `callback_urls` varchar(2048) default '{}'              not null comment '回调接口',
 
-    `create_time`   datetime     default current_timestamp not null comment '创建时间',
-    `update_time`   datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+    `deleted`       tinyint       default 0                 not null comment '是否删除',
+    `create_user`   int           default 0                 not null comment '创建人',
+    `update_user`   int           default 0                 not null comment '修改人',
+    `create_time`   datetime      default current_timestamp not null comment '创建时间',
+    `update_time`   datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
 
-    primary key (`id`),
-    index idx_engine_version (`app_name`)
+    primary key (`app_name`)
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci
