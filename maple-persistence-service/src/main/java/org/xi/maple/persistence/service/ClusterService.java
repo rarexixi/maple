@@ -1,6 +1,7 @@
 package org.xi.maple.persistence.service;
 
 import org.xi.maple.persistence.model.request.ClusterAddRequest;
+import org.xi.maple.persistence.model.request.ClusterPatchRequest;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.request.ClusterSaveRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
@@ -27,29 +28,29 @@ public interface ClusterService {
     /**
      * 删除集群
      *
-     * @param name 集群名称
+     * @param patchRequest 删除条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int delete(String name);
+    int delete(ClusterPatchRequest patchRequest);
 
     /**
      * 禁用集群
      *
-     * @param name 集群名称
+     * @param patchRequest 禁用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int disable(String name);
+    int disable(ClusterPatchRequest patchRequest);
 
     /**
      * 启用集群
      *
-     * @param name 集群名称
+     * @param patchRequest 启用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int enable(String name);
+    int enable(ClusterPatchRequest patchRequest);
 
     /**
      * 根据集群名称更新集群

@@ -1,10 +1,10 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.service.impl;
 
+import ${commonPackage}.constant.DeletedConstant;
 import ${commonPackage}.exception.MapleDataNotFoundException;
 import ${commonPackage}.model.PageList;
-import ${commonPackage}.utils.ObjectUtils;
-import ${modulePackage}.constant.DeletedConstant;
+import ${commonPackage}.util.ObjectUtils;
 import ${modulePackage}.persistence.condition.${className}SelectCondition;
 import ${modulePackage}.persistence.condition.${className}UpdateCondition;
 import ${modulePackage}.persistence.entity.${className}Entity;
@@ -32,7 +32,6 @@ import java.util.List;
  * @author ${author}
  */
 @Service("${classNameFirstLower}Service")
-@Transactional
 public class ${className}ServiceImpl implements ${className}Service {
 
     final ${className}Mapper ${classNameFirstLower}Mapper;
@@ -50,6 +49,7 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @author ${author}
      */
     @Override
+    @Transactional
     public ${className}DetailResponse add(${className}AddRequest addRequest) {
         ${className}Entity entity = ObjectUtils.copy(addRequest, ${className}Entity.class);
         ${classNameFirstLower}Mapper.insert(entity);
@@ -64,6 +64,7 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @author ${author}
      */
     @Override
+    @Transactional
     public int batchAdd(Collection<${className}AddRequest> list) {
         List<${className}Entity> entityList = ObjectUtils.copy(list, ${className}Entity.class);
         return ${classNameFirstLower}Mapper.batchInsert(entityList);
@@ -73,71 +74,62 @@ public class ${className}ServiceImpl implements ${className}Service {
     /**
      * 删除${tableComment}
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 删除条件请求
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
+    @Transactional
     public int delete(${className}PatchRequest patchRequest) {
-        ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
-        return ${classNameFirstLower}Mapper.delete(condition);
+        <#if (table.hasUniPk)>
+        <#else>
+            ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
+        </#if>
+        return ${classNameFirstLower}Mapper.deleteBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(<#if (table.hasUniPk)>patchRequest.get${uniPkPropertyName}()<#else>condition</#if>);
     }
     <#if table.validStatusColumn??>
 
     /**
      * 禁用${tableComment}
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 禁用条件请求
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
+    @Transactional
     public int disable(${className}PatchRequest patchRequest) {
+        <#if (table.hasUniPk)>
+        <#else>
         ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
+        </#if>
         ${className}Entity entity = ObjectUtils.copy(patchRequest, ${className}Entity.class<#list pks as column><#include "/include/column/properties.ftl">, "${fieldName}"</#list>);
         entity.setDeleted(DeletedConstant.INVALID);
-        return ${classNameFirstLower}Mapper.update(entity, condition);
+        return ${classNameFirstLower}Mapper.updateBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(entity, <#if (table.hasUniPk)>patchRequest.get${uniPkPropertyName}()<#else>condition</#if>);
     }
 
     /**
      * 启用${tableComment}
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 启用条件请求
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
+    @Transactional
     public int enable(${className}PatchRequest patchRequest) {
+        <#if (table.hasUniPk)>
+        <#else>
         ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
+        </#if>
         ${className}Entity entity = ObjectUtils.copy(patchRequest, ${className}Entity.class<#list pks as column><#include "/include/column/properties.ftl">, "${fieldName}"</#list>);
         entity.setDeleted(DeletedConstant.VALID);
-        return ${classNameFirstLower}Mapper.update(entity, condition);
+        return ${classNameFirstLower}Mapper.updateBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(entity, <#if (table.hasUniPk)>patchRequest.get${uniPkPropertyName}()<#else>condition</#if>);
     }
     </#if>
     <#-- endregion 删除/启用/禁用 -->
 
     <#-- region 更新 -->
-    <#if (table.hasAutoIncUniPk)>
-
-    /**
-     * 根据<#include "/include/table/pk_fun_comment.ftl">更新${tableComment}
-     *
-     * @param saveRequest 保存${tableComment}请求实体
-     * @return 更新后的${tableComment}详情
-     * @author ${author}
-     */
-    @Override
-    public ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest) {
-        ${className}UpdateCondition condition = new ${className}UpdateCondition();
-        <#list pks as column>
-        <#include "/include/column/properties.ftl">
-        condition.set${propertyName}(saveRequest.get${propertyName}());
-        </#list>
-        ${className}Entity entity = ObjectUtils.copy(saveRequest, ${className}Entity.class);
-        ${classNameFirstLower}Mapper.update(entity, condition);
-        return getBy<#include "/include/table/pk_fun_names.ftl">(<#list pks as column><#include "/include/column/properties.ftl">saveRequest.get${propertyName}()<#if (column?has_next)>, </#if></#list>);
-    }
-    <#else>
 
     /**
      * 根据<#include "/include/table/pk_fun_comment.ftl">更新${tableComment}
@@ -151,14 +143,18 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @author ${author}
      */
     @Override
+    @Transactional
     public ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest, <#include "/include/table/pk_params.ftl">) {
+        <#if (table.hasUniPk)>
+        <#else>
         ${className}UpdateCondition condition = new ${className}UpdateCondition();
         <#list pks as column>
         <#include "/include/column/properties.ftl">
         condition.set${propertyName}(${fieldName});
         </#list>
+        </#if>
         ${className}Entity entity = ObjectUtils.copy(saveRequest, ${className}Entity.class);
-        ${classNameFirstLower}Mapper.update(entity, condition);
+        ${classNameFirstLower}Mapper.updateBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(entity, <#if (table.hasUniPk)><#include "/include/table/pk_values.ftl"><#else>condition</#if>);
         ${className}DetailResponse result;
         if (<#list pks as column><#include "/include/column/properties.ftl">saveRequest.get${propertyName}() == null<#if (column?has_next)> || </#if></#list>) {
             result = getBy<#include "/include/table/pk_fun_names.ftl">(<#include "/include/table/pk_values.ftl">);
@@ -167,7 +163,6 @@ public class ${className}ServiceImpl implements ${className}Service {
         }
         return result;
     }
-    </#if>
     <#-- endregion 更新 -->
 
     <#-- region 详情 -->
@@ -185,7 +180,7 @@ public class ${className}ServiceImpl implements ${className}Service {
     @Override
     @Transactional(readOnly = true)
     public ${className}DetailResponse getBy<#include "/include/table/pk_fun_names.ftl">(<#include "/include/table/pk_params.ftl">) {
-        ${className}EntityExt entity = ${classNameFirstLower}Mapper.detail(<#include "/include/table/pk_values.ftl">);
+        ${className}EntityExt entity = ${classNameFirstLower}Mapper.detailBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else></#if>(<#include "/include/table/pk_values.ftl">);
         if (entity == null) {
             throw new MapleDataNotFoundException("${tableComment}不存在");
         }
@@ -203,7 +198,7 @@ public class ${className}ServiceImpl implements ${className}Service {
     @Transactional(readOnly = true)
     public List<${className}ListItemResponse> getList(${className}QueryRequest queryRequest) {
         ${className}SelectCondition condition = ObjectUtils.copy(queryRequest, ${className}SelectCondition.class);
-        List<${className}EntityExt> list = ${classNameFirstLower}Mapper.select(condition);
+        List<${className}Entity> list = ${classNameFirstLower}Mapper.select(condition);
         return ObjectUtils.copy(list, ${className}ListItemResponse.class);
     }
 

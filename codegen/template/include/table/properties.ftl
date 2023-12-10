@@ -34,4 +34,5 @@
     <#elseif (uniPkFieldType=="Long")>
         <#assign uniPkFieldBasicType = "long">
     </#if>
+    <#assign hasUniId = (table.hasAutoIncUniPk && (uniPkFieldType == "Integer") && (uniPkFieldName == "id"))>
 </#if>

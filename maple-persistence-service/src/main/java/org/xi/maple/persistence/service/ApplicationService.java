@@ -39,7 +39,7 @@ public interface ApplicationService {
     /**
      * 删除访问程序
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 删除条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
@@ -48,7 +48,7 @@ public interface ApplicationService {
     /**
      * 禁用访问程序
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 禁用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
@@ -57,7 +57,7 @@ public interface ApplicationService {
     /**
      * 启用访问程序
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 启用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */

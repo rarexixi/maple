@@ -1,7 +1,7 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.persistence.condition;
 
-import ${commonPackage}.model.UpdateCondition;
+import ${commonPackage}.model.ManipulateCondition;
 
 import java.util.Collection;
 
@@ -17,7 +17,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ${className}UpdateCondition extends UpdateCondition {
+public class ${className}UpdateCondition extends ManipulateCondition {
     <#list pks as column>
     <#include "/include/column/properties.ftl">
 

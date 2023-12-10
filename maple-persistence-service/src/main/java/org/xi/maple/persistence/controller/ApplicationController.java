@@ -78,4 +78,13 @@ public class ApplicationController {
     public ResponseEntity<List<ApplicationListItemResponse>> getList(ApplicationQueryRequest queryRequest) {
         return ResponseEntity.ok(applicationService.getList(queryRequest));
     }
+
+    @GetMapping("/page-list")
+    public ResponseEntity<PageList<ApplicationListItemResponse>> getPageList(
+            ApplicationQueryRequest queryRequest,
+            @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "50") @Min(value = 1, message = "分页大小必须大于0") Integer pageSize
+    ) {
+        return ResponseEntity.ok(applicationService.getPageList(queryRequest, pageNum, pageSize));
+    }
 }

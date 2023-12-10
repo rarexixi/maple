@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.annotation.SetFieldTypes;
 import org.xi.maple.persistence.model.request.ClusterAddRequest;
+import org.xi.maple.persistence.model.request.ClusterPatchRequest;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.request.ClusterSaveRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
@@ -36,20 +37,20 @@ public class ClusterController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Integer> delete(@RequestParam("name") @NotBlank(message = "name(集群名称)不能为空") String name) {
-        Integer count = clusterService.delete(name);
+    public ResponseEntity<Integer> delete(@Validated @SetFieldTypes(types = {"update"}) ClusterPatchRequest patchRequest) {
+        Integer count = clusterService.delete(patchRequest);
         return ResponseEntity.ok(count);
     }
 
     @PatchMapping("/disable")
-    public ResponseEntity<Integer> disable(@RequestParam("name") @NotBlank(message = "name(集群名称)不能为空") String name) {
-        Integer count = clusterService.disable(name);
+    public ResponseEntity<Integer> disable(@Validated @SetFieldTypes(types = {"update"}) ClusterPatchRequest patchRequest) {
+        Integer count = clusterService.disable(patchRequest);
         return ResponseEntity.ok(count);
     }
 
     @PatchMapping("/enable")
-    public ResponseEntity<Integer> enable(@RequestParam("name") @NotBlank(message = "name(集群名称)不能为空") String name) {
-        Integer count = clusterService.enable(name);
+    public ResponseEntity<Integer> enable(@Validated @SetFieldTypes(types = {"update"}) ClusterPatchRequest patchRequest) {
+        Integer count = clusterService.enable(patchRequest);
         return ResponseEntity.ok(count);
     }
 

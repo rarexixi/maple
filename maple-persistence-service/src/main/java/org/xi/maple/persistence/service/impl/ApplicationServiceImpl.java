@@ -1,11 +1,11 @@
 package org.xi.maple.persistence.service.impl;
 
+import org.apache.commons.lang.StringUtils;
+import org.xi.maple.common.constant.DeletedConstant;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.common.utils.ObjectUtils;
-import org.xi.maple.persistence.constant.DeletedConstant;
+import org.xi.maple.common.util.ObjectUtils;
 import org.xi.maple.persistence.persistence.condition.ApplicationSelectCondition;
-import org.xi.maple.persistence.persistence.condition.ApplicationUpdateCondition;
 import org.xi.maple.persistence.persistence.entity.ApplicationEntity;
 import org.xi.maple.persistence.persistence.entity.ApplicationEntityExt;
 import org.xi.maple.persistence.persistence.mapper.ApplicationMapper;
@@ -31,7 +31,6 @@ import java.util.List;
  * @author 郗世豪（rarexixi@gmail.com）
  */
 @Service("applicationService")
-@Transactional
 public class ApplicationServiceImpl implements ApplicationService {
 
     final ApplicationMapper applicationMapper;
@@ -49,6 +48,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
+    @Transactional
     public ApplicationDetailResponse add(ApplicationAddRequest addRequest) {
         ApplicationEntity entity = ObjectUtils.copy(addRequest, ApplicationEntity.class);
         applicationMapper.insert(entity);
@@ -63,6 +63,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
+    @Transactional
     public int batchAdd(Collection<ApplicationAddRequest> list) {
         List<ApplicationEntity> entityList = ObjectUtils.copy(list, ApplicationEntity.class);
         return applicationMapper.batchInsert(entityList);
@@ -71,44 +72,44 @@ public class ApplicationServiceImpl implements ApplicationService {
     /**
      * 删除访问程序
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 删除条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
+    @Transactional
     public int delete(ApplicationPatchRequest patchRequest) {
-        ApplicationUpdateCondition condition = ObjectUtils.copy(patchRequest, ApplicationUpdateCondition.class);
-        return applicationMapper.delete(condition);
+        return applicationMapper.deleteByPk(patchRequest.getAppName());
     }
 
     /**
      * 禁用访问程序
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 禁用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
+    @Transactional
     public int disable(ApplicationPatchRequest patchRequest) {
-        ApplicationUpdateCondition condition = ObjectUtils.copy(patchRequest, ApplicationUpdateCondition.class);
         ApplicationEntity entity = ObjectUtils.copy(patchRequest, ApplicationEntity.class, "appName");
         entity.setDeleted(DeletedConstant.INVALID);
-        return applicationMapper.update(entity, condition);
+        return applicationMapper.updateByPk(entity, patchRequest.getAppName());
     }
 
     /**
      * 启用访问程序
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 启用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
+    @Transactional
     public int enable(ApplicationPatchRequest patchRequest) {
-        ApplicationUpdateCondition condition = ObjectUtils.copy(patchRequest, ApplicationUpdateCondition.class);
         ApplicationEntity entity = ObjectUtils.copy(patchRequest, ApplicationEntity.class, "appName");
         entity.setDeleted(DeletedConstant.VALID);
-        return applicationMapper.update(entity, condition);
+        return applicationMapper.updateByPk(entity, patchRequest.getAppName());
     }
 
     /**
@@ -120,13 +121,12 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
+    @Transactional
     public ApplicationDetailResponse updateByAppName(ApplicationSaveRequest saveRequest, String appName) {
-        ApplicationUpdateCondition condition = new ApplicationUpdateCondition();
-        condition.setAppName(appName);
         ApplicationEntity entity = ObjectUtils.copy(saveRequest, ApplicationEntity.class);
-        applicationMapper.update(entity, condition);
+        applicationMapper.updateByPk(entity, appName);
         ApplicationDetailResponse result;
-        if (saveRequest.getAppName() == null) {
+        if (StringUtils.isBlank(saveRequest.getAppName())) {
             result = getByAppName(appName);
         } else {
             result = getByAppName(saveRequest.getAppName());
@@ -144,7 +144,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional(readOnly = true)
     public ApplicationDetailResponse getByAppName(String appName) {
-        ApplicationEntityExt entity = applicationMapper.detail(appName);
+        ApplicationEntityExt entity = applicationMapper.detailByPk(appName);
         if (entity == null) {
             throw new MapleDataNotFoundException("访问程序不存在");
         }
@@ -161,7 +161,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional(readOnly = true)
     public List<ApplicationListItemResponse> getList(ApplicationQueryRequest queryRequest) {
         ApplicationSelectCondition condition = ObjectUtils.copy(queryRequest, ApplicationSelectCondition.class);
-        List<ApplicationEntityExt> list = applicationMapper.select(condition);
+        List<ApplicationEntity> list = applicationMapper.select(condition);
         return ObjectUtils.copy(list, ApplicationListItemResponse.class);
     }
 

@@ -1,5 +1,6 @@
 package org.xi.maple.persistence.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,7 @@ import org.xi.maple.common.constant.DeletedConstant;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.util.ObjectUtils;
 import org.xi.maple.persistence.model.request.ClusterAddRequest;
+import org.xi.maple.persistence.model.request.ClusterPatchRequest;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.request.ClusterSaveRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
@@ -41,8 +43,8 @@ public class ClusterServiceImpl implements ClusterService {
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
+    @Transactional
     public ClusterDetailResponse add(ClusterAddRequest addRequest) {
         ClusterEntity entity = ObjectUtils.copy(addRequest, ClusterEntity.class);
         clusterMapper.insert(entity);
@@ -52,44 +54,44 @@ public class ClusterServiceImpl implements ClusterService {
     /**
      * 删除集群
      *
-     * @param name 集群名称
+     * @param patchRequest 删除条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
-    public int delete(String name) {
-        return clusterMapper.deleteByPk(name);
+    @Transactional
+    public int delete(ClusterPatchRequest patchRequest) {
+        return clusterMapper.deleteByPk(patchRequest.getName());
     }
 
     /**
      * 禁用集群
      *
-     * @param name 集群名称
+     * @param patchRequest 禁用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
-    public int disable(String name) {
-        ClusterEntity entity = new ClusterEntity();
+    @Transactional
+    public int disable(ClusterPatchRequest patchRequest) {
+        ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
         entity.setDeleted(DeletedConstant.INVALID);
-        return clusterMapper.updateByPk(entity, name);
+        return clusterMapper.updateByPk(entity, patchRequest.getName());
     }
 
     /**
      * 启用集群
      *
-     * @param name 集群名称
+     * @param patchRequest 启用条件请求
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
-    public int enable(String name) {
-        ClusterEntity entity = new ClusterEntity();
+    @Transactional
+    public int enable(ClusterPatchRequest patchRequest) {
+        ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
         entity.setDeleted(DeletedConstant.VALID);
-        return clusterMapper.updateByPk(entity, name);
+        return clusterMapper.updateByPk(entity, patchRequest.getName());
     }
 
     /**
@@ -100,13 +102,13 @@ public class ClusterServiceImpl implements ClusterService {
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
+    @Transactional
     public ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest, String name) {
         ClusterEntity entity = ObjectUtils.copy(saveRequest, ClusterEntity.class);
         clusterMapper.updateByPk(entity, name);
         ClusterDetailResponse result;
-        if (saveRequest.getName() == null) {
+        if (StringUtils.isBlank(saveRequest.getName())) {
             result = getByName(name);
         } else {
             result = getByName(saveRequest.getName());

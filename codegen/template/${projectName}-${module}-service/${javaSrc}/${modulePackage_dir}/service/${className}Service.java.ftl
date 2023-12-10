@@ -41,7 +41,7 @@ public interface ${className}Service {
     /**
      * 删除${tableComment}
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 删除条件请求
      * @return 受影响的行数
      * @author ${author}
      */
@@ -51,7 +51,7 @@ public interface ${className}Service {
     /**
      * 禁用${tableComment}
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 禁用条件请求
      * @return 受影响的行数
      * @author ${author}
      */
@@ -60,7 +60,7 @@ public interface ${className}Service {
     /**
      * 启用${tableComment}
      *
-     * @param patchRequest 更新条件请求
+     * @param patchRequest 启用条件请求
      * @return 受影响的行数
      * @author ${author}
      */
@@ -69,31 +69,21 @@ public interface ${className}Service {
     <#-- endregion 删除/启用/禁用 -->
 
     <#-- region 更新 -->
-    <#if (table.hasAutoIncUniPk)>
 
     /**
      * 根据<#include "/include/table/pk_fun_comment.ftl">更新${tableComment}
      *
      * @param saveRequest 保存${tableComment}请求实体
-     * @return 更新后的${tableComment}详情
-     * @author ${author}
-     */
-    ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest);
-    <#else>
-
-    /**
-     * 根据<#include "/include/table/pk_fun_comment.ftl">更新${tableComment}
-     *
-     * @param saveRequest 保存${tableComment}请求实体
+     <#if (!table.hasAutoIncUniPk)>
      <#list pks as column>
      <#include "/include/column/properties.ftl">
      * @param ${fieldName} ${columnFullComment}
      </#list>
+     </#if>
      * @return 更新后的${tableComment}详情
      * @author ${author}
      */
-    ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest, <#include "/include/table/pk_params.ftl">);
-    </#if>
+    ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest<#if (!table.hasAutoIncUniPk)>, <#include "/include/table/pk_params.ftl"></#if>);
     <#-- endregion 更新 -->
 
     <#-- region 详情 -->

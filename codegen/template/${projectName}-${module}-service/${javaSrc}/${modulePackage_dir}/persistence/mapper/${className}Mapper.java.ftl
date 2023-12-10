@@ -19,18 +19,16 @@ import java.util.Collection;
 @Mapper
 public interface ${className}Mapper extends
         InsertMapper<${className}Entity>,
+        BatchInsertMapper<${className}Entity>,
 <#if (table.hasUniPk)>
-    <#list pks as column>
-        <#include "/include/column/properties.ftl">
-    </#list>
-    <#if (fieldType == "Integer") && (fieldName == "id")>
+    <#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>
         DeleteByIdMapper,
         UpdateByIdMapper<${className}Entity>,
         SelectByIdMapper<${className}EntityExt>,
     <#else>
-        DeleteByPkMapper<${fieldType}>,
-        UpdateByPkMapper<${className}Entity, ${fieldType}>,
-        SelectByPkMapper<${className}EntityExt, ${fieldType}>,
+        DeleteByPkMapper<${uniPkFieldType}>,
+        UpdateByPkMapper<${className}Entity, ${uniPkFieldType}>,
+        SelectByPkMapper<${className}EntityExt, ${uniPkFieldType}>,
     </#if>
 <#else>
         DeleteByPkConditionMapper,

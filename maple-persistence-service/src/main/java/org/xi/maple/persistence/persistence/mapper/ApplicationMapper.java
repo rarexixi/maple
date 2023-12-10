@@ -18,6 +18,7 @@ import java.util.Collection;
 @Mapper
 public interface ApplicationMapper extends
         InsertMapper<ApplicationEntity>,
+        BatchInsertMapper<ApplicationEntity>,
         DeleteByPkMapper<String>,
         UpdateByPkMapper<ApplicationEntity, String>,
         SelectByPkMapper<ApplicationEntityExt, String>,
