@@ -7,9 +7,9 @@ import org.xi.maple.builder.annotation.ClusterCategory;
 import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.convertor.MapleConvertor;
+import org.xi.maple.execution.configuration.PluginProperties;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -21,6 +21,13 @@ import java.util.ServiceLoader;
 @Service
 public class EnginePluginService {
 
+    private final PluginProperties pluginProperties;
+
+    public EnginePluginService(PluginProperties pluginProperties) {
+        this.pluginProperties = pluginProperties;
+        refreshPluginConvertors();
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(EnginePluginService.class);
 
     Map<String, MapleConvertor> convertorMap;
@@ -31,7 +38,7 @@ public class EnginePluginService {
 
     public void refreshPluginConvertors() {
         Map<String, MapleConvertor> convertors = new HashMap<>();
-        File dir = new File("");
+        File dir = new File(pluginProperties.getHome());
         if (!dir.exists() || !dir.isDirectory()) {
             throw new RuntimeException("");
         }

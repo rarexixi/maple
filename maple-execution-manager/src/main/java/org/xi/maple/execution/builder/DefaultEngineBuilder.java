@@ -15,8 +15,9 @@ import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.RetryUtils;
 import org.xi.maple.execution.client.PersistenceClient;
-import org.xi.maple.execution.configuration.EngineManagerProperties;
+import org.xi.maple.execution.configuration.ExecutionProperties;
 import org.xi.maple.execution.builder.spi.EnginePluginService;
+import org.xi.maple.execution.configuration.PluginProperties;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
@@ -31,57 +32,27 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-@Component
-public class EngineBuilder {
+public abstract class DefaultEngineBuilder<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(EngineBuilder.class);
+    private final Logger logger;
 
     final EnginePluginService enginePluginService;
-    final EngineManagerProperties engineManagerProperties;
+    final ExecutionProperties executionProperties;
+    final PluginProperties pluginProperties;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
 
-    public EngineBuilder(EnginePluginService enginePluginService, EngineManagerProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+    public DefaultEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         this.enginePluginService = enginePluginService;
-        this.engineManagerProperties = pluginProperties;
+        this.executionProperties = executionProperties;
+        this.pluginProperties = pluginProperties;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
+        logger = getLogger();
     }
 
-    public void execute(EngineExecutionDetailResponse execution) {
-        updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
-        MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion());
-        List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
-        String startFile = null;
-        String execHome = getPath(engineManagerProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
-        for (CommandGeneratorModel generatorModel : commandGenerators) {
-            String ftlPath = generatorModel.getFtlPath();
-            String fileName = generatorModel.getFilePath();
-            ActionUtils.executeQuietly(() -> generateFile(execHome, ftlPath, fileName, generatorModel.getRequestModel()));
-            if (generatorModel.isStartCommand()) {
-                startFile = fileName;
-            }
-        }
-        ProcessBuilder processBuilder = new ProcessBuilder("sh", getPath(engineManagerProperties.getExecHome(), startFile));
-
-        threadPoolTaskExecutor.submit(() -> {
-            Process process = null;
-            try {
-                process = processBuilder.start();
-                int exitcode = process.waitFor();
-                if (exitcode != 0) {
-                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
-                }
-            } catch (Throwable t) {
-                logger.error("Execution[" + execution.getId() + "] starts failed!", t);
-                updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
-            } finally {
-                if (process != null && process.isAlive()) {
-                    ActionUtils.executeQuietly(process::destroyForcibly);
-                }
-            }
-        });
-    }
+    public abstract T execute(EngineExecutionDetailResponse execution);
+    public abstract Logger getLogger();
 
     /**
      * 修改执行状态，状态变更逻辑已在接口实现
@@ -90,12 +61,12 @@ public class EngineBuilder {
      * @param status 变更状态
      * @return 修改的数据量
      */
-    private Integer updateExecutionStatus(Integer id, String status) {
+    protected Integer updateExecutionStatus(Integer id, String status) {
         Supplier<Integer> updateStatus = () -> persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, status));
         return RetryUtils.retry(updateStatus, 3, 1000, String.format("更新状态失败, id: %d, status: %s", id, status));
     }
 
-    private long getPid(Process process) {
+    protected long getPid(Process process) {
         long pid = -1;
         try {
             if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
@@ -110,11 +81,11 @@ public class EngineBuilder {
         return pid;
     }
 
-    private String getPath(String... more) {
+    protected String getPath(String... more) {
         return String.join("/", more).replaceAll("/+", "/");
     }
 
-    private EngineExecutionModel convert(EngineExecutionDetailResponse execution) {
+    protected EngineExecutionModel convert(EngineExecutionDetailResponse execution) {
         return EngineExecutionModel.builder()
                 .execId(execution.getId())
                 .uniqueId(execution.getUniqueId())
@@ -139,8 +110,8 @@ public class EngineBuilder {
      * @throws IOException
      * @throws TemplateException
      */
-    private void generateFile(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
-        String pluginHome = engineManagerProperties.getPluginHome();
+    protected void generateFile(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
+        String pluginHome = pluginProperties.getFtlPath();
         Path path = Paths.get(execHome, fileName);
         Path dir = path.getParent();
         if (Files.notExists(dir)) {
