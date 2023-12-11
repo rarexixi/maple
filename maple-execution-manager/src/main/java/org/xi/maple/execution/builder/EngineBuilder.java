@@ -5,14 +5,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
-import org.xi.maple.builder.convertor.MapleConvertor;
-import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
-import org.xi.maple.common.constant.EngineExecutionStatus;
-import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.RetryUtils;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.configuration.ExecutionProperties;
@@ -28,11 +22,10 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public abstract class DefaultEngineBuilder<T> {
+public abstract class EngineBuilder<T> {
 
     private final Logger logger;
 
@@ -42,7 +35,7 @@ public abstract class DefaultEngineBuilder<T> {
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
 
-    public DefaultEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+    public EngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         this.enginePluginService = enginePluginService;
         this.executionProperties = executionProperties;
         this.pluginProperties = pluginProperties;
@@ -110,8 +103,33 @@ public abstract class DefaultEngineBuilder<T> {
      * @throws IOException
      * @throws TemplateException
      */
-    protected void generateFile(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
+    protected String generateFileContent(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
         String pluginHome = pluginProperties.getFtlPath();
+
+        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_31);
+        cfg.setDirectoryForTemplateLoading(new File(pluginHome));
+        cfg.setDefaultEncoding("UTF-8");
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+        try (StringWriter sw = new StringWriter(4096)) {
+            Template ftl = cfg.getTemplate(ftlPath);
+            ftl.process(dataModel, sw);
+            sw.flush();
+            return sw.toString();
+        }
+    }
+
+    /**
+     * 生成最终的可执行文件
+     *
+     * @param execHome  生成目录地址
+     * @param ftlPath   模板路径
+     * @param fileName  生成的文件
+     * @param dataModel 模板数据模型
+     * @throws IOException
+     * @throws TemplateException
+     */
+    protected void generateFile(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
         Path path = Paths.get(execHome, fileName);
         Path dir = path.getParent();
         if (Files.notExists(dir)) {
@@ -120,14 +138,9 @@ public abstract class DefaultEngineBuilder<T> {
             Files.createDirectories(dir, fileAttributes);
         }
 
-        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_31);
-        cfg.setDirectoryForTemplateLoading(new File(pluginHome));
-        cfg.setDefaultEncoding("UTF-8");
-        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-
         try (FileWriter out = new FileWriter(path.toFile())) {
-            Template ftl = cfg.getTemplate(ftlPath);
-            ftl.process(dataModel, out);
+            String content = generateFileContent(execHome, ftlPath, fileName, dataModel);
+            out.write(content);
             out.flush();
         }
     }

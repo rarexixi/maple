@@ -17,10 +17,14 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import java.util.List;
 
 @Component
-public class YarnEngineBuilder extends DefaultEngineBuilder<Void> {
+public class YarnEngineBuilder extends EngineBuilder<Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnEngineBuilder.class);
 
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
 
     public YarnEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         super(enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
@@ -60,10 +64,5 @@ public class YarnEngineBuilder extends DefaultEngineBuilder<Void> {
             }
         });
         return null;
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
     }
 }

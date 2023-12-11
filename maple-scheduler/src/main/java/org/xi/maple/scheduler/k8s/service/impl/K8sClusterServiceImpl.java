@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author xishihao
@@ -60,19 +61,19 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     private static final Map<String, Method> configSetMethodMap = getConfigSetMethodMap();
 
+    final static Map<String, MapleClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+
     private final PersistenceClient client;
     private final UpdateExecStatusFunc updateExecStatusFunc;
-    private final ClusterQueueService clusterQueueService;
 
     /**
      * 集群名称 -> KubernetesClient
      */
     private final Map<String, KubernetesClient> k8sClients;
 
-    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc, ClusterQueueService clusterQueueService) {
+    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
         this.client = client;
         this.updateExecStatusFunc = updateExecStatusFunc;
-        this.clusterQueueService = clusterQueueService;
         this.k8sClients = new HashMap<>();
     }
 
@@ -243,8 +244,15 @@ public class K8sClusterServiceImpl implements K8sClusterService {
                 .resources(VolcanoQueue.class, VolcanoQueueList.class)
                 .inform(new MapleResourceEventHandler<>() {
                     @Override
+                    public  void onAdd(VolcanoQueue volcanoQueue) {
+                    }
+
+                    @Override
+                    public  void onUpdate(VolcanoQueue oldVolcanoQueue, VolcanoQueue volcanoQueue) {
+                    }
+                    @Override
                     public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
-                        clusterQueueService.deleteCacheQueueInfo(clusterName, volcanoQueue.getMetadata().getName());
+                        CLUSTER_QUEUE_MAP.remove(MapleClusterQueue.getKey(clusterName, volcanoQueue.getMetadata().getName()));
                     }
                 }, 10000L);
         volcanoInformer.start();
