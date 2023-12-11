@@ -10,6 +10,6 @@ import io.fabric8.kubernetes.model.annotation.Version;
 @Group("sparkoperator.k8s.io")
 @Singular("sparkapplication")
 @Plural("sparkapplications")
-public class SparkDeploymentList extends DefaultKubernetesResourceList<SparkDeployment> {
+public class SparkApplicationList extends DefaultKubernetesResourceList<SparkApplication> {
 
 }

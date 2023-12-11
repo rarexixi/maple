@@ -15,7 +15,7 @@ import java.util.Map;
 @ToString(callSuper = true)
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SparkDeploymentSpec implements Serializable {
+public class SparkApplicationSpec implements Serializable {
     private List<String> arguments;
     private String batchScheduler;
     private Map<String, Object> batchSchedulerOptions;

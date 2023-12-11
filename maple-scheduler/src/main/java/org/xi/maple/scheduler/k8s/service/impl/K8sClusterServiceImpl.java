@@ -1,4 +1,4 @@
-package org.xi.maple.scheduler.service.impl;
+package org.xi.maple.scheduler.k8s.service.impl;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusDetails;
@@ -6,7 +6,6 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -20,7 +19,7 @@ import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.redis.model.MapleClusterQueue;
+import org.xi.maple.scheduler.model.MapleClusterQueue;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.K8sResourceType;
 import org.xi.maple.scheduler.constant.MapleConstants;
@@ -32,13 +31,14 @@ import org.xi.maple.scheduler.k8s.MapleResourceEventHandler;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentList;
 import org.xi.maple.scheduler.k8s.flink.eventhandler.FlinkDeploymentEventHandler;
-import org.xi.maple.scheduler.k8s.spark.crds.SparkDeployment;
-import org.xi.maple.scheduler.k8s.spark.crds.SparkDeploymentList;
-import org.xi.maple.scheduler.k8s.spark.eventhandler.SparkDeploymentEventHandler;
+import org.xi.maple.scheduler.k8s.service.K8sClusterService;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkApplication;
+import org.xi.maple.scheduler.k8s.spark.crds.SparkApplicationList;
+import org.xi.maple.scheduler.k8s.spark.eventhandler.SparkApplicationEventHandler;
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueue;
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueueList;
 import org.xi.maple.scheduler.model.YarnCluster;
-import org.xi.maple.scheduler.service.K8sClusterService;
+import org.xi.maple.scheduler.service.ClusterQueueService;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author xishihao
@@ -63,23 +62,22 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     private final PersistenceClient client;
     private final UpdateExecStatusFunc updateExecStatusFunc;
-
-    final static Map<String, MapleClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
-    final static Map<String, SharedIndexInformer<VolcanoQueue>> k8sQueueInformer = new ConcurrentHashMap<>();
+    private final ClusterQueueService clusterQueueService;
 
     /**
      * 集群名称 -> KubernetesClient
      */
     private final Map<String, KubernetesClient> k8sClients;
 
-    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
+    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc, ClusterQueueService clusterQueueService) {
         this.client = client;
         this.updateExecStatusFunc = updateExecStatusFunc;
+        this.clusterQueueService = clusterQueueService;
         this.k8sClients = new HashMap<>();
     }
 
     /**
-     * 用于动态设置 K8s 配置，暂时没用到
+     * 动态设置 K8s 配置（暂时没用到）
      *
      * @return
      */
@@ -142,7 +140,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             if (K8sResourceType.FLINK.is(type)) {
                 return kubernetesClient.resources(FlinkDeployment.class).inNamespace(namespace).withName(name).delete();
             } else if (K8sResourceType.SPARK.is(type)) {
-                return kubernetesClient.resources(SparkDeployment.class).inNamespace(namespace).withName(name).delete();
+                return kubernetesClient.resources(SparkApplication.class).inNamespace(namespace).withName(name).delete();
             }
         } catch (Throwable t) {
             throw new MapleK8sException(t);
@@ -155,23 +153,6 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             throw new ClusterNotConfiguredExceptionMaple("Cluster [" + clusterName + "] not configured");
         }
         return k8sClients.get(clusterName);
-    }
-
-    @Override
-    public void cacheQueueInfos(Map<String, MapleClusterQueue> queues) {
-        CLUSTER_QUEUE_MAP.putAll(queues);
-    }
-
-    @Override
-    public void cacheQueueInfo(String clusterName, String queue, MapleClusterQueue queueInfo) {
-        String key = MapleClusterQueue.getKey(clusterName, queue);
-        CLUSTER_QUEUE_MAP.put(key, queueInfo);
-    }
-
-    @Override
-    public MapleClusterQueue getCachedQueueInfo(String clusterName, String queue) {
-        String key = MapleClusterQueue.getKey(clusterName, queue);
-        return CLUSTER_QUEUE_MAP.get(key);
     }
 
     private List<YarnCluster> getClusters() {
@@ -252,10 +233,10 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
         flinkInformer.start();
 
-        SharedIndexInformer<SparkDeployment> sparkInformer = kubernetesClient
-                .resources(SparkDeployment.class, SparkDeploymentList.class)
+        SharedIndexInformer<SparkApplication> sparkInformer = kubernetesClient
+                .resources(SparkApplication.class, SparkApplicationList.class)
                 .withLabel(MapleConstants.LABEL_EXEC_KEY, MapleConstants.LABEL_EXEC_VALUE)
-                .inform(new SparkDeploymentEventHandler(updateExecStatusFunc), 10000L);
+                .inform(new SparkApplicationEventHandler(updateExecStatusFunc), 10000L);
         sparkInformer.start();
 
         SharedIndexInformer<VolcanoQueue> volcanoInformer = kubernetesClient
@@ -263,8 +244,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
                 .inform(new MapleResourceEventHandler<>() {
                     @Override
                     public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
-                        String key = MapleClusterQueue.getKey(clusterName, volcanoQueue.getMetadata().getName());
-                        CLUSTER_QUEUE_MAP.remove(key);
+                        clusterQueueService.deleteCacheQueueInfo(clusterName, volcanoQueue.getMetadata().getName());
                     }
                 }, 10000L);
         volcanoInformer.start();

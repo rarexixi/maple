@@ -13,5 +13,5 @@ import io.fabric8.kubernetes.model.annotation.*;
 @Kind("SparkApplication")
 @Singular("sparkapplication")
 @Plural("sparkapplications")
-public class SparkDeployment extends CustomResource<SparkDeploymentSpec, SparkDeploymentStatus> implements Namespaced {
+public class SparkApplication extends CustomResource<SparkApplicationSpec, SparkApplicationStatus> implements Namespaced {
 }

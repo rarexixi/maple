@@ -1,4 +1,4 @@
-package org.xi.maple.redis.model;
+package org.xi.maple.scheduler.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class MapleClusterQueue implements Serializable {
 
     private Integer pendingApps;
 
-    public static String getKey(String clusterName,String queueName) {
+    public static String getKey(String clusterName, String queueName) {
         return clusterName + "-" + queueName;
     }
 }

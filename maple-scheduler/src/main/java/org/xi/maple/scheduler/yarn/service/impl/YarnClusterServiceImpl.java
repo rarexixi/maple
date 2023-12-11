@@ -1,4 +1,4 @@
-package org.xi.maple.scheduler;
+package org.xi.maple.scheduler.yarn.service.impl;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -9,12 +9,13 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.xi.maple.common.util.JsonUtils;
-import org.xi.maple.redis.model.MapleClusterQueue;
+import org.xi.maple.scheduler.model.MapleClusterQueue;
 import org.xi.maple.scheduler.model.YarnCluster;
 import org.xi.maple.scheduler.model.YarnScheduler;
-import org.xi.maple.scheduler.service.K8sClusterService;
+import org.xi.maple.scheduler.service.ClusterQueueService;
+import org.xi.maple.scheduler.yarn.service.YarnClusterService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,20 +23,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author xishihao
- */
-@Component
-public class ResourceTasks {
+@Service
+public class YarnClusterServiceImpl implements YarnClusterService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceTasks.class);
+    private static final Logger logger = LoggerFactory.getLogger(YarnClusterServiceImpl.class);
 
-    final K8sClusterService k8sClusterService;
+    final ClusterQueueService clusterQueueService;
 
-    public ResourceTasks(K8sClusterService k8sClusterService) {
-        this.k8sClusterService = k8sClusterService;
+    public YarnClusterServiceImpl(ClusterQueueService clusterQueueService) {
+        this.clusterQueueService = clusterQueueService;
     }
-
     /**
      * 定时缓存 集群-队列 资源
      */
@@ -64,7 +61,7 @@ public class ResourceTasks {
             }
         }*/
         queueMap.put(MapleClusterQueue.getKey("hadoop", "default"), new MapleClusterQueue(0));
-        k8sClusterService.cacheQueueInfos(queueMap);
+        clusterQueueService.cacheQueueInfos(queueMap);
     }
 
     private List<YarnCluster> getClusters() {

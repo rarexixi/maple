@@ -1,9 +1,9 @@
-package org.xi.maple.scheduler.service;
+package org.xi.maple.scheduler.k8s.service;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import org.springframework.web.multipart.MultipartFile;
-import org.xi.maple.redis.model.MapleClusterQueue;
+import org.xi.maple.scheduler.model.MapleClusterQueue;
 
 import java.util.List;
 import java.util.Map;
@@ -59,10 +59,4 @@ public interface K8sClusterService {
      * @return 删除结果
      */
     List<StatusDetails> deleteEngine(String clusterName, String namespace, String type, String name);
-
-    void cacheQueueInfos(Map<String, MapleClusterQueue> queues);
-
-    void cacheQueueInfo(String clusterName, String queue, MapleClusterQueue queueInfo);
-
-    MapleClusterQueue getCachedQueueInfo(String clusterName, String queue);
 }

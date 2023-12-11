@@ -13,7 +13,7 @@ import java.util.Map;
 @ToString(callSuper = true)
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SparkDeploymentStatus {
+public class SparkApplicationStatus {
     private Map<String, Object> applicationState;
     private Map<String, Object> driverInfo;
     private Integer executionAttempts;
