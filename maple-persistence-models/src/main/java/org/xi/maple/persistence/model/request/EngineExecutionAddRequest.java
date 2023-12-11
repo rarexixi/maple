@@ -106,9 +106,4 @@ public class EngineExecutionAddRequest extends BaseEntity {
      * 执行信息
      */
     private String processInfo;
-
-    /**
-     * 安全验证字符串 （app 安全码 + uniqueId + execName 的 md5 值）
-     */
-    private String accessKey;
 }

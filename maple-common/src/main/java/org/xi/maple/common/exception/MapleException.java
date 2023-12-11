@@ -12,4 +12,12 @@ public class MapleException extends RuntimeException {
     public MapleException(String message) {
         super(message);
     }
+
+    public MapleException(Throwable t) {
+        super(t);
+    }
+
+    public MapleException(String message, Throwable t) {
+        super(message, t);
+    }
 }

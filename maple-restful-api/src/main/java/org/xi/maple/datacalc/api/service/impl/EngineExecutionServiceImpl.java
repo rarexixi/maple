@@ -10,13 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.JobStatusConstants;
+import org.xi.maple.common.exception.MapleValidException;
+import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
+import org.xi.maple.datacalc.api.configuration.MapleSecurityProperties;
 import org.xi.maple.datacalc.api.service.EngineExecutionService;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author xishihao
@@ -29,12 +35,14 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     final RedissonClient redissonClient;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
+    final MapleSecurityProperties securityProperties;
 
     @Autowired
-    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, MapleSecurityProperties securityProperties) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
+        this.securityProperties = securityProperties;
     }
 
     @Override
@@ -63,7 +71,23 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 执行记录ID
      */
     @Override
-    public Integer submit(EngineExecutionAddRequest submitReq) {
+    public Integer submit(EngineExecutionAddRequest submitReq, String timestamp, String secret) {
+        if (Boolean.TRUE.equals(securityProperties.getAppCheck())) {
+            if (System.currentTimeMillis() - Long.parseLong(timestamp) > 1000 * 60 * 5) {
+                throw new MapleValidException("请求已过期");
+            }
+
+            String fromApp = submitReq.getFromApp();
+            String secretStr = String.join("#;", new String[]{submitReq.getUniqueId(), submitReq.getExecName(), timestamp});
+            String key = getAppKey(fromApp);
+            try {
+                if (!SecurityUtils.valid(key, secretStr, secret)) {
+                    throw new MapleValidException("参数验证失败");
+                }
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new MapleValidException("参数验证失败", e);
+            }
+        }
         final Integer id = persistenceClient.addExecution(submitReq);
         threadPoolTaskExecutor.execute(() -> {
             MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getClusterQueue(),
@@ -77,5 +101,9 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             }, () -> logger.error("Add to queue failed " + submitReq));
         });
         return id;
+    }
+
+    private String getAppKey(String fromApp) {
+        return "";
     }
 }

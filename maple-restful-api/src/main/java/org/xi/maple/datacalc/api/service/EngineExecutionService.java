@@ -30,5 +30,5 @@ public interface EngineExecutionService {
      * @param submitReq 执行提交请求对象
      * @return 执行记录ID
      */
-    Integer submit(EngineExecutionAddRequest submitReq);
+    Integer submit(EngineExecutionAddRequest submitReq, String timestamp, String secret);
 }

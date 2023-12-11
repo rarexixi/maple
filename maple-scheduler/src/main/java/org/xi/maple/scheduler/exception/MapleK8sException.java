@@ -1,6 +1,8 @@
 package org.xi.maple.scheduler.exception;
 
-public class MapleK8sException extends RuntimeException {
+import org.xi.maple.common.exception.MapleException;
+
+public class MapleK8sException extends MapleException {
     public MapleK8sException(Throwable t) {
         super(t);
     }

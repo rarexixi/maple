@@ -29,22 +29,8 @@ public class EngineExecutionController {
             @RequestParam("timestamp") String timestamp,
             @RequestParam("secret") String secret,
             @RequestBody EngineExecutionAddRequest addRequest) throws NoSuchAlgorithmException, InvalidKeyException {
-        if (System.currentTimeMillis() - Long.parseLong(timestamp) > 1000 * 60 * 5) {
-            throw new RuntimeException("请求已过期");
-        }
 
-        String fromApp = addRequest.getFromApp();
-        String secretStr = String.join("#;", new String[]{addRequest.getUniqueId(), addRequest.getExecName(), timestamp});
-        String key = getAppKey(fromApp);
-        if (SecurityUtils.valid(key, secretStr, secret)) {
-            throw new RuntimeException("参数验证失败");
-        }
-
-        Integer id = engineExecutionService.submit(addRequest);
+        Integer id = engineExecutionService.submit(addRequest, timestamp, secret);
         return ResponseEntity.ok(id);
-    }
-
-    private String getAppKey(String fromApp) {
-        return "";
     }
 }
