@@ -12,14 +12,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.constant.ClusterTypeConstants;
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
 import org.xi.maple.scheduler.k8s.service.K8sClusterService;
 import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
-import org.xi.maple.scheduler.client.EngineManagerClient;
+import org.xi.maple.scheduler.client.ExecutionManagerClient;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.yarn.service.YarnClusterService;
 
@@ -49,22 +51,23 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     final PersistenceClient persistenceClient;
 
-    final EngineManagerClient engineManagerClient;
+    final ExecutionManagerClient executionManagerClient;
+    private final UpdateExecStatusFunc updateExecStatusFunc;
 
     final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
     public ScheduledExecutions(RedissonClient redissonClient,
-                               ThreadPoolTaskExecutor threadPoolTaskExecutor,
-                               ThreadPoolTaskScheduler threadPoolTaskScheduler,
+                               ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                YarnClusterService yarnClusterService, K8sClusterService k8sClusterService, PersistenceClient persistenceClient,
-                               EngineManagerClient engineManagerClient) {
+                               ExecutionManagerClient executionManagerClient, UpdateExecStatusFunc updateExecStatusFunc) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.yarnClusterService = yarnClusterService;
         this.k8sClusterService = k8sClusterService;
         this.persistenceClient = persistenceClient;
-        this.engineManagerClient = engineManagerClient;
+        this.executionManagerClient = executionManagerClient;
+        this.updateExecStatusFunc = updateExecStatusFunc;
     }
 
     /**
@@ -110,8 +113,8 @@ public class ScheduledExecutions implements CommandLineRunner {
                     continueRunning.set(false);
                     return;
                 }
-                EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(queueItem.getExecId());
 
+                EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(queueItem.getExecId());
                 ClusterQueue cachedQueueInfo = null;
                 if (ClusterTypeConstants.K8s.equals(execution.getClusterCategory())) {
                     cachedQueueInfo = k8sClusterService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
@@ -124,6 +127,7 @@ public class ScheduledExecutions implements CommandLineRunner {
                 if (cachedQueueInfo == null) {
                     logger.error("队列不存在，cluster: {}, queue: {}", executionQueue.getCluster(), executionQueue.getClusterQueue());
                     // todo 修改作业状态
+                    updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.FAILED);
                 } else if (cachedQueueInfo.idle()) {
                     logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", executionQueue.getCluster(), executionQueue.getClusterQueue());
                     deque.addFirst(queueItem);
@@ -138,7 +142,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     private void submitExecution(EngineExecutionDetailResponse execution) {
         logger.info("submit execution: {}", execution);
         threadPoolTaskExecutor.submit(() -> {
-            engineManagerClient.execute(execution);
+            executionManagerClient.execute(execution);
         });
     }
 

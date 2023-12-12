@@ -9,6 +9,7 @@ public interface EngineExecutionStatus {
     String SUCCEED = "SUCCEED";
     String FAILED = "FAILED";
     String KILLED = "KILLED";
+    String CANCELED = "CANCELED";
     String LOST = "LOST";
 
     static boolean isFinalStatus(String status) {

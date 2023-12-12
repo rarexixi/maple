@@ -21,13 +21,8 @@ public class YarnEngineBuilder extends EngineBuilder<Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnEngineBuilder.class);
 
-    @Override
-    public Logger getLogger() {
-        return logger;
-    }
-
     public YarnEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
-        super(enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
+        super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
     }
 
     public Void execute(EngineExecutionDetailResponse execution) {

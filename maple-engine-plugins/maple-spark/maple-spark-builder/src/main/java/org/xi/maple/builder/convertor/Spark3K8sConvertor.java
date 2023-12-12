@@ -6,6 +6,7 @@ import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.builder.model.Spark3EngineExecution;
+import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 
 import java.io.IOException;
@@ -13,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ClusterCategory("k8s")
-@EngineCategory("spark")
+@EngineCategory(EngineCategoryConstants.SPARK)
 @EngineVersion(value = {"3.3.2"})
 public class Spark3K8sConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getCommandGenerator(EngineExecutionModel execution) {
-        Spark3EngineExecution execConf = null;
+        Spark3EngineExecution execConf;
         try {
             execConf = convert(execution);
         } catch (IOException e) {
@@ -27,7 +28,7 @@ public class Spark3K8sConvertor implements MapleConvertor {
         }
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-to-yarn.sh.ftl", "spark3-to-yarn.sh", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-to-k8s.yaml.ftl", "spark-to-k8s.yaml", execConf));
         return commandGeneratorModels;
     }
 

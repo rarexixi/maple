@@ -22,20 +22,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Component
 public class K8sEngineBuilder extends EngineBuilder<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(K8sEngineBuilder.class);
-    @Override
-    public Logger getLogger() {
-        return logger;
-    }
 
     private final SchedulerClient schedulerClient;
 
     public K8sEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient) {
-        super(enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
+        super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
         this.schedulerClient = schedulerClient;
     }
 
@@ -45,15 +40,15 @@ public class K8sEngineBuilder extends EngineBuilder<Object> {
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion());
         List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
         String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
-        List<String> files = new ArrayList<>(commandGenerators.size());
+        List<String> yamlFiles = new ArrayList<>(commandGenerators.size());
         for (CommandGeneratorModel generatorModel : commandGenerators) {
             String ftlPath = generatorModel.getFtlPath();
             String fileName = generatorModel.getFilePath();
             ActionUtils.executeQuietly(() -> generateFile(execHome, ftlPath, fileName, generatorModel.getRequestModel()));
-            files.add(fileName);
+            yamlFiles.add(fileName);
         }
 
-        for (String yamlPath : files) {
+        for (String yamlPath : yamlFiles) {
             ActionUtils.executeQuietly(() -> deploy(execution.getCluster(), yamlPath));
         }
         return null;

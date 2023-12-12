@@ -35,17 +35,16 @@ public abstract class EngineBuilder<T> {
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
 
-    public EngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+    public EngineBuilder(Logger logger, EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+        this.logger = logger;
         this.enginePluginService = enginePluginService;
         this.executionProperties = executionProperties;
         this.pluginProperties = pluginProperties;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
-        logger = getLogger();
     }
 
     public abstract T execute(EngineExecutionDetailResponse execution);
-    public abstract Logger getLogger();
 
     /**
      * 修改执行状态，状态变更逻辑已在接口实现

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.xi.maple.common.constant.JobStatusConstants;
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
@@ -97,7 +97,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             MapleRedisUtil.waitLockAndExecute(lock, execQueue.getLockName(), 10, 2, () -> {
                 RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(execQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
                 deque.addLast(new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
-                persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, JobStatusConstants.ACCEPTED));
+                persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, EngineExecutionStatus.ACCEPTED));
             }, () -> logger.error("Add to queue failed " + submitReq));
         });
         return id;

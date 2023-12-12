@@ -3,9 +3,7 @@ package org.xi.maple.execution.builder.spi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.xi.maple.builder.annotation.ClusterCategory;
-import org.xi.maple.builder.annotation.EngineCategory;
-import org.xi.maple.builder.annotation.EngineVersion;
+import org.xi.maple.builder.annotation.*;
 import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.execution.configuration.PluginProperties;
 
@@ -21,14 +19,14 @@ import java.util.ServiceLoader;
 @Service
 public class EnginePluginService {
 
+    private static final Logger logger = LoggerFactory.getLogger(EnginePluginService.class);
+
     private final PluginProperties pluginProperties;
 
     public EnginePluginService(PluginProperties pluginProperties) {
         this.pluginProperties = pluginProperties;
         refreshPluginConvertors();
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(EnginePluginService.class);
 
     Map<String, MapleConvertor> convertorMap;
 
@@ -66,7 +64,6 @@ public class EnginePluginService {
             ServiceLoader<MapleConvertor> loader = ServiceLoader.load(MapleConvertor.class, classLoader);
             for (MapleConvertor convertor : loader) {
                 Class<? extends MapleConvertor> convertorClass = convertor.getClass();
-                // todo
                 ClusterCategory clusterCategory = convertorClass.getAnnotation(ClusterCategory.class);
                 EngineCategory engineCategory = convertorClass.getAnnotation(EngineCategory.class);
                 EngineVersion engineVersion = convertorClass.getAnnotation(EngineVersion.class);

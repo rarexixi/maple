@@ -1,11 +1,13 @@
 package org.xi.maple.scheduler.constant;
 
+import org.xi.maple.common.constant.EngineCategoryConstants;
+
 public enum K8sResourceType {
 
     POD("pod"),
     QUEUE("queue"),
-    SPARK("spark"),
-    FLINK("flink");
+    SPARK(EngineCategoryConstants.SPARK),
+    FLINK(EngineCategoryConstants.FLINK);
 
     final String name;
 

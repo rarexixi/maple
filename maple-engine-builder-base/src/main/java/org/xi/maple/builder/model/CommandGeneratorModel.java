@@ -8,7 +8,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommandGeneratorModel {
-    boolean startCommand;
+
+    public CommandGeneratorModel(String ftlPath, String filePath, Object requestModel) {
+        this.ftlPath = ftlPath;
+        this.filePath = filePath;
+        this.requestModel = requestModel;
+    }
+
+    boolean startCommand = false;
     String ftlPath;
     String filePath;
     Object requestModel;

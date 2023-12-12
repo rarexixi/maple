@@ -6,6 +6,7 @@ import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.builder.model.FlinkEngineExecution;
+import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 
 import java.io.IOException;
@@ -13,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ClusterCategory("k8s")
-@EngineCategory("flink")
+@EngineCategory(EngineCategoryConstants.FLINK)
 @EngineVersion(value = {"1.16.1", "1.17.2"})
 public class FlinkK8sConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getCommandGenerator(EngineExecutionModel execution) {
-        FlinkEngineExecution execConf = null;
+        FlinkEngineExecution execConf;
         try {
             execConf = convert(execution);
         } catch (IOException e) {
@@ -27,7 +28,7 @@ public class FlinkK8sConvertor implements MapleConvertor {
         }
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-to-yarn.sh.ftl", "flink-to-yarn.sh", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel("flink-to-k8s.yaml.ftl", "flink-to-k8s.yaml", execConf));
         return commandGeneratorModels;
     }
 

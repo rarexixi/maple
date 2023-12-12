@@ -5,13 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.execution.client.PersistenceClient;
-import org.xi.maple.persistence.model.request.*;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-
-import java.util.List;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 
 @Component
 public class PersistenceClientFallbackFactory implements FallbackFactory<PersistenceClient> {

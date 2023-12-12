@@ -5,16 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.scheduler.client.EngineManagerClient;
+import org.xi.maple.scheduler.client.ExecutionManagerClient;
 
 @Component
-public class EngineManagerClientFallbackFactory implements FallbackFactory<EngineManagerClient> {
+public class ExecutionManagerClientFallbackFactory implements FallbackFactory<ExecutionManagerClient> {
 
-    private static final Logger logger = LoggerFactory.getLogger(EngineManagerClientFallbackFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExecutionManagerClientFallbackFactory.class);
 
     @Override
-    public EngineManagerClient create(Throwable cause) {
-        return new EngineManagerClient() {
+    public ExecutionManagerClient create(Throwable cause) {
+        return new ExecutionManagerClient() {
 
             @Override
             public void execute(EngineExecutionDetailResponse execution) {
