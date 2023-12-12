@@ -19,7 +19,8 @@ import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.scheduler.model.MapleClusterQueue;
+import org.xi.maple.scheduler.k8s.model.K8sClusterQueue;
+import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.K8sResourceType;
 import org.xi.maple.scheduler.constant.MapleConstants;
@@ -38,7 +39,6 @@ import org.xi.maple.scheduler.k8s.spark.eventhandler.SparkApplicationEventHandle
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueue;
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueueList;
 import org.xi.maple.scheduler.model.YarnCluster;
-import org.xi.maple.scheduler.service.ClusterQueueService;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
@@ -54,14 +54,14 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author xishihao
  */
-@Service
+@Service("k8sClusterService")
 public class K8sClusterServiceImpl implements K8sClusterService {
 
     private static final Logger logger = LoggerFactory.getLogger(K8sClusterServiceImpl.class);
 
     private static final Map<String, Method> configSetMethodMap = getConfigSetMethodMap();
 
-    final static Map<String, MapleClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+    final static Map<String, ClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
 
     private final PersistenceClient client;
     private final UpdateExecStatusFunc updateExecStatusFunc;
@@ -244,15 +244,23 @@ public class K8sClusterServiceImpl implements K8sClusterService {
                 .resources(VolcanoQueue.class, VolcanoQueueList.class)
                 .inform(new MapleResourceEventHandler<>() {
                     @Override
-                    public  void onAdd(VolcanoQueue volcanoQueue) {
+                    public void onAdd(VolcanoQueue volcanoQueue) {
+                        String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
+                        ClusterQueue clusterQueue = new K8sClusterQueue(volcanoQueue.getStatus().getPending());
+                        CLUSTER_QUEUE_MAP.put(key, clusterQueue);
                     }
 
                     @Override
-                    public  void onUpdate(VolcanoQueue oldVolcanoQueue, VolcanoQueue volcanoQueue) {
+                    public void onUpdate(VolcanoQueue oldVolcanoQueue, VolcanoQueue volcanoQueue) {
+                        String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
+                        ClusterQueue clusterQueue = new K8sClusterQueue(volcanoQueue.getStatus().getPending());
+                        CLUSTER_QUEUE_MAP.put(key, clusterQueue);
                     }
+
                     @Override
                     public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
-                        CLUSTER_QUEUE_MAP.remove(MapleClusterQueue.getKey(clusterName, volcanoQueue.getMetadata().getName()));
+                        String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
+                        CLUSTER_QUEUE_MAP.remove(key);
                     }
                 }, 10000L);
         volcanoInformer.start();
@@ -269,6 +277,11 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     @PostConstruct
     public void run() throws Exception {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
+
+    @Override
+    public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
+        return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
     }
 
     @Data

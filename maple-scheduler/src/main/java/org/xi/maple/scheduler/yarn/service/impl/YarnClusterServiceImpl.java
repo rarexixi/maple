@@ -18,11 +18,11 @@ import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.MapleConstants;
 import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
-import org.xi.maple.scheduler.model.MapleClusterQueue;
+import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.scheduler.model.YarnCluster;
 import org.xi.maple.scheduler.model.YarnScheduler;
-import org.xi.maple.scheduler.service.ClusterQueueService;
 import org.xi.maple.scheduler.yarn.model.YarnApplications;
+import org.xi.maple.scheduler.yarn.model.YarnClusterQueue;
 import org.xi.maple.scheduler.yarn.service.YarnClusterService;
 
 import java.io.IOException;
@@ -32,7 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
+/**
+ * @author xishihao
+ */
+@Service("yarnClusterService")
 public class YarnClusterServiceImpl implements YarnClusterService {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnClusterServiceImpl.class);
@@ -41,7 +44,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
 
     private final UpdateExecStatusFunc updateExecStatusFunc;
 
-    static Map<String, MapleClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+    static Map<String, ClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
 
     public YarnClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
         this.client = client;
@@ -55,7 +58,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     public void cacheClusterQueueInfo() {
         logger.info("Reloading cluster queue info...");
         List<YarnCluster> clusters = getClusters();
-        Map<String, MapleClusterQueue> queueMap = new HashMap<>();
+        Map<String, ClusterQueue> queueMap = new HashMap<>();
         for (YarnCluster cluster : clusters) {
             String clusterName = cluster.getName();
             YarnScheduler yarnScheduler = getClusterQueueInfo(clusterName);
@@ -70,13 +73,11 @@ public class YarnClusterServiceImpl implements YarnClusterService {
             }
 
             for (YarnScheduler.Scheduler.SchedulerInfo.Queues.Queue queue : queues) {
-                String key = MapleClusterQueue.getKey(cluster.getName(), queue.getQueueName());
-                MapleClusterQueue value = new MapleClusterQueue(queue.getNumPendingApplications());
+                String key = ClusterQueue.getClusterQueueKey(cluster.getName(),  queue.getQueueName());
+                ClusterQueue value = new YarnClusterQueue(queue.getNumPendingApplications());
                 queueMap.put(key, value);
             }
         }
-        // 测试使用
-        // queueMap.put(MapleClusterQueue.getKey("hadoop", "default"), new MapleClusterQueue(0));
         CLUSTER_QUEUE_MAP = queueMap;
     }
 
@@ -91,8 +92,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
             HttpResponse response = client.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String responseBody = EntityUtils.toString(response.getEntity(), "utf-8");
-                YarnScheduler result = JsonUtils.parseObject(responseBody, YarnScheduler.class);
-                return result;
+                return JsonUtils.parseObject(responseBody, YarnScheduler.class);
             } else {
                 logger.error("获取 Yarn 队列信息失败：code:" + response.getStatusLine().getStatusCode());
             }
@@ -102,11 +102,10 @@ public class YarnClusterServiceImpl implements YarnClusterService {
         return null;
     }
 
-
     /**
      * 刷新引擎执行任务状态
      */
-    @Scheduled
+    @Scheduled(fixedDelay = 5000)
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
         request.setCategory(ClusterTypeConstants.YARN);
@@ -182,5 +181,10 @@ public class YarnClusterServiceImpl implements YarnClusterService {
         } catch (IOException e) {
             logger.error("获取 YARN 作业信息失败", e);
         }
+    }
+
+    @Override
+    public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
+        return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
     }
 }

@@ -1,4 +1,9 @@
 package org.xi.maple.scheduler.yarn.service;
 
-public interface YarnClusterService {
+import org.xi.maple.scheduler.service.ClusterQueueService;
+
+/**
+ * @author xishihao
+ */
+public interface YarnClusterService extends ClusterQueueService {
 }

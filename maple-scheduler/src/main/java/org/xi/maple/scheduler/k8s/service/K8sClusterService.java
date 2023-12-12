@@ -3,15 +3,14 @@ package org.xi.maple.scheduler.k8s.service;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import org.springframework.web.multipart.MultipartFile;
-import org.xi.maple.scheduler.model.MapleClusterQueue;
+import org.xi.maple.scheduler.service.ClusterQueueService;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author xishihao
  */
-public interface K8sClusterService {
+public interface K8sClusterService extends ClusterQueueService {
 
     /**
      * 部署引擎到K8s集群
