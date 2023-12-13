@@ -1,6 +1,8 @@
 package org.xi.maple.persistence.service.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.xi.maple.common.constant.DeletedConstant;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.PageList;
@@ -76,6 +78,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @CacheEvict(cacheNames = {"maple-app"}, key = "#patchRequest.appName")
     @Override
     @Transactional
     public int delete(ApplicationPatchRequest patchRequest) {
@@ -89,6 +92,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @CacheEvict(cacheNames = {"maple-app"}, key = "#patchRequest.appName")
     @Override
     @Transactional
     public int disable(ApplicationPatchRequest patchRequest) {
@@ -104,6 +108,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @CacheEvict(cacheNames = {"maple-app"}, key = "#patchRequest.appName")
     @Override
     @Transactional
     public int enable(ApplicationPatchRequest patchRequest) {
@@ -120,6 +125,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @return 更新后的访问程序详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @CacheEvict(cacheNames = {"maple-app"}, key = "#appName")
     @Override
     @Transactional
     public ApplicationDetailResponse updateByAppName(ApplicationSaveRequest saveRequest, String appName) {
@@ -141,6 +147,7 @@ public class ApplicationServiceImpl implements ApplicationService {
      * @return 访问程序详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
+    @Cacheable(cacheNames = {"maple-app"}, key = "#appName")
     @Override
     @Transactional(readOnly = true)
     public ApplicationDetailResponse getByAppName(String appName) {

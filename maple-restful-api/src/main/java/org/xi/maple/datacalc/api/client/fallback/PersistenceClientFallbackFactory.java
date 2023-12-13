@@ -10,6 +10,7 @@ import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
@@ -62,6 +63,11 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest) {
+                return null;
+            }
+
+            @Override
+            public ApplicationDetailResponse getByAppName(String appName) {
                 return null;
             }
         };

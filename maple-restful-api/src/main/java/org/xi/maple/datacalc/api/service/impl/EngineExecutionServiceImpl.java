@@ -1,5 +1,6 @@
 package org.xi.maple.datacalc.api.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RDeque;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -15,6 +16,7 @@ import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
 import org.xi.maple.datacalc.api.configuration.MapleSecurityProperties;
 import org.xi.maple.datacalc.api.service.EngineExecutionService;
+import org.xi.maple.datacalc.api.service.MapleAppService;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
@@ -35,13 +37,15 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     final RedissonClient redissonClient;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
+    final MapleAppService mapleAppService;
     final MapleSecurityProperties securityProperties;
 
     @Autowired
-    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, MapleSecurityProperties securityProperties) {
+    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, MapleAppService mapleAppService, MapleSecurityProperties securityProperties) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
+        this.mapleAppService = mapleAppService;
         this.securityProperties = securityProperties;
     }
 
@@ -79,7 +83,10 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
 
             String fromApp = submitReq.getFromApp();
             String secretStr = String.join("#;", new String[]{submitReq.getUniqueId(), submitReq.getExecName(), timestamp});
-            String key = getAppKey(fromApp);
+            String key = mapleAppService.getAppKey(fromApp);
+            if (StringUtils.isBlank(key)) {
+                throw new MapleValidException("应用不存在/设置不正确");
+            }
             try {
                 if (!SecurityUtils.valid(key, secretStr, secret)) {
                     throw new MapleValidException("参数验证失败");
@@ -101,9 +108,5 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             }, () -> logger.error("Add to queue failed " + submitReq));
         });
         return id;
-    }
-
-    private String getAppKey(String fromApp) {
-        return "";
     }
 }

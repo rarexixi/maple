@@ -1,6 +1,7 @@
 package org.xi.maple.datacalc.api.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.model.OperateResult;
@@ -9,6 +10,7 @@ import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
@@ -45,4 +47,7 @@ public interface PersistenceClient {
 
     @GetMapping("/engine-execution-queue/list")
     List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest);
+
+    @GetMapping("/application/detail")
+    ApplicationDetailResponse getByAppName(@RequestParam("appName") @NotBlank(message = "应用名称不能为空") String appName);
 }
