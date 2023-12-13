@@ -1,0 +1,25 @@
+server:
+  port: 8110
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: maple-execution-manager-service
+  jackson:
+    date-format: java.text.SimpleDateFormat
+
+plugin: 
+  home: /home/xi/tmp
+  ftl-path: /home/xi/tmp
+
+execution:
+  exec-home: /home/xi/history
+
+# /actuator/info
+info:
+  app:
+    name: ${spring.application.name}
