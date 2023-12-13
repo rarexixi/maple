@@ -1,6 +1,5 @@
 package org.xi.maple.execution.client.fallback;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.xi.maple.execution.client.SchedulerClient;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class SchedulerClientFallbackFactory implements FallbackFactory<SchedulerClient> {
@@ -18,7 +18,7 @@ public class SchedulerClientFallbackFactory implements FallbackFactory<Scheduler
     public SchedulerClient create(Throwable cause) {
         return new SchedulerClient() {
             @Override
-            public List<HasMetadata> deploy(String clusterName, String yaml) {
+            public List<Map<String, ?>> deploy(String clusterName, String yaml) {
                 return null;
             }
         };

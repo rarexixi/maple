@@ -6,9 +6,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
 @SpringBootApplication
-public class MapleEngineManagerApplication {
+public class MapleExecutionManagerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MapleEngineManagerApplication.class, args);
+        SpringApplication.run(MapleExecutionManagerApplication.class, args);
     }
 }

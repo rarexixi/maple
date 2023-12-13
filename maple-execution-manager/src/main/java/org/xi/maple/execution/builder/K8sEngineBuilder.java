@@ -1,6 +1,5 @@
 package org.xi.maple.execution.builder;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -21,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class K8sEngineBuilder extends EngineBuilder<Object> {
@@ -54,7 +54,7 @@ public class K8sEngineBuilder extends EngineBuilder<Object> {
         return null;
     }
 
-    private List<HasMetadata> deploy(String cluster, String yamlPath) throws IOException {
+    private List<Map<String, ?>> deploy(String cluster, String yamlPath) throws IOException {
         return schedulerClient.deploy(cluster, Files.readString(Paths.get(yamlPath)));
     }
 }

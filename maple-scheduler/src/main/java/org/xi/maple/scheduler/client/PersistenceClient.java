@@ -58,7 +58,7 @@ public interface PersistenceClient {
     ClusterDetailResponse getByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);
 
     @GetMapping("/cluster/list")
-    List<ClusterListItemResponse> getClusterList(@RequestBody ClusterQueryRequest queryRequest);
+    List<ClusterListItemResponse> getClusterList(@SpringQueryMap ClusterQueryRequest queryRequest);
 
     // endregion
 }
