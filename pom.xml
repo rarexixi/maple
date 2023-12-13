@@ -24,6 +24,7 @@
         <module>maple-spring-dependencies</module>
         <module>maple-common</module>
         <module>maple-spring-common</module>
+        <module>maple-service-spring-boot-starter</module>
         <module>maple-eureka</module>
         <module>maple-datasource</module>
         <module>maple-persistence-models</module>
