@@ -11,19 +11,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
-import org.xi.maple.common.constant.ClusterTypeConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
-import org.xi.maple.scheduler.k8s.service.K8sClusterService;
-import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
-import org.xi.maple.scheduler.client.ExecutionManagerClient;
-import org.xi.maple.scheduler.client.PersistenceClient;
-import org.xi.maple.scheduler.yarn.service.YarnClusterService;
+import org.xi.maple.scheduler.service.ExecutionService;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,29 +39,17 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     final ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    final YarnClusterService yarnClusterService;
-
-    final K8sClusterService k8sClusterService;
-
-    final PersistenceClient persistenceClient;
-
-    final ExecutionManagerClient executionManagerClient;
-    private final UpdateExecStatusFunc updateExecStatusFunc;
+    final ExecutionService executionService;
 
     final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
     public ScheduledExecutions(RedissonClient redissonClient,
                                ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                               YarnClusterService yarnClusterService, K8sClusterService k8sClusterService, PersistenceClient persistenceClient,
-                               ExecutionManagerClient executionManagerClient, UpdateExecStatusFunc updateExecStatusFunc) {
+                               ExecutionService executionService) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
-        this.yarnClusterService = yarnClusterService;
-        this.k8sClusterService = k8sClusterService;
-        this.persistenceClient = persistenceClient;
-        this.executionManagerClient = executionManagerClient;
-        this.updateExecStatusFunc = updateExecStatusFunc;
+        this.executionService = executionService;
     }
 
     /**
@@ -76,7 +58,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
         logger.info("开始消费队列...");
-        List<EngineExecutionQueue> queueList = persistenceClient.getExecQueueList(new EngineExecutionQueueQueryRequest());
+        List<EngineExecutionQueue> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryRequest());
         if (queueList == null || queueList.isEmpty()) {
             logger.warn("队列列表为空");
             return;
@@ -114,36 +96,23 @@ public class ScheduledExecutions implements CommandLineRunner {
                     return;
                 }
 
-                EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(queueItem.getExecId());
-                ClusterQueue cachedQueueInfo = null;
-                if (ClusterTypeConstants.K8s.equals(execution.getClusterCategory())) {
-                    cachedQueueInfo = k8sClusterService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
-                } else if (ClusterTypeConstants.YARN.equals(execution.getClusterCategory())) {
-                    cachedQueueInfo = yarnClusterService.getCachedQueueInfo(executionQueue.getCluster(), executionQueue.getClusterQueue());
-                } else {
-                    logger.error("不支持的集群类型，cluster: {}, queue: {}", executionQueue.getCluster(), executionQueue.getClusterQueue());
+                EngineExecutionDetailResponse execution = executionService.getExecutionById(queueItem.getExecId());
+                if (execution == null) {
+                    logger.error("作业不存在，id: {}", queueItem.getExecId());
+                    return;
                 }
-                // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
-                if (cachedQueueInfo == null) {
-                    logger.error("队列不存在，cluster: {}, queue: {}", executionQueue.getCluster(), executionQueue.getClusterQueue());
-                    // todo 修改作业状态
-                    updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.FAILED);
-                } else if (cachedQueueInfo.idle()) {
-                    logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", executionQueue.getCluster(), executionQueue.getClusterQueue());
+                if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getClusterQueue())) {
+                    logger.info("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
+                    executionService.updateExecutionStatus(execution.getId(), EngineExecutionStatus.FAILED);
+                    return;
+                }
+                threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {
+                    logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getCluster(), execution.getClusterQueue());
                     deque.addFirst(queueItem);
                     continueRunning.set(false);
-                } else {
-                    submitExecution(execution);
-                }
+                }));
             });
         }
-    }
-
-    private void submitExecution(EngineExecutionDetailResponse execution) {
-        logger.info("submit execution: {}", execution);
-        threadPoolTaskExecutor.submit(() -> {
-            executionManagerClient.execute(execution);
-        });
     }
 
     public void clearScheduling() {

@@ -16,6 +16,6 @@ public class K8sClusterQueue implements ClusterQueue, Serializable {
 
     @Override
     public boolean idle() {
-        return pending != null && pending == 0;
+        return pending == null || pending == 0;
     }
 }

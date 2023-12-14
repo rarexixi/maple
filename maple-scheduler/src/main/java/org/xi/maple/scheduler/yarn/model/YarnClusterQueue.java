@@ -18,6 +18,6 @@ public class YarnClusterQueue implements ClusterQueue, Serializable {
 
     @Override
     public boolean idle() {
-        return numPendingApplications != null && numPendingApplications == 0;
+        return numPendingApplications == null || numPendingApplications == 0;
     }
 }
