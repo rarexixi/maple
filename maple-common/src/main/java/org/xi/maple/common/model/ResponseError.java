@@ -14,5 +14,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ResponseError implements Serializable {
 
-    private String message;
+    private int code;
+    private String msg;
 }

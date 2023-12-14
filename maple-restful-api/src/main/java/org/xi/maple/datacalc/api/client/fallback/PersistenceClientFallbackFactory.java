@@ -1,5 +1,6 @@
 package org.xi.maple.datacalc.api.client.fallback;
 
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -15,7 +16,9 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 
+import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class PersistenceClientFallbackFactory implements FallbackFactory<PersistenceClient> {
@@ -33,6 +36,20 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public EngineExecutionDetailResponse getExecutionById(Integer id) {
+                if (cause instanceof FeignException.InternalServerError) {
+                    FeignException.InternalServerError internalServerError = (FeignException.InternalServerError) cause;
+                    int status = internalServerError.status();
+                    logger.error("调用maple-persistence-service失败，执行getExecutionById方法失败，参数id：{}，错误状态码：{}", id, status);
+                    Optional<ByteBuffer> byteBuffer = internalServerError.responseBody();
+                    if (byteBuffer.isPresent()) {
+                        ByteBuffer buffer = byteBuffer.get();
+                        byte[] bytes = new byte[buffer.remaining()];
+                        buffer.get(bytes);
+                        String message = new String(bytes);
+                        logger.error("调用maple-persistence-service失败，执行getExecutionById方法失败，参数id：{}，错误信息：{}", id, message);
+                    }
+                    return null;
+                }
                 return null;
             }
 

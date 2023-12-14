@@ -113,7 +113,7 @@ public class ExceptionControllerAdvice {
 
     private ResponseEntity<ResponseError> getError(HttpStatus httpStatus, String message) {
         ResponseError responseError = new ResponseError();
-        responseError.setMessage(message);
+        responseError.setMsg(message);
         return ResponseEntity.status(httpStatus).body(responseError);
     }
 }

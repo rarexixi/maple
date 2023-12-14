@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.datacalc.api.service.EngineExecutionService;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -32,5 +33,11 @@ public class EngineExecutionController {
 
         Integer id = engineExecutionService.submit(addRequest, timestamp, secret);
         return ResponseEntity.ok(id);
+    }
+
+    @GetMapping("detail")
+    public ResponseEntity<EngineExecutionDetailResponse> detail(@RequestParam("id") Integer id) {
+        EngineExecutionDetailResponse detail = engineExecutionService.detail(id);
+        return ResponseEntity.ok(detail);
     }
 }
