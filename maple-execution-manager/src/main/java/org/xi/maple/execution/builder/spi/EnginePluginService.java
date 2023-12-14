@@ -58,9 +58,7 @@ public class EnginePluginService {
                 })
                 .toArray(URL[]::new);
 
-        URLClassLoader classLoader = null;
-        try {
-            classLoader = new URLClassLoader(pluginJars);
+        try (URLClassLoader classLoader = new URLClassLoader(pluginJars)) {
             ServiceLoader<MapleConvertor> loader = ServiceLoader.load(MapleConvertor.class, classLoader);
             for (MapleConvertor convertor : loader) {
                 Class<? extends MapleConvertor> convertorClass = convertor.getClass();
@@ -73,14 +71,6 @@ public class EnginePluginService {
             }
         } catch (Exception e) {
             logger.error("Load plugin failed", e);
-        } finally {
-            if (classLoader != null) {
-                try {
-                    classLoader.close();
-                } catch (Exception e) {
-                    logger.error("Close class loader failed", e);
-                }
-            }
         }
         this.convertorMap = convertors;
     }
