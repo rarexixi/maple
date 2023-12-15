@@ -24,9 +24,9 @@ import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.K8sResourceType;
 import org.xi.maple.scheduler.constant.MapleConstants;
-import org.xi.maple.scheduler.exception.ClusterNotConfiguredExceptionMaple;
-import org.xi.maple.scheduler.exception.EngineTypeNotSupportExceptionMaple;
-import org.xi.maple.scheduler.exception.MapleK8sException;
+import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
+import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
+import org.xi.maple.common.exception.MapleK8sException;
 import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
 import org.xi.maple.scheduler.k8s.MapleResourceEventHandler;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
@@ -146,12 +146,12 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         } catch (Throwable t) {
             throw new MapleK8sException(t);
         }
-        throw new EngineTypeNotSupportExceptionMaple("engine type not support: " + type);
+        throw new MapleEngineTypeNotSupportException("engine type not support: " + type);
     }
 
     private KubernetesClient getKubernetesClient(String clusterName) {
         if (!k8sClients.containsKey(clusterName)) {
-            throw new ClusterNotConfiguredExceptionMaple("Cluster [" + clusterName + "] not configured");
+            throw new MapleClusterNotConfiguredException("Cluster [" + clusterName + "] not configured");
         }
         return k8sClients.get(clusterName);
     }

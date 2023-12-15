@@ -1,4 +1,4 @@
-package org.xi.maple.scheduler.exception;
+package org.xi.maple.common.exception;
 
 import org.xi.maple.common.exception.MapleException;
 
