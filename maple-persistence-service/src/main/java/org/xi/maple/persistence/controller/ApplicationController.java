@@ -70,7 +70,8 @@ public class ApplicationController {
 
     @GetMapping("/detail")
     public ResponseEntity<ApplicationDetailResponse> getByAppName(@RequestParam("appName") @NotBlank(message = "应用名称不能为空") String appName) {
-        throw new RuntimeException("=========================error");
+        ApplicationDetailResponse detail = applicationService.getByAppName(appName);
+        return ResponseEntity.ok(detail);
     }
 
     @GetMapping("/list")

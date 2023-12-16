@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.EngineExecutionStatus;
+import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
@@ -53,7 +54,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     public String getExecutionStatus(Integer jobId) {
         EngineExecutionDetailResponse detail = persistenceClient.getExecutionById(jobId);
         if (detail == null) {
-            throw new RuntimeException("");
+            throw new MapleDataNotFoundException(String.format("作业 %s 不存在", jobId));
         }
         return detail.getStatus();
     }

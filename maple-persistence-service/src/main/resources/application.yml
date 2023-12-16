@@ -40,7 +40,33 @@ spring:
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 # endregion
-
+management:
+  endpoints:
+    # 关闭所有的检查项
+    enabled-by-default: false
+    web:
+      exposure:
+        # 暴露监控接口，*为全部接口
+        include: 'prometheus'
+      ## 省掉了/actuator前缀
+      base-path: "/"
+  # 对外暴露prometheus接口并显示更多健康信息
+  endpoint:
+    prometheus:
+      enabled: true
+    health:
+      show-details: always
+  ## 关闭内置的检查项
+  metrics:
+    enable:
+      jvm: true
+      logback: false
+      files: false
+      tomcat: false
+      executor: false
+      disk: false
+      uptime: false
+      integration: false
 # region mybatis
 mybatis:
   type-aliases-package: org.xi.maple.persistence.persistence.mapper

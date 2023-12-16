@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.xi.maple.builder.annotation.*;
 import org.xi.maple.builder.convertor.MapleConvertor;
+import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.execution.configuration.PluginProperties;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class EnginePluginService {
         Map<String, MapleConvertor> convertors = new HashMap<>();
         File dir = new File(pluginProperties.getHome());
         if (!dir.exists() || !dir.isDirectory()) {
-            throw new RuntimeException("");
+            throw new MapleException(String.format("[%s] 不存在或者不是一个文件夹", dir.getAbsolutePath())); // todo 修改文文件异常
         }
 
         File[] files = dir.listFiles();

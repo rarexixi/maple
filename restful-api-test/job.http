@@ -1,5 +1,5 @@
 ###
-POST http://{{domain}}/engine-execution/submit
+PATCH http://{{domain}}/engine-execution/add
 Content-Type: application/json
 
 {
@@ -13,7 +13,8 @@ Content-Type: application/json
   "clusterQueue": "default",
   "engineCategory": "spark",
   "engineVersion": "3.3.2",
-  "priority": 1,
+  "priority": "xx",
+  "priority2": "xx3",
   "group": "group1",
   "user": "",
   "webhooks": "",

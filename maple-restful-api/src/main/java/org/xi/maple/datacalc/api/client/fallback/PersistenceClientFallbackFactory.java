@@ -5,7 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+import org.xi.maple.common.exception.MapleException;
+import org.xi.maple.common.model.FeignResponseError;
 import org.xi.maple.common.model.OperateResult;
+import org.xi.maple.common.model.ResponseError;
+import org.xi.maple.common.util.MapleExceptionUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
@@ -36,20 +40,13 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public EngineExecutionDetailResponse getExecutionById(Integer id) {
-                if (cause instanceof FeignException.InternalServerError) {
-                    FeignException.InternalServerError internalServerError = (FeignException.InternalServerError) cause;
-                    int status = internalServerError.status();
-                    logger.error("调用maple-persistence-service失败，执行getExecutionById方法失败，参数id：{}，错误状态码：{}", id, status);
-                    Optional<ByteBuffer> byteBuffer = internalServerError.responseBody();
-                    if (byteBuffer.isPresent()) {
-                        ByteBuffer buffer = byteBuffer.get();
-                        byte[] bytes = new byte[buffer.remaining()];
-                        buffer.get(bytes);
-                        String message = new String(bytes);
-                        logger.error("调用maple-persistence-service失败，执行getExecutionById方法失败，参数id：{}，错误信息：{}", id, message);
-                    }
-                    return null;
-                }
+                Optional<FeignResponseError> error = MapleExceptionUtils.getFeignResponseError(cause);
+                error.ifPresentOrElse(feignResponseError -> {
+                    FeignException feignException = feignResponseError.getException();
+                    logger.error("调用 maple-persistence-service 失败，请求路径：{}，请求方法：{}，参数 id：{}，响应数据：{}",
+                            feignException.request().url(), feignException.request().httpMethod(), id, feignException.contentUTF8());
+                    throw new MapleException(feignResponseError.getError().getMsg());
+                }, () -> logger.error("调用 maple-persistence-service 失败，方法：getExecutionById，参数 id：{}", id, cause));
                 return null;
             }
 

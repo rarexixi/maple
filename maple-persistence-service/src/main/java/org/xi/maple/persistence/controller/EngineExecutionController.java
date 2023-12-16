@@ -56,9 +56,8 @@ public class EngineExecutionController {
 
     @GetMapping("/detail")
     public ResponseEntity<EngineExecutionDetailResponse> getById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id) {
-        throw new RuntimeException("detail error");
-        // EngineExecutionDetailResponse detail = engineExecutionService.getById(id);
-        // return ResponseEntity.ok(detail);
+        EngineExecutionDetailResponse detail = engineExecutionService.getById(id);
+        return ResponseEntity.ok(detail);
     }
 
     @GetMapping("/page-list")
