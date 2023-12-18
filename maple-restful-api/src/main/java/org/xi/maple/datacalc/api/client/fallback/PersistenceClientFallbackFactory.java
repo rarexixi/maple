@@ -40,13 +40,9 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public EngineExecutionDetailResponse getExecutionById(Integer id) {
-                Optional<FeignResponseError> error = MapleExceptionUtils.getFeignResponseError(cause);
-                error.ifPresentOrElse(feignResponseError -> {
-                    FeignException feignException = feignResponseError.getException();
-                    logger.error("调用 maple-persistence-service 失败，请求路径：{}，请求方法：{}，参数 id：{}，响应数据：{}",
-                            feignException.request().url(), feignException.request().httpMethod(), id, feignException.contentUTF8());
+                MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
                     throw new MapleException(feignResponseError.getError().getMsg());
-                }, () -> logger.error("调用 maple-persistence-service 失败，方法：getExecutionById，参数 id：{}", id, cause));
+                });
                 return null;
             }
 

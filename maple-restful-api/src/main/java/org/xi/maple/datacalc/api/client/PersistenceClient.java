@@ -1,6 +1,7 @@
 package org.xi.maple.datacalc.api.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,30 +25,30 @@ import java.util.List;
 public interface PersistenceClient {
 
     @PostMapping("/engine-execution/add")
-    Integer addExecution(@Validated @RequestBody EngineExecutionAddRequest engineExecution);
+    Integer addExecution(@RequestBody EngineExecutionAddRequest engineExecution);
 
     @GetMapping("/engine-execution/detail")
-    EngineExecutionDetailResponse getExecutionById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id);
+    EngineExecutionDetailResponse getExecutionById(@RequestParam("id") Integer id);
 
     @PatchMapping("/engine-execution/update-status")
-    Integer updateExecutionStatusById(@Validated @RequestBody EngineExecutionUpdateStatusRequest updateRequest);
+    Integer updateExecutionStatusById(@RequestBody EngineExecutionUpdateStatusRequest updateRequest);
 
     @PatchMapping("/engine-execution/update-ext-info")
-    Integer updateExecutionInfoById(@Validated @RequestBody EngineExecutionUpdateRequest updateRequest);
+    Integer updateExecutionInfoById(@RequestBody EngineExecutionUpdateRequest updateRequest);
 
 
     @PostMapping("/engine-execution-queue/add-or-update")
-    OperateResult<Integer> addOrUpdateExecQueue(@Validated @RequestBody MapleEngineExecutionQueue engineExecutionQueue);
+    OperateResult<Integer> addOrUpdateExecQueue(@RequestBody MapleEngineExecutionQueue engineExecutionQueue);
 
     @DeleteMapping("/engine-execution-queue/delete")
-    Integer deleteExecQueue(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
+    Integer deleteExecQueue(@RequestParam("queueName") String queueName);
 
     @GetMapping("/engine-execution-queue/detail")
-    EngineExecutionQueue getExecQueueByName(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
+    EngineExecutionQueue getExecQueueByName(@RequestParam("queueName") String queueName);
 
     @GetMapping("/engine-execution-queue/list")
-    List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest queryRequest);
+    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryRequest queryRequest);
 
     @GetMapping("/application/detail")
-    ApplicationDetailResponse getByAppName(@RequestParam("appName") @NotBlank(message = "应用名称不能为空") String appName);
+    ApplicationDetailResponse getByAppName(@RequestParam("appName") String appName);
 }
