@@ -19,7 +19,7 @@ public class K8sController {
         this.clusterService = clusterService;
     }
 
-    @PostMapping("{clusterName}/deploy-by-file")
+    @PutMapping("{clusterName}/deploy-by-file")
     public ResponseEntity<List<HasMetadata>> deployByFile(
             @PathVariable("clusterName") String clusterName,
             @RequestParam("yamlFile") MultipartFile yamlFile) {
@@ -27,7 +27,7 @@ public class K8sController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("{clusterName}/delete-by-file")
+    @PutMapping("{clusterName}/delete-by-file")
     public ResponseEntity<List<StatusDetails>> deleteByFile(
             @PathVariable("clusterName") String clusterName,
             @RequestParam("yamlFile") MultipartFile yamlFile) {
@@ -35,7 +35,7 @@ public class K8sController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("{clusterName}/delete-by-name")
+    @PutMapping("{clusterName}/delete-by-name")
     public ResponseEntity<List<StatusDetails>> deleteByName(
             @PathVariable("clusterName") String clusterName,
             @RequestParam("namespace") String namespace,
@@ -45,7 +45,7 @@ public class K8sController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("{clusterName}/deploy")
+    @PutMapping("{clusterName}/deploy")
     public ResponseEntity<List<HasMetadata>> deploy(
             @PathVariable("clusterName") String clusterName,
             @RequestBody String yaml) {
@@ -53,7 +53,7 @@ public class K8sController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("{clusterName}/delete")
+    @PutMapping("{clusterName}/delete")
     public ResponseEntity<List<StatusDetails>> delete(
             @PathVariable("clusterName") String clusterName,
             @RequestBody String yaml) {

@@ -2,8 +2,6 @@ package org.xi.maple.datacalc.api.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.datacalc.api.client.fallback.PersistenceClientFallbackFactory;
@@ -16,9 +14,6 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @FeignClient(value = "maple-persistence-service", fallbackFactory = PersistenceClientFallbackFactory.class)

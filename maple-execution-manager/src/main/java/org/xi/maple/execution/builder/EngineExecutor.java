@@ -12,6 +12,7 @@ import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.configuration.ExecutionProperties;
 import org.xi.maple.execution.builder.spi.EnginePluginService;
 import org.xi.maple.execution.configuration.PluginProperties;
+import org.xi.maple.execution.service.EngineExecutionService;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
@@ -25,17 +26,17 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public abstract class EngineBuilder<T> {
+public abstract class EngineExecutor implements EngineExecutionService {
 
     private final Logger logger;
 
-    final EnginePluginService enginePluginService;
-    final ExecutionProperties executionProperties;
-    final PluginProperties pluginProperties;
-    final ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    final PersistenceClient persistenceClient;
+    protected final EnginePluginService enginePluginService;
+    protected final ExecutionProperties executionProperties;
+    protected final PluginProperties pluginProperties;
+    protected final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    protected final PersistenceClient persistenceClient;
 
-    public EngineBuilder(Logger logger, EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+    public EngineExecutor(Logger logger, EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         this.logger = logger;
         this.enginePluginService = enginePluginService;
         this.executionProperties = executionProperties;
@@ -43,8 +44,6 @@ public abstract class EngineBuilder<T> {
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
     }
-
-    public abstract T execute(EngineExecutionDetailResponse execution);
 
     /**
      * 修改执行状态，状态变更逻辑已在接口实现

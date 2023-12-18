@@ -1,14 +1,11 @@
 package org.xi.maple.datacalc.api.client.fallback;
 
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.exception.MapleException;
-import org.xi.maple.common.model.FeignResponseError;
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.common.model.ResponseError;
 import org.xi.maple.common.util.MapleExceptionUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
@@ -20,9 +17,7 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 
-import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class PersistenceClientFallbackFactory implements FallbackFactory<PersistenceClient> {

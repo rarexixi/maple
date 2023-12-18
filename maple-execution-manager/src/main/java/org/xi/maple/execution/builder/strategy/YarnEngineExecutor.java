@@ -1,4 +1,4 @@
-package org.xi.maple.execution.builder;
+package org.xi.maple.execution.builder.strategy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,7 @@ import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.ActionUtils;
+import org.xi.maple.execution.builder.EngineExecutor;
 import org.xi.maple.execution.builder.spi.EnginePluginService;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.configuration.ExecutionProperties;
@@ -17,15 +18,15 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import java.util.List;
 
 @Component
-public class YarnEngineBuilder extends EngineBuilder<Void> {
+public class YarnEngineExecutor extends EngineExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(YarnEngineBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(YarnEngineExecutor.class);
 
-    public YarnEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
+    public YarnEngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
     }
 
-    public Void execute(EngineExecutionDetailResponse execution) {
+    public void execute(EngineExecutionDetailResponse execution) {
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion());
         List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
@@ -58,6 +59,5 @@ public class YarnEngineBuilder extends EngineBuilder<Void> {
                 }
             }
         });
-        return null;
     }
 }

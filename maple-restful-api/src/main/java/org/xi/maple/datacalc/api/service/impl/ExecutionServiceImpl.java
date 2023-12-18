@@ -15,8 +15,9 @@ import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.datacalc.api.client.PersistenceClient;
+import org.xi.maple.datacalc.api.client.SchedulerClient;
 import org.xi.maple.datacalc.api.configuration.MapleSecurityProperties;
-import org.xi.maple.datacalc.api.service.EngineExecutionService;
+import org.xi.maple.datacalc.api.service.ExecutionService;
 import org.xi.maple.datacalc.api.service.MapleAppService;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
@@ -31,21 +32,23 @@ import java.security.NoSuchAlgorithmException;
  * @author xishihao
  */
 @Service
-public class EngineExecutionServiceImpl implements EngineExecutionService {
+public class ExecutionServiceImpl implements ExecutionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EngineExecutionServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExecutionServiceImpl.class);
 
     final RedissonClient redissonClient;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
+    final SchedulerClient schedulerClient;
     final MapleAppService mapleAppService;
     final MapleSecurityProperties securityProperties;
 
     @Autowired
-    public EngineExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, MapleAppService mapleAppService, MapleSecurityProperties securityProperties) {
+    public ExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient, MapleAppService mapleAppService, MapleSecurityProperties securityProperties) {
         this.redissonClient = redissonClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
+        this.schedulerClient = schedulerClient;
         this.mapleAppService = mapleAppService;
         this.securityProperties = securityProperties;
     }
@@ -76,26 +79,8 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 执行记录ID
      */
     @Override
-    public Integer submit(EngineExecutionAddRequest submitReq, String timestamp, String secret) {
-        if (Boolean.TRUE.equals(securityProperties.getAppCheck())) {
-            if (System.currentTimeMillis() - Long.parseLong(timestamp) > 1000 * 60 * 5) {
-                throw new MapleValidException("请求已过期");
-            }
-
-            String fromApp = submitReq.getFromApp();
-            String secretStr = String.join("#;", new String[]{submitReq.getUniqueId(), submitReq.getExecName(), timestamp});
-            String key = mapleAppService.getAppKey(fromApp);
-            if (StringUtils.isBlank(key)) {
-                throw new MapleValidException("应用不存在/设置不正确");
-            }
-            try {
-                if (!SecurityUtils.valid(key, secretStr, secret)) {
-                    throw new MapleValidException("参数验证失败");
-                }
-            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-                throw new MapleValidException("参数验证失败", e);
-            }
-        }
+    public Integer submit(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
+        checkSecurity(submitReq, secret, timestamp);
         final Integer id = persistenceClient.addExecution(submitReq);
         threadPoolTaskExecutor.execute(() -> {
             MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getClusterQueue(),
@@ -109,5 +94,36 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             }, () -> logger.error("Add to queue failed " + submitReq));
         });
         return id;
+    }
+
+    @Override
+    public Integer submitNow(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
+        checkSecurity(submitReq, secret, timestamp);
+        final Integer id = persistenceClient.addExecution(submitReq);
+        schedulerClient.submitExecution(id);
+        return id;
+    }
+
+    private void checkSecurity(EngineExecutionAddRequest submitReq, String secret, Long timestamp) {
+        if (!Boolean.TRUE.equals(securityProperties.getAppCheck())) {
+            return;
+        }
+        if (System.currentTimeMillis() - timestamp > 1000 * 60 * 5) {
+            throw new MapleValidException("请求已过期");
+        }
+
+        String fromApp = submitReq.getFromApp();
+        String secretStr = String.join("#;", new String[]{submitReq.getUniqueId(), submitReq.getExecName(), timestamp.toString()});
+        String key = mapleAppService.getAppKey(fromApp);
+        if (StringUtils.isBlank(key)) {
+            throw new MapleValidException("应用不存在/设置不正确");
+        }
+        try {
+            if (!SecurityUtils.valid(key, secretStr, secret)) {
+                throw new MapleValidException("参数验证失败");
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new MapleValidException("参数验证失败", e);
+        }
     }
 }

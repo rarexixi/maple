@@ -13,7 +13,7 @@ public class ExecutionController {
         this.executionService = executionService;
     }
 
-    @PostMapping("exec-now")
+    @PutMapping("exec-now")
     public void submitExecution(@RequestParam("execId") int execId) {
         executionService.submitExecution(execId);
     }

@@ -6,7 +6,7 @@ import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 /**
  * @author xishihao
  */
-public interface EngineExecutionService {
+public interface ExecutionService {
 
     /**
      * 获取执行状态
@@ -28,7 +28,19 @@ public interface EngineExecutionService {
      * 提交执行
      *
      * @param submitReq 执行提交请求对象
+     * @param timestamp 时间戳
+     * @param secret    加密字符串
      * @return 执行记录ID
      */
-    Integer submit(EngineExecutionAddRequest submitReq, String timestamp, String secret);
+    Integer submit(EngineExecutionAddRequest submitReq, Long timestamp, String secret);
+
+    /**
+     * 立即执行，返回提交结果
+     *
+     * @param submitReq 执行提交请求对象
+     * @param timestamp 时间戳
+     * @param secret    加密字符串
+     * @return 执行记录ID
+     */
+    Integer submitNow(EngineExecutionAddRequest submitReq, Long timestamp, String secret);
 }

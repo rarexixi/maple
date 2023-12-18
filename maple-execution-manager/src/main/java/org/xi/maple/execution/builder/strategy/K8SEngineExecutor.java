@@ -1,4 +1,4 @@
-package org.xi.maple.execution.builder;
+package org.xi.maple.execution.builder.strategy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,7 @@ import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.ActionUtils;
+import org.xi.maple.execution.builder.EngineExecutor;
 import org.xi.maple.execution.builder.spi.EnginePluginService;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.client.SchedulerClient;
@@ -23,18 +24,18 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class K8sEngineBuilder extends EngineBuilder<Object> {
+public class K8SEngineExecutor extends EngineExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(K8sEngineBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(K8SEngineExecutor.class);
 
     private final SchedulerClient schedulerClient;
 
-    public K8sEngineBuilder(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient) {
+    public K8SEngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient) {
         super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
         this.schedulerClient = schedulerClient;
     }
 
-    public String execute(EngineExecutionDetailResponse execution) {
+    public void execute(EngineExecutionDetailResponse execution) {
 
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion());
@@ -51,10 +52,10 @@ public class K8sEngineBuilder extends EngineBuilder<Object> {
         for (String yamlPath : yamlFiles) {
             ActionUtils.executeQuietly(() -> deploy(execution.getCluster(), yamlPath));
         }
-        return null;
     }
 
     private List<Map<String, ?>> deploy(String cluster, String yamlPath) throws IOException {
+        // todo 拦截错误信息，修改状态
         return schedulerClient.deploy(cluster, Files.readString(Paths.get(yamlPath)));
     }
 }

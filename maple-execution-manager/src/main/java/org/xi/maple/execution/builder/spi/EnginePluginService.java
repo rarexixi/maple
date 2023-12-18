@@ -44,9 +44,8 @@ public class EnginePluginService {
 
         File[] files = dir.listFiles();
 
-        if (files == null) {
-            logger.warn("There is no plugins.");
-            return;
+        if (files == null || files.length == 0) {
+            throw new MapleException("没有可用插件"); // todo 修改文件夹为空异常
         }
         URL[] pluginJars = Arrays.stream(files)
                 .filter(file -> file.isFile() && file.getPath().endsWith(".jar"))
