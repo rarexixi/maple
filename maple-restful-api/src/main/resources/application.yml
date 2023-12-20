@@ -22,3 +22,5 @@ spring:
 feign:
   circuitbreaker:
     enabled: true
+  okhttp:
+    enabled: true
