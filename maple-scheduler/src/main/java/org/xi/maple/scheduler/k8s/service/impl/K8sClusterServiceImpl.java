@@ -306,8 +306,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         }
         if ("file".equals(kubeConfig.getType())) {
             if (StringUtils.isNotBlank(kubeConfig.getKubeConfigFile())) {
-                Config config = Config.fromKubeconfig(kubeConfig.getKubeConfigFile());
-                config.setMasterUrl(master);
+                Config config = Config.fromKubeconfig(null, null, kubeConfig.getKubeConfigFile());
                 return new KubernetesClientBuilder().withConfig(config).build();
             }
         } else {

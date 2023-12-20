@@ -73,7 +73,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
             }
 
             for (YarnScheduler.Scheduler.SchedulerInfo.Queues.Queue queue : queues) {
-                String key = ClusterQueue.getClusterQueueKey(cluster.getName(),  queue.getQueueName());
+                String key = ClusterQueue.getClusterQueueKey(cluster.getName(), queue.getQueueName());
                 ClusterQueue value = new YarnClusterQueue(queue.getNumPendingApplications());
                 queueMap.put(key, value);
             }
@@ -136,43 +136,47 @@ public class YarnClusterServiceImpl implements YarnClusterService {
             HttpResponse response = client.execute(request);
             if (response.getStatusLine().getStatusCode() == org.apache.http.HttpStatus.SC_OK) {
                 String responseBody = EntityUtils.toString(response.getEntity(), "utf-8");
-
                 YarnApplications result = JsonUtils.parseObject(responseBody, YarnApplications.class);
+                if (result == null || result.getApps() == null || result.getApps().getApp() == null) {
+                    logger.info("YARN 作业信息为空");
+                    return;
+                }
                 for (YarnApplications.Apps.App app : result.getApps().getApp()) {
                     String[] tags = app.getApplicationTags().split(",");
                     for (String tag : tags) {
-                        if (tag.startsWith(MapleConstants.TAG_ID_PREFIX)) {
-                            String execIdStr = tag.substring(MapleConstants.TAG_ID_PREFIX_LEN);
-                            if (StringUtils.isBlank(execIdStr) || !StringUtils.isNumeric(execIdStr)) {
-                                break;
-                            }
-                            Integer execId = Integer.getInteger(execIdStr);
-                            /*
-                             * NEW - 应用程序已创建但尚未提交。
-                             * NEW_SAVING - 应用程序新建完毕，正在保存到资源管理器（ResourceManager）。
-                             * SUBMITTED - 应用程序已提交，等待调度。
-                             * ACCEPTED - 应用程序已被资源管理器接受，正在等待资源分配。
-                             * RUNNING - 应用程序正在运行中。
-                             * FINISHED - 应用程序已经完成，这是一个最终状态。
-                             * FAILED - 应用程序运行失败，这是一个最终状态。
-                             * KILLED - 应用程序被终止或杀死，这是一个最终状态。
-                             */
-                            String state = app.getState();
-                            /*
-                             * SUCCEEDED - 应用程序成功完成了所有任务并按预期退出。
-                             * FAILED - 应用程序未能正确完成，出现错误或异常导致任务失败。
-                             * KILLED - 应用程序由于某种外部干预（例如用户请求或资源管理策略）而被明确地杀死。
-                             */
-                            String finalStatus = app.getFinalStatus();
-                            if ("FINISHED".equals(state)) {
-                                if ("UNDEFINED".equals(finalStatus)) {
-                                    state = "RUNNING";
-                                } else {
-                                    state = finalStatus;
-                                }
-                            }
-                            updateExecStatusFunc.apply(execId, state);
+                        if (!tag.startsWith(MapleConstants.TAG_ID_PREFIX)) {
+                            continue;
                         }
+                        String execIdStr = tag.substring(MapleConstants.TAG_ID_PREFIX_LEN);
+                        if (StringUtils.isBlank(execIdStr) || !StringUtils.isNumeric(execIdStr)) {
+                            break;
+                        }
+                        Integer execId = Integer.getInteger(execIdStr);
+                        /*
+                         * NEW - 应用程序已创建但尚未提交。
+                         * NEW_SAVING - 应用程序新建完毕，正在保存到资源管理器（ResourceManager）。
+                         * SUBMITTED - 应用程序已提交，等待调度。
+                         * ACCEPTED - 应用程序已被资源管理器接受，正在等待资源分配。
+                         * RUNNING - 应用程序正在运行中。
+                         * FINISHED - 应用程序已经完成，这是一个最终状态。
+                         * FAILED - 应用程序运行失败，这是一个最终状态。
+                         * KILLED - 应用程序被终止或杀死，这是一个最终状态。
+                         */
+                        String state = app.getState();
+                        /*
+                         * SUCCEEDED - 应用程序成功完成了所有任务并按预期退出。
+                         * FAILED - 应用程序未能正确完成，出现错误或异常导致任务失败。
+                         * KILLED - 应用程序由于某种外部干预（例如用户请求或资源管理策略）而被明确地杀死。
+                         */
+                        String finalStatus = app.getFinalStatus();
+                        if ("FINISHED".equals(state)) {
+                            if ("UNDEFINED".equals(finalStatus)) {
+                                state = "RUNNING";
+                            } else {
+                                state = finalStatus;
+                            }
+                        }
+                        updateExecStatusFunc.apply(execId, state);
                     }
                 }
             } else {
