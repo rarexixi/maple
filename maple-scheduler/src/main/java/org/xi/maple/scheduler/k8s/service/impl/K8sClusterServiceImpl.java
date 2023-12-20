@@ -42,9 +42,13 @@ import org.xi.maple.scheduler.model.YarnCluster;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -305,17 +309,24 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             return new KubernetesClientBuilder().withConfig(config).build();
         }
         if ("file".equals(kubeConfig.getType())) {
-            if (StringUtils.isNotBlank(kubeConfig.getKubeConfigFile())) {
-                Config config = Config.fromKubeconfig(null, null, kubeConfig.getKubeConfigFile());
-                return new KubernetesClientBuilder().withConfig(config).build();
+            String kubeConfigFile = kubeConfig.getKubeConfigFile();
+            if (StringUtils.isBlank(kubeConfigFile)) {
+                throw new MapleClusterNotConfiguredException("K8s 配置文件路径不能为空");
             }
-        } else {
-            Config config = kubeConfig.getConfig();
-            config.setMasterUrl(master);
-            return new KubernetesClientBuilder().withConfig(config).build();
+            Path path = Paths.get(kubeConfigFile);
+            if (Files.notExists(path)) {
+                throw new MapleClusterNotConfiguredException("K8s 配置文件不存在");
+            }
+            try {
+                String content = Files.readString(path);
+                Config config = Config.fromKubeconfig(content);
+                return new KubernetesClientBuilder().withConfig(config).build();
+            } catch (IOException e) {
+                throw new MapleClusterNotConfiguredException("K8s 配置文件读取失败", e);
+            }
         }
-
-        Config config = new ConfigBuilder().withMasterUrl(master).build();
+        Config config = kubeConfig.getConfig();
+        config.setMasterUrl(master);
         return new KubernetesClientBuilder().withConfig(config).build();
     }
 }

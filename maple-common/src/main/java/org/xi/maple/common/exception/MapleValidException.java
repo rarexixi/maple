@@ -3,7 +3,7 @@ package org.xi.maple.common.exception;
 /**
  * @author xishihao
  */
-public class MapleValidException extends RuntimeException {
+public class MapleValidException extends MapleException {
 
     public MapleValidException() {
         super();
