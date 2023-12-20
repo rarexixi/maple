@@ -2,7 +2,7 @@ package org.xi.maple.execution.service.impl;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.xi.maple.common.constant.ClusterTypeConstants;
+import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.exception.MapleClusterNotSupportException;
 import org.xi.maple.execution.builder.EngineExecutor;
 import org.xi.maple.execution.builder.strategy.K8SEngineExecutor;
@@ -21,8 +21,8 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
 
     public EngineExecutionServiceImpl(K8SEngineExecutor k8sEngineBuilder, YarnEngineExecutor yarnEngineBuilder) {
         engineExecutorMap = new HashMap<>();
-        engineExecutorMap.put(ClusterTypeConstants.K8s, k8sEngineBuilder);
-        engineExecutorMap.put(ClusterTypeConstants.YARN, yarnEngineBuilder);
+        engineExecutorMap.put(ClusterCategoryConstants.K8s, k8sEngineBuilder);
+        engineExecutorMap.put(ClusterCategoryConstants.YARN, yarnEngineBuilder);
     }
 
     @Override

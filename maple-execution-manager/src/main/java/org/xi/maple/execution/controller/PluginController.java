@@ -17,7 +17,7 @@ public class PluginController {
 
     @GetMapping("refresh")
     public ResponseEntity<Void> refreshPlugins() {
-        enginePluginService.refreshPluginConvertors();
+        // enginePluginService.refreshPluginConvertors();
         return ResponseEntity.ok().build();
     }
 }

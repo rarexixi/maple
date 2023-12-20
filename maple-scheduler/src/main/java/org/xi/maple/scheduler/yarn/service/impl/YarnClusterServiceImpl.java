@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.xi.maple.common.constant.ClusterTypeConstants;
+import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
@@ -108,7 +108,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     @Scheduled(fixedDelay = 5000)
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
-        request.setCategory(ClusterTypeConstants.YARN);
+        request.setCategory(ClusterCategoryConstants.YARN);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
         for (ClusterListItemResponse cluster : clusters) {
             String[] masters = cluster.getAddress().split("[,;]");

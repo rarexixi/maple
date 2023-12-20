@@ -6,6 +6,7 @@ import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.builder.model.Spark3EngineExecution;
+import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@ClusterCategory("yarn")
+@ClusterCategory(ClusterCategoryConstants.YARN)
 @EngineCategory(EngineCategoryConstants.SPARK)
 @EngineVersion(value = {"3.3.2"})
 public class Spark3YarnConvertor implements MapleConvertor {

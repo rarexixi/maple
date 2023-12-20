@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
+import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.execution.builder.EngineExecutor;
 import org.xi.maple.execution.builder.spi.EnginePluginService;
@@ -28,7 +29,11 @@ public class YarnEngineExecutor extends EngineExecutor {
 
     public void execute(EngineExecutionDetailResponse execution) {
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
-        MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion());
+        MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {
+            logger.error("Execution[" + execution.getId() + "] starts failed!");
+            updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+        });
+
         List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
         String startFile = null;
         String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));

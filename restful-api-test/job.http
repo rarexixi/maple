@@ -1,5 +1,5 @@
 ###
-PATCH http://{{domain}}/engine-execution/add
+PATCH http://localhost:8100/engine-execution/add
 Content-Type: application/json
 
 {
@@ -21,6 +21,48 @@ Content-Type: application/json
   "configuration": "{}",
   "extInfo": "{}"
 }
+
+###
+
+POST http://localhost:8110/engine-execution/execute
+Content-Type: application/json
+
+{
+    "id": 3,
+    "uniqueId": "3",
+    "execName": "test-xi",
+    "execComment": "测试作业",
+    "contentType": "path",
+    "contentPath": "path",
+    "fromApp": "schedule",
+    "cluster": "hadoop",
+    "clusterQueue": "default",
+    "engineCategory": "spark",
+    "engineVersion": "3.3.2",
+    "priority": 1,
+    "runPriority": 1,
+    "status": "ACCEPTED",
+    "group": "group1",
+    "user": "",
+    "webhooks": "",
+    "startTime": null,
+    "endTime": null,
+    "heartbeatTime": null,
+    "createTime": "2023-11-14 10:58:18",
+    "updateTime": "2023-11-14 10:58:18",
+    "clusterCategory": "YARN",
+    "execContent": null,
+    "configuration": "{}",
+    "extInfo": "{}",
+    "processInfo": null
+}
+
+###
+
+GET http://localhost:8100/engine-execution/detail?id=3
+Content-Type: application/json
+
+
 
 ###
 

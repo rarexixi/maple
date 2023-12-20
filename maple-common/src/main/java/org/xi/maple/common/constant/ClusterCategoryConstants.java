@@ -1,6 +1,6 @@
 package org.xi.maple.common.constant;
 
-public interface ClusterTypeConstants {
+public interface ClusterCategoryConstants {
     String YARN = "YARN";
     String K8s = "K8s";
 }

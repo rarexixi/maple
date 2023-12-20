@@ -53,8 +53,9 @@ public abstract class EngineExecutor implements EngineExecutionService {
      * @return 修改的数据量
      */
     protected Integer updateExecutionStatus(Integer id, String status) {
-        Supplier<Integer> updateStatus = () -> persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, status));
-        return RetryUtils.retry(updateStatus, 3, 1000, String.format("更新状态失败, id: %d, status: %s", id, status));
+        return persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, status));
+        // Supplier<Integer> updateStatus = () -> );
+        // return RetryUtils.retry(updateStatus, 3, 1000, String.format("更新状态失败, id: %d, status: %s", id, status));
     }
 
     protected long getPid(Process process) {

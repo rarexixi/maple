@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.xi.maple.common.constant.ClusterTypeConstants;
+import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
@@ -180,7 +180,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     @Scheduled(fixedDelay = 5000)
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
-        request.setCategory(ClusterTypeConstants.K8s);
+        request.setCategory(ClusterCategoryConstants.K8s);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
         for (ClusterListItemResponse cluster : clusters) {
             KubernetesClient kubernetesClient;

@@ -2,18 +2,11 @@ package org.xi.maple.execution.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.xi.maple.execution.client.fallback.PersistenceClientFallbackFactory;
-import org.xi.maple.persistence.model.request.*;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 
 @FeignClient(value = "maple-persistence-service", fallbackFactory = PersistenceClientFallbackFactory.class)
 public interface PersistenceClient {

@@ -13,11 +13,15 @@ spring:
     date-format: java.text.SimpleDateFormat
 
 plugin: 
-  home: /home/xi/tmp
-  ftl-path: /home/xi/tmp
+  home: ./tmp
+  ftl-path: ./tmp
 
 execution:
-  exec-home: /home/xi/history
+  exec-home: ./history
+
+feign:
+  okhttp:
+    enabled: true
 
 # /actuator/info
 info:

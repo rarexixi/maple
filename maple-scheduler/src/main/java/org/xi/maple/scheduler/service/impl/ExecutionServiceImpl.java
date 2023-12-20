@@ -3,7 +3,7 @@ package org.xi.maple.scheduler.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.xi.maple.common.constant.ClusterTypeConstants;
+import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
@@ -77,9 +77,9 @@ public class ExecutionServiceImpl implements ExecutionService {
     @Override
     public void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback) {
         ClusterQueue cachedQueueInfo = null;
-        if (ClusterTypeConstants.K8s.equals(execution.getClusterCategory())) {
+        if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
             cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getCluster(), execution.getClusterQueue());
-        } else if (ClusterTypeConstants.YARN.equals(execution.getClusterCategory())) {
+        } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
             cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getCluster(), execution.getClusterQueue());
         } else {
             logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
