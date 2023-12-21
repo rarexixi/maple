@@ -3,41 +3,41 @@ package org.xi.maple.scheduler.k8s.service.impl;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
+import org.xi.maple.common.exception.MapleClusterConfigException;
+import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
+import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
+import org.xi.maple.common.exception.MapleK8sException;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.scheduler.k8s.model.K8sClusterQueue;
-import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.K8sResourceType;
 import org.xi.maple.scheduler.constant.MapleConstants;
-import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
-import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
-import org.xi.maple.common.exception.MapleK8sException;
 import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
 import org.xi.maple.scheduler.k8s.MapleResourceEventHandler;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentList;
 import org.xi.maple.scheduler.k8s.flink.eventhandler.FlinkDeploymentEventHandler;
+import org.xi.maple.scheduler.k8s.model.K8sClusterQueue;
 import org.xi.maple.scheduler.k8s.service.K8sClusterService;
 import org.xi.maple.scheduler.k8s.spark.crds.SparkApplication;
 import org.xi.maple.scheduler.k8s.spark.crds.SparkApplicationList;
 import org.xi.maple.scheduler.k8s.spark.eventhandler.SparkApplicationEventHandler;
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueue;
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueueList;
+import org.xi.maple.scheduler.model.ClusterQueue;
 import org.xi.maple.scheduler.model.YarnCluster;
 
 import javax.annotation.PostConstruct;
@@ -173,7 +173,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
                 logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
             }
         }
-        KubernetesClient kubernetesClient = createKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
+        KubernetesClient kubernetesClient = createKubernetesClient(cluster);
         k8sClients.put(cluster.getName(), kubernetesClient);
         refreshExecStatus(clusterName, kubernetesClient);
     }
@@ -191,7 +191,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             if (k8sClients.containsKey(cluster.getName())) {
                 kubernetesClient = k8sClients.get(cluster.getName());
             } else {
-                kubernetesClient = createKubernetesClient(cluster.getAddress(), cluster.getConfiguration());
+                kubernetesClient = createKubernetesClient(cluster);
                 k8sClients.put(cluster.getName(), kubernetesClient);
             }
             refreshExecStatus(cluster.getName(), kubernetesClient);
@@ -292,41 +292,49 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     public static class KubeConfigWithType {
         private String type;
         private String kubeConfigFile;
+        private String kubeConfigContent;
         private Config config;
     }
 
     /**
      * 根据配置的 master 和 configJson 获取 KubernetesClient
      *
-     * @param master     地址
-     * @param configJson 配置
+     * @param cluster 集群配置
      * @return KubernetesClient
      */
-    private KubernetesClient createKubernetesClient(String master, String configJson) {
+    private KubernetesClient createKubernetesClient(ClusterListItemResponse cluster) {
+        Config config = getConfig(cluster);
+        return new KubernetesClientBuilder().withConfig(config).build();
+    }
+
+    private Config getConfig(ClusterListItemResponse cluster) {
+        String name = cluster.getName();
+        String master = cluster.getAddress();
+        String configJson = cluster.getConfiguration();
         KubeConfigWithType kubeConfig = JsonUtils.parseObject(configJson, KubeConfigWithType.class, null);
         if (kubeConfig == null) {
-            Config config = new ConfigBuilder().withMasterUrl(master).build();
-            return new KubernetesClientBuilder().withConfig(config).build();
+            throw new MapleClusterConfigException("K8s 集群配置错误");
         }
         if ("file".equals(kubeConfig.getType())) {
-            String kubeConfigFile = kubeConfig.getKubeConfigFile();
-            if (StringUtils.isBlank(kubeConfigFile)) {
-                throw new MapleClusterNotConfiguredException("K8s 配置文件路径不能为空");
+            if (StringUtils.isBlank(kubeConfig.getKubeConfigContent())) {
+                String kubeConfigFile = kubeConfig.getKubeConfigFile();
+                if (StringUtils.isBlank(kubeConfigFile)) {
+                    throw new MapleClusterConfigException("K8s 配置文件路径不能为空");
+                }
+                Path path = Paths.get(kubeConfigFile);
+                if (Files.notExists(path)) {
+                    throw new MapleClusterConfigException("K8s 配置文件不存在");
+                }
+                try {
+                    return Config.fromKubeconfig(Files.readString(path));
+                } catch (IOException e) {
+                    throw new MapleClusterConfigException("K8s 配置文件读取失败", e);
+                }
             }
-            Path path = Paths.get(kubeConfigFile);
-            if (Files.notExists(path)) {
-                throw new MapleClusterNotConfiguredException("K8s 配置文件不存在");
-            }
-            try {
-                String content = Files.readString(path);
-                Config config = Config.fromKubeconfig(content);
-                return new KubernetesClientBuilder().withConfig(config).build();
-            } catch (IOException e) {
-                throw new MapleClusterNotConfiguredException("K8s 配置文件读取失败", e);
-            }
+            return Config.fromKubeconfig(kubeConfig.getKubeConfigContent());
         }
         Config config = kubeConfig.getConfig();
         config.setMasterUrl(master);
-        return new KubernetesClientBuilder().withConfig(config).build();
+        return config;
     }
 }

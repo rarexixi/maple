@@ -1,6 +1,6 @@
 package org.xi.maple.common.exception;
 
-public class MapleClusterNotConfiguredException extends MapleK8sException {
+public class MapleClusterNotConfiguredException extends MapleException {
     public MapleClusterNotConfiguredException() {
         super();
     }
