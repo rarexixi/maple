@@ -55,9 +55,9 @@
 1. 用户发起引擎执行作业请求
 
 2. 添加作业状态为 SUBMITTED
-   
+
    1. 将作业信息存储到数据库，获取到作业ID
-   
+
    2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
 
 3. scheduler 持续消费 redis 队列，根据作业ID拿到执行详细信息
@@ -66,11 +66,19 @@
 
 5. execution-manager 根据引擎的类型，加载对应插件，获取到执行命令生成对象（包括模板地址，输出文件地址，模板数据对象）
 
-6. execution-manager 根据执行命令生成对象，生成对应的脚本，并启动
+6. execution-manager 根据执行命令生成对象，
+
+   1. YARN 生成对应的脚本，并启动
+
+   2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
 
 如果启动失败，由 execution-manager 将作业状态更新为 STARTED_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
 
-由引擎自己回写状态，并在任务执行完成前定时上报心跳
+引擎启动后自己回写状态，同时由 scheduler 监控状态
+
+   1. YARN 类型的任务由 scheduler 定时获取结束的任务，修改作业状态为对应的结束状态
+
+   2. K8s 类型的任务由 scheduler 通过 informer list-watch 机制，实时修改作业状态
 
 启动完成后修改状态为 RUNNING
 
@@ -78,23 +86,4 @@
 
 运行失败后，修改状态为 FAILED
 
-调用 execution-manager kill 引擎，修改状态为 KILLED
-
-scheduler 定时监控 RUNNING 中的任务，心跳超时修改状态为 LOST
-
-## 单次任务
-
-需要给定资源配置
-
-调度器持续消费 redis 队列，
-
-**消费任务**
-
-1. 加锁
-2. 判断是否有资源
-   1. 将任务提交到新引擎
-3. 释放锁
-
-**引擎执行**
-
-执行完成后，通过 webhook 通知到调用方
+调用 scheduler kill 引擎，修改状态为 KILLED
