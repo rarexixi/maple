@@ -38,7 +38,6 @@ import org.xi.maple.scheduler.k8s.spark.eventhandler.SparkApplicationEventHandle
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueue;
 import org.xi.maple.scheduler.k8s.volcano.crds.VolcanoQueueList;
 import org.xi.maple.scheduler.model.ClusterQueue;
-import org.xi.maple.scheduler.model.YarnCluster;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
@@ -49,10 +48,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -160,33 +156,31 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         return k8sClients.get(clusterName);
     }
 
-    private List<YarnCluster> getClusters() {
-        return new ArrayList<>(0);
-    }
-
+    /**
+     * 强制刷新集群配置
+     *
+     * @param clusterName 集群名称
+     */
+    @Override
     public void refreshClusterConfig(String clusterName) {
         ClusterDetailResponse cluster = client.getByName(clusterName);
-        if (k8sClients.containsKey(clusterName)) {
-            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
-                kubernetesClient.informers().stopAllRegisteredInformers();
-            } catch (Throwable t) {
-                logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
-            }
-        }
+        removeK8sClient(clusterName);
         KubernetesClient kubernetesClient = createKubernetesClient(cluster);
         k8sClients.put(cluster.getName(), kubernetesClient);
         refreshExecStatus(clusterName, kubernetesClient);
     }
 
     /**
-     * 刷新引擎执行任务状态
+     * 刷新 K8s 集群配置，不会重启已有集群，如果已有集群有变更，需要使用强制刷新
      */
     @Scheduled(fixedDelay = 5000)
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
         request.setCategory(ClusterCategoryConstants.K8s);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
+        final Set<String> clusterNames = new HashSet<>(clusters.size());
         for (ClusterListItemResponse cluster : clusters) {
+            clusterNames.add(cluster.getName());
             KubernetesClient kubernetesClient;
             if (k8sClients.containsKey(cluster.getName())) {
                 kubernetesClient = k8sClients.get(cluster.getName());
@@ -195,6 +189,11 @@ public class K8sClusterServiceImpl implements K8sClusterService {
                 k8sClients.put(cluster.getName(), kubernetesClient);
             }
             refreshExecStatus(cluster.getName(), kubernetesClient);
+        }
+        for (String clusterName: k8sClients.keySet()) {
+            if (!clusterNames.contains(clusterName)) {
+                removeK8sClient(clusterName);
+            }
         }
     }
 
@@ -271,16 +270,23 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     }
 
-    private void close() {
-        for (KubernetesClient kubernetesClient : k8sClients.values()) {
-            kubernetesClient.close();
-            kubernetesClient.informers().stopAllRegisteredInformers();
+    private void removeK8sClient(String clusterName) {
+        if (k8sClients.containsKey(clusterName)) {
+            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
+                kubernetesClient.informers().stopAllRegisteredInformers();
+            } catch (Throwable t) {
+                logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
+            }
         }
     }
 
     @PostConstruct
     public void run() throws Exception {
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            for (String clusterName : k8sClients.keySet()) {
+                removeK8sClient(clusterName);
+            }
+        }));
     }
 
     @Override

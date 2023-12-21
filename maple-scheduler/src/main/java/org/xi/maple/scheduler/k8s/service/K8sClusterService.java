@@ -58,4 +58,11 @@ public interface K8sClusterService extends ClusterQueueService {
      * @return 删除结果
      */
     List<StatusDetails> deleteEngine(String clusterName, String namespace, String type, String name);
+
+    /**
+     * 强制刷新集群配置
+     *
+     * @param clusterName 集群名称
+     */
+    void refreshClusterConfig(String clusterName);
 }
