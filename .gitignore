@@ -6,6 +6,8 @@ target/
 
 ### out ###
 out/
+tmp/
+history/
 
 ### STS ###
 .apt_generated
