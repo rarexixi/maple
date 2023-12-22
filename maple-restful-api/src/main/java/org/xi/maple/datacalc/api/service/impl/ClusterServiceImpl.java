@@ -10,6 +10,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.datacalc.api.service.ClusterService;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public int refresh() {
-        List<InstanceInfo> instances = eurekaClient.getInstancesByVipAddress("maple-scheduler", false);
+        List<InstanceInfo> instances = eurekaClient.getInstancesByVipAddress(MapleServiceName.SCHEDULER_SERVICE, false);
         for (InstanceInfo instance : instances) {
             String url = instance.getHomePageUrl() + "/cluster/refresh";
         }

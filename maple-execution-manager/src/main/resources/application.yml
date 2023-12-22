@@ -8,7 +8,7 @@ server:
 
 spring:
   application:
-    name: maple-execution-manager-service
+    name: maple-execution-manager
   jackson:
     date-format: java.text.SimpleDateFormat
 

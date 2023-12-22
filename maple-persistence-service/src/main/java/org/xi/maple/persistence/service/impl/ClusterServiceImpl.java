@@ -1,6 +1,8 @@
 package org.xi.maple.persistence.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
+import io.reactivex.rxjava3.core.Single;
+import org.redisson.api.RTopicRx;
+import org.redisson.api.RedissonRxClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import org.xi.maple.persistence.persistence.entity.ClusterEntity;
 import org.xi.maple.persistence.persistence.entity.ClusterEntityExt;
 import org.xi.maple.persistence.persistence.mapper.ClusterMapper;
 import org.xi.maple.persistence.service.ClusterService;
+import org.xi.maple.redis.model.ClusterMessage;
 
 import java.util.List;
 
@@ -30,10 +33,12 @@ import java.util.List;
 public class ClusterServiceImpl implements ClusterService {
 
     final ClusterMapper clusterMapper;
+    final RTopicRx topic;
 
     @Autowired
-    public ClusterServiceImpl(ClusterMapper clusterMapper) {
+    public ClusterServiceImpl(ClusterMapper clusterMapper, RedissonRxClient redissonRxClient) {
         this.clusterMapper = clusterMapper;
+        this.topic = redissonRxClient.getTopic(ClusterMessage.CLUSTER_CHANNEL);
     }
 
     /**
@@ -48,6 +53,8 @@ public class ClusterServiceImpl implements ClusterService {
     public ClusterDetailResponse add(ClusterAddRequest addRequest) {
         ClusterEntity entity = ObjectUtils.copy(addRequest, ClusterEntity.class);
         clusterMapper.insert(entity);
+        Single<Long> publish = topic.publish(ClusterMessage.Type.ADD.getMessage(addRequest.getName()));
+        publish.subscribe();
         return getByName(entity.getName());
     }
 
@@ -61,7 +68,10 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     @Transactional
     public int delete(ClusterPatchRequest patchRequest) {
-        return clusterMapper.deleteByPk(patchRequest.getName());
+        int count = clusterMapper.deleteByPk(patchRequest.getName());
+        Single<Long> publish = topic.publish(ClusterMessage.Type.DELETE.getMessage(patchRequest.getName()));
+        publish.subscribe();
+        return count;
     }
 
     /**
@@ -76,7 +86,10 @@ public class ClusterServiceImpl implements ClusterService {
     public int disable(ClusterPatchRequest patchRequest) {
         ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
         entity.setDeleted(DeletedConstant.INVALID);
-        return clusterMapper.updateByPk(entity, patchRequest.getName());
+        int count = clusterMapper.updateByPk(entity, patchRequest.getName());
+        Single<Long> publish = topic.publish(ClusterMessage.Type.DELETE.getMessage(patchRequest.getName()));
+        publish.subscribe();
+        return count;
     }
 
     /**
@@ -91,29 +104,27 @@ public class ClusterServiceImpl implements ClusterService {
     public int enable(ClusterPatchRequest patchRequest) {
         ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
         entity.setDeleted(DeletedConstant.VALID);
-        return clusterMapper.updateByPk(entity, patchRequest.getName());
+        int count = clusterMapper.updateByPk(entity, patchRequest.getName());
+        Single<Long> publish = topic.publish(ClusterMessage.Type.ADD.getMessage(patchRequest.getName()));
+        publish.subscribe();
+        return count;
     }
 
     /**
      * 根据集群名称更新集群
      *
      * @param saveRequest 保存集群请求实体
-     * @param name 集群名称
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest, String name) {
+    public ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest) {
         ClusterEntity entity = ObjectUtils.copy(saveRequest, ClusterEntity.class);
-        clusterMapper.updateByPk(entity, name);
-        ClusterDetailResponse result;
-        if (StringUtils.isBlank(saveRequest.getName())) {
-            result = getByName(name);
-        } else {
-            result = getByName(saveRequest.getName());
-        }
-        return result;
+        clusterMapper.updateByPk(entity, saveRequest.getName());
+        Single<Long> publish = topic.publish(ClusterMessage.Type.UPDATE.getMessage(saveRequest.getName()));
+        publish.subscribe();
+        return getByName(saveRequest.getName());
     }
 
     /**

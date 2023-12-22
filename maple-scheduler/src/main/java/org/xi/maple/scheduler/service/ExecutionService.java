@@ -3,15 +3,15 @@ package org.xi.maple.scheduler.service;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-import org.xi.maple.scheduler.model.ClusterQueue;
+import org.xi.maple.redis.model.ClusterMessage;
 
 import java.util.List;
 
 public interface ExecutionService {
 
     List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest request);
-    EngineExecutionDetailResponse getExecutionById(int execId);
 
+    EngineExecutionDetailResponse getExecutionById(int execId);
 
     void updateExecutionStatus(int execId, String status);
 
@@ -20,4 +20,6 @@ public interface ExecutionService {
     void submitExecution(int execId);
 
     void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback);
+
+    void refreshCluster(ClusterMessage clusterMessage);
 }

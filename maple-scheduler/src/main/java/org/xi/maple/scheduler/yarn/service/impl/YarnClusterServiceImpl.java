@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
+import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.constant.MapleConstants;
@@ -190,5 +191,20 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     @Override
     public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
         return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
+    }
+
+    @Override
+    public void removeClusterConfig(String clusterName) {
+
+    }
+
+    @Override
+    public void addClusterConfig(ClusterDetailResponse cluster) {
+
+    }
+
+    @Override
+    public void refreshAllClusterConfig() {
+
     }
 }

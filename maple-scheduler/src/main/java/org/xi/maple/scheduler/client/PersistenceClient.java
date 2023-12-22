@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
@@ -17,7 +18,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@FeignClient(value = "maple-persistence-service", fallbackFactory = PersistenceClientFallbackFactory.class)
+@FeignClient(value = MapleServiceName.PERSISTENCE_SERVICE, fallbackFactory = PersistenceClientFallbackFactory.class)
 public interface PersistenceClient {
 
     // region engine-execution
@@ -55,7 +56,7 @@ public interface PersistenceClient {
     // region cluster
 
     @GetMapping("/cluster/detail")
-    ClusterDetailResponse getByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);
+    ClusterDetailResponse getClusterByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);
 
     @GetMapping("/cluster/list")
     List<ClusterListItemResponse> getClusterList(@SpringQueryMap ClusterQueryRequest queryRequest);

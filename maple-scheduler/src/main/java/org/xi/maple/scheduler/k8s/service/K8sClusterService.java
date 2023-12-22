@@ -3,14 +3,14 @@ package org.xi.maple.scheduler.k8s.service;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import org.springframework.web.multipart.MultipartFile;
-import org.xi.maple.scheduler.service.ClusterQueueService;
+import org.xi.maple.scheduler.service.ClusterService;
 
 import java.util.List;
 
 /**
  * @author xishihao
  */
-public interface K8sClusterService extends ClusterQueueService {
+public interface K8sClusterService extends ClusterService {
 
     /**
      * 部署引擎到K8s集群
@@ -58,11 +58,4 @@ public interface K8sClusterService extends ClusterQueueService {
      * @return 删除结果
      */
     List<StatusDetails> deleteEngine(String clusterName, String namespace, String type, String name);
-
-    /**
-     * 强制刷新集群配置
-     *
-     * @param clusterName 集群名称
-     */
-    void refreshClusterConfig(String clusterName);
 }

@@ -156,18 +156,27 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         return k8sClients.get(clusterName);
     }
 
-    /**
-     * 强制刷新集群配置
-     *
-     * @param clusterName 集群名称
-     */
     @Override
-    public void refreshClusterConfig(String clusterName) {
-        ClusterDetailResponse cluster = client.getByName(clusterName);
-        removeK8sClient(clusterName);
+    public void removeClusterConfig(String clusterName) {
+        if (k8sClients.containsKey(clusterName)) {
+            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
+                kubernetesClient.informers().stopAllRegisteredInformers();
+            } catch (Throwable t) {
+                logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
+            }
+        }
+    }
+
+    @Override
+    public void addClusterConfig(ClusterDetailResponse cluster) {
         KubernetesClient kubernetesClient = createKubernetesClient(cluster);
         k8sClients.put(cluster.getName(), kubernetesClient);
-        refreshExecStatus(clusterName, kubernetesClient);
+        refreshExecStatus(cluster.getName(), kubernetesClient);
+    }
+
+    @Override
+    public void refreshAllClusterConfig() {
+
     }
 
     /**
@@ -190,9 +199,9 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             }
             refreshExecStatus(cluster.getName(), kubernetesClient);
         }
-        for (String clusterName: k8sClients.keySet()) {
+        for (String clusterName : k8sClients.keySet()) {
             if (!clusterNames.contains(clusterName)) {
-                removeK8sClient(clusterName);
+                removeClusterConfig(clusterName);
             }
         }
     }
@@ -270,21 +279,11 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     }
 
-    private void removeK8sClient(String clusterName) {
-        if (k8sClients.containsKey(clusterName)) {
-            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
-                kubernetesClient.informers().stopAllRegisteredInformers();
-            } catch (Throwable t) {
-                logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
-            }
-        }
-    }
-
     @PostConstruct
     public void run() throws Exception {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             for (String clusterName : k8sClients.keySet()) {
-                removeK8sClient(clusterName);
+                removeClusterConfig(clusterName);
             }
         }));
     }

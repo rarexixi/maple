@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
+import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.redis.model.ClusterMessage;
 import org.xi.maple.scheduler.client.ExecutionManagerClient;
 import org.xi.maple.scheduler.client.PersistenceClient;
 import org.xi.maple.scheduler.function.UpdateExecStatusFunc;
@@ -95,5 +97,29 @@ public class ExecutionServiceImpl implements ExecutionService {
             logger.info("submit execution: {}", execution);
             executionManagerClient.execute(execution);
         }
+    }
+
+    @Override
+    public void refreshCluster(ClusterMessage clusterMessage) {
+        String clusterName = clusterMessage.getClusterName();
+        if (ClusterMessage.Type.DELETE == clusterMessage.getType()) {
+            k8sClusterService.removeClusterConfig(clusterName);
+            yarnClusterService.removeClusterConfig(clusterName);
+        } else {
+             ClusterDetailResponse cluster = persistenceClient.getClusterByName(clusterName);
+             if (ClusterCategoryConstants.K8s.equals(cluster.getCategory())) {
+                 if (ClusterMessage.Type.UPDATE == clusterMessage.getType()) {
+                     k8sClusterService.removeClusterConfig(clusterName);
+                 }
+                 k8sClusterService.addClusterConfig(cluster);
+             } else if (ClusterCategoryConstants.YARN.equals(cluster.getCategory())) {
+                 if (ClusterMessage.Type.UPDATE == clusterMessage.getType()) {
+                     yarnClusterService.removeClusterConfig(clusterName);
+                 }
+                 yarnClusterService.addClusterConfig(cluster);
+             } else {
+                 logger.error("不支持的集群类型，cluster: {}, category: {}", clusterName, cluster.getCategory());
+             }
+         }
     }
 }

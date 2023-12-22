@@ -1,8 +1,10 @@
 package org.xi.maple.scheduler;
 
+import io.reactivex.rxjava3.core.Single;
 import org.redisson.api.RDeque;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.redisson.api.RedissonRxClient;
 import org.redisson.codec.JsonJacksonCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.redis.model.ClusterMessage;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
 import org.xi.maple.scheduler.service.ExecutionService;
@@ -35,6 +38,8 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     final RedissonClient redissonClient;
 
+    final RedissonRxClient redissonRxClient;
+
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     final ThreadPoolTaskScheduler threadPoolTaskScheduler;
@@ -43,10 +48,11 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
-    public ScheduledExecutions(RedissonClient redissonClient,
+    public ScheduledExecutions(RedissonClient redissonClient, RedissonRxClient redissonRxClient,
                                ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                ExecutionService executionService) {
         this.redissonClient = redissonClient;
+        this.redissonRxClient = redissonRxClient;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.executionService = executionService;
@@ -122,6 +128,13 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Runtime.getRuntime().addShutdownHook(new Thread(this::clearScheduling));
+        Single<Integer> test = redissonRxClient.getTopic(ClusterMessage.CLUSTER_CHANNEL).addListener(String.class, (channel, msg) -> {
+            logger.info("收到集群消息: {}", msg);
+            executionService.refreshCluster(ClusterMessage.getClusterMessage(msg));
+        });
+        test.subscribe();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            clearScheduling();
+        }));
     }
 }

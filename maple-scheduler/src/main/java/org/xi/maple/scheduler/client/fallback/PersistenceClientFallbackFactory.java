@@ -63,7 +63,7 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
             }
 
             @Override
-            public ClusterDetailResponse getByName(String name) {
+            public ClusterDetailResponse getClusterByName(String name) {
                 return null;
             }
 

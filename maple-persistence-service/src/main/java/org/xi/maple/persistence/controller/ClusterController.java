@@ -56,10 +56,9 @@ public class ClusterController {
 
     @PatchMapping("/update")
     public ResponseEntity<ClusterDetailResponse> updateByName(
-            @Validated @RequestBody @SetFieldTypes(types = {"update"}) ClusterSaveRequest cluster,
-            @RequestParam("name") @NotBlank(message = "name(集群名称)不能为空") String name
+            @Validated @RequestBody @SetFieldTypes(types = {"update"}) ClusterSaveRequest cluster
     ) {
-        ClusterDetailResponse detail = clusterService.updateByName(cluster, name);
+        ClusterDetailResponse detail = clusterService.updateByName(cluster);
         return ResponseEntity.ok(detail);
     }
 

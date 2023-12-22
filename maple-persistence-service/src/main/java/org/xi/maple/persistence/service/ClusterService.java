@@ -56,11 +56,10 @@ public interface ClusterService {
      * 根据集群名称更新集群
      *
      * @param saveRequest 保存集群请求实体
-     * @param name 集群名称
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest, String name);
+    ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest);
 
     /**
      * 根据集群名称获取集群详情
