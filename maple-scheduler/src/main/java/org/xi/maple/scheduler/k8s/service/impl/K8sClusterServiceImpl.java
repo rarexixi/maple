@@ -6,7 +6,6 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,7 @@ import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeployment;
 import org.xi.maple.scheduler.k8s.flink.crds.FlinkDeploymentList;
 import org.xi.maple.scheduler.k8s.flink.eventhandler.FlinkDeploymentEventHandler;
 import org.xi.maple.scheduler.k8s.model.K8sClusterQueue;
+import org.xi.maple.scheduler.k8s.model.KubeConfigWithType;
 import org.xi.maple.scheduler.k8s.service.K8sClusterService;
 import org.xi.maple.scheduler.k8s.spark.crds.SparkApplication;
 import org.xi.maple.scheduler.k8s.spark.crds.SparkApplicationList;
@@ -146,12 +146,12 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         } catch (Throwable t) {
             throw new MapleK8sException(t);
         }
-        throw new MapleEngineTypeNotSupportException("engine type not support: " + type);
+        throw new MapleEngineTypeNotSupportException("不支持的引擎类型: " + type);
     }
 
     private KubernetesClient getKubernetesClient(String clusterName) {
         if (!k8sClients.containsKey(clusterName)) {
-            throw new MapleClusterNotConfiguredException("Cluster [" + clusterName + "] not configured");
+            throw new MapleClusterNotConfiguredException("K8s 集群 [" + clusterName + "] 没有被配置");
         }
         return k8sClients.get(clusterName);
     }
@@ -162,7 +162,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
                 kubernetesClient.informers().stopAllRegisteredInformers();
             } catch (Throwable t) {
-                logger.error("Close kubernetes client error, clusterName: " + clusterName, t);
+                logger.error("关闭 K8s 客户端错误, name: {}", clusterName, t);
             }
         }
     }
@@ -235,7 +235,8 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     /**
      * 刷新引擎执行任务状态
      *
-     * @param kubernetesClient
+     * @param clusterName      集群名称
+     * @param kubernetesClient K8s client
      */
     public void refreshExecStatus(String clusterName, KubernetesClient kubernetesClient) {
 
@@ -282,8 +283,9 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     @PostConstruct
     public void run() throws Exception {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (String clusterName : k8sClients.keySet()) {
-                removeClusterConfig(clusterName);
+            for (KubernetesClient kubernetesClient : k8sClients.values()) {
+                kubernetesClient.informers().stopAllRegisteredInformers();
+                kubernetesClient.close();
             }
         }));
     }
@@ -293,13 +295,6 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
     }
 
-    @Data
-    public static class KubeConfigWithType {
-        private String type;
-        private String kubeConfigFile;
-        private String kubeConfigContent;
-        private Config config;
-    }
 
     /**
      * 根据配置的 master 和 configJson 获取 KubernetesClient
@@ -318,22 +313,22 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         String configJson = cluster.getConfiguration();
         KubeConfigWithType kubeConfig = JsonUtils.parseObject(configJson, KubeConfigWithType.class, null);
         if (kubeConfig == null) {
-            throw new MapleClusterConfigException("K8s 集群配置错误");
+            throw new MapleClusterConfigException("K8s 集群配置错误, name: " + name);
         }
         if ("file".equals(kubeConfig.getType())) {
             if (StringUtils.isBlank(kubeConfig.getKubeConfigContent())) {
                 String kubeConfigFile = kubeConfig.getKubeConfigFile();
                 if (StringUtils.isBlank(kubeConfigFile)) {
-                    throw new MapleClusterConfigException("K8s 配置文件路径不能为空");
+                    throw new MapleClusterConfigException("K8s 配置文件路径不能为空, name: " + name);
                 }
                 Path path = Paths.get(kubeConfigFile);
                 if (Files.notExists(path)) {
-                    throw new MapleClusterConfigException("K8s 配置文件不存在");
+                    throw new MapleClusterConfigException("K8s 配置文件不存在, name: " + name);
                 }
                 try {
                     return Config.fromKubeconfig(Files.readString(path));
                 } catch (IOException e) {
-                    throw new MapleClusterConfigException("K8s 配置文件读取失败", e);
+                    throw new MapleClusterConfigException("K8s 配置文件读取失败, name: " + name, e);
                 }
             }
             return Config.fromKubeconfig(kubeConfig.getKubeConfigContent());

@@ -20,11 +20,11 @@ public class MapleRedisUtil {
      * 队列标识：cluster + queue + 来源应用 + group + 优先级
      * 例：hadoop_prod-root.default-schedule-maple-1
      *
-     * @param cluster        集群
-     * @param clusterQueue   集群队列
-     * @param fromApp        来源应用
-     * @param group          用户组
-     * @param priority       优先级
+     * @param cluster      集群
+     * @param clusterQueue 集群队列
+     * @param fromApp      来源应用
+     * @param group        用户组
+     * @param priority     优先级
      * @return redis 队列信息
      */
     public static MapleEngineExecutionQueue getEngineExecutionQueue(

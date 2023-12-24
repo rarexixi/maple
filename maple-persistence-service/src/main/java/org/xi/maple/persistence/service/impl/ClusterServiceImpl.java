@@ -1,9 +1,8 @@
 package org.xi.maple.persistence.service.impl;
 
-import io.reactivex.rxjava3.core.Single;
-import org.redisson.api.RTopicRx;
-import org.redisson.api.RedissonRxClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.xi.maple.common.constant.DeletedConstant;
@@ -32,14 +31,16 @@ import java.util.List;
 @Service("clusterService")
 public class ClusterServiceImpl implements ClusterService {
 
-    final ClusterMapper clusterMapper;
-    final RTopicRx topic;
+    private static final Logger logger = LoggerFactory.getLogger(ClusterServiceImpl.class);
 
-    @Autowired
-    public ClusterServiceImpl(ClusterMapper clusterMapper, RedissonRxClient redissonRxClient) {
+    final ClusterMapper clusterMapper;
+    final RedisTemplate<String, Object> redisTemplate;
+
+    public ClusterServiceImpl(ClusterMapper clusterMapper, RedisTemplate<String, Object> redisTemplate) {
         this.clusterMapper = clusterMapper;
-        this.topic = redissonRxClient.getTopic(ClusterMessage.CLUSTER_CHANNEL);
+        this.redisTemplate = redisTemplate;
     }
+
 
     /**
      * 添加集群
@@ -53,8 +54,7 @@ public class ClusterServiceImpl implements ClusterService {
     public ClusterDetailResponse add(ClusterAddRequest addRequest) {
         ClusterEntity entity = ObjectUtils.copy(addRequest, ClusterEntity.class);
         clusterMapper.insert(entity);
-        Single<Long> publish = topic.publish(ClusterMessage.Type.ADD.getMessage(addRequest.getName()));
-        publish.subscribe();
+        sendRefreshClusterMsg(ClusterMessage.Type.ADD, addRequest.getName());
         return getByName(entity.getName());
     }
 
@@ -69,8 +69,7 @@ public class ClusterServiceImpl implements ClusterService {
     @Transactional
     public int delete(ClusterPatchRequest patchRequest) {
         int count = clusterMapper.deleteByPk(patchRequest.getName());
-        Single<Long> publish = topic.publish(ClusterMessage.Type.DELETE.getMessage(patchRequest.getName()));
-        publish.subscribe();
+        sendRefreshClusterMsg(ClusterMessage.Type.DELETE, patchRequest.getName());
         return count;
     }
 
@@ -87,8 +86,7 @@ public class ClusterServiceImpl implements ClusterService {
         ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
         entity.setDeleted(DeletedConstant.INVALID);
         int count = clusterMapper.updateByPk(entity, patchRequest.getName());
-        Single<Long> publish = topic.publish(ClusterMessage.Type.DELETE.getMessage(patchRequest.getName()));
-        publish.subscribe();
+        sendRefreshClusterMsg(ClusterMessage.Type.DELETE, patchRequest.getName());
         return count;
     }
 
@@ -105,8 +103,7 @@ public class ClusterServiceImpl implements ClusterService {
         ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
         entity.setDeleted(DeletedConstant.VALID);
         int count = clusterMapper.updateByPk(entity, patchRequest.getName());
-        Single<Long> publish = topic.publish(ClusterMessage.Type.ADD.getMessage(patchRequest.getName()));
-        publish.subscribe();
+        sendRefreshClusterMsg(ClusterMessage.Type.ADD, patchRequest.getName());
         return count;
     }
 
@@ -122,8 +119,7 @@ public class ClusterServiceImpl implements ClusterService {
     public ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest) {
         ClusterEntity entity = ObjectUtils.copy(saveRequest, ClusterEntity.class);
         clusterMapper.updateByPk(entity, saveRequest.getName());
-        Single<Long> publish = topic.publish(ClusterMessage.Type.UPDATE.getMessage(saveRequest.getName()));
-        publish.subscribe();
+        sendRefreshClusterMsg(ClusterMessage.Type.UPDATE, saveRequest.getName());
         return getByName(saveRequest.getName());
     }
 
@@ -156,5 +152,13 @@ public class ClusterServiceImpl implements ClusterService {
         ClusterSelectCondition condition = ObjectUtils.copy(queryRequest, ClusterSelectCondition.class);
         List<ClusterEntity> list = clusterMapper.select(condition);
         return ObjectUtils.copy(list, ClusterListItemResponse.class);
+    }
+
+    private void sendRefreshClusterMsg(ClusterMessage.Type type, String clusterName) {
+        try {
+            redisTemplate.convertAndSend(ClusterMessage.CLUSTER_CHANNEL, new ClusterMessage(type, clusterName));
+        } catch (Throwable t) {
+            logger.error("发送集群刷新消息失败, cluster: {}, type: {}", clusterName, type, t);
+        }
     }
 }

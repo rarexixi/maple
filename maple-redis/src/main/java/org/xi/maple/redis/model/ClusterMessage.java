@@ -14,23 +14,6 @@ public class ClusterMessage {
     private Type type;
     private String clusterName;
 
-    public static ClusterMessage getClusterMessage(String message) {
-        String[] msg = message.split(Type.DELIMITER);
-        if (msg.length != 2) {
-            throw new IllegalArgumentException("Invalid message: " + message);
-        }
-        if (Type.ADD.value.equals(msg[0])) {
-            return new ClusterMessage(Type.ADD, msg[1]);
-        }
-        if (Type.UPDATE.value.equals(msg[0])) {
-            return new ClusterMessage(Type.ADD, msg[1]);
-        }
-        if (Type.DELETE.value.equals(msg[0])) {
-            return new ClusterMessage(Type.ADD, msg[1]);
-        }
-        throw new IllegalArgumentException("Unknown message type: " + msg[0]);
-    }
-
     public enum Type {
         ADD("add"),
         UPDATE("updage"),
