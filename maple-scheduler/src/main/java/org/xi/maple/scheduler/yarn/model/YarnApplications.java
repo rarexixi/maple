@@ -10,20 +10,6 @@ public class YarnApplications {
 
     @Data
     public static class Apps {
-        private List<App> app;
-
-        @Data
-        public static class App {
-            private String id;
-            private String user;
-            private String name;
-            private String queue;
-            private String state;
-            private String finalStatus;
-            private Double progress;
-            private String applicationType;
-            private String applicationTags;
-            private String logAggregationStatus;
-        }
+        private List<YarnApp> app;
     }
 }

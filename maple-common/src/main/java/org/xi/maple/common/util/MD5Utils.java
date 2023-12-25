@@ -1,16 +1,15 @@
 package org.xi.maple.common.util;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class MD5Utils {
 
-    private static final String defaultEncoding = "UTF-8";
-
     public static String getMd5(String str) {
-        return getMd5(str, defaultEncoding);
+        return getMd5(str, StandardCharsets.UTF_8.name());
     }
 
     public static String getMd5(String data, String encoding)  {

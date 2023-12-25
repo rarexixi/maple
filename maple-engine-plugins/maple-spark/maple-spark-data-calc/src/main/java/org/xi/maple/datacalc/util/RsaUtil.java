@@ -7,6 +7,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -22,16 +24,19 @@ public class RsaUtil {
         this.privateKey = privateKey;
     }
 
-    private static final String DEFAULT_CHARSET = "UTF-8";
     private static final String ALGORITHM = "RSA";
     private String publicKey;
     private String privateKey;
 
     public String encrypt(String text) throws NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException, InvalidKeySpecException {
-        return encrypt(text, DEFAULT_CHARSET);
+        return encrypt(text, StandardCharsets.UTF_8);
     }
 
-    public String encrypt(String text, String charset) throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public String encrypt(String text, String charset) throws NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException, InvalidKeySpecException {
+        return encrypt(text, Charset.forName(charset));
+    }
+
+    public String encrypt(String text, Charset charset) throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         byte[] decoded = Base64.decodeBase64(publicKey);
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(decoded));
         Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -42,10 +47,14 @@ public class RsaUtil {
     }
 
     public String decrypt(String text) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
-        return decrypt(text, DEFAULT_CHARSET);
+        return decrypt(text, StandardCharsets.UTF_8);
     }
 
-    public String decrypt(String text, String charset) throws NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException, InvalidKeySpecException {
+    public String decrypt(String text, String charset) throws NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException {
+        return decrypt(text, Charset.forName(charset));
+    }
+
+    public String decrypt(String text, Charset charset) throws NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException, InvalidKeySpecException {
         byte[] decoded = Base64.decodeBase64(privateKey);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(decoded));
         Cipher cipher = Cipher.getInstance(ALGORITHM);

@@ -17,6 +17,7 @@ import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,7 +108,7 @@ public abstract class EngineExecutor implements EngineExecutionService {
 
         Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_31);
         cfg.setDirectoryForTemplateLoading(new File(pluginHome));
-        cfg.setDefaultEncoding("UTF-8");
+        cfg.setDefaultEncoding(StandardCharsets.UTF_8.name());
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         try (StringWriter sw = new StringWriter(4096)) {

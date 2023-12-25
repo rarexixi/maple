@@ -2,6 +2,7 @@ package org.xi.maple.common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xi.maple.common.function.Action;
 
 /**
  * @author xishihao
@@ -10,10 +11,6 @@ public class ActionUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionUtils.class);
 
-    @FunctionalInterface
-    public interface Action {
-        void run() throws Throwable;
-    }
 
     /**
      * 执行操作，不抛出异常
