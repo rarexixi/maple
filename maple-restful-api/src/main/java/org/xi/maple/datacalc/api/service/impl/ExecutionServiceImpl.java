@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.util.SecurityUtils;
@@ -21,6 +22,8 @@ import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.redis.util.MapleRedisUtil;
+
+import java.util.Map;
 
 /**
  * @author xishihao
@@ -93,6 +96,20 @@ public class ExecutionServiceImpl implements ExecutionService {
         final Integer id = persistenceClient.addExecution(submitReq);
         schedulerClient.submitExecution(id);
         return id;
+    }
+
+    @Override
+    public Object kill(Integer id, Long timestamp, String secret) {
+        EngineExecutionDetailResponse detail = detail(id);
+        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getUniqueId(), detail.getExecName());
+        return schedulerClient.killExecution(id);
+    }
+
+    @Override
+    public Object stop(Integer id, Long timestamp, String secret, Map<String, ?> cancelParams) {
+        EngineExecutionDetailResponse detail = detail(id);
+        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getUniqueId(), detail.getExecName());
+        return schedulerClient.stopExecution(id, cancelParams);
     }
 
     private void checkSecurity(String fromApp, String secret, Long timestamp, String... fieldValues) {

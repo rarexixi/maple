@@ -1,10 +1,13 @@
 package org.xi.maple.datacalc.api.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.datacalc.api.client.fallback.SchedulerClientFallbackFactory;
+
+import java.util.Map;
 
 @FeignClient(value = MapleServiceName.SCHEDULER_SERVICE, fallbackFactory = SchedulerClientFallbackFactory.class)
 public interface SchedulerClient {
@@ -13,6 +16,12 @@ public interface SchedulerClient {
 
     @PutMapping("exec-now")
     void submitExecution(@RequestParam("execId") int execId);
+
+    @PutMapping("kill/{id}")
+    Object killExecution(@PathVariable("id") Integer id);
+
+    @PutMapping("stop/{id}")
+    Object stopExecution(@PathVariable("id") Integer id, Map<String,?> cancelParams);
 
     // endregion
 }

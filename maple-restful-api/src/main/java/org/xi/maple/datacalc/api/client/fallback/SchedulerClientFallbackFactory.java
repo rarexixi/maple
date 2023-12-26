@@ -8,6 +8,8 @@ import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.util.MapleExceptionUtils;
 import org.xi.maple.datacalc.api.client.SchedulerClient;
 
+import java.util.Map;
+
 @Component
 public class SchedulerClientFallbackFactory implements FallbackFactory<SchedulerClient> {
 
@@ -21,6 +23,22 @@ public class SchedulerClientFallbackFactory implements FallbackFactory<Scheduler
                 MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
                     throw new MapleException(feignResponseError.getError().getMsg());
                 });
+            }
+
+            @Override
+            public Object killExecution(Integer id) {
+                MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
+                    throw new MapleException(feignResponseError.getError().getMsg());
+                });
+                return null;
+            }
+
+            @Override
+            public Object stopExecution(Integer id, Map<String, ?> cancelParams) {
+                MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
+                    throw new MapleException(feignResponseError.getError().getMsg());
+                });
+                return null;
             }
         };
     }

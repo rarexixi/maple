@@ -6,20 +6,23 @@ import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.ClusterMessage;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ExecutionService {
+
+    void submitExecution(int execId);
+
+    void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback);
+
+    Object kill(Integer id);
+
+    Object stop(Integer id, Map<String, ?> cancelParams);
 
     List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest request);
 
     EngineExecutionDetailResponse getExecutionById(int execId);
 
     void updateExecutionStatus(int execId, String status);
-
-    void execute(EngineExecutionDetailResponse execution);
-
-    void submitExecution(int execId);
-
-    void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback);
 
     void refreshCluster(ClusterMessage clusterMessage);
 }

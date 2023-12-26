@@ -3,6 +3,8 @@ package org.xi.maple.datacalc.api.service;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
+import java.util.Map;
+
 /**
  * @author xishihao
  */
@@ -43,4 +45,22 @@ public interface ExecutionService {
      * @return 执行记录ID
      */
     Integer submitNow(EngineExecutionAddRequest submitReq, Long timestamp, String secret);
+
+    /**
+     * 杀死执行任务
+     * @param id 执行记录ID
+     * @param timestamp 时间戳
+     * @param secret 加密字符串
+     * @return 执行结果
+     */
+    Object kill(Integer id, Long timestamp, String secret);
+
+    /**
+     * 取消执行任务
+     * @param id 执行记录ID
+     * @param timestamp 时间戳
+     * @param secret 加密字符串
+     * @return 执行结果
+     */
+    Object stop(Integer id, Long timestamp, String secret, Map<String, ?> cancelParams);
 }
