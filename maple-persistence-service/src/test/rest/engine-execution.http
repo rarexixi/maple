@@ -18,7 +18,6 @@ Content-Type: application/json
   "status": "Submitted",
   "group":  "dip",
   "user": "xishihao",
-  "webhooks":  "",
   "execContent": "",
   "configuration":  "{}",
   "extInfo": "{}",

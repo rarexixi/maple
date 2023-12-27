@@ -86,7 +86,7 @@ const columns = [
     { title: '应用名称', dataIndex: 'appName', key: 'appName' },
     { title: '应用访问密钥', dataIndex: 'accessKey', key: 'accessKey' },
     { title: '允许请求的IP', dataIndex: 'legalHosts', key: 'legalHosts' },
-    { title: '回调接口', dataIndex: 'callbackUrls', key: 'callbackUrls' },
+    { title: '回调接口', dataIndex: 'webhooks', key: 'webhooks' },
     { title: '创建人', dataIndex: 'createUser', key: 'createUser' },
     { title: '修改人', dataIndex: 'updateUser', key: 'updateUser' },
     { title: '创建时间', dataIndex: 'createTime', key: 'createTime' },

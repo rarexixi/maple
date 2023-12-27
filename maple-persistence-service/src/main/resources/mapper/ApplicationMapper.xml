@@ -7,7 +7,7 @@
         <result property="appName" column="app_name"/>
         <result property="accessKey" column="access_key"/>
         <result property="legalHosts" column="legal_hosts"/>
-        <result property="callbackUrls" column="callback_urls"/>
+        <result property="webhooks" column="webhooks"/>
         <result property="deleted" column="deleted"/>
         <result property="createUser" column="create_user"/>
         <result property="updateUser" column="update_user"/>
@@ -26,7 +26,7 @@
             <if test="entity.appName != null">`app_name`,</if>
             <if test="entity.accessKey != null">`access_key`,</if>
             <if test="entity.legalHosts != null">`legal_hosts`,</if>
-            <if test="entity.callbackUrls != null">`callback_urls`,</if>
+            <if test="entity.webhooks != null">`webhooks`,</if>
             <if test="entity.deleted != null">`deleted`,</if>
             <if test="entity.createUser != null">`create_user`,</if>
             <if test="entity.updateUser != null">`update_user`,</if>
@@ -37,7 +37,7 @@
             <if test="entity.appName != null">#{entity.appName},</if>
             <if test="entity.accessKey != null">#{entity.accessKey},</if>
             <if test="entity.legalHosts != null">#{entity.legalHosts},</if>
-            <if test="entity.callbackUrls != null">#{entity.callbackUrls},</if>
+            <if test="entity.webhooks != null">#{entity.webhooks},</if>
             <if test="entity.deleted != null">#{entity.deleted},</if>
             <if test="entity.createUser != null">#{entity.createUser},</if>
             <if test="entity.updateUser != null">#{entity.updateUser},</if>
@@ -54,7 +54,7 @@
             `app_name`,
             `access_key`,
             `legal_hosts`,
-            `callback_urls`,
+            `webhooks`,
             `deleted`,
             `create_user`,
             `update_user`,
@@ -67,7 +67,7 @@
             #{item.appName},
             #{item.accessKey},
             #{item.legalHosts},
-            #{item.callbackUrls},
+            #{item.webhooks},
             #{item.deleted},
             #{item.createUser},
             #{item.updateUser},
@@ -98,8 +98,8 @@
             <if test="entity.legalHosts != null">
                 `legal_hosts` = #{entity.legalHosts},
             </if>
-            <if test="entity.callbackUrls != null">
-                `callback_urls` = #{entity.callbackUrls},
+            <if test="entity.webhooks != null">
+                `webhooks` = #{entity.webhooks},
             </if>
             <if test="entity.deleted != null">
                 `deleted` = #{entity.deleted},
@@ -128,7 +128,7 @@
             MT.`app_name`,
             MT.`access_key`,
             MT.`legal_hosts`,
-            MT.`callback_urls`,
+            MT.`webhooks`,
             MT.`deleted`,
             MT.`create_user`,
             MT.`update_user`,
@@ -224,32 +224,6 @@
                     <if test="condition.legalHostsContains != null and condition.legalHostsContains != ''">
                         AND MT.`legal_hosts` LIKE concat('%', #{condition.legalHostsContains}, '%')
                     </if>
-                    <if test="condition.callbackUrls != null and condition.callbackUrls != ''">
-                        AND MT.`callback_urls` = #{condition.callbackUrls}
-                    </if>
-                    <if test="condition.callbackUrlsIn != null and condition.callbackUrlsIn.size() > 0">
-                        AND MT.`callback_urls` IN
-                        <foreach collection="condition.callbackUrlsIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.callbackUrlsNotIn != null and condition.callbackUrlsNotIn.size() > 0">
-                        AND MT.`callback_urls` NOT IN
-                        <foreach collection="condition.callbackUrlsNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.callbackUrlsIsNotEmpty != null and condition.callbackUrlsIsNotEmpty == true">
-                        AND MT.`callback_urls` IS NOT NULL AND `callback_urls` != ''
-                    </if>
-                    <if test="condition.callbackUrlsIsEmpty != null and condition.callbackUrlsIsEmpty == true">
-                        AND (MT.`callback_urls` IS NULL OR MT.`callback_urls` = '')
-                    </if>
-                    <if test="condition.callbackUrlsStartWith != null and condition.callbackUrlsStartWith != ''">
-                        AND MT.`callback_urls` LIKE concat(#{condition.callbackUrlsStartWith}, '%')
-                    </if>
-                    <if test="condition.callbackUrlsEndWith != null and condition.callbackUrlsEndWith != ''">
-                        AND MT.`callback_urls` LIKE concat('%', #{condition.callbackUrlsEndWith})
-                    </if>
-                    <if test="condition.callbackUrlsContains != null and condition.callbackUrlsContains != ''">
-                        AND MT.`callback_urls` LIKE concat('%', #{condition.callbackUrlsContains}, '%')
-                    </if>
                     <if test="condition.deleted != null">
                         AND MT.`deleted` = #{condition.deleted}
                     </if>
@@ -328,7 +302,7 @@
             MT.`app_name`,
             MT.`access_key`,
             MT.`legal_hosts`,
-            MT.`callback_urls`,
+            MT.`webhooks`,
             MT.`deleted`,
             MT.`create_user`,
             MT.`update_user`,

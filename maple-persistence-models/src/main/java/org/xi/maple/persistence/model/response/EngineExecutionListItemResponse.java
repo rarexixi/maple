@@ -89,11 +89,6 @@ public class EngineExecutionListItemResponse implements Serializable {
     private String user;
 
     /**
-     * 回调地址
-     */
-    private String webhooks;
-
-    /**
      * 创建时间
      */
     private LocalDateTime startTime;

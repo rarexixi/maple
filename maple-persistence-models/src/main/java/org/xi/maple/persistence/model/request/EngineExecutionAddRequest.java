@@ -83,11 +83,6 @@ public class EngineExecutionAddRequest extends BaseEntity {
     private String user;
 
     /**
-     * 回调地址
-     */
-    private String webhooks;
-
-    /**
      * 执行内容
      */
     private String execContent;

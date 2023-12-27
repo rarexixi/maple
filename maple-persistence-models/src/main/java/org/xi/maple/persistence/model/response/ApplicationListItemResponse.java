@@ -29,7 +29,7 @@ public class ApplicationListItemResponse implements Serializable {
     /**
      * 回调接口
      */
-    private String callbackUrls;
+    private String webhooks;
 
     /**
      * 是否删除

@@ -18,8 +18,8 @@
                     </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                    <a-form-item ref="callbackUrls" label="回调接口" name="callbackUrls">
-                        <a-input v-model:value.trim="detail.callbackUrls" type="text" />
+                    <a-form-item ref="webhooks" label="回调接口" name="webhooks">
+                        <a-input v-model:value.trim="detail.webhooks" type="text" />
                     </a-form-item>
                 </a-col>
             </a-row>
@@ -70,7 +70,7 @@ export default defineComponent({
             appName: '',
             accessKey: '',
             legalHosts: '',
-            callbackUrls: '',
+            webhooks: '',
         })
         const resetForm = () => {
             formRef.value.resetFields()
@@ -96,7 +96,7 @@ export default defineComponent({
                     detail.appName = response.appName
                     detail.accessKey = response.accessKey
                     detail.legalHosts = response.legalHosts
-                    detail.callbackUrls = response.callbackUrls
+                    detail.webhooks = response.webhooks
                 })
             }
         }

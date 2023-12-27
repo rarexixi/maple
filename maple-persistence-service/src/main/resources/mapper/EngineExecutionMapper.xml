@@ -20,7 +20,6 @@
         <result property="status" column="status"/>
         <result property="group" column="group"/>
         <result property="user" column="user"/>
-        <result property="webhooks" column="webhooks"/>
         <result property="startTime" column="start_time"/>
         <result property="endTime" column="end_time"/>
         <result property="heartbeatTime" column="heartbeat_time"/>
@@ -57,7 +56,6 @@
             <if test="entity.status != null">`status`,</if>
             <if test="entity.group != null">`group`,</if>
             <if test="entity.user != null">`user`,</if>
-            <if test="entity.webhooks != null">`webhooks`,</if>
             <if test="entity.startTime != null">`start_time`,</if>
             <if test="entity.endTime != null">`end_time`,</if>
             <if test="entity.heartbeatTime != null">`heartbeat_time`,</if>
@@ -80,7 +78,6 @@
             <if test="entity.status != null">#{entity.status},</if>
             <if test="entity.group != null">#{entity.group},</if>
             <if test="entity.user != null">#{entity.user},</if>
-            <if test="entity.webhooks != null">#{entity.webhooks},</if>
             <if test="entity.startTime != null">#{entity.startTime},</if>
             <if test="entity.endTime != null">#{entity.endTime},</if>
             <if test="entity.heartbeatTime != null">#{entity.heartbeatTime},</if>
@@ -127,7 +124,6 @@
             `status`,
             `group`,
             `user`,
-            `webhooks`,
             `start_time`,
             `end_time`,
             `heartbeat_time`,
@@ -152,7 +148,6 @@
             #{item.status},
             #{item.group},
             #{item.user},
-            #{item.webhooks},
             #{item.startTime},
             #{item.endTime},
             #{item.heartbeatTime},
@@ -236,7 +231,6 @@
                MT.`status`,
                MT.`group`,
                MT.`user`,
-               MT.`webhooks`,
                MT.`start_time`,
                MT.`end_time`,
                MT.`heartbeat_time`,
@@ -660,32 +654,6 @@
                     <if test="condition.userContains != null and condition.userContains != ''">
                         AND MT.`user` LIKE concat('%', #{condition.userContains}, '%')
                     </if>
-                    <if test="condition.webhooks != null and condition.webhooks != ''">
-                        AND MT.`webhooks` = #{condition.webhooks}
-                    </if>
-                    <if test="condition.webhooksIn != null and condition.webhooksIn.size() > 0">
-                        AND MT.`webhooks` IN
-                        <foreach collection="condition.webhooksIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.webhooksNotIn != null and condition.webhooksNotIn.size() > 0">
-                        AND MT.`webhooks` NOT IN
-                        <foreach collection="condition.webhooksNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.webhooksIsNotEmpty != null and condition.webhooksIsNotEmpty == true">
-                        AND MT.`webhooks` IS NOT NULL AND `webhooks` != ''
-                    </if>
-                    <if test="condition.webhooksIsEmpty != null and condition.webhooksIsEmpty == true">
-                        AND (MT.`webhooks` IS NULL OR MT.`webhooks` = '')
-                    </if>
-                    <if test="condition.webhooksStartWith != null and condition.webhooksStartWith != ''">
-                        AND MT.`webhooks` LIKE concat(#{condition.webhooksStartWith}, '%')
-                    </if>
-                    <if test="condition.webhooksEndWith != null and condition.webhooksEndWith != ''">
-                        AND MT.`webhooks` LIKE concat('%', #{condition.webhooksEndWith})
-                    </if>
-                    <if test="condition.webhooksContains != null and condition.webhooksContains != ''">
-                        AND MT.`webhooks` LIKE concat('%', #{condition.webhooksContains}, '%')
-                    </if>
                     <if test="condition.startTimeMin != null">
                         <![CDATA[
                         AND MT.`start_time` >= #{condition.startTimeMin}
@@ -780,7 +748,6 @@
             MT.`status`,
             MT.`group`,
             MT.`user`,
-            MT.`webhooks`,
             MT.`start_time`,
             MT.`end_time`,
             MT.`heartbeat_time`,

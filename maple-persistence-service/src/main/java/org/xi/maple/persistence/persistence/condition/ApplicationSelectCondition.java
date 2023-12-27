@@ -143,46 +143,6 @@ public class ApplicationSelectCondition extends SelectCondition {
     private String legalHostsContains;
 
     /**
-     * 回调接口
-     */
-    private String callbackUrls;
-
-    /**
-     * 回调接口列表
-     */
-    private Collection<String> callbackUrlsIn;
-
-    /**
-     * 排除的回调接口列表
-     */
-    private Collection<String> callbackUrlsNotIn;
-
-    /**
-     * 回调接口不为空
-     */
-    private Boolean callbackUrlsIsNotEmpty;
-
-    /**
-     * 回调接口为空
-     */
-    private Boolean callbackUrlsIsEmpty;
-
-    /**
-     * 回调接口开始
-     */
-    private String callbackUrlsStartWith;
-
-    /**
-     * 回调接口结束
-     */
-    private String callbackUrlsEndWith;
-
-    /**
-     * 回调接口包含
-     */
-    private String callbackUrlsContains;
-
-    /**
      * 是否删除
      */
     private Integer deleted;

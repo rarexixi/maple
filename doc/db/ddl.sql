@@ -82,16 +82,16 @@ create table `maple`.`maple_datasource`
 drop table if exists `maple`.`maple_application`;
 create table `maple`.`maple_application`
 (
-    `app_name`      varchar(32)                             not null comment '应用名称',
-    `access_key`    varchar(256)  default ''                not null comment '应用访问密钥',
-    `legal_hosts`   varchar(1500) default '*'               not null comment '允许请求的IP',
-    `callback_urls` varchar(2048) default '{}'              not null comment '回调接口',
+    `app_name`    varchar(32)                             not null comment '应用名称',
+    `access_key`  varchar(256)  default ''                not null comment '应用访问密钥',
+    `legal_hosts` varchar(1500) default '*'               not null comment '允许请求的IP',
+    `webhooks`    varchar(2048) default '{}'              not null comment '回调接口',
 
-    `deleted`       tinyint       default 0                 not null comment '是否删除',
-    `create_user`   int           default 0                 not null comment '创建人',
-    `update_user`   int           default 0                 not null comment '修改人',
-    `create_time`   datetime      default current_timestamp not null comment '创建时间',
-    `update_time`   datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
+    `deleted`     tinyint       default 0                 not null comment '是否删除',
+    `create_user` int           default 0                 not null comment '创建人',
+    `update_user` int           default 0                 not null comment '修改人',
+    `create_time` datetime      default current_timestamp not null comment '创建时间',
+    `update_time` datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
 
     primary key (`app_name`)
 ) engine = InnoDB
@@ -180,30 +180,29 @@ drop table if exists `maple`.`maple_engine_execution`;
 create table `maple`.`maple_engine_execution`
 
 (
-    `id`              int                                     not null auto_increment comment '执行ID',
-    `unique_id`       varchar(32)                             not null comment '执行标识',
-    `exec_name`       varchar(256)  default ''                not null comment '执行名称',
-    `exec_comment`    varchar(64)   default ''                not null comment '作业说明',
-    `content_type`    varchar(8)    default 'text'            not null comment '执行内容类型 (text, path)',
-    `content_path`    varchar(256)  default ''                not null comment '执行内容路径',
-    `from_app`        varchar(16)                             not null comment '来源应用',
-    `cluster`         varchar(32)                             not null comment '提交集群',
-    `cluster_queue`   varchar(128)  default ''                not null comment '集群队列',
-    `engine_category` varchar(16)   default ''                not null comment '引擎种类',
-    `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
-    `priority`        tinyint                                 not null comment '初始优先级',
-    `run_pri`         tinyint                                 not null comment '运行优先级',
-    `pri_upgradable`  bit           default 0                 not null comment '优先级是否可升级',
-    `status`          varchar(16)   default 'CREATED'         not null comment '状态 (CREATED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, CANCELED, LOST, UNKNOWN)',
-    `group`           varchar(32)   default ''                not null comment '用户组',
-    `user`            varchar(32)   default ''                not null comment '用户',
-    `webhooks`        varchar(1024) default ''                not null comment '回调地址',
+    `id`              int                                    not null auto_increment comment '执行ID',
+    `unique_id`       varchar(32)                            not null comment '执行标识',
+    `exec_name`       varchar(32)  default ''                not null comment '执行名称',
+    `exec_comment`    varchar(256) default ''                not null comment '作业说明',
+    `content_type`    varchar(8)   default 'text'            not null comment '执行内容类型 (text, path)',
+    `content_path`    varchar(256) default ''                not null comment '执行内容路径',
+    `from_app`        varchar(16)                            not null comment '来源应用',
+    `cluster`         varchar(32)                            not null comment '提交集群',
+    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
+    `engine_category` varchar(16)  default ''                not null comment '引擎种类',
+    `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
+    `priority`        tinyint                                not null comment '初始优先级',
+    `run_pri`         tinyint                                not null comment '运行优先级',
+    `pri_upgradable`  bit          default 0                 not null comment '优先级是否可升级',
+    `status`          varchar(16)  default 'CREATED'         not null comment '状态 (CREATED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, CANCELED, LOST, UNKNOWN)',
+    `group`           varchar(32)  default ''                not null comment '用户组',
+    `user`            varchar(32)  default ''                not null comment '用户',
 
-    `starting_time`   datetime                                null comment '任务提交时间',     -- 对应 STARTING 的时间
-    `running_time`    datetime                                null comment '任务执行开始时间', -- 对应首次 RUNNING 的时间
-    `finish_time`     datetime                                null comment '任务执行结束时间', -- 对应结束状态的时间
-    `create_time`     datetime      default current_timestamp not null comment '创建时间',
-    `update_time`     datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
+    `starting_time`   datetime                               null comment '任务提交时间',     -- 对应 STARTING 的时间
+    `running_time`    datetime                               null comment '任务执行开始时间', -- 对应首次 RUNNING 的时间
+    `finish_time`     datetime                               null comment '任务执行结束时间', -- 对应结束状态的时间
+    `create_time`     datetime     default current_timestamp not null comment '创建时间',
+    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
 
     primary key (`id`),
     unique uniq_exec_unique_id (`unique_id`),
@@ -223,10 +222,10 @@ drop table if exists `maple`.maple_engine_execution_ext_info;
 create table `maple`.`maple_engine_execution_ext_info`
 (
     `id`            int        not null comment '执行ID',
-    `exec_content`  mediumtext null comment '执行内容',
-    `configuration` text       null comment '作业配置',
-    `ext_info`      text       null comment '扩展信息',
-    `process_info`  text       null comment '执行信息',
+    `exec_content`  mediumtext null comment '执行内容', -- 作业执行的内容，包括 python/sql/scala 等
+    `configuration` text       null comment '作业配置', -- 作业的配置信息
+    `ext_info`      text       null comment '扩展信息', -- 作业的扩展信息，todo
+    `process_info`  text       null comment '执行信息', -- 包括状态信息，状态变更时间等
     primary key (`id`)
 ) engine = InnoDB
   default charset = utf8
@@ -288,30 +287,29 @@ create table `maple`.`maple_job_queue`
 drop table if exists `maple`.`maple_job`;
 create table `maple`.`maple_job`
 (
-    `id`              int                                     not null auto_increment comment '作业ID',
-    `job_name`        varchar(256)  default ''                not null comment '作业名',
-    `job_type`        varchar(8)    default ''                not null comment '作业类型 (sync, async)',
-    `unique_id`       varchar(32)                             not null comment '作业唯一标识',
-    `job_comment`     varchar(64)   default ''                not null comment '作业说明',
-    `from_app`        varchar(16)                             not null comment '来源应用',
-    `cluster`         varchar(16)                             not null comment '提交集群',
-    `cluster_queue`   varchar(128)  default ''                not null comment '集群队列',
-    `engine_id`       int           default 0                 not null comment '引擎ID',
-    `engine_category` varchar(16)   default ''                not null comment '引擎种类',
-    `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
-    `priority`        tinyint                                 not null comment '初始优先级',
-    `run_priority`    tinyint                                 not null comment '运行优先级',
-    `content_type`    varchar(8)    default 'text'            not null comment '执行内容类型 (text, path)',
-    `result_type`     varchar(8)    default 'text'            not null comment '执行结果类型 (text, path)',
-    `status`          varchar(16)   default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)',
-    `group`           varchar(32)   default ''                not null comment '用户组',
-    `user`            varchar(32)   default ''                not null comment '用户',
-    `webhooks`        varchar(1024) default ''                not null comment '回调地址',
-    `configuration`   text                                    not null comment '作业配置',
-    `ext_info`        text                                    not null comment '扩展信息',
+    `id`              int                                    not null auto_increment comment '作业ID',
+    `job_name`        varchar(256) default ''                not null comment '作业名',
+    `job_type`        varchar(8)   default ''                not null comment '作业类型 (sync, async)',
+    `unique_id`       varchar(32)                            not null comment '作业唯一标识',
+    `job_comment`     varchar(64)  default ''                not null comment '作业说明',
+    `from_app`        varchar(16)                            not null comment '来源应用',
+    `cluster`         varchar(16)                            not null comment '提交集群',
+    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
+    `engine_id`       int          default 0                 not null comment '引擎ID',
+    `engine_category` varchar(16)  default ''                not null comment '引擎种类',
+    `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
+    `priority`        tinyint                                not null comment '初始优先级',
+    `run_priority`    tinyint                                not null comment '运行优先级',
+    `content_type`    varchar(8)   default 'text'            not null comment '执行内容类型 (text, path)',
+    `result_type`     varchar(8)   default 'text'            not null comment '执行结果类型 (text, path)',
+    `status`          varchar(16)  default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)',
+    `group`           varchar(32)  default ''                not null comment '用户组',
+    `user`            varchar(32)  default ''                not null comment '用户',
+    `configuration`   text                                   not null comment '作业配置',
+    `ext_info`        text                                   not null comment '扩展信息',
 
-    `create_time`     datetime      default current_timestamp not null comment '创建时间',
-    `update_time`     datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
+    `create_time`     datetime     default current_timestamp not null comment '创建时间',
+    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
 
     primary key (`id`),
     index idx_job_name (`job_name`),

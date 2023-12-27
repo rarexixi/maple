@@ -89,7 +89,6 @@ public abstract class EngineExecutor implements EngineExecutionService {
                 .group(execution.getGroup())
                 .user(execution.getUser())
                 .configuration(execution.getConfiguration())
-                .webhooks(execution.getWebhooks())
                 .build();
     }
 

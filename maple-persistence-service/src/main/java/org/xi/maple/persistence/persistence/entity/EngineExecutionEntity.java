@@ -103,11 +103,6 @@ public class EngineExecutionEntity extends BaseEntity {
     private String user;
 
     /**
-     * 回调地址
-     */
-    private String webhooks;
-
-    /**
      * 创建时间
      */
     private LocalDateTime startTime;

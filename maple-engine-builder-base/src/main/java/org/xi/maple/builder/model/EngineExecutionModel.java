@@ -18,6 +18,5 @@ public class EngineExecutionModel {
     private String group;
     private String user;
     private String configuration;
-    private String webhooks;
 
 }

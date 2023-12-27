@@ -40,5 +40,5 @@ public class ApplicationEntity extends BaseEntity {
     /**
      * 回调接口
      */
-    private String callbackUrls;
+    private String webhooks;
 }

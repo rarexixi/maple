@@ -618,46 +618,6 @@ public class EngineExecutionSelectCondition extends SelectCondition {
     private String userContains;
 
     /**
-     * 回调地址
-     */
-    private String webhooks;
-
-    /**
-     * 回调地址列表
-     */
-    private Collection<String> webhooksIn;
-
-    /**
-     * 排除的回调地址列表
-     */
-    private Collection<String> webhooksNotIn;
-
-    /**
-     * 回调地址不为空
-     */
-    private Boolean webhooksIsNotEmpty;
-
-    /**
-     * 回调地址为空
-     */
-    private Boolean webhooksIsEmpty;
-
-    /**
-     * 回调地址开始
-     */
-    private String webhooksStartWith;
-
-    /**
-     * 回调地址结束
-     */
-    private String webhooksEndWith;
-
-    /**
-     * 回调地址包含
-     */
-    private String webhooksContains;
-
-    /**
      * 最小创建时间
      */
     private LocalDateTime startTimeMin;

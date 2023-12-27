@@ -17,7 +17,6 @@ Content-Type: application/json
   "priority2": "xx3",
   "group": "group1",
   "user": "",
-  "webhooks": "",
   "configuration": "{}",
   "extInfo": "{}"
 }
@@ -44,7 +43,6 @@ Content-Type: application/json
     "status": "ACCEPTED",
     "group": "group1",
     "user": "",
-    "webhooks": "",
     "startTime": null,
     "endTime": null,
     "heartbeatTime": null,
