@@ -20,7 +20,7 @@ import java.util.List;
 public class Spark3K8sConvertor implements MapleConvertor {
 
     @Override
-    public List<CommandGeneratorModel> getCommandGenerator(EngineExecutionModel execution) {
+    public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
         Spark3EngineExecution execConf;
         try {
             execConf = convert(execution);
@@ -29,7 +29,7 @@ public class Spark3K8sConvertor implements MapleConvertor {
         }
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-to-k8s.yaml.ftl", "spark-to-k8s.yaml", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-k8s-submit.yaml.ftl", "spark-k8s-submit.yaml", execConf));
         return commandGeneratorModels;
     }
 

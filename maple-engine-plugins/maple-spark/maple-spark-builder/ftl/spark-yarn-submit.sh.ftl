@@ -36,9 +36,10 @@ ${sparkHome}/bin/spark-submit \
 <#if archives?? && (archives?length > 0)>
   --archives ${archives} \
 </#if>
+  --conf
 <#if conf??>
 <#list conf?keys as key>
-    --conf ${key}=${conf[key]}
+  --conf ${key}=${conf[key]}
 </#list>
 </#if>
 <#if propertiesFile?? && (propertiesFile?length > 0)>

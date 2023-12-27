@@ -66,16 +66,11 @@ public class EngineExecutionAddRequest extends BaseEntity {
      */
     @NotNull(message = "priority(初始优先级)不能为空")
     private Integer priority;
-    /**
-     * 初始优先级
-     */
-    @NotNull(message = "priority(初始优先级)不能为空")
-    private Integer priority2;
 
     /**
-     * 状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)
+     * 优先级是否可升级
      */
-    private String status;
+    private boolean priUpgradable = false;
 
     /**
      * 用户组

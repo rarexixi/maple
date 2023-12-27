@@ -20,23 +20,34 @@ import java.util.List;
 public class FlinkYarnConvertor implements MapleConvertor {
 
     @Override
-    public List<CommandGeneratorModel> getCommandGenerator(EngineExecutionModel execution) {
-        FlinkEngineExecution execConf;
-        try {
-            execConf = convert(execution);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
+        FlinkEngineExecution execConf = convert(execution);
+        if (execConf == null) {
+            return null;
         }
-        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-to-yarn.sh.ftl", "flink-to-yarn.sh", execConf));
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-submit.sh.ftl", "flink-yarn-submit.sh", execConf));
         return commandGeneratorModels;
     }
 
-    private FlinkEngineExecution convert(EngineExecutionModel execution) throws IOException {
+    @Override
+    public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
+        FlinkEngineExecution execConf = convert(execution);
+        if (execConf == null) {
+            return null;
+        }
+
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-stop.sh.ftl", "flink-yarn-stop.sh", execConf));
+        return commandGeneratorModels;
+    }
+
+    private FlinkEngineExecution convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
-        FlinkEngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, FlinkEngineExecution.class);
-        assert spark3EngineExecution != null;
-        return spark3EngineExecution;
+        FlinkEngineExecution flinkEngineExecution = JsonUtils.parseObject(executionConf, FlinkEngineExecution.class, null);
+        if (flinkEngineExecution != null) {
+        }
+        return flinkEngineExecution;
     }
 }

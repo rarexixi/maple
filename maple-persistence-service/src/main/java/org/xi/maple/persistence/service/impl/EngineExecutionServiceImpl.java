@@ -134,19 +134,19 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
         String oldStatus = entity.getStatus();
 
         switch (updateRequest.getStatus()) {
-            case EngineExecutionStatus.SUBMITTED:
+            case EngineExecutionStatus.CREATED:
                 return 0;
             case EngineExecutionStatus.ACCEPTED:
-                if (!EngineExecutionStatus.SUBMITTED.equals(oldStatus)) {
+                if (!EngineExecutionStatus.CREATED.equals(oldStatus)) {
                     return 0;
                 }
                 break;
             case EngineExecutionStatus.STARTING:
-                if (!EngineExecutionStatus.SUBMITTED .equals(oldStatus) && !EngineExecutionStatus.ACCEPTED.equals(oldStatus)) {
+                if (!EngineExecutionStatus.CREATED.equals(oldStatus) && !EngineExecutionStatus.ACCEPTED.equals(oldStatus)) {
                     return 0;
                 }
                 break;
-            case EngineExecutionStatus.STARTED_FAILED:
+            case EngineExecutionStatus.START_FAILED:
             case EngineExecutionStatus.RUNNING:
             case EngineExecutionStatus.SUCCEED:
             case EngineExecutionStatus.FAILED:

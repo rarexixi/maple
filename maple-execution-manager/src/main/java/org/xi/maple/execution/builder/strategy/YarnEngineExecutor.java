@@ -31,10 +31,13 @@ public class YarnEngineExecutor extends EngineExecutor {
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {
             logger.error("Execution[" + execution.getId() + "] starts failed!");
-            updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
         });
 
-        List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
+        List<CommandGeneratorModel> commandGenerators = convertor.getSubmitCommandGenerator(convert(execution));
+        if (commandGenerators == null || commandGenerators.isEmpty()) {
+            throw new MapleException(""); // todo
+        }
         String startFile = null;
         String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
         for (CommandGeneratorModel generatorModel : commandGenerators) {
@@ -53,11 +56,11 @@ public class YarnEngineExecutor extends EngineExecutor {
                 process = processBuilder.start();
                 int exitcode = process.waitFor();
                 if (exitcode != 0) {
-                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
                 }
             } catch (Throwable t) {
                 logger.error("Execution[" + execution.getId() + "] starts failed!", t);
-                updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+                updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
             } finally {
                 if (process != null && process.isAlive()) {
                     ActionUtils.executeQuietly(process::destroyForcibly);

@@ -41,10 +41,13 @@ public class K8SEngineExecutor extends EngineExecutor {
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {
             logger.error("Execution[" + execution.getId() + "] starts failed!");
-            updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
         });
 
-        List<CommandGeneratorModel> commandGenerators = convertor.getCommandGenerator(convert(execution));
+        List<CommandGeneratorModel> commandGenerators = convertor.getSubmitCommandGenerator(convert(execution));
+        if (commandGenerators == null || commandGenerators.isEmpty()) {
+            throw new MapleException(""); // todo
+        }
         String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
         List<String> yamlFiles = new ArrayList<>(commandGenerators.size());
         for (CommandGeneratorModel generatorModel : commandGenerators) {

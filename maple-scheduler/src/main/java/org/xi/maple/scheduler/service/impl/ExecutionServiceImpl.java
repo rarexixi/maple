@@ -54,7 +54,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         }
         submitExecution(execution, () -> {
             logger.warn("队列没有足够的资源，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
-            updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+            updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.START_FAILED);
         });
     }
 
@@ -72,7 +72,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         if (cachedQueueInfo == null) {
             logger.error("队列不存在，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
             // 修改作业状态
-            updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.STARTED_FAILED);
+            updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.START_FAILED);
         } else if (!cachedQueueInfo.idle()) {
             queueBusyCallback.run();
         } else {

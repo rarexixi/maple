@@ -192,15 +192,16 @@ create table `maple`.`maple_engine_execution`
     `engine_category` varchar(16)   default ''                not null comment '引擎种类',
     `engine_version`  varchar(16)   default ''                not null comment '引擎版本',
     `priority`        tinyint                                 not null comment '初始优先级',
-    `run_priority`    tinyint                                 not null comment '运行优先级',
-    `status`          varchar(16)   default 'SUBMITTED'       not null comment '状态 (SUBMITTED, ACCEPTED, STARTED_FAILED, RUNNING, SUCCEED, FAILED, KILLED, LOST)',
+    `run_pri`         tinyint                                 not null comment '运行优先级',
+    `pri_upgradable`  bit           default 0                 not null comment '优先级是否可升级',
+    `status`          varchar(16)   default 'CREATED'         not null comment '状态 (CREATED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, CANCELED, LOST, UNKNOWN)',
     `group`           varchar(32)   default ''                not null comment '用户组',
     `user`            varchar(32)   default ''                not null comment '用户',
     `webhooks`        varchar(1024) default ''                not null comment '回调地址',
 
-    `start_time`      datetime                                null comment '创建时间',
-    `end_time`        datetime                                null comment '停止时间',
-    `heartbeat_time`  datetime                                null comment '更新时间',
+    `starting_time`   datetime                                null comment '任务提交时间',     -- 对应 STARTING 的时间
+    `running_time`    datetime                                null comment '任务执行开始时间', -- 对应首次 RUNNING 的时间
+    `finish_time`     datetime                                null comment '任务执行结束时间', -- 对应结束状态的时间
     `create_time`     datetime      default current_timestamp not null comment '创建时间',
     `update_time`     datetime      default current_timestamp not null on update current_timestamp comment '更新时间',
 

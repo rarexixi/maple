@@ -60,7 +60,7 @@
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
                                 <div style="color: rgb(8, 8, 8); font-family: &quot;InconsolataGo Nerd Font Mono&quot;, monospace; font-size: 10.5pt;">
                                     <p>
-                                        STARTED_FAILED
+                                        START_FAILED
                                     </p>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                     </div>
                 </foreignObject>
                 <text x="60" y="346" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="12px" text-anchor="middle">
-                    STARTED_FAILED
+                    START_FAILED
                 </text>
             </switch>
         </g>

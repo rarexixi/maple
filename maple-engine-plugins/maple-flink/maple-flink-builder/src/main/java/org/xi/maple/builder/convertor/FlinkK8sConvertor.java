@@ -20,7 +20,7 @@ import java.util.List;
 public class FlinkK8sConvertor implements MapleConvertor {
 
     @Override
-    public List<CommandGeneratorModel> getCommandGenerator(EngineExecutionModel execution) {
+    public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
         FlinkEngineExecution execConf;
         try {
             execConf = convert(execution);
@@ -29,7 +29,7 @@ public class FlinkK8sConvertor implements MapleConvertor {
         }
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel("flink-to-k8s.yaml.ftl", "flink-to-k8s.yaml", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel("flink-k8s-submit.yaml.ftl", "flink-k8s-submit.yaml", execConf));
         return commandGeneratorModels;
     }
 

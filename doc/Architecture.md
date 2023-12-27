@@ -28,7 +28,7 @@
 
 - STARTING: 正在启动，从队列消费后为该状态
 
-- STARTED_FAILED：启动失败
+- START_FAILED：启动失败
 
 - RUNNING：运行中
 
@@ -72,7 +72,7 @@
 
    2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
 
-如果启动失败，由 execution-manager 将作业状态更新为 STARTED_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
+如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
 
 引擎启动后自己回写状态，同时由 scheduler 监控状态
 

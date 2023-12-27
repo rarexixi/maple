@@ -20,26 +20,37 @@ import java.util.List;
 public class Spark3YarnConvertor implements MapleConvertor {
 
     @Override
-    public List<CommandGeneratorModel> getCommandGenerator(EngineExecutionModel execution) {
-        Spark3EngineExecution execConf;
-        try {
-            execConf = convert(execution);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
+        Spark3EngineExecution execConf = convert(execution);
+        if (execConf == null) {
+            return null;
         }
-        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-to-yarn.sh.ftl", "spark3-to-yarn.sh", execConf));
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-yarn-submit.sh.ftl", "spark3-yarn-submit.sh", execConf));
         return commandGeneratorModels;
     }
 
-    private Spark3EngineExecution convert(EngineExecutionModel execution) throws IOException {
+    @Override
+    public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
+        Spark3EngineExecution execConf = convert(execution);
+        if (execConf == null) {
+            return null;
+        }
+
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-stop.sh.ftl", "flink-yarn-stop.sh", execConf));
+        return commandGeneratorModels;
+    }
+
+    private Spark3EngineExecution convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
-        Spark3EngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class);
-        assert spark3EngineExecution != null;
-        spark3EngineExecution.setName(execution.getExecName());
-        spark3EngineExecution.setQueue(execution.getClusterQueue());
-        spark3EngineExecution.setProxyUser(execution.getUser());
+        Spark3EngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class, null);
+        if (spark3EngineExecution != null) {
+            spark3EngineExecution.setName(execution.getExecName());
+            spark3EngineExecution.setQueue(execution.getClusterQueue());
+            spark3EngineExecution.setProxyUser(execution.getUser());
+        }
         return spark3EngineExecution;
     }
 }

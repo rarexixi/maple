@@ -15,7 +15,7 @@
 
     <modules>
         <module>maple-spark-builder</module>
-        <module>maple-spark-data-calc</module>
-        <module>maple-spark-executor</module>
+        <module>apps/maple-spark-data-calc</module>
+        <module>apps/maple-spark-executor</module>
     </modules>
 </project>
