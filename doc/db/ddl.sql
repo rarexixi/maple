@@ -182,6 +182,7 @@ create table `maple`.`maple_engine_execution`
 (
     `id`              int                                    not null auto_increment comment '执行ID',
     `unique_id`       varchar(32)                            not null comment '执行标识',
+    `exec_group_job`  varchar(32)                            not null comment '执行的作业ID',
     `exec_name`       varchar(32)  default ''                not null comment '执行名称',
     `exec_comment`    varchar(256) default ''                not null comment '作业说明',
     `content_type`    varchar(8)   default 'text'            not null comment '执行内容类型 (text, path)',

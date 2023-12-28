@@ -87,3 +87,140 @@
 运行失败后，修改状态为 FAILED
 
 调用 scheduler kill 引擎，修改状态为 KILLED
+
+# 数据库设计
+
+## 作业表
+
+```mysql
+
+drop table if exists `maple`.`maple_engine_execution`;
+create table `maple`.`maple_engine_execution`
+
+(
+    `id`              int                                    not null auto_increment comment '执行ID',
+    `unique_id`       varchar(32)                            not null comment '执行标识',
+    `exec_name`       varchar(32)  default ''                not null comment '执行名称',
+    `exec_comment`    varchar(256) default ''                not null comment '作业说明',
+    `content_type`    varchar(8)   default 'text'            not null comment '执行内容类型 (text, path)',
+    `content_path`    varchar(256) default ''                not null comment '执行内容路径',
+    `from_app`        varchar(16)                            not null comment '来源应用',
+    `cluster`         varchar(32)                            not null comment '提交集群',
+    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
+    `engine_category` varchar(16)  default ''                not null comment '引擎种类',
+    `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
+    `priority`        tinyint                                not null comment '初始优先级',
+    `run_pri`         tinyint                                not null comment '运行优先级',
+    `pri_upgradable`  bit          default 0                 not null comment '优先级是否可升级',
+    `status`          varchar(16)  default 'CREATED'         not null comment '状态 (CREATED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, CANCELED, LOST, UNKNOWN)',
+    `group`           varchar(32)  default ''                not null comment '用户组',
+    `user`            varchar(32)  default ''                not null comment '用户',
+
+    `starting_time`   datetime                               null comment '任务提交时间',     -- 对应 STARTING 的时间
+    `running_time`    datetime                               null comment '任务执行开始时间', -- 对应首次 RUNNING 的时间
+    `finish_time`     datetime                               null comment '任务执行结束时间', -- 对应结束状态的时间
+    `create_time`     datetime     default current_timestamp not null comment '创建时间',
+    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    unique uniq_exec_unique_id (`unique_id`),
+    index idx_exec_name (`exec_name`),
+    index idx_exec_from_app (`from_app`),
+    index idx_exec_cluster_queue (`cluster`, `cluster_queue`),
+    index idx_exec_engine (`engine_category`, `engine_version`),
+    index idx_exec_status (`status`),
+    index idx_exec_group (`group`),
+    index idx_exec_user (`user`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '引擎执行记录';
+
+drop table if exists `maple`.maple_engine_execution_ext_info;
+create table `maple`.`maple_engine_execution_ext_info`
+(
+    `id`            int        not null comment '执行ID',
+    `exec_content`  mediumtext null comment '执行内容',
+    `configuration` text       null comment '作业配置',
+    `ext_info`      text       null comment '扩展信息',
+    `process_info`  text       null comment '执行信息',
+    primary key (`id`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '引擎执行扩展信息';
+```
+
+- exec_content: 作业执行的内容，包括 python/sql/scala 等
+
+  
+- configuration: 作业的配置信息，json 字符串
+
+  
+- ext_info: 作业的扩展信息，todo
+
+  
+- process_info: 作业的执行信息，todo
+
+  
+# 作业配置
+
+## spark
+
+### spark sql
+
+```json
+{
+   "driverCores": "",
+   "driverMemory": "",
+   "numExecutors": "",
+   "executorCores": "",
+   "executorMemory": "",
+   "driverJavaOptions": "",
+   "driverLibraryPath": "",
+   "driverClassPath": "",
+   "jars": "",
+   "files": "",
+   "archives": "",
+   "conf": {
+   },
+   "runType": "data_calc",
+   "jobConf": {
+      "mainFile": ""
+   },
+   "runType": "sql",
+   "jobConf": {
+      "mainFile": ""
+   },
+   "runType": "scala",
+   "jobConf": {
+      "mainFile": ""
+   },
+   "runType": "py",
+   "jobConf": {
+      "pyFiles": "",    // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
+      "mainFile": "",
+      "args": ""
+   },
+   "runType": "jar",
+   "jobConf": {
+      "mainFile": "",
+      "mainClass": "",
+      "args": ""
+   }
+}
+```
+
+生成对象：
+
+```json
+{
+   "mapleId": "1",
+   "execName": "xxx_sync_task",
+   "fromApp": "schedule",
+   "queue": "default",
+   "group": "",
+   "user": "",
+   "job": {}
+}
+```
