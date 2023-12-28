@@ -1,6 +1,7 @@
 package org.xi.maple.scheduler.service;
 
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.ClusterMessage;
@@ -22,7 +23,7 @@ public interface ExecutionService {
 
     EngineExecutionDetailResponse getExecutionById(int execId);
 
-    void updateExecutionStatus(int execId, String status);
+    void updateExecutionStatus(int execId, EngineExecutionUpdateStatusRequest statusRequest);
 
     void refreshCluster(ClusterMessage clusterMessage);
 }

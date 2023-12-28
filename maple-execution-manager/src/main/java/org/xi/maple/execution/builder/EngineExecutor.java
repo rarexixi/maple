@@ -7,6 +7,7 @@ import freemarker.template.TemplateExceptionHandler;
 import org.slf4j.Logger;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.xi.maple.builder.model.EngineExecutionModel;
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.RetryUtils;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.configuration.ExecutionProperties;
@@ -53,10 +54,8 @@ public abstract class EngineExecutor implements EngineExecutionService {
      * @param status 变更状态
      * @return 修改的数据量
      */
-    protected Integer updateExecutionStatus(Integer id, String status) {
-        return persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, status));
-        // Supplier<Integer> updateStatus = () -> );
-        // return RetryUtils.retry(updateStatus, 3, 1000, String.format("更新状态失败, id: %d, status: %s", id, status));
+    protected Integer updateExecutionStatus(Integer id, EngineExecutionStatus status) {
+        return persistenceClient.updateExecutionStatusById(id, new EngineExecutionUpdateStatusRequest(status.toString())); // todo
     }
 
     protected long getPid(Process process) {

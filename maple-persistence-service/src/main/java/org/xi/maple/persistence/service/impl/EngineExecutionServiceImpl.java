@@ -119,44 +119,38 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Transactional
-    @CacheEvict(cacheNames = {"maple-execution"}, key = "#updateRequest.id")
+    @CacheEvict(cacheNames = {"maple-execution"}, key = "#id")
     @Override
-    public int updateStatusById(EngineExecutionUpdateStatusRequest updateRequest) {
-        EngineExecutionEntityExt entity = engineExecutionMapper.detailById(updateRequest.getId());
+    public int updateStatusById(int id, EngineExecutionUpdateStatusRequest updateRequest) {
+        EngineExecutionEntityExt entity = engineExecutionMapper.detailById(id);
         if (entity == null) {
             throw new MapleDataNotFoundException("引擎执行记录不存在");
         }
-        if (EngineExecutionStatus.isFinalStatus(entity.getStatus())) {
-            logger.error("引擎执行已结束，id: {}", updateRequest.getId());
+        EngineExecutionStatus newStatus = EngineExecutionStatus.valueOf(updateRequest.getStatus());
+        if (newStatus.isFinalStatus()) {
+            logger.error("引擎执行已结束，id: {}", id);
             return 0;
         }
 
-        String oldStatus = entity.getStatus();
+        EngineExecutionStatus oldStatus = EngineExecutionStatus.valueOf(entity.getStatus());
 
-        switch (updateRequest.getStatus()) {
-            case EngineExecutionStatus.CREATED:
+        switch (newStatus) {
+            case CREATED:
                 return 0;
-            case EngineExecutionStatus.ACCEPTED:
-                if (!EngineExecutionStatus.CREATED.equals(oldStatus)) {
+            case ACCEPTED:
+                if (!oldStatus.canAccept()) {
                     return 0;
                 }
                 break;
-            case EngineExecutionStatus.STARTING:
-                if (!EngineExecutionStatus.CREATED.equals(oldStatus) && !EngineExecutionStatus.ACCEPTED.equals(oldStatus)) {
+            case STARTING:
+                if (!oldStatus.canStart()) {
                     return 0;
                 }
-                break;
-            case EngineExecutionStatus.START_FAILED:
-            case EngineExecutionStatus.RUNNING:
-            case EngineExecutionStatus.SUCCEED:
-            case EngineExecutionStatus.FAILED:
-            case EngineExecutionStatus.KILLED:
-            case EngineExecutionStatus.LOST:
                 break;
             default:
-                throw new MapleOperationForbiddenException("未知状态");
+                break;
         }
-        return engineExecutionMapper.updateStatusById(updateRequest.getId(), updateRequest.getStatus());
+        return engineExecutionMapper.updateStatusById(id, updateRequest.getStatus());
     }
 
     /**
@@ -167,11 +161,11 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Transactional
-    @CacheEvict(cacheNames = {"maple-execution"}, key = "#updateRequest.id")
+    @CacheEvict(cacheNames = {"maple-execution"}, key = "#id")
     @Override
-    public int updateExtInfoById(EngineExecutionUpdateRequest updateRequest) {
+    public int updateExtInfoById(int id, EngineExecutionUpdateRequest updateRequest) {
         EngineExecutionExtInfoEntity entity = ObjectUtils.copy(updateRequest, EngineExecutionExtInfoEntity.class);
-        return engineExecutionMapper.updateExtInfoById(entity);
+        return engineExecutionMapper.updateExtInfoById(id, entity);
     }
 
     /**

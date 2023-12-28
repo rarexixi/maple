@@ -45,20 +45,22 @@ public interface EngineExecutionService {
     /**
      * 根据执行ID更新引擎执行状态
      *
+     * @param id            引擎执行记录ID
      * @param updateRequest 更新引擎执行记录请求实体
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateStatusById(EngineExecutionUpdateStatusRequest updateRequest);
+    int updateStatusById(int id, EngineExecutionUpdateStatusRequest updateRequest);
 
     /**
      * 根据执行ID更新引擎执行信息
      *
+     * @param id            引擎执行记录ID
      * @param updateRequest 更新引擎执行记录请求实体
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateExtInfoById(EngineExecutionUpdateRequest updateRequest);
+    int updateExtInfoById(int id, EngineExecutionUpdateRequest updateRequest);
 
     /**
      * 根据执行ID获取引擎执行记录详情

@@ -2,6 +2,7 @@ package org.xi.maple.scheduler.k8s;
 
 import io.fabric8.kubernetes.client.CustomResource;
 import org.slf4j.Logger;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.scheduler.constant.MapleConstants;
 
 import java.util.function.BiFunction;
@@ -9,10 +10,10 @@ import java.util.function.BiFunction;
 public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S, T>> implements MapleResourceEventHandler<A> {
 
     protected final Logger logger;
-    protected final BiFunction<Integer, String, Integer> updateFunc;
+    protected final BiFunction<Integer, EngineExecutionUpdateStatusRequest, Integer> updateFunc;
     protected final String type;
 
-    public BaseResourceEventHandler(Logger logger, BiFunction<Integer, String, Integer> updateFunc, String type) {
+    public BaseResourceEventHandler(Logger logger, BiFunction<Integer, EngineExecutionUpdateStatusRequest, Integer> updateFunc, String type) {
         this.logger = logger;
         this.updateFunc = updateFunc;
         this.type = type;
@@ -22,7 +23,7 @@ public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S,
     public void onAdd(A obj) {
         int execId = getExecId(obj);
         String mapleAppName = getAppName(obj);
-        String state = getState(obj);
+        EngineExecutionUpdateStatusRequest state = getState(obj);
         updateFunc.apply(execId, state);
 
         logger.info("{}[{}] from {} change state to {} in action[{}]", type, execId, mapleAppName, state, "ADD");
@@ -32,7 +33,7 @@ public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S,
     public void onUpdate(A oldObj, A newObj) {
         int execId = getExecId(newObj);
         String mapleAppName = getAppName(newObj);
-        String state = getState(newObj);
+        EngineExecutionUpdateStatusRequest state = getState(newObj);
         updateFunc.apply(execId, state);
 
         logger.info("{}[{}] from {} change state to {} in action[{}]", type, execId, mapleAppName, state, "UPDATE");
@@ -42,7 +43,7 @@ public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S,
     public void onDelete(A obj, boolean deletedFinalStateUnknown) {
         int execId = getExecId(obj);
         String mapleAppName = getAppName(obj);
-        String state = getState(obj);
+        EngineExecutionUpdateStatusRequest state = getState(obj);
         updateFunc.apply(execId, state);
 
         logger.info("{}[{}] from {} change state to {} in action[{}]", type, execId, mapleAppName, state, "DELETE");
@@ -57,5 +58,5 @@ public abstract class BaseResourceEventHandler<S, T, A extends CustomResource<S,
         return obj.getMetadata().getLabels().getOrDefault(MapleConstants.LABEL_APP_NAME, "");
     }
 
-    public abstract String getState(A obj);
+    public abstract EngineExecutionUpdateStatusRequest getState(A obj);
 }

@@ -7,6 +7,7 @@ import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleClusterNotSupportException;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
@@ -53,8 +54,8 @@ public class ExecutionServiceImpl implements ExecutionService {
             return;
         }
         submitExecution(execution, () -> {
-            logger.warn("队列没有足够的资源，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
-            updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.START_FAILED);
+            logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
+            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列资源不足"));
         });
     }
 
@@ -72,7 +73,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         if (cachedQueueInfo == null) {
             logger.error("队列不存在，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
             // 修改作业状态
-            updateExecStatusFunc.apply(execution.getId(), EngineExecutionStatus.START_FAILED);
+            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列不存在"));
         } else if (!cachedQueueInfo.idle()) {
             queueBusyCallback.run();
         } else {
@@ -112,8 +113,8 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
-    public void updateExecutionStatus(int execId, String status) {
-        updateExecStatusFunc.apply(execId, status);
+    public void updateExecutionStatus(int execId, EngineExecutionUpdateStatusRequest statusRequest) {
+        updateExecStatusFunc.apply(execId, statusRequest);
     }
 
     @Override

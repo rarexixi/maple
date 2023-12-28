@@ -5,6 +5,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.engine.common.utils.ParamsUtils;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
@@ -17,25 +18,24 @@ import java.io.IOException;
  */
 public class EngineExecutionUpdateService {
 
-    public static void updateStatus(String status) {
+    public static void updateStatus(EngineExecutionStatus status) {
         Integer execId = ParamsUtils.EXEC_ID;
         String updateExecStatusUrl = ParamsUtils.UPDATE_EXEC_STATUS_URL;
-        EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(execId, status);
-        post(updateExecStatusUrl, request);
+        EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(status.toString());
+        post(execId, updateExecStatusUrl, request);
     }
 
     public static void updateInfo(String info) {
         Integer execId = ParamsUtils.EXEC_ID;
         String updateExecInfoUrl = ParamsUtils.UPDATE_EXEC_INFO_URL;
         EngineExecutionUpdateRequest request = new EngineExecutionUpdateRequest();
-        request.setId(execId);
         request.setExtInfo(info);
-        post(updateExecInfoUrl, request);
+        post(execId, updateExecInfoUrl, request);
     }
 
-    private static void post(String url, Object data) {
+    private static void post(int execId, String url, Object data) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(url + "/" + execId); // todo
             httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
             httpPost.setEntity(new StringEntity(JsonUtils.toJsonString(data)));
 

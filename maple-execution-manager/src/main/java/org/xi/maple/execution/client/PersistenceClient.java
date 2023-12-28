@@ -3,6 +3,7 @@ package org.xi.maple.execution.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.execution.client.fallback.PersistenceClientFallbackFactory;
@@ -14,8 +15,8 @@ public interface PersistenceClient {
 
     // region engine-execution
 
-    @PatchMapping("/engine-execution/update-status")
-    Integer updateExecutionStatusById(@Validated @RequestBody EngineExecutionUpdateStatusRequest updateStatusRequest);
+    @PatchMapping("/engine-execution/update-status/{id}")
+    Integer updateExecutionStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateStatusRequest);
 
     @PatchMapping("/engine-execution/update-ext-info")
     Integer updateExecutionExtInfoById(@RequestBody EngineExecutionUpdateRequest updateRequest);

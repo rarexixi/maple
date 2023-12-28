@@ -20,7 +20,7 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
         return new PersistenceClient() {
 
             @Override
-            public Integer updateExecutionStatusById(EngineExecutionUpdateStatusRequest updateStatusRequest) {
+            public Integer updateExecutionStatusById(Integer id, EngineExecutionUpdateStatusRequest updateStatusRequest) {
                 MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
                     throw new MapleException(feignResponseError.getError().getMsg());
                 });

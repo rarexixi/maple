@@ -2,6 +2,7 @@ package org.xi.maple.datacalc.api.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.common.model.OperateResult;
@@ -26,11 +27,11 @@ public interface PersistenceClient {
     @GetMapping("/engine-execution/detail")
     EngineExecutionDetailResponse getExecutionById(@RequestParam("id") Integer id);
 
-    @PatchMapping("/engine-execution/update-status")
-    Integer updateExecutionStatusById(@RequestBody EngineExecutionUpdateStatusRequest updateRequest);
+    @PatchMapping("/engine-execution/update-status/{id}")
+    Integer updateExecutionStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateStatusRequest);
 
     @PatchMapping("/engine-execution/update-ext-info")
-    Integer updateExecutionInfoById(@RequestBody EngineExecutionUpdateRequest updateRequest);
+    Integer updateExecutionInfoById(@RequestParam("id")Integer id, @RequestBody EngineExecutionUpdateRequest updateRequest);
 
 
     @PostMapping("/engine-execution-queue/add-or-update")

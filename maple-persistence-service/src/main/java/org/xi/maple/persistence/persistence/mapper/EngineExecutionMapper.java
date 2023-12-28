@@ -60,9 +60,10 @@ public interface EngineExecutionMapper extends
     /**
      * 根据执行ID更新引擎执行信息
      *
+     * @param id            引擎执行记录ID
      * @param extInfoEntity 引擎执行记录扩展实体
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateExtInfoById(@Param("entity") EngineExecutionExtInfoEntity extInfoEntity);
+    int updateExtInfoById(@Param("id") Integer id, @Param("entity") EngineExecutionExtInfoEntity extInfoEntity);
 }

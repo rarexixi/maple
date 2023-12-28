@@ -3,23 +3,38 @@ package org.xi.maple.persistence.model.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.xi.maple.persistence.model.BaseEntity;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EngineExecutionUpdateStatusRequest extends BaseEntity {
+public class EngineExecutionUpdateStatusRequest {
+
+    public EngineExecutionUpdateStatusRequest(String status) {
+        this.status = status;
+    }
+
+    public EngineExecutionUpdateStatusRequest(String status, String rawStatus) {
+        this.status = status;
+        this.rawStatus = rawStatus;
+    }
 
     /**
-     * 执行ID
-     */
-    @NotNull(message = "id(执行ID)不能为空")
-    private Integer id;
-
-    /**
-     * 状态 (SUBMITTED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, LOST)
+     * 状态
      */
     private String status;
+
+    /**
+     * 原始状态
+     */
+    private String rawStatus = "";
+
+    /**
+     * 状态码
+     */
+    private Integer statusCode = 0;
+
+    /**
+     * 状态说明
+     */
+    private String statusMsg = "";
 }

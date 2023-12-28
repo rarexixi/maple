@@ -16,6 +16,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.ClusterMessage;
@@ -111,7 +112,7 @@ public class ScheduledExecutions implements CommandLineRunner {
             }
             if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getClusterQueue())) {
                 logger.info("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
-                executionService.updateExecutionStatus(execution.getId(), EngineExecutionStatus.FAILED);
+                executionService.updateExecutionStatus(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.FAILED.toString()));
                 return;
             }
             threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {

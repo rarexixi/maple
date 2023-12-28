@@ -84,7 +84,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             persistenceClient.addOrUpdateExecQueue(execQueue);
             RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(execQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
             deque.addLast(new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
-            persistenceClient.updateExecutionStatusById(new EngineExecutionUpdateStatusRequest(id, EngineExecutionStatus.ACCEPTED));
+            persistenceClient.updateExecutionStatusById(id, new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.ACCEPTED.toString()));
         });
         return id;
     }

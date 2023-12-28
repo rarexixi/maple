@@ -13,12 +13,6 @@ import javax.validation.constraints.NotNull;
 public class EngineExecutionUpdateRequest extends BaseEntity {
 
     /**
-     * 执行ID
-     */
-    @NotNull(message = "id(执行ID)不能为空")
-    private Integer id;
-
-    /**
      * 执行内容
      */
     private String execContent;

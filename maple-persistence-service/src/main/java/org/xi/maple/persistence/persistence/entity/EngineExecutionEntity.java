@@ -1,5 +1,6 @@
 package org.xi.maple.persistence.persistence.entity;
 
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.persistence.model.BaseEntity;
 
 import java.math.BigDecimal;
@@ -88,7 +89,7 @@ public class EngineExecutionEntity extends BaseEntity {
     private Integer runPriority;
 
     /**
-     * 状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)
+     * 状态
      */
     private String status;
 

@@ -16,9 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
+import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.function.ThrowableFunction;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
 import org.xi.maple.scheduler.client.PersistenceClient;
@@ -263,8 +265,11 @@ public class YarnClusterServiceImpl implements YarnClusterService {
                 } else {
                     state = finalStatus;
                 }
+            } else {
+                state = EngineExecutionStatus.RUNNING.toString();
             }
-            updateExecStatusFunc.apply(execId, state);
+            EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.valueOf(state).toString(), state);
+            updateExecStatusFunc.apply(execId, request);
         }
     }
 }

@@ -22,23 +22,16 @@
 
 ### 执行状态
 
-- SUBMITTED：新建任务，刚存储到数据库
-
-- ACCEPTED：进入队列
-
-- STARTING: 正在启动，从队列消费后为该状态
-
-- START_FAILED：启动失败
-
-- RUNNING：运行中
-
-- SUCCEED：成功
-
-- FAILED：失败
-
-- KILLED：运行中被杀
-
-- LOST：连接丢失（心跳超时不上报）
+- CREATED:       新建任务，刚存储到数据库
+- ACCEPTED:      添加系统队列
+- STARTING:      提交集群/开始启动
+- START_FAILED:  提交集群失败/启动失败
+- RUNNING:       运行中
+- SUCCEED:       运行成功
+- FAILED:        运行失败
+- KILLED:        强制杀死
+- CANCELED:      作业停止/取消
+- UNKNOWN:       未知
 
 **状态流转**
 

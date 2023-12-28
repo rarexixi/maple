@@ -208,7 +208,7 @@
             <if test="entity.processInfo != null">`process_info` = #{entity.processInfo},</if>
         </set>
         <where>
-            `id` = #{entity.id}
+            `id` = #{id}
         </where>
     </update>
 

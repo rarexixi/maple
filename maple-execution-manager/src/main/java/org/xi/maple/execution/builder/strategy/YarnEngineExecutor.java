@@ -14,6 +14,7 @@ import org.xi.maple.execution.builder.spi.EnginePluginService;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.configuration.ExecutionProperties;
 import org.xi.maple.execution.configuration.PluginProperties;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
 import java.util.List;

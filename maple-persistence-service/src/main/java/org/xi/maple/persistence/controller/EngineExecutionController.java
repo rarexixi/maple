@@ -36,21 +36,21 @@ public class EngineExecutionController {
         return ResponseEntity.created(URI.create("")).body(id);
     }
 
-    @GetMapping("/heartbeat")
-    public ResponseEntity<Integer> heartbeatById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id) {
+    @GetMapping("/heartbeat/{id}")
+    public ResponseEntity<Integer> heartbeatById(@PathVariable("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id) {
         int count = engineExecutionService.heartbeatById(id);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/update-status")
-    public ResponseEntity<Integer> updateStatusById(@Validated @RequestBody EngineExecutionUpdateStatusRequest updateRequest) {
-        int count = engineExecutionService.updateStatusById(updateRequest);
+    @PatchMapping("/update-status/{id}")
+    public ResponseEntity<Integer> updateStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateRequest) {
+        int count = engineExecutionService.updateStatusById(id, updateRequest);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/update-ext-info")
-    public ResponseEntity<Integer> updateExtInfoById(@Validated @RequestBody EngineExecutionUpdateRequest updateRequest) {
-        int count = engineExecutionService.updateExtInfoById(updateRequest);
+    @PatchMapping("/update-ext-info/{id}")
+    public ResponseEntity<Integer> updateExtInfoById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateRequest updateRequest) {
+        int count = engineExecutionService.updateExtInfoById(id, updateRequest);
         return ResponseEntity.ok(count);
     }
 

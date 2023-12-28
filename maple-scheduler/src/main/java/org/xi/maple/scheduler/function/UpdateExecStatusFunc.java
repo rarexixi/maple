@@ -7,7 +7,7 @@ import org.xi.maple.scheduler.client.PersistenceClient;
 import java.util.function.BiFunction;
 
 @Component
-public class UpdateExecStatusFunc implements BiFunction<Integer, String, Integer> {
+public class UpdateExecStatusFunc implements BiFunction<Integer, EngineExecutionUpdateStatusRequest, Integer> {
 
     private final PersistenceClient persistenceClient;
 
@@ -16,8 +16,7 @@ public class UpdateExecStatusFunc implements BiFunction<Integer, String, Integer
     }
 
     @Override
-    public Integer apply(Integer id, String status) {
-        EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(id, status);
-        return persistenceClient.updateExecutionStatusById(request);
+    public Integer apply(Integer id, EngineExecutionUpdateStatusRequest request) {
+        return persistenceClient.updateExecutionStatusById(id, request);
     }
 }
