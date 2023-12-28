@@ -195,6 +195,7 @@ create table `maple`.`maple_engine_execution`
     `priority`        tinyint                                not null comment '初始优先级',
     `run_pri`         tinyint                                not null comment '运行优先级',
     `pri_upgradable`  bit          default 0                 not null comment '优先级是否可升级',
+    `cluster_id`      varchar(64)  default ''                not null comment '在集群上的ID',
     `status`          varchar(16)  default 'CREATED'         not null comment '状态',
     `raw_status`      varchar(16)  default ''                not null comment '原始状态',
     `group`           varchar(32)  default ''                not null comment '用户组',
