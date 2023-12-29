@@ -52,7 +52,7 @@ Content-Type: application/json
     "execContent": null,
     "configuration": "{}",
     "extInfo": "{}",
-    "processInfo": null
+    "execInfo": null
 }
 
 ###

@@ -146,16 +146,6 @@ create table `maple`.`maple_cluster`
   collate = utf8_unicode_ci
     comment = '集群';
 
-drop table if exists `maple`.`maple_cluster_queue`;
-create table `maple`.`maple_cluster_queue`
-(
-    `cluster_name` varchar(16) not null comment '集群名称',
-    `queue_name`   varchar(16) not null comment '队列名称',
-    primary key (`cluster_name`, `queue_name`)
-) engine = InnoDB
-  default charset = utf8
-  collate = utf8_unicode_ci
-    comment = '集群队列';
 
 drop table if exists `maple`.`maple_engine_execution_queue`;
 create table `maple`.`maple_engine_execution_queue`
@@ -181,37 +171,38 @@ create table `maple`.`maple_engine_execution`
 
 (
     `id`              int                                    not null auto_increment comment '执行ID',
-    `unique_id`       varchar(32)                            not null comment '执行标识',
-    `exec_group_job`  varchar(32)                            not null comment '执行的作业ID',
-    `exec_name`       varchar(32)  default ''                not null comment '执行名称',
-    `exec_comment`    varchar(256) default ''                not null comment '作业说明',
-    `content_type`    varchar(8)   default 'text'            not null comment '执行内容类型 (text, path)',
-    `content_path`    varchar(256) default ''                not null comment '执行内容路径',
-    `from_app`        varchar(16)                            not null comment '来源应用',
+    `exec_file`       varchar(256)                           not null comment '执行文件',
+
+    `from_app`        varchar(16)                            not null comment '来源应用',           -- 用于区分哪个应用提交，例如调度系统，实时平台等
+    `job_id`          varchar(32)                            not null comment '作业ID',             -- 用于关联到某一个具体的作业配置
+    `biz_id`          varchar(32)                            not null comment '执行批次ID',         -- 某个作业同一个业务时间运行的实例的集合ID (可能包含多次执行)
+    `exec_uniq_id`    varchar(32)                            not null comment '应用作业执行唯一ID', -- 一个作业运行实例的ID，用于防止重复提交执行
+    `exec_name`       varchar(32)  default ''                not null comment '执行名称',           -- 作业的code，用于生成集群上的名称
+
     `cluster`         varchar(32)                            not null comment '提交集群',
-    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
-    `engine_category` varchar(16)  default ''                not null comment '引擎种类',
+    `resource_group`  varchar(256) default ''                not null comment '集群资源组',         -- 如 YARN、Volcano 的 Queue，K8s 的 Namespace 等
+    `engine_category` varchar(16)  default ''                not null comment '引擎种类',           -- 如 Spark、Flink、Hive 等
     `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
-    `priority`        tinyint                                not null comment '初始优先级',
+    `priority`        tinyint                                not null comment '初始优先级',         -- 用于区分优先级，优先级高的先执行
     `run_pri`         tinyint                                not null comment '运行优先级',
-    `pri_upgradable`  bit          default 0                 not null comment '优先级是否可升级',
-    `cluster_id`      varchar(64)  default ''                not null comment '在集群上的ID',
-    `status`          varchar(16)  default 'CREATED'         not null comment '状态',
-    `raw_status`      varchar(16)  default ''                not null comment '原始状态',
+    `pri_upgradable`  bit          default 0                 not null comment '优先级可提升',       -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
+
     `group`           varchar(32)  default ''                not null comment '用户组',
     `user`            varchar(32)  default ''                not null comment '用户',
 
-    `starting_time`   datetime                               null comment '任务提交时间',     -- 对应 STARTING 的时间
-    `running_time`    datetime                               null comment '任务执行开始时间', -- 对应首次 RUNNING 的时间
-    `finish_time`     datetime                               null comment '任务执行结束时间', -- 对应结束状态的时间
+    `status`          varchar(16)  default 'CREATED'         not null comment '状态',               -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
+    `cluster_app_id`  varchar(64)  default ''                not null comment '集群应用ID',         -- K8s 按一定规则生成，直接写入数据库，YARN 的 ApplicationID 由 YARN 生成，后续回写到数据库
+
+    `starting_time`   datetime                               null comment '任务提交时间',           -- 对应 STARTING 的时间，提交执行的时候设置
+    `running_time`    datetime                               null comment '任务执行开始时间',       -- 对应首次 RUNNING 的时间，任务真正开始执行的时候设置
+    `finish_time`     datetime                               null comment '任务执行结束时间',       -- 对应结束状态的时间，任务结束的时候设置，不管是否成功
     `create_time`     datetime     default current_timestamp not null comment '创建时间',
     `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
 
     primary key (`id`),
-    unique uniq_exec_unique_id (`unique_id`),
+    unique uniq_exec_from_app_uniq_id (`from_app`, `exec_uniq_id`),
     index idx_exec_name (`exec_name`),
-    index idx_exec_from_app (`from_app`),
-    index idx_exec_cluster_queue (`cluster`, `cluster_queue`),
+    index idx_exec_cluster (`cluster`),
     index idx_exec_engine (`engine_category`, `engine_version`),
     index idx_exec_status (`status`),
     index idx_exec_group (`group`),
@@ -224,11 +215,10 @@ create table `maple`.`maple_engine_execution`
 drop table if exists `maple`.maple_engine_execution_ext_info;
 create table `maple`.`maple_engine_execution_ext_info`
 (
-    `id`            int        not null comment '执行ID',
-    `exec_content`  mediumtext null comment '执行内容', -- 作业执行的内容，包括 python/sql/scala 等
-    `configuration` text       null comment '作业配置', -- 作业的配置信息
-    `ext_info`      text       null comment '扩展信息', -- 作业的扩展信息，todo
-    `process_info`  text       null comment '执行信息', -- 包括状态信息，状态变更时间等
+    `id`            int  not null comment '执行ID',
+    `configuration` text null comment '作业配置', -- 作业的配置信息
+    `ext_info`      text null comment '扩展信息', -- 作业的扩展信息，todo
+    `exec_info`     text null comment '执行信息', -- 包括状态信息，状态变更时间等
     primary key (`id`)
 ) engine = InnoDB
   default charset = utf8
@@ -236,6 +226,7 @@ create table `maple`.`maple_engine_execution_ext_info`
     comment = '引擎执行扩展信息';
 
 
+-- region 暂时不用
 
 drop table if exists `maple_engine_instance`;
 create table `maple_engine_instance`
@@ -334,3 +325,5 @@ create table `maple_job_ext_info`
   default charset = utf8
   collate = utf8_unicode_ci
     comment = '执行作业结果';
+
+-- endregion

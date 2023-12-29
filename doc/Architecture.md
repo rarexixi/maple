@@ -136,7 +136,7 @@ create table `maple`.`maple_engine_execution_ext_info`
     `exec_content`  mediumtext null comment '执行内容',
     `configuration` text       null comment '作业配置',
     `ext_info`      text       null comment '扩展信息',
-    `process_info`  text       null comment '执行信息',
+    `exec_info`  text       null comment '执行信息',
     primary key (`id`)
 ) engine = InnoDB
   default charset = utf8
@@ -153,14 +153,92 @@ create table `maple`.`maple_engine_execution_ext_info`
 - ext_info: 作业的扩展信息，todo
 
   
-- process_info: 作业的执行信息，todo
+- exec_info: 作业的执行信息，todo
+
+YARN
+
+```json
+{
+  "lastStatus": "",
+  "startInfo": {
+    "statuses": [
+      {
+        "code": "",
+        "status": "",
+        "message": "",
+        "time": ""
+      }
+    ]
+  },
+  "lastClusterStatus": "",
+  "clusterInfo": {
+    "statuses": [
+      {
+        "code": "",
+        "status": "",
+        "time": ""
+      }
+    ],
+    "resources": {
+      "memory": "",
+      "cores": ""
+    },
+    "detail": {
+      // map
+    }
+  },
+  "rawStatus": "",
+  "rawInfo": {
+    "statuses": [
+      {
+        "code": "",
+        "status": "",
+        "time": ""
+      }
+    ]
+  }
+}
+```
+
+K8s
+
+```json
+{
+  "lastStatus": "",
+  "startInfo": {
+    "statuses": [
+      {
+        "code": "",
+        "status": "",
+        "message": "",
+        "time": ""
+      }
+    ]
+  },
+  "lastClusterStatus": "",
+  "clusterInfo": {
+    "statuses": [
+      {
+        "code": "",
+        "status": "",
+        "time": ""
+      }
+    ],
+    "resources": {
+      "memory": "",
+      "cores": ""
+    },
+    "detail": {
+      // map
+    }
+  }
+}
+```
 
   
 # 作业配置
 
 ## spark
-
-### spark sql
 
 ```json
 {
@@ -170,13 +248,43 @@ create table `maple`.`maple_engine_execution_ext_info`
    "executorCores": "",
    "executorMemory": "",
    "driverJavaOptions": "",
-   "driverLibraryPath": "",
    "driverClassPath": "",
    "jars": "",
    "files": "",
    "archives": "",
    "conf": {
    },
+   "runType": "data_calc",
+   "jobConf": {
+      "mainFile": ""
+   },
+   "runType": "sql",
+   "jobConf": {
+      "mainFile": ""
+   },
+   "runType": "scala",
+   "jobConf": {
+      "mainFile": ""
+   },
+   "runType": "py",
+   "jobConf": {
+      "pyFiles": "",    // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
+      "mainFile": "",
+      "args": ""
+   },
+   "runType": "jar",
+   "jobConf": {
+      "mainFile": "",
+      "mainClass": "",
+      "args": ""
+   }
+}
+```
+
+## flink
+
+```json
+{
    "runType": "data_calc",
    "jobConf": {
       "mainFile": ""
@@ -214,6 +322,11 @@ create table `maple`.`maple_engine_execution_ext_info`
    "queue": "default",
    "group": "",
    "user": "",
-   "job": {}
+   "job": {} // 上面的作业配置
 }
 ```
+
+
+# YARN
+
+# 作业返回详情

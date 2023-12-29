@@ -31,7 +31,7 @@
         <result property="execContent" column="exec_content"/>
         <result property="configuration" column="configuration"/>
         <result property="extInfo" column="ext_info"/>
-        <result property="processInfo" column="process_info"/>
+        <result property="execInfo" column="exec_info"/>
     </resultMap>
 
     <sql id="tableName">`maple_engine_execution`</sql>
@@ -93,14 +93,14 @@
             <if test="entity.execContent != null">`exec_content`,</if>
             <if test="entity.configuration != null">`configuration`,</if>
             <if test="entity.extInfo != null">`ext_info`,</if>
-            <if test="entity.processInfo != null">`process_info`,</if>
+            <if test="entity.execInfo != null">`exec_info`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
             <if test="entity.execContent != null">#{entity.execContent},</if>
             <if test="entity.configuration != null">#{entity.configuration},</if>
             <if test="entity.extInfo != null">#{entity.extInfo},</if>
-            <if test="entity.processInfo != null">#{entity.processInfo},</if>
+            <if test="entity.execInfo != null">#{entity.execInfo},</if>
         </trim>
     </insert>
 
@@ -165,7 +165,7 @@
             `exec_content`,
             `configuration`,
             `ext_info`,
-            `process_info`
+            `exec_info`
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -174,7 +174,7 @@
             #{item.execContent},
             #{item.configuration},
             #{item.extInfo},
-            #{item.processInfo}
+            #{item.execInfo}
         )
         </foreach>
     </insert>
@@ -203,9 +203,9 @@
         UPDATE <include refid="extTableName"/>
         <set>
             <if test="entity.execContent != null">`exec_content` = #{entity.execContent},</if>
-            <if test="entity.configuration != null">`configuration` = #{entity.processInfo},</if>
-            <if test="entity.extInfo != null">`ext_info` = #{entity.processInfo},</if>
-            <if test="entity.processInfo != null">`process_info` = #{entity.processInfo},</if>
+            <if test="entity.configuration != null">`configuration` = #{entity.execInfo},</if>
+            <if test="entity.extInfo != null">`ext_info` = #{entity.execInfo},</if>
+            <if test="entity.execInfo != null">`exec_info` = #{entity.execInfo},</if>
         </set>
         <where>
             `id` = #{id}
@@ -239,7 +239,7 @@
                EXT.`exec_content`,
                EXT.`configuration`,
                EXT.`ext_info`,
-               EXT.`process_info`
+               EXT.`exec_info`
         FROM <include refid="tableName"/> MT
               JOIN <include refid="extTableName"/> EXT on MT.`id` = EXT.`id`
               JOIN `maple_cluster` CLUSTER on MT.`cluster` = CLUSTER.`name`
@@ -736,8 +736,7 @@
             MT.`unique_id`,
             MT.`exec_name`,
             MT.`exec_comment`,
-            MT.`content_type`,
-            MT.`content_path`,
+            MT.`exec_file`,
             MT.`from_app`,
             MT.`cluster`,
             MT.`cluster_queue`,

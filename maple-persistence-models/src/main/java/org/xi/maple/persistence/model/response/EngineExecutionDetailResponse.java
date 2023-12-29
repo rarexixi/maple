@@ -28,5 +28,5 @@ public class EngineExecutionDetailResponse extends EngineExecutionListItemRespon
     /**
      * 执行信息
      */
-    private String processInfo;
+    private String execInfo;
 }

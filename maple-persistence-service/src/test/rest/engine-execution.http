@@ -21,7 +21,7 @@ Content-Type: application/json
   "execContent": "",
   "configuration":  "{}",
   "extInfo": "{}",
-  "processInfo":  "{}"
+  "execInfo":  "{}"
 }
 
 ###
@@ -46,7 +46,7 @@ Content-Type: application/json
 
 {
     "id": 2,
-    "processInfo": "{\"progress\": 0.5}"
+    "execInfo": "{\"progress\": 0.5}"
 }
 
 ###

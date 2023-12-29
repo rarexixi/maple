@@ -100,5 +100,5 @@ public class EngineExecutionAddRequest extends BaseEntity {
     /**
      * 执行信息
      */
-    private String processInfo;
+    private String execInfo;
 }

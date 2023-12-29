@@ -40,5 +40,5 @@ public class EngineExecutionEntityExt extends EngineExecutionEntity {
     /**
      * 执行信息
      */
-    private String processInfo;
+    private String execInfo;
 }
