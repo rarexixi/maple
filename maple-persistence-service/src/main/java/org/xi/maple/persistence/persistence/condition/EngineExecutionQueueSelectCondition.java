@@ -63,46 +63,6 @@ public class EngineExecutionQueueSelectCondition extends SelectCondition {
     private String queueNameContains;
 
     /**
-     * 执行队列锁名
-     */
-    private String lockName;
-
-    /**
-     * 执行队列锁名列表
-     */
-    private Collection<String> lockNameIn;
-
-    /**
-     * 排除的执行队列锁名列表
-     */
-    private Collection<String> lockNameNotIn;
-
-    /**
-     * 执行队列锁名不为空
-     */
-    private Boolean lockNameIsNotEmpty;
-
-    /**
-     * 执行队列锁名为空
-     */
-    private Boolean lockNameIsEmpty;
-
-    /**
-     * 执行队列锁名开始
-     */
-    private String lockNameStartWith;
-
-    /**
-     * 执行队列锁名结束
-     */
-    private String lockNameEndWith;
-
-    /**
-     * 执行队列锁名包含
-     */
-    private String lockNameContains;
-
-    /**
      * 提交集群
      */
     private String cluster;

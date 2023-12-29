@@ -22,11 +22,6 @@ public class EngineExecutionQueueEntity extends BaseEntity {
     private String queueName;
 
     /**
-     * 执行队列锁名
-     */
-    private String lockName;
-
-    /**
      * 提交集群
      */
     private String cluster;

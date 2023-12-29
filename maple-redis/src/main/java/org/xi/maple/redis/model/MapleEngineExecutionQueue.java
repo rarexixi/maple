@@ -17,7 +17,6 @@ import java.io.Serializable;
 public class MapleEngineExecutionQueue implements Serializable {
 
     private String queueName;
-    private String lockName;
     private String cluster;
     private String clusterQueue;
     private String fromApp;

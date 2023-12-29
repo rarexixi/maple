@@ -5,7 +5,6 @@
 
     <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionQueueEntity">
         <result property="queueName" column="queue_name"/>
-        <result property="lockName" column="lock_name"/>
         <result property="cluster" column="cluster"/>
         <result property="clusterQueue" column="cluster_queue"/>
         <result property="fromApp" column="from_app"/>
@@ -22,7 +21,6 @@
         insert into <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.queueName != null">`queue_name`,</if>
-            <if test="entity.lockName != null">`lock_name`,</if>
             <if test="entity.cluster != null">`cluster`,</if>
             <if test="entity.clusterQueue != null">`cluster_queue`,</if>
             <if test="entity.fromApp != null">`from_app`,</if>
@@ -33,7 +31,6 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.queueName != null">#{entity.queueName},</if>
-            <if test="entity.lockName != null">#{entity.lockName},</if>
             <if test="entity.cluster != null">#{entity.cluster},</if>
             <if test="entity.clusterQueue != null">#{entity.clusterQueue},</if>
             <if test="entity.fromApp != null">#{entity.fromApp},</if>
@@ -58,9 +55,6 @@
         <set>
             <if test="entity.queueName != null">
                 `queue_name` = #{entity.queueName},
-            </if>
-            <if test="entity.lockName != null">
-                `lock_name` = #{entity.lockName},
             </if>
             <if test="entity.cluster != null">
                 `cluster` = #{entity.cluster},
@@ -93,7 +87,6 @@
     <select id="detailByPk" resultMap="BaseResultMap">
         SELECT DISTINCT
         MT.`queue_name`,
-        MT.`lock_name`,
         MT.`cluster`,
         MT.`cluster_queue`,
         MT.`from_app`,
@@ -138,32 +131,6 @@
                     </if>
                     <if test="condition.queueNameContains != null and condition.queueNameContains != ''">
                         AND MT.`queue_name` LIKE concat('%', #{condition.queueNameContains}, '%')
-                    </if>
-                    <if test="condition.lockName != null and condition.lockName != ''">
-                        AND MT.`lock_name` = #{condition.lockName}
-                    </if>
-                    <if test="condition.lockNameIn != null and condition.lockNameIn.size() > 0">
-                        AND MT.`lock_name` IN
-                        <foreach collection="condition.lockNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.lockNameNotIn != null and condition.lockNameNotIn.size() > 0">
-                        AND MT.`lock_name` NOT IN
-                        <foreach collection="condition.lockNameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.lockNameIsNotEmpty != null and condition.lockNameIsNotEmpty == true">
-                        AND MT.`lock_name` IS NOT NULL AND `lock_name` != ''
-                    </if>
-                    <if test="condition.lockNameIsEmpty != null and condition.lockNameIsEmpty == true">
-                        AND (MT.`lock_name` IS NULL OR MT.`lock_name` = '')
-                    </if>
-                    <if test="condition.lockNameStartWith != null and condition.lockNameStartWith != ''">
-                        AND MT.`lock_name` LIKE concat(#{condition.lockNameStartWith}, '%')
-                    </if>
-                    <if test="condition.lockNameEndWith != null and condition.lockNameEndWith != ''">
-                        AND MT.`lock_name` LIKE concat('%', #{condition.lockNameEndWith})
-                    </if>
-                    <if test="condition.lockNameContains != null and condition.lockNameContains != ''">
-                        AND MT.`lock_name` LIKE concat('%', #{condition.lockNameContains}, '%')
                     </if>
                     <if test="condition.cluster != null and condition.cluster != ''">
                         AND MT.`cluster` = #{condition.cluster}
@@ -321,7 +288,6 @@
         </if>
         <if test="condition.columns == null">
             MT.`queue_name`,
-            MT.`lock_name`,
             MT.`cluster`,
             MT.`cluster_queue`,
             MT.`from_app`,

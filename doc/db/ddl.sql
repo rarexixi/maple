@@ -151,7 +151,6 @@ drop table if exists `maple`.`maple_engine_execution_queue`;
 create table `maple`.`maple_engine_execution_queue`
 (
     `queue_name`    varchar(128) default ''                not null comment '执行队列名',
-    `lock_name`     varchar(128) default ''                not null comment '队列锁名',
     `cluster`       varchar(16)  default ''                not null comment '提交集群',
     `cluster_queue` varchar(128) default ''                not null comment '集群队列',
     `from_app`      varchar(16)  default ''                not null comment '来源应用',
