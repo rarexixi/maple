@@ -110,7 +110,7 @@ spec:
     parallelism: ${parallelism}
 <#elseif job.runType="jar">
     jarURI: local:///opt/flink/extlib${job.jarURI}
-    entryClass: "${job.entryClass}"
+    entryClass: "${job.mainClass}"
     <#if (job.args?? && job.args?size > 0)>
     args:
     <#list job.args as arg>
@@ -119,7 +119,7 @@ spec:
     </#if>
     parallelism: ${parallelism}
 </#if>
-    <#if (checkPoint?? && ((checkPoint?trim) != ""))>
+    <#if (checkpoint?? && ((checkpoint?trim) != ""))>
     initialSavepointPath: "${checkpoint}"
     </#if>
     upgradeMode: savepoint

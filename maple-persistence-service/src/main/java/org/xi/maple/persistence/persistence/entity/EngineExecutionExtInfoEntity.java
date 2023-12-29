@@ -3,27 +3,23 @@ package org.xi.maple.persistence.persistence.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.xi.maple.persistence.model.BaseEntity;
+
+import java.io.Serializable;
 
 /**
- * 引擎执行记录扩展实体
+ * 引擎执行扩展信息实体
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */
 @Getter
 @Setter
 @ToString
-public class EngineExecutionExtInfoEntity extends BaseEntity {
+public class EngineExecutionExtInfoEntity implements Serializable {
 
     /**
      * 执行ID
      */
     private Integer id;
-
-    /**
-     * 执行内容
-     */
-    private String execContent;
 
     /**
      * 作业配置

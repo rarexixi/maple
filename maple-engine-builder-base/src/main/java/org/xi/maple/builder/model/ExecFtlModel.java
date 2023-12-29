@@ -2,12 +2,14 @@ package org.xi.maple.builder.model;
 
 import lombok.*;
 
+import java.util.Map;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-public class EngineExecutionModel {
-    private Integer execId;
+public class ExecFtlModel<T> {
+    private Integer mapleExecId;
     private String execFile;
     private String fromApp;
     private String jobId;
@@ -17,5 +19,7 @@ public class EngineExecutionModel {
     private String resourceGroup;
     private String group;
     private String user;
-    private String configuration;
+
+    private Map<String, String> envs;
+    private T job;
 }

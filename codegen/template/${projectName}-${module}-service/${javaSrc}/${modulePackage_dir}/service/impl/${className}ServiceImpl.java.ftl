@@ -178,7 +178,6 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @author ${author}
      */
     @Override
-    @Transactional(readOnly = true)
     public ${className}DetailResponse getBy<#include "/include/table/pk_fun_names.ftl">(<#include "/include/table/pk_params.ftl">) {
         ${className}EntityExt entity = ${classNameFirstLower}Mapper.detailBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else></#if>(<#include "/include/table/pk_values.ftl">);
         if (entity == null) {
@@ -195,7 +194,6 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @return 符合条件的${tableComment}列表
      */
     @Override
-    @Transactional(readOnly = true)
     public List<${className}ListItemResponse> getList(${className}QueryRequest queryRequest) {
         ${className}SelectCondition condition = ObjectUtils.copy(queryRequest, ${className}SelectCondition.class);
         List<${className}Entity> list = ${classNameFirstLower}Mapper.select(condition);
@@ -211,7 +209,6 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @return 符合条件的${tableComment}分页列表
      */
     @Override
-    @Transactional(readOnly = true)
     public PageList<${className}ListItemResponse> getPageList(${className}QueryRequest queryRequest, Integer pageNum, Integer pageSize) {
 
         ${className}SelectCondition condition = ObjectUtils.copy(queryRequest, ${className}SelectCondition.class);

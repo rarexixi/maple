@@ -5,6 +5,7 @@ import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
+import org.xi.maple.builder.model.ExecFtlModel;
 import org.xi.maple.builder.model.Spark3EngineExecution;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
@@ -21,7 +22,7 @@ public class Spark3YarnConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        Spark3EngineExecution execConf = convert(execution);
+        ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
@@ -33,7 +34,7 @@ public class Spark3YarnConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
-        Spark3EngineExecution execConf = convert(execution);
+        ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
@@ -43,14 +44,14 @@ public class Spark3YarnConvertor implements MapleConvertor {
         return commandGeneratorModels;
     }
 
-    private Spark3EngineExecution convert(EngineExecutionModel execution) {
+    private ExecFtlModel<Spark3EngineExecution> convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
+        ExecFtlModel<Spark3EngineExecution> execModel = new ExecFtlModel<>();
         Spark3EngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class, null);
+        // todo 根据 runType 设置 runConf
         if (spark3EngineExecution != null) {
-            spark3EngineExecution.setName(execution.getExecName());
-            spark3EngineExecution.setQueue(execution.getClusterQueue());
-            spark3EngineExecution.setProxyUser(execution.getUser());
+            spark3EngineExecution.setQueue(execution.getResourceGroup());
         }
-        return spark3EngineExecution;
+        return execModel;
     }
 }

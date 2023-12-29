@@ -33,8 +33,7 @@ public class MapleRedisUtil {
     ) {
         String queueName = String.join("-", cluster, clusterQueue, fromApp, group, priority.toString());
         // megq (maple-execution-group-queue), megql (maple-execution-group-queue-lock)
-        return new MapleEngineExecutionQueue("megq::" + queueName, "megql::" + queueName,
-                cluster, clusterQueue, fromApp, group, priority);
+        return new MapleEngineExecutionQueue("megq::" + queueName, cluster, clusterQueue, fromApp, group, priority);
     }
 
     /**

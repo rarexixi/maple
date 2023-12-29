@@ -1,30 +1,32 @@
 package org.xi.maple.persistence.service.impl;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleDataInsertException;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
-import org.xi.maple.common.exception.MapleOperationForbiddenException;
 import org.xi.maple.common.model.PageList;
 import org.xi.maple.common.util.ObjectUtils;
-import org.xi.maple.persistence.model.request.*;
-import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
+import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionQueryRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
 import org.xi.maple.persistence.persistence.condition.EngineExecutionSelectCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
+import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
 import org.xi.maple.persistence.persistence.mapper.EngineExecutionMapper;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
 import org.xi.maple.persistence.service.EngineExecutionService;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -97,18 +99,6 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             return result;
         }
         throw new MapleDataInsertException("批量插入失败");
-    }
-
-    /**
-     * 根据执行ID更新心跳时间
-     *
-     * @param id 引擎执行记录ID
-     * @return 影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    @Override
-    public int heartbeatById(Integer id) {
-        return engineExecutionMapper.heartbeatById(id);
     }
 
     /**

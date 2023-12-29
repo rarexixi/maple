@@ -33,14 +33,6 @@ public interface EngineExecutionService {
      */
     List<Integer> batchAdd(Collection<EngineExecutionAddRequest> list);
 
-    /**
-     * 根据执行ID更新心跳时间
-     *
-     * @param id 引擎执行记录ID
-     * @return 影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    int heartbeatById(Integer id);
 
     /**
      * 根据执行ID更新引擎执行状态

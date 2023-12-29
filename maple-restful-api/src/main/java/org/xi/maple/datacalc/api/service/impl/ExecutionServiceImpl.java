@@ -76,10 +76,10 @@ public class ExecutionServiceImpl implements ExecutionService {
      */
     @Override
     public Integer submit(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
-        checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getUniqueId(), submitReq.getExecName());
+        checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getExecUniqId(), submitReq.getExecName());
         final Integer id = persistenceClient.addExecution(submitReq);
         threadPoolTaskExecutor.execute(() -> {
-            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getClusterQueue(),
+            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getResourceGroup(),
                     submitReq.getFromApp(), submitReq.getGroup(), submitReq.getPriority());
             persistenceClient.addOrUpdateExecQueue(execQueue);
             RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(execQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
@@ -91,7 +91,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public Integer submitNow(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
-        checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getUniqueId(), submitReq.getExecName());
+        checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getExecUniqId(), submitReq.getExecName());
 
         final Integer id = persistenceClient.addExecution(submitReq);
         schedulerClient.submitExecution(id);
@@ -101,14 +101,14 @@ public class ExecutionServiceImpl implements ExecutionService {
     @Override
     public Object kill(Integer id, Long timestamp, String secret) {
         EngineExecutionDetailResponse detail = detail(id);
-        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getUniqueId(), detail.getExecName());
+        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getExecUniqId(), detail.getExecName());
         return schedulerClient.killExecution(id);
     }
 
     @Override
     public Object stop(Integer id, Long timestamp, String secret, Map<String, ?> cancelParams) {
         EngineExecutionDetailResponse detail = detail(id);
-        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getUniqueId(), detail.getExecName());
+        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getExecUniqId(), detail.getExecName());
         return schedulerClient.stopExecution(id, cancelParams);
     }
 

@@ -103,28 +103,6 @@ create table `maple`.`maple_application`
 
 # region engine
 
-drop table if exists `maple`.`maple_engine_category`;
-create table `maple`.`maple_engine_category`
-(
-    `id`          int                                    not null auto_increment comment '引擎ID',
-    `name`        varchar(32)  default ''                not null comment '类型名称',
-    `version`     varchar(32)  default ''                not null comment '类型版本',
-    `home`        varchar(256) default ''                not null comment '引擎目录',
-    `group`       varchar(32)  default ''                not null comment '用户组',
-    `user`        varchar(32)  default ''                not null comment '用户',
-
-    `create_time` datetime     default current_timestamp not null comment '创建时间',
-    `update_time` datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
-
-    primary key (`id`),
-    index idx_engine_version (`name`, `version`),
-    unique uniq_engine_version (`name`, `version`)
-) engine = InnoDB
-  default charset = utf8
-  collate = utf8_unicode_ci
-    comment = '执行器实例';
-
-
 drop table if exists `maple`.`maple_cluster`;
 create table `maple`.`maple_cluster`
 (
@@ -146,6 +124,38 @@ create table `maple`.`maple_cluster`
   collate = utf8_unicode_ci
     comment = '集群';
 
+drop table if exists `maple`.`maple_cluster_engine`;
+create table `maple`.`maple_cluster_engine`
+(
+    `id`          int                                    not null auto_increment comment '引擎ID',
+    `cluster`     varchar(32)  default ''                not null comment '集群名称',
+    `name`        varchar(32)  default ''                not null comment '类型名称',
+    `version`     varchar(32)  default ''                not null comment '类型版本',
+    `engine_home` varchar(256) default ''                not null comment '引擎目录',
+
+    `create_time` datetime     default current_timestamp not null comment '创建时间',
+    `update_time` datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    unique uniq_cluster_engine_version (`cluster`, `name`, `version`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '集群引擎';
+
+drop table if exists `maple`.`maple_cluster_engine_default_conf`;
+create table `maple`.`maple_cluster_engine_default_conf`
+(
+    `obj_type`     varchar(32) default '' not null comment '主体类型', -- engine、group、user
+    `obj_name`     varchar(32) default '' not null comment '所属主体', -- engine_name、group_name、user_name
+    `engine_id`    int                    not null comment '集群引擎ID',
+    `default_conf` text                   not null comment '默认配置',
+
+    primary key (`obj_type`, `obj_name`, `engine_id`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '集群引擎默认配置';
 
 drop table if exists `maple`.`maple_engine_execution_queue`;
 create table `maple`.`maple_engine_execution_queue`
@@ -189,12 +199,12 @@ create table `maple`.`maple_engine_execution`
     `group`           varchar(32)  default ''                not null comment '用户组',
     `user`            varchar(32)  default ''                not null comment '用户',
 
-    `status`          varchar(16)  default 'CREATED'         not null comment '状态',               -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
     `cluster_app_id`  varchar(64)  default ''                not null comment '集群应用ID',         -- K8s 按一定规则生成，直接写入数据库，YARN 的 ApplicationID 由 YARN 生成，后续回写到数据库
-
+    `status`          varchar(16)  default 'CREATED'         not null comment '状态',               -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
     `starting_time`   datetime                               null comment '任务提交时间',           -- 对应 STARTING 的时间，提交执行的时候设置
     `running_time`    datetime                               null comment '任务执行开始时间',       -- 对应首次 RUNNING 的时间，任务真正开始执行的时候设置
     `finish_time`     datetime                               null comment '任务执行结束时间',       -- 对应结束状态的时间，任务结束的时候设置，不管是否成功
+
     `create_time`     datetime     default current_timestamp not null comment '创建时间',
     `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
 

@@ -11,11 +11,6 @@ public class EngineExecutionDetailResponse extends EngineExecutionListItemRespon
     private String clusterCategory;
 
     /**
-     * 执行内容
-     */
-    private String execContent;
-
-    /**
      * 作业配置
      */
     private String configuration;

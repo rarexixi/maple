@@ -54,7 +54,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             return;
         }
         submitExecution(execution, () -> {
-            logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
+            logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
             updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列资源不足"));
         });
     }
@@ -63,15 +63,15 @@ public class ExecutionServiceImpl implements ExecutionService {
     public void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback) {
         ClusterQueue cachedQueueInfo = null;
         if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
-            cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getCluster(), execution.getClusterQueue());
+            cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getCluster(), execution.getResourceGroup());
         } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
-            cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getCluster(), execution.getClusterQueue());
+            cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getCluster(), execution.getResourceGroup());
         } else {
-            logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
+            logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
         }
         // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
         if (cachedQueueInfo == null) {
-            logger.error("队列不存在，cluster: {}, queue: {}", execution.getCluster(), execution.getClusterQueue());
+            logger.error("队列不存在，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
             // 修改作业状态
             updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列不存在"));
         } else if (!cachedQueueInfo.idle()) {
@@ -86,9 +86,9 @@ public class ExecutionServiceImpl implements ExecutionService {
     public Object kill(Integer id) {
         EngineExecutionDetailResponse execution = getExecutionById(id);
         if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
-            return null; // k8sClusterService.deleteEngine(execution.getCluster(), execution.getNamespace(), execution.getClusterCategory(), execution.getUniqueId());
+            return null; // k8sClusterService.deleteEngine(execution.getCluster(), execution.getNamespace(), execution.getClusterCategory(), execution.getExecUniqId());
         } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
-            return yarnClusterService.kill(execution.getCluster(), execution.getClusterQueue());
+            return yarnClusterService.kill(execution.getCluster(), execution.getResourceGroup());
         } else {
             throw new MapleClusterNotSupportException("不支持的集群类型，id: " + id);
         }

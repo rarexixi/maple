@@ -1,38 +1,24 @@
 package org.xi.maple.persistence.model.request;
 
-import org.xi.maple.persistence.model.BaseEntity;
-import javax.validation.constraints.*;
-
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+
 @Data
-public class EngineExecutionAddRequest extends BaseEntity {
+public class EngineExecutionAddRequest implements Serializable {
 
     /**
-     * 执行标识
+     * 执行ID
      */
-    @NotBlank(message = "uniqueId(执行标识)不能为空")
-    private String uniqueId;
+    private Integer id;
 
     /**
-     * 执行名称
+     * 执行文件
      */
-    private String execName;
-
-    /**
-     * 作业说明
-     */
-    private String execComment;
-
-    /**
-     * 执行内容类型 (text, path)
-     */
-    private String contentType;
-
-    /**
-     * 执行内容路径
-     */
-    private String contentPath;
+    @NotBlank(message = "execFile(执行文件)不能为空")
+    private String execFile;
 
     /**
      * 来源应用
@@ -41,15 +27,38 @@ public class EngineExecutionAddRequest extends BaseEntity {
     private String fromApp;
 
     /**
+     * 作业ID
+     */
+    @NotBlank(message = "jobId(作业ID)不能为空")
+    private String jobId;
+
+    /**
+     * 执行批次ID
+     */
+    @NotBlank(message = "bizId(执行批次ID)不能为空")
+    private String bizId;
+
+    /**
+     * 应用作业执行唯一ID
+     */
+    @NotBlank(message = "execUniqId(应用作业执行唯一ID)不能为空")
+    private String execUniqId;
+
+    /**
+     * 执行名称
+     */
+    private String execName;
+
+    /**
      * 提交集群
      */
     @NotBlank(message = "cluster(提交集群)不能为空")
     private String cluster;
 
     /**
-     * 集群队列
+     * 集群资源组
      */
-    private String clusterQueue;
+    private String resourceGroup;
 
     /**
      * 引擎种类
@@ -68,9 +77,9 @@ public class EngineExecutionAddRequest extends BaseEntity {
     private Integer priority;
 
     /**
-     * 优先级是否可升级
+     * 优先级可提升
      */
-    private boolean priUpgradable = false;
+    private Boolean priUpgradable = false;
 
     /**
      * 用户组
@@ -83,9 +92,9 @@ public class EngineExecutionAddRequest extends BaseEntity {
     private String user;
 
     /**
-     * 执行内容
+     * 集群应用ID
      */
-    private String execContent;
+    private String clusterAppId;
 
     /**
      * 作业配置

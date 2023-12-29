@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 @CrossOrigin
-@RequestMapping("/${tablePath}")
+@RequestMapping("${tablePath}")
 @RestController
 @Validated
 public class ${className}Controller {
@@ -37,7 +37,7 @@ public class ${className}Controller {
         this.${classNameFirstLower}Service = ${classNameFirstLower}Service;
     }
 
-    @PostMapping("/add")
+    @PostMapping("add")
     public ResponseEntity<${className}DetailResponse> add(@Validated @RequestBody @SetFieldTypes(types = {"create"}) ${className}AddRequest ${classNameFirstLower}) {
         ${className}DetailResponse detail = ${classNameFirstLower}Service.add(${classNameFirstLower});
         return ResponseEntity.created(URI.create("")).body(detail);
@@ -45,20 +45,20 @@ public class ${className}Controller {
     <#-- region 删除/启用/禁用 -->
     <#if (table.hasUniPk)>
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("delete")
     public ResponseEntity<Integer> delete(@Validated @SetFieldTypes(types = {"update"}) ${className}PatchRequest patchRequest) {
         Integer count = ${classNameFirstLower}Service.delete(patchRequest);
         return ResponseEntity.ok(count);
     }
 
     <#if table.validStatusColumn??>
-    @PatchMapping("/disable")
+    @PatchMapping("disable")
     public ResponseEntity<Integer> disable(@Validated @SetFieldTypes(types = {"update"}) ${className}PatchRequest patchRequest) {
         Integer count = ${classNameFirstLower}Service.disable(patchRequest);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/enable")
+    @PatchMapping("enable")
     public ResponseEntity<Integer> enable(@Validated @SetFieldTypes(types = {"update"}) ${className}PatchRequest patchRequest) {
         Integer count = ${classNameFirstLower}Service.enable(patchRequest);
         return ResponseEntity.ok(count);
@@ -70,14 +70,14 @@ public class ${className}Controller {
     <#-- region 更新 -->
     <#if (table.hasAutoIncUniPk)>
 
-    @PatchMapping("/update")
+    @PatchMapping("update")
     public ResponseEntity<${className}DetailResponse> updateBy<#include "/include/table/pk_fun_names.ftl">(@Validated @RequestBody @SetFieldTypes(types = {"update"}) ${className}SaveRequest ${classNameFirstLower}) {
         ${className}DetailResponse detail = ${classNameFirstLower}Service.updateBy<#include "/include/table/pk_fun_names.ftl">(${classNameFirstLower});
         return ResponseEntity.ok(detail);
     }
     <#else>
 
-    @PatchMapping("/update")
+    @PatchMapping("update")
     public ResponseEntity<${className}DetailResponse> updateBy<#include "/include/table/pk_fun_names.ftl">(
             @Validated @RequestBody @SetFieldTypes(types = {"update"}) ${className}SaveRequest ${classNameFirstLower},
             <#list pks as column>
@@ -94,14 +94,14 @@ public class ${className}Controller {
     <#-- region 详情 -->
     <#if (table.hasUniPk)>
 
-    @GetMapping("/detail")
+    @GetMapping("detail")
     public ResponseEntity<${className}DetailResponse> getBy<#include "/include/table/pk_fun_names.ftl">(@RequestParam("${uniPkFieldName}") <#if uniPkIsString>@NotBlank(message = "${uniPkComment}不能为空")<#else>@NotNull(message = "${uniPkComment}不能为空") @Min(value = 1, message = "${uniPkComment}必须大于0")</#if> ${uniPkFieldType} ${uniPkFieldName}) {
         ${className}DetailResponse detail = ${classNameFirstLower}Service.getBy<#include "/include/table/pk_fun_names.ftl">(${uniPkFieldName});
         return ResponseEntity.ok(detail);
     }
     <#else>
 
-    @GetMapping("/detail")
+    @GetMapping("detail")
     public ResponseEntity<${className}DetailResponse> getBy<#include "/include/table/pk_fun_names.ftl">(
             <#list pks as column>
             <#include "/include/column/properties.ftl">
@@ -114,12 +114,12 @@ public class ${className}Controller {
     </#if>
     <#-- endregion 详情 -->
 
-    @GetMapping("/list")
+    @GetMapping("list")
     public ResponseEntity<List<${className}ListItemResponse>> getList(${className}QueryRequest queryRequest) {
         return ResponseEntity.ok(${classNameFirstLower}Service.getList(queryRequest));
     }
 
-    @GetMapping("/page-list")
+    @GetMapping("page-list")
     public ResponseEntity<PageList<${className}ListItemResponse>> getPageList(
             ${className}QueryRequest queryRequest,
             @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,

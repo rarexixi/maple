@@ -1,12 +1,12 @@
 package org.xi.maple.persistence.persistence.mapper;
 
-import org.apache.ibatis.annotations.Param;
 import org.xi.maple.common.mapper.*;
 import org.xi.maple.persistence.persistence.condition.EngineExecutionSelectCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
-import org.apache.ibatis.annotations.Mapper;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 
@@ -38,15 +38,6 @@ public interface EngineExecutionMapper extends
      * @return 影响的行数
      */
     int batchInsertExt(@Param("list") Collection<EngineExecutionExtInfoEntity> list);
-
-    /**
-     * 根据执行ID更新心跳时间
-     *
-     * @param id 引擎执行记录ID
-     * @return 影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    int heartbeatById(@Param("id") Integer id);
 
     /**
      * 根据执行ID更新引擎执行状态

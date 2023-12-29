@@ -1,9 +1,9 @@
 package org.xi.maple.persistence.model.response;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
-import lombok.Data;
 
 @Data
 public class EngineExecutionListItemResponse implements Serializable {
@@ -14,29 +14,9 @@ public class EngineExecutionListItemResponse implements Serializable {
     private Integer id;
 
     /**
-     * 执行标识
+     * 执行文件
      */
-    private String uniqueId;
-
-    /**
-     * 执行名称
-     */
-    private String execName;
-
-    /**
-     * 作业说明
-     */
-    private String execComment;
-
-    /**
-     * 执行内容类型 (text, path)
-     */
-    private String contentType;
-
-    /**
-     * 执行内容路径
-     */
-    private String contentPath;
+    private String execFile;
 
     /**
      * 来源应用
@@ -44,14 +24,34 @@ public class EngineExecutionListItemResponse implements Serializable {
     private String fromApp;
 
     /**
+     * 作业ID
+     */
+    private String jobId;
+
+    /**
+     * 执行批次ID
+     */
+    private String bizId;
+
+    /**
+     * 应用作业执行唯一ID
+     */
+    private String execUniqId;
+
+    /**
+     * 执行名称
+     */
+    private String execName;
+
+    /**
      * 提交集群
      */
     private String cluster;
 
     /**
-     * 集群队列
+     * 集群资源组
      */
-    private String clusterQueue;
+    private String resourceGroup;
 
     /**
      * 引擎种类
@@ -71,12 +71,12 @@ public class EngineExecutionListItemResponse implements Serializable {
     /**
      * 运行优先级
      */
-    private Integer runPriority;
+    private Integer runPri;
 
     /**
-     * 状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)
+     * 优先级可提升
      */
-    private String status;
+    private Boolean priUpgradable;
 
     /**
      * 用户组
@@ -89,19 +89,29 @@ public class EngineExecutionListItemResponse implements Serializable {
     private String user;
 
     /**
-     * 创建时间
+     * 集群应用ID
      */
-    private LocalDateTime startTime;
+    private String clusterAppId;
 
     /**
-     * 停止时间
+     * 状态
      */
-    private LocalDateTime endTime;
+    private String status;
 
     /**
-     * 更新时间
+     * 任务提交时间
      */
-    private LocalDateTime heartbeatTime;
+    private LocalDateTime startingTime;
+
+    /**
+     * 任务执行开始时间
+     */
+    private LocalDateTime runningTime;
+
+    /**
+     * 任务执行结束时间
+     */
+    private LocalDateTime finishTime;
 
     /**
      * 创建时间

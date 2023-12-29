@@ -1,16 +1,12 @@
 package org.xi.maple.persistence.persistence.condition;
 
-import org.xi.maple.common.model.SelectCondition;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.xi.maple.common.model.SelectCondition;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 /**
  * 引擎执行记录查询条件
@@ -48,204 +44,44 @@ public class EngineExecutionSelectCondition extends SelectCondition {
     private Integer idMax;
 
     /**
-     * 执行标识
+     * 执行文件
      */
-    private String uniqueId;
+    private String execFile;
 
     /**
-     * 执行标识列表
+     * 执行文件列表
      */
-    private Collection<String> uniqueIdIn;
+    private Collection<String> execFileIn;
 
     /**
-     * 排除的执行标识列表
+     * 排除的执行文件列表
      */
-    private Collection<String> uniqueIdNotIn;
+    private Collection<String> execFileNotIn;
 
     /**
-     * 执行标识不为空
+     * 执行文件不为空
      */
-    private Boolean uniqueIdIsNotEmpty;
+    private Boolean execFileIsNotEmpty;
 
     /**
-     * 执行标识为空
+     * 执行文件为空
      */
-    private Boolean uniqueIdIsEmpty;
+    private Boolean execFileIsEmpty;
 
     /**
-     * 执行标识开始
+     * 执行文件开始
      */
-    private String uniqueIdStartWith;
+    private String execFileStartWith;
 
     /**
-     * 执行标识结束
+     * 执行文件结束
      */
-    private String uniqueIdEndWith;
+    private String execFileEndWith;
 
     /**
-     * 执行标识包含
+     * 执行文件包含
      */
-    private String uniqueIdContains;
-
-    /**
-     * 执行名称
-     */
-    private String execName;
-
-    /**
-     * 执行名称列表
-     */
-    private Collection<String> execNameIn;
-
-    /**
-     * 排除的执行名称列表
-     */
-    private Collection<String> execNameNotIn;
-
-    /**
-     * 执行名称不为空
-     */
-    private Boolean execNameIsNotEmpty;
-
-    /**
-     * 执行名称为空
-     */
-    private Boolean execNameIsEmpty;
-
-    /**
-     * 执行名称开始
-     */
-    private String execNameStartWith;
-
-    /**
-     * 执行名称结束
-     */
-    private String execNameEndWith;
-
-    /**
-     * 执行名称包含
-     */
-    private String execNameContains;
-
-    /**
-     * 作业说明
-     */
-    private String execComment;
-
-    /**
-     * 作业说明列表
-     */
-    private Collection<String> execCommentIn;
-
-    /**
-     * 排除的作业说明列表
-     */
-    private Collection<String> execCommentNotIn;
-
-    /**
-     * 作业说明不为空
-     */
-    private Boolean execCommentIsNotEmpty;
-
-    /**
-     * 作业说明为空
-     */
-    private Boolean execCommentIsEmpty;
-
-    /**
-     * 作业说明开始
-     */
-    private String execCommentStartWith;
-
-    /**
-     * 作业说明结束
-     */
-    private String execCommentEndWith;
-
-    /**
-     * 作业说明包含
-     */
-    private String execCommentContains;
-
-    /**
-     * 执行内容类型 (text, path)
-     */
-    private String contentType;
-
-    /**
-     * 执行内容类型列表
-     */
-    private Collection<String> contentTypeIn;
-
-    /**
-     * 排除的执行内容类型列表
-     */
-    private Collection<String> contentTypeNotIn;
-
-    /**
-     * 执行内容类型不为空
-     */
-    private Boolean contentTypeIsNotEmpty;
-
-    /**
-     * 执行内容类型为空
-     */
-    private Boolean contentTypeIsEmpty;
-
-    /**
-     * 执行内容类型开始
-     */
-    private String contentTypeStartWith;
-
-    /**
-     * 执行内容类型结束
-     */
-    private String contentTypeEndWith;
-
-    /**
-     * 执行内容类型包含
-     */
-    private String contentTypeContains;
-
-    /**
-     * 执行内容路径
-     */
-    private String contentPath;
-
-    /**
-     * 执行内容路径列表
-     */
-    private Collection<String> contentPathIn;
-
-    /**
-     * 排除的执行内容路径列表
-     */
-    private Collection<String> contentPathNotIn;
-
-    /**
-     * 执行内容路径不为空
-     */
-    private Boolean contentPathIsNotEmpty;
-
-    /**
-     * 执行内容路径为空
-     */
-    private Boolean contentPathIsEmpty;
-
-    /**
-     * 执行内容路径开始
-     */
-    private String contentPathStartWith;
-
-    /**
-     * 执行内容路径结束
-     */
-    private String contentPathEndWith;
-
-    /**
-     * 执行内容路径包含
-     */
-    private String contentPathContains;
+    private String execFileContains;
 
     /**
      * 来源应用
@@ -288,6 +124,166 @@ public class EngineExecutionSelectCondition extends SelectCondition {
     private String fromAppContains;
 
     /**
+     * 作业ID
+     */
+    private String jobId;
+
+    /**
+     * 作业ID列表
+     */
+    private Collection<String> jobIdIn;
+
+    /**
+     * 排除的作业ID列表
+     */
+    private Collection<String> jobIdNotIn;
+
+    /**
+     * 作业ID不为空
+     */
+    private Boolean jobIdIsNotEmpty;
+
+    /**
+     * 作业ID为空
+     */
+    private Boolean jobIdIsEmpty;
+
+    /**
+     * 作业ID开始
+     */
+    private String jobIdStartWith;
+
+    /**
+     * 作业ID结束
+     */
+    private String jobIdEndWith;
+
+    /**
+     * 作业ID包含
+     */
+    private String jobIdContains;
+
+    /**
+     * 执行批次ID
+     */
+    private String bizId;
+
+    /**
+     * 执行批次ID列表
+     */
+    private Collection<String> bizIdIn;
+
+    /**
+     * 排除的执行批次ID列表
+     */
+    private Collection<String> bizIdNotIn;
+
+    /**
+     * 执行批次ID不为空
+     */
+    private Boolean bizIdIsNotEmpty;
+
+    /**
+     * 执行批次ID为空
+     */
+    private Boolean bizIdIsEmpty;
+
+    /**
+     * 执行批次ID开始
+     */
+    private String bizIdStartWith;
+
+    /**
+     * 执行批次ID结束
+     */
+    private String bizIdEndWith;
+
+    /**
+     * 执行批次ID包含
+     */
+    private String bizIdContains;
+
+    /**
+     * 应用作业执行唯一ID
+     */
+    private String execUniqId;
+
+    /**
+     * 应用作业执行唯一ID列表
+     */
+    private Collection<String> execUniqIdIn;
+
+    /**
+     * 排除的应用作业执行唯一ID列表
+     */
+    private Collection<String> execUniqIdNotIn;
+
+    /**
+     * 应用作业执行唯一ID不为空
+     */
+    private Boolean execUniqIdIsNotEmpty;
+
+    /**
+     * 应用作业执行唯一ID为空
+     */
+    private Boolean execUniqIdIsEmpty;
+
+    /**
+     * 应用作业执行唯一ID开始
+     */
+    private String execUniqIdStartWith;
+
+    /**
+     * 应用作业执行唯一ID结束
+     */
+    private String execUniqIdEndWith;
+
+    /**
+     * 应用作业执行唯一ID包含
+     */
+    private String execUniqIdContains;
+
+    /**
+     * 执行名称
+     */
+    private String execName;
+
+    /**
+     * 执行名称列表
+     */
+    private Collection<String> execNameIn;
+
+    /**
+     * 排除的执行名称列表
+     */
+    private Collection<String> execNameNotIn;
+
+    /**
+     * 执行名称不为空
+     */
+    private Boolean execNameIsNotEmpty;
+
+    /**
+     * 执行名称为空
+     */
+    private Boolean execNameIsEmpty;
+
+    /**
+     * 执行名称开始
+     */
+    private String execNameStartWith;
+
+    /**
+     * 执行名称结束
+     */
+    private String execNameEndWith;
+
+    /**
+     * 执行名称包含
+     */
+    private String execNameContains;
+
+    /**
      * 提交集群
      */
     private String cluster;
@@ -328,44 +324,44 @@ public class EngineExecutionSelectCondition extends SelectCondition {
     private String clusterContains;
 
     /**
-     * 集群队列
+     * 集群资源组
      */
-    private String clusterQueue;
+    private String resourceGroup;
 
     /**
-     * 集群队列列表
+     * 集群资源组列表
      */
-    private Collection<String> clusterQueueIn;
+    private Collection<String> resourceGroupIn;
 
     /**
-     * 排除的集群队列列表
+     * 排除的集群资源组列表
      */
-    private Collection<String> clusterQueueNotIn;
+    private Collection<String> resourceGroupNotIn;
 
     /**
-     * 集群队列不为空
+     * 集群资源组不为空
      */
-    private Boolean clusterQueueIsNotEmpty;
+    private Boolean resourceGroupIsNotEmpty;
 
     /**
-     * 集群队列为空
+     * 集群资源组为空
      */
-    private Boolean clusterQueueIsEmpty;
+    private Boolean resourceGroupIsEmpty;
 
     /**
-     * 集群队列开始
+     * 集群资源组开始
      */
-    private String clusterQueueStartWith;
+    private String resourceGroupStartWith;
 
     /**
-     * 集群队列结束
+     * 集群资源组结束
      */
-    private String clusterQueueEndWith;
+    private String resourceGroupEndWith;
 
     /**
-     * 集群队列包含
+     * 集群资源组包含
      */
-    private String clusterQueueContains;
+    private String resourceGroupContains;
 
     /**
      * 引擎种类
@@ -475,67 +471,27 @@ public class EngineExecutionSelectCondition extends SelectCondition {
     /**
      * 运行优先级
      */
-    private Integer runPriority;
+    private Integer runPri;
 
     /**
      * 运行优先级列表
      */
-    private Collection<Integer> runPriorityIn;
+    private Collection<Integer> runPriIn;
 
     /**
      * 排除的运行优先级列表
      */
-    private Collection<Integer> runPriorityNotIn;
+    private Collection<Integer> runPriNotIn;
 
     /**
      * 最小运行优先级
      */
-    private Integer runPriorityMin;
+    private Integer runPriMin;
 
     /**
      * 最大运行优先级
      */
-    private Integer runPriorityMax;
-
-    /**
-     * 状态 (SUBMITTED, ACCEPTED, RUNNING, SUCCEED, FAILED, KILLED)
-     */
-    private String status;
-
-    /**
-     * 状态列表
-     */
-    private Collection<String> statusIn;
-
-    /**
-     * 排除的状态列表
-     */
-    private Collection<String> statusNotIn;
-
-    /**
-     * 状态不为空
-     */
-    private Boolean statusIsNotEmpty;
-
-    /**
-     * 状态为空
-     */
-    private Boolean statusIsEmpty;
-
-    /**
-     * 状态开始
-     */
-    private String statusStartWith;
-
-    /**
-     * 状态结束
-     */
-    private String statusEndWith;
-
-    /**
-     * 状态包含
-     */
-    private String statusContains;
+    private Integer runPriMax;
 
     /**
      * 用户组
@@ -618,64 +574,144 @@ public class EngineExecutionSelectCondition extends SelectCondition {
     private String userContains;
 
     /**
-     * 最小创建时间
+     * 集群应用ID
      */
-    private LocalDateTime startTimeMin;
+    private String clusterAppId;
 
     /**
-     * 最大创建时间
+     * 集群应用ID列表
      */
-    private LocalDateTime startTimeMax;
+    private Collection<String> clusterAppIdIn;
 
     /**
-     * 创建时间不为null
+     * 排除的集群应用ID列表
      */
-    private Boolean startTimeIsNotNull;
+    private Collection<String> clusterAppIdNotIn;
 
     /**
-     * 创建时间为null
+     * 集群应用ID不为空
      */
-    private Boolean startTimeIsNull;
+    private Boolean clusterAppIdIsNotEmpty;
 
     /**
-     * 最小停止时间
+     * 集群应用ID为空
      */
-    private LocalDateTime endTimeMin;
+    private Boolean clusterAppIdIsEmpty;
 
     /**
-     * 最大停止时间
+     * 集群应用ID开始
      */
-    private LocalDateTime endTimeMax;
+    private String clusterAppIdStartWith;
 
     /**
-     * 停止时间不为null
+     * 集群应用ID结束
      */
-    private Boolean endTimeIsNotNull;
+    private String clusterAppIdEndWith;
 
     /**
-     * 停止时间为null
+     * 集群应用ID包含
      */
-    private Boolean endTimeIsNull;
+    private String clusterAppIdContains;
 
     /**
-     * 最小更新时间
+     * 状态
      */
-    private LocalDateTime heartbeatTimeMin;
+    private String status;
 
     /**
-     * 最大更新时间
+     * 状态列表
      */
-    private LocalDateTime heartbeatTimeMax;
+    private Collection<String> statusIn;
 
     /**
-     * 更新时间不为null
+     * 排除的状态列表
      */
-    private Boolean heartbeatTimeIsNotNull;
+    private Collection<String> statusNotIn;
 
     /**
-     * 更新时间为null
+     * 状态不为空
      */
-    private Boolean heartbeatTimeIsNull;
+    private Boolean statusIsNotEmpty;
+
+    /**
+     * 状态为空
+     */
+    private Boolean statusIsEmpty;
+
+    /**
+     * 状态开始
+     */
+    private String statusStartWith;
+
+    /**
+     * 状态结束
+     */
+    private String statusEndWith;
+
+    /**
+     * 状态包含
+     */
+    private String statusContains;
+
+    /**
+     * 最小任务提交时间
+     */
+    private LocalDateTime startingTimeMin;
+
+    /**
+     * 最大任务提交时间
+     */
+    private LocalDateTime startingTimeMax;
+
+    /**
+     * 任务提交时间不为null
+     */
+    private Boolean startingTimeIsNotNull;
+
+    /**
+     * 任务提交时间为null
+     */
+    private Boolean startingTimeIsNull;
+
+    /**
+     * 最小任务执行开始时间
+     */
+    private LocalDateTime runningTimeMin;
+
+    /**
+     * 最大任务执行开始时间
+     */
+    private LocalDateTime runningTimeMax;
+
+    /**
+     * 任务执行开始时间不为null
+     */
+    private Boolean runningTimeIsNotNull;
+
+    /**
+     * 任务执行开始时间为null
+     */
+    private Boolean runningTimeIsNull;
+
+    /**
+     * 最小任务执行结束时间
+     */
+    private LocalDateTime finishTimeMin;
+
+    /**
+     * 最大任务执行结束时间
+     */
+    private LocalDateTime finishTimeMax;
+
+    /**
+     * 任务执行结束时间不为null
+     */
+    private Boolean finishTimeIsNotNull;
+
+    /**
+     * 任务执行结束时间为null
+     */
+    private Boolean finishTimeIsNull;
 
     /**
      * 最小创建时间

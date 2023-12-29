@@ -110,13 +110,13 @@ public class ScheduledExecutions implements CommandLineRunner {
                 logger.error("作业不存在，id: {}", queueItem.getExecId());
                 return;
             }
-            if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getClusterQueue())) {
+            if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getResourceGroup())) {
                 logger.info("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
                 executionService.updateExecutionStatus(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.FAILED.toString()));
                 return;
             }
             threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {
-                logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getCluster(), execution.getClusterQueue());
+                logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getCluster(), execution.getResourceGroup());
                 deque.addFirst(queueItem);
                 continueRunning.set(false);
             }));

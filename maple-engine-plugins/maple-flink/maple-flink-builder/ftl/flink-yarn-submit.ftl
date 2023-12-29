@@ -20,7 +20,7 @@ ${flinkHome}/bin/flink run-application \
 </#list>
 </#if>
 <#if runType == "jar">
-    --class ${className} \
+    --class ${mainClass} \
     ${jarFile} ${args}
 <#elseif runType == "py">
     --python ${python} \

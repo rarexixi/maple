@@ -18,7 +18,7 @@ import javax.validation.constraints.*;
 import java.net.URI;
 
 @CrossOrigin
-@RequestMapping("/engine-execution")
+@RequestMapping("engine-execution")
 @RestController
 @Validated
 public class EngineExecutionController {
@@ -30,19 +30,13 @@ public class EngineExecutionController {
         this.engineExecutionService = engineExecutionService;
     }
 
-    @PostMapping("/add")
+    @PostMapping("add")
     public ResponseEntity<Integer> add(@Validated @RequestBody EngineExecutionAddRequest engineExecution) {
         Integer id = engineExecutionService.add(engineExecution);
         return ResponseEntity.created(URI.create("")).body(id);
     }
 
-    @GetMapping("/heartbeat/{id}")
-    public ResponseEntity<Integer> heartbeatById(@PathVariable("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id) {
-        int count = engineExecutionService.heartbeatById(id);
-        return ResponseEntity.ok(count);
-    }
-
-    @PatchMapping("/update-status/{id}")
+    @PatchMapping("update-status/{id}")
     public ResponseEntity<Integer> updateStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateRequest) {
         int count = engineExecutionService.updateStatusById(id, updateRequest);
         return ResponseEntity.ok(count);
@@ -54,13 +48,13 @@ public class EngineExecutionController {
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/detail")
+    @GetMapping("detail")
     public ResponseEntity<EngineExecutionDetailResponse> getById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id) {
         EngineExecutionDetailResponse detail = engineExecutionService.getById(id);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/page-list")
+    @GetMapping("page-list")
     public ResponseEntity<PageList<EngineExecutionListItemResponse>> getPageList(
             EngineExecutionQueryRequest queryRequest,
             @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,

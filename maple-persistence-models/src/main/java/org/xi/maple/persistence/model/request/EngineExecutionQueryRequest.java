@@ -2,7 +2,11 @@ package org.xi.maple.persistence.model.request;
 
 import org.xi.maple.common.constant.SortConstants;
 import org.xi.maple.common.model.QueryRequest;
-
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 
 import lombok.Data;
@@ -18,11 +22,17 @@ public class EngineExecutionQueryRequest extends QueryRequest {
 
     private Integer idMax;
 
-    private String uniqueId;
+    private String fromApp;
 
-    private Collection<String> uniqueIdIn;
+    private Collection<String> fromAppIn;
 
-    private String uniqueIdContains;
+    private String fromAppContains;
+
+    private String execUniqId;
+
+    private Collection<String> execUniqIdIn;
+
+    private String execUniqIdContains;
 
     private String execName;
 
@@ -30,23 +40,11 @@ public class EngineExecutionQueryRequest extends QueryRequest {
 
     private String execNameContains;
 
-    private String fromApp;
-
-    private Collection<String> fromAppIn;
-
-    private String fromAppContains;
-
     private String cluster;
 
     private Collection<String> clusterIn;
 
     private String clusterContains;
-
-    private String clusterQueue;
-
-    private Collection<String> clusterQueueIn;
-
-    private String clusterQueueContains;
 
     private String engineCategory;
 
@@ -60,12 +58,6 @@ public class EngineExecutionQueryRequest extends QueryRequest {
 
     private String engineVersionContains;
 
-    private String status;
-
-    private Collection<String> statusIn;
-
-    private String statusContains;
-
     private String group;
 
     private Collection<String> groupIn;
@@ -77,6 +69,12 @@ public class EngineExecutionQueryRequest extends QueryRequest {
     private Collection<String> userIn;
 
     private String userContains;
+
+    private String status;
+
+    private Collection<String> statusIn;
+
+    private String statusContains;
 
     public void setIdRange(Integer[] idRange)  {
         if (idRange == null || idRange.length != 2) {
@@ -94,12 +92,20 @@ public class EngineExecutionQueryRequest extends QueryRequest {
         super.getOrderBy().getOrDefault("id", null);
     }
 
-    public void setUniqueIdSort(SortConstants sortConstants)  {
-        super.orderBy("unique_id", sortConstants);
+    public void setFromAppSort(SortConstants sortConstants)  {
+        super.orderBy("from_app", sortConstants);
     }
 
-    public void getUniqueIdSort()  {
-        super.getOrderBy().getOrDefault("unique_id", null);
+    public void getFromAppSort()  {
+        super.getOrderBy().getOrDefault("from_app", null);
+    }
+
+    public void setExecUniqIdSort(SortConstants sortConstants)  {
+        super.orderBy("exec_uniq_id", sortConstants);
+    }
+
+    public void getExecUniqIdSort()  {
+        super.getOrderBy().getOrDefault("exec_uniq_id", null);
     }
 
     public void setExecNameSort(SortConstants sortConstants)  {
@@ -110,28 +116,12 @@ public class EngineExecutionQueryRequest extends QueryRequest {
         super.getOrderBy().getOrDefault("exec_name", null);
     }
 
-    public void setFromAppSort(SortConstants sortConstants)  {
-        super.orderBy("from_app", sortConstants);
-    }
-
-    public void getFromAppSort()  {
-        super.getOrderBy().getOrDefault("from_app", null);
-    }
-
     public void setClusterSort(SortConstants sortConstants)  {
         super.orderBy("cluster", sortConstants);
     }
 
     public void getClusterSort()  {
         super.getOrderBy().getOrDefault("cluster", null);
-    }
-
-    public void setClusterQueueSort(SortConstants sortConstants)  {
-        super.orderBy("cluster_queue", sortConstants);
-    }
-
-    public void getClusterQueueSort()  {
-        super.getOrderBy().getOrDefault("cluster_queue", null);
     }
 
     public void setEngineCategorySort(SortConstants sortConstants)  {
@@ -150,14 +140,6 @@ public class EngineExecutionQueryRequest extends QueryRequest {
         super.getOrderBy().getOrDefault("engine_version", null);
     }
 
-    public void setStatusSort(SortConstants sortConstants)  {
-        super.orderBy("status", sortConstants);
-    }
-
-    public void getStatusSort()  {
-        super.getOrderBy().getOrDefault("status", null);
-    }
-
     public void setGroupSort(SortConstants sortConstants)  {
         super.orderBy("group", sortConstants);
     }
@@ -172,5 +154,13 @@ public class EngineExecutionQueryRequest extends QueryRequest {
 
     public void getUserSort()  {
         super.getOrderBy().getOrDefault("user", null);
+    }
+
+    public void setStatusSort(SortConstants sortConstants)  {
+        super.orderBy("status", sortConstants);
+    }
+
+    public void getStatusSort()  {
+        super.getOrderBy().getOrDefault("status", null);
     }
 }

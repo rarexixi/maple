@@ -5,12 +5,12 @@ import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
+import org.xi.maple.builder.model.ExecFtlModel;
 import org.xi.maple.builder.model.Spark3EngineExecution;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,25 +21,36 @@ public class Spark3K8sConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        Spark3EngineExecution execConf;
-        try {
-            execConf = convert(execution);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
+        if (execConf == null) {
+            return null;
         }
-        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-k8s-submit.yaml.ftl", "spark-k8s-submit.yaml", execConf));
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-yarn-submit.sh.ftl", "spark3-yarn-submit.sh", execConf));
         return commandGeneratorModels;
     }
 
-    private Spark3EngineExecution convert(EngineExecutionModel execution) throws IOException {
+    @Override
+    public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
+        ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
+        if (execConf == null) {
+            return null;
+        }
+
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-stop.sh.ftl", "flink-yarn-stop.sh", execConf));
+        return commandGeneratorModels;
+    }
+
+    private ExecFtlModel<Spark3EngineExecution> convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
-        Spark3EngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class);
-        assert spark3EngineExecution != null;
-        spark3EngineExecution.setName(execution.getExecName());
-        spark3EngineExecution.setQueue(execution.getClusterQueue());
-        spark3EngineExecution.setProxyUser(execution.getUser());
-        return spark3EngineExecution;
+        ExecFtlModel<Spark3EngineExecution> execModel = new ExecFtlModel<>();
+        Spark3EngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class, null);
+        // todo 根据 runType 设置 runConf
+        if (spark3EngineExecution != null) {
+            spark3EngineExecution.setQueue(execution.getResourceGroup());
+        }
+        return execModel;
     }
 }

@@ -78,17 +78,17 @@ public abstract class EngineExecutor implements EngineExecutionService {
     }
 
     protected EngineExecutionModel convert(EngineExecutionDetailResponse execution) {
-        return EngineExecutionModel.builder()
-                .execId(execution.getId())
-                .uniqueId(execution.getUniqueId())
-                .execName(execution.getExecName())
-                .execComment(execution.getExecComment())
-                .execContent(execution.getExecContent())
-                .clusterQueue(execution.getClusterQueue())
-                .group(execution.getGroup())
-                .user(execution.getUser())
-                .configuration(execution.getConfiguration())
-                .build();
+        return new EngineExecutionModel().withExecId(execution.getId())
+                .withExecFile(execution.getExecFile())
+                .withFromApp(execution.getFromApp())
+                .withJobId(execution.getJobId())
+                .withBizId(execution.getBizId())
+                .withExecUniqId(execution.getExecUniqId())
+                .withExecName(execution.getExecName())
+                .withResourceGroup(execution.getResourceGroup())
+                .withGroup(execution.getGroup())
+                .withUser(execution.getUser())
+                .withConfiguration(execution.getConfiguration());
     }
 
     /**

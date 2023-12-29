@@ -1,8 +1,5 @@
 package org.xi.maple.persistence.persistence.entity;
 
-import java.math.BigDecimal;
-import java.util.Collection;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,11 +18,6 @@ public class EngineExecutionEntityExt extends EngineExecutionEntity {
      * 集群类型
      */
     private String clusterCategory;
-
-    /**
-     * 执行内容
-     */
-    private String execContent;
 
     /**
      * 作业配置
