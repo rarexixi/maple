@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.exception.MapleException;
+import org.xi.maple.common.model.EngineConf;
 import org.xi.maple.common.util.MapleExceptionUtils;
 import org.xi.maple.execution.client.PersistenceClient;
+import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 
@@ -31,6 +33,13 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
             public Integer updateExecutionExtInfoById(EngineExecutionUpdateRequest updateRequest) {
                 MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
                     throw new MapleException(feignResponseError.getError().getMsg());
+                });
+                return null;
+            }
+
+            @Override
+            public EngineConf getEngineConf(ClusterEngineDefaultConfGetRequest request) {
+                MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
                 });
                 return null;
             }

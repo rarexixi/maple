@@ -35,8 +35,8 @@ public class FlinkK8sConvertor implements MapleConvertor {
 
     private FlinkEngineExecution convert(EngineExecutionModel execution) throws IOException {
         String executionConf = execution.getConfiguration();
-        FlinkEngineExecution spark3EngineExecution = JsonUtils.parseObject(executionConf, FlinkEngineExecution.class);
-        assert spark3EngineExecution != null;
-        return spark3EngineExecution;
+        FlinkEngineExecution flinkEngineExecution = JsonUtils.parseObject(executionConf, FlinkEngineExecution.class);
+        assert flinkEngineExecution != null;
+        return flinkEngineExecution;
     }
 }

@@ -22,10 +22,6 @@ public class Spark3K8sConvertor implements MapleConvertor {
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
         ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
-        if (execConf == null) {
-            return null;
-        }
-
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
         commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-yarn-submit.sh.ftl", "spark3-yarn-submit.sh", execConf));
         return commandGeneratorModels;
@@ -34,10 +30,6 @@ public class Spark3K8sConvertor implements MapleConvertor {
     @Override
     public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
         ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
-        if (execConf == null) {
-            return null;
-        }
-
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
         commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-stop.sh.ftl", "flink-yarn-stop.sh", execConf));
         return commandGeneratorModels;

@@ -1,12 +1,12 @@
-<#list envs as key, value>
+<#list engine.envs as key, value>
     export ${key}=${value}
 </#list>
 
-${sparkHome}/bin/spark-submit \
+${engine.engineHome}/bin/spark-submit \
     --master yarn \
     --deploy-mode cluster \
     --queue ${job.queue} \
-    --name SPARK-${execName}-${mapleExecId} \
+    --name SPARK-${execName}-${execId} \
     --driver-cores ${job.driverCores} \
     --driver-memory ${job.driverMemory} \
     --num-executors ${job.numExecutors} \
@@ -34,9 +34,11 @@ ${sparkHome}/bin/spark-submit \
     </#list>
 </#if>
 <#if job.runType == "data_calc">
-    --class xxx.xxx.xxx ${execFile}
+    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execFile}
 <#elseif job.runType == "sql">
-    --class xxx.xxx.xxx ${execFile}
+    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execFile}
+<#elseif job.runType == "scala">
+    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execFile}
 <#elseif job.runType == "py">
     --py-files ${job.runConf.pyFiles} ${execFile} ${job.runConf.args}
 <#elseif job.runType == "jar">

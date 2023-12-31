@@ -1,6 +1,10 @@
 package org.xi.maple.builder.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.With;
+import org.xi.maple.common.model.EngineConf;
 
 @Data
 @AllArgsConstructor
@@ -17,5 +21,6 @@ public class EngineExecutionModel {
     private String resourceGroup;
     private String group;
     private String user;
+    private EngineConf engine;
     private String configuration;
 }

@@ -1,12 +1,12 @@
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: ${mapleAppName}-${mapleId}
+  name: ${execName}-${execId}
   namespace: ${namespace}
   labels:
     from-app: maple-exec
-    maple-id: "${mapleId}"
-    maple-app-name: "${mapleAppName}"
+    maple-id: "${execId}"
+    maple-app-name: "${execName}"
     submit-user-group: "${submitUserGroup}"
     submit-user: "${submitUser}"
 spec:
@@ -46,8 +46,8 @@ spec:
     "spark.eventLog.enabled": "true"
     "spark.eventLog.dir": "hdfs://hadoop-cluster/spark/benchmark/logs/"
     "spark.kubernetes.file.upload.path": "local:///tmp/"
-    "spark.kubernetes.executor.podNamePrefix": "maple-spark-${mapleId}"
-    "spark.ui.proxyBase": "/ui/${namespace}/maple-spark-${mapleId}-ui-svc"
+    "spark.kubernetes.executor.podNamePrefix": "maple-spark-${execId}"
+    "spark.ui.proxyBase": "/ui/${namespace}/maple-spark-${execId}-ui-svc"
     "spark.ui.proxyRedirectUri": ""
     "spark.ui.port": "8080"
     <#list sparkConfSelf as confSelf>
@@ -65,8 +65,8 @@ spec:
     javaOptions: ""
     labels:
       from-app: maple-exec
-      maple-id: "${mapleId}"
-      maple-app-name: "${mapleAppName}"
+      maple-id: "${execId}"
+      maple-app-name: "${execName}"
       submit-user-group: "${submitUserGroup}"
       submit-user: "${submitUser}"
     serviceAccount: spark

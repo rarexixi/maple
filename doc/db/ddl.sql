@@ -132,6 +132,7 @@ create table `maple`.`maple_cluster_engine`
     `name`        varchar(32)  default ''                not null comment '类型名称',
     `version`     varchar(32)  default ''                not null comment '类型版本',
     `engine_home` varchar(256) default ''                not null comment '引擎目录',
+    `ext_info`    text                                   not null comment '扩展信息', -- 包括禁止的 --conf 配置，envs, default_conf 等
 
     `create_time` datetime     default current_timestamp not null comment '创建时间',
     `update_time` datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
@@ -146,10 +147,10 @@ create table `maple`.`maple_cluster_engine`
 drop table if exists `maple`.`maple_cluster_engine_default_conf`;
 create table `maple`.`maple_cluster_engine_default_conf`
 (
-    `obj_type`     varchar(32) default '' not null comment '主体类型', -- engine、group、user
-    `obj_name`     varchar(32) default '' not null comment '所属主体', -- engine_name、group_name、user_name
+    `obj_type`     varchar(32) default '' not null comment '主体类型', -- group、user
+    `obj_name`     varchar(32) default '' not null comment '所属主体', -- group_name、user_name
     `engine_id`    int                    not null comment '集群引擎ID',
-    `default_conf` text                   not null comment '默认配置',
+    `default_conf` text                   not null comment '默认配置', -- json，包括 envs，conf，args
 
     primary key (`obj_type`, `obj_name`, `engine_id`)
 ) engine = InnoDB

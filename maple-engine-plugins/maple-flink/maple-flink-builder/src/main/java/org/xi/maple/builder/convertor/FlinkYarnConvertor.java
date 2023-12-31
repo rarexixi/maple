@@ -10,7 +10,6 @@ import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

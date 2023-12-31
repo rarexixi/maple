@@ -6,7 +6,7 @@ metadata:
   labels:
     from-app: maple-exec
     maple-id: "${mapleId}"
-    maple-app-name: "${mapleAppName}"
+    maple-app-name: "${execName}"
     submit-user-group: "${submitUserGroup}"
     submit-user: "${submitUser}"
 spec:
@@ -17,7 +17,7 @@ spec:
       labels:
         from-app: maple-exec
         maple-id: "${mapleId}"
-        maple-app-name: "${mapleAppName}"
+        maple-app-name: "${execName}"
         submit-user-group: "${submitUserGroup}"
         submit-user: "${submitUser}"
     spec:

@@ -8,12 +8,13 @@ import org.slf4j.Logger;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
-import org.xi.maple.common.util.RetryUtils;
+import org.xi.maple.common.model.EngineConf;
 import org.xi.maple.execution.client.PersistenceClient;
 import org.xi.maple.execution.configuration.ExecutionProperties;
 import org.xi.maple.execution.builder.spi.EnginePluginService;
 import org.xi.maple.execution.configuration.PluginProperties;
 import org.xi.maple.execution.service.EngineExecutionService;
+import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 
@@ -26,7 +27,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public abstract class EngineExecutor implements EngineExecutionService {
 
@@ -78,6 +78,8 @@ public abstract class EngineExecutor implements EngineExecutionService {
     }
 
     protected EngineExecutionModel convert(EngineExecutionDetailResponse execution) {
+        ClusterEngineDefaultConfGetRequest request = new ClusterEngineDefaultConfGetRequest(execution.getCluster(), execution.getEngineCategory(), execution.getEngineVersion(), execution.getGroup(), execution.getUser());
+        EngineConf engineConf = persistenceClient.getEngineConf(request);
         return new EngineExecutionModel().withExecId(execution.getId())
                 .withExecFile(execution.getExecFile())
                 .withFromApp(execution.getFromApp())
@@ -88,6 +90,7 @@ public abstract class EngineExecutor implements EngineExecutionService {
                 .withResourceGroup(execution.getResourceGroup())
                 .withGroup(execution.getGroup())
                 .withUser(execution.getUser())
+                .withEngine(engineConf)
                 .withConfiguration(execution.getConfiguration());
     }
 
