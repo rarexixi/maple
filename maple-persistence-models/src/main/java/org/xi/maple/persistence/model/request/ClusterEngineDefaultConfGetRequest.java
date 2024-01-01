@@ -17,7 +17,7 @@ public class ClusterEngineDefaultConfGetRequest {
     /**
      * 引擎类型
      */
-    private String name;
+    private String engine;
 
     /**
      * 引擎版本

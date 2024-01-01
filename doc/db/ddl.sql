@@ -147,12 +147,14 @@ create table `maple`.`maple_cluster_engine`
 drop table if exists `maple`.`maple_cluster_engine_default_conf`;
 create table `maple`.`maple_cluster_engine_default_conf`
 (
+    `id`           int                    not null auto_increment comment '引擎ID',
     `obj_type`     varchar(32) default '' not null comment '主体类型', -- group、user
     `obj_name`     varchar(32) default '' not null comment '所属主体', -- group_name、user_name
     `engine_id`    int                    not null comment '集群引擎ID',
     `default_conf` text                   not null comment '默认配置', -- json，包括 envs，conf，args
 
-    primary key (`obj_type`, `obj_name`, `engine_id`)
+    primary key (`id`),
+    unique uniq_cluster_engine_obj_name (`obj_type`, `obj_name`, `engine_id`)
 ) engine = InnoDB
   default charset = utf8
   collate = utf8_unicode_ci

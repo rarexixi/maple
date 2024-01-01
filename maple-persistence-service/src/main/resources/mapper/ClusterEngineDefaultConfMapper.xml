@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.persistence.persistence.mapper.ClusterEngineDefaultConfMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEngineDefaultConfEntity">
+        <result property="id" column="id"/>
+        <result property="objType" column="obj_type"/>
+        <result property="objName" column="obj_name"/>
+        <result property="engineId" column="engine_id"/>
+        <result property="defaultConf" column="default_conf"/>
+    </resultMap>
+
+    <sql id="tableName">`maple_cluster_engine_default_conf`</sql>
+
+    <!--插入集群引擎默认配置-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">`id`,</if>
+            <if test="entity.objType != null">`obj_type`,</if>
+            <if test="entity.objName != null">`obj_name`,</if>
+            <if test="entity.engineId != null">`engine_id`,</if>
+            <if test="entity.defaultConf != null">`default_conf`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">#{entity.id},</if>
+            <if test="entity.objType != null">#{entity.objType},</if>
+            <if test="entity.objName != null">#{entity.objName},</if>
+            <if test="entity.engineId != null">#{entity.engineId},</if>
+            <if test="entity.defaultConf != null">#{entity.defaultConf},</if>
+        </trim>
+    </insert>
+
+    <!--根据引擎ID删除集群引擎默认配置-->
+    <delete id="deleteById">
+        DELETE FROM <include refid="tableName"/>
+        <where>
+            `id` = #{id}
+        </where>
+    </delete>
+
+    <!--根据引擎ID更新集群引擎默认配置-->
+    <update id="updateById">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.objType != null">
+                `obj_type` = #{entity.objType},
+            </if>
+            <if test="entity.objName != null">
+                `obj_name` = #{entity.objName},
+            </if>
+            <if test="entity.engineId != null">
+                `engine_id` = #{entity.engineId},
+            </if>
+            <if test="entity.defaultConf != null">
+                `default_conf` = #{entity.defaultConf}
+            </if>
+        </set>
+        <where>
+            `id` = #{id}
+        </where>
+    </update>
+
+    <!--根据主键获取集群引擎默认配置详情-->
+    <select id="detailById" resultMap="ExtResultMap">
+        SELECT
+            MT.`id`,
+            MT.`obj_type`,
+            MT.`obj_name`,
+            MT.`engine_id`,
+            MT.`default_conf`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            `id` = #{id}
+        </where>
+    </select>
+
+    <select id="selectByTypeAndName" resultMap="ResultMap">
+        SELECT
+            MT.`id`,
+            MT.`obj_type`,
+            MT.`obj_name`,
+            MT.`engine_id`,
+            MT.`default_conf`
+        FROM <include refid="tableName"/> MT
+        <where>
+            `engine_id` = #{engineId} AND `obj_type` = #{objType} AND `obj_name` = #{objName}
+        </where>
+    </select>
+</mapper>

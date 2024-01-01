@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.persistence.persistence.mapper.ClusterEngineMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEngineEntity">
+        <result property="id" column="id"/>
+        <result property="cluster" column="cluster"/>
+        <result property="name" column="name"/>
+        <result property="version" column="version"/>
+        <result property="engineHome" column="engine_home"/>
+        <result property="extInfo" column="ext_info"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEngineEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_cluster_engine`</sql>
+
+    <!--插入集群引擎-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">`id`,</if>
+            <if test="entity.cluster != null">`cluster`,</if>
+            <if test="entity.name != null">`name`,</if>
+            <if test="entity.version != null">`version`,</if>
+            <if test="entity.engineHome != null">`engine_home`,</if>
+            <if test="entity.extInfo != null">`ext_info`,</if>
+            <if test="entity.createTime != null">`create_time`,</if>
+            <if test="entity.updateTime != null">`update_time`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">#{entity.id},</if>
+            <if test="entity.cluster != null">#{entity.cluster},</if>
+            <if test="entity.name != null">#{entity.name},</if>
+            <if test="entity.version != null">#{entity.version},</if>
+            <if test="entity.engineHome != null">#{entity.engineHome},</if>
+            <if test="entity.extInfo != null">#{entity.extInfo},</if>
+            <if test="entity.createTime != null">#{entity.createTime},</if>
+            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入集群引擎-->
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/>
+        (
+            `id`,
+            `cluster`,
+            `name`,
+            `version`,
+            `engine_home`,
+            `ext_info`,
+            `create_time`,
+            `update_time`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.cluster},
+            #{item.name},
+            #{item.version},
+            #{item.engineHome},
+            #{item.extInfo},
+            #{item.createTime},
+            #{item.updateTime}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据引擎ID删除集群引擎-->
+    <delete id="deleteById">
+        DELETE FROM <include refid="tableName"/>
+        <where>
+            `id` = #{id}
+        </where>
+    </delete>
+
+    <!--根据引擎ID更新集群引擎-->
+    <update id="updateById">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.cluster != null">
+                `cluster` = #{entity.cluster},
+            </if>
+            <if test="entity.name != null">
+                `name` = #{entity.name},
+            </if>
+            <if test="entity.version != null">
+                `version` = #{entity.version},
+            </if>
+            <if test="entity.engineHome != null">
+                `engine_home` = #{entity.engineHome},
+            </if>
+            <if test="entity.extInfo != null">
+                `ext_info` = #{entity.extInfo},
+            </if>
+            <if test="entity.createTime != null">
+                `create_time` = #{entity.createTime},
+            </if>
+            <if test="entity.updateTime != null">
+                `update_time` = #{entity.updateTime}
+            </if>
+        </set>
+        <where>
+            `id` = #{id}
+        </where>
+    </update>
+
+    <!--根据主键获取集群引擎详情-->
+    <select id="detailById" resultMap="ExtResultMap">
+        SELECT
+            MT.`id`,
+            MT.`cluster`,
+            MT.`name`,
+            MT.`version`,
+            MT.`engine_home`,
+            MT.`ext_info`,
+            MT.`create_time`,
+            MT.`update_time`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            `id` = #{id}
+        </where>
+    </select>
+
+    <!--根据集群，引擎名称，引擎版本获取集群引擎详情-->
+    <select id="detailByClusterEngineVersion" resultMap="ExtResultMap">
+        SELECT
+            MT.`id`,
+            MT.`cluster`,
+            MT.`name`,
+            MT.`version`,
+            MT.`engine_home`,
+            MT.`ext_info`,
+            MT.`create_time`,
+            MT.`update_time`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            `cluster` = #{cluster} and `name` = #{name} and `version` = #{version}
+        </where>
+    </select>
+
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.id != null">
+                        AND MT.`id` = #{condition.id}
+                    </if>
+                    <if test="condition.idIn != null and condition.idIn.size() > 0">
+                        AND MT.`id` IN
+                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.idNotIn != null and condition.idNotIn.size() > 0">
+                        AND MT.`id` NOT IN
+                        <foreach collection="condition.idNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.idMin != null">
+                        <![CDATA[
+                        AND MT.`id` >= #{condition.idMin}
+                        ]]>
+                    </if>
+                    <if test="condition.idMax != null">
+                        <![CDATA[
+                        AND MT.`id` <= #{condition.idMax}
+                        ]]>
+                    </if>
+                    <if test="condition.cluster != null and condition.cluster != ''">
+                        AND MT.`cluster` = #{condition.cluster}
+                    </if>
+                    <if test="condition.clusterIn != null and condition.clusterIn.size() > 0">
+                        AND MT.`cluster` IN
+                        <foreach collection="condition.clusterIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.clusterNotIn != null and condition.clusterNotIn.size() > 0">
+                        AND MT.`cluster` NOT IN
+                        <foreach collection="condition.clusterNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.clusterIsNotEmpty != null and condition.clusterIsNotEmpty == true">
+                        AND MT.`cluster` IS NOT NULL AND `cluster` != ''
+                    </if>
+                    <if test="condition.clusterIsEmpty != null and condition.clusterIsEmpty == true">
+                        AND (MT.`cluster` IS NULL OR MT.`cluster` = '')
+                    </if>
+                    <if test="condition.clusterStartWith != null and condition.clusterStartWith != ''">
+                        AND MT.`cluster` LIKE concat(#{condition.clusterStartWith}, '%')
+                    </if>
+                    <if test="condition.clusterEndWith != null and condition.clusterEndWith != ''">
+                        AND MT.`cluster` LIKE concat('%', #{condition.clusterEndWith})
+                    </if>
+                    <if test="condition.clusterContains != null and condition.clusterContains != ''">
+                        AND MT.`cluster` LIKE concat('%', #{condition.clusterContains}, '%')
+                    </if>
+                    <if test="condition.name != null and condition.name != ''">
+                        AND MT.`name` = #{condition.name}
+                    </if>
+                    <if test="condition.nameIn != null and condition.nameIn.size() > 0">
+                        AND MT.`name` IN
+                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.nameNotIn != null and condition.nameNotIn.size() > 0">
+                        AND MT.`name` NOT IN
+                        <foreach collection="condition.nameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.nameIsNotEmpty != null and condition.nameIsNotEmpty == true">
+                        AND MT.`name` IS NOT NULL AND `name` != ''
+                    </if>
+                    <if test="condition.nameIsEmpty != null and condition.nameIsEmpty == true">
+                        AND (MT.`name` IS NULL OR MT.`name` = '')
+                    </if>
+                    <if test="condition.nameStartWith != null and condition.nameStartWith != ''">
+                        AND MT.`name` LIKE concat(#{condition.nameStartWith}, '%')
+                    </if>
+                    <if test="condition.nameEndWith != null and condition.nameEndWith != ''">
+                        AND MT.`name` LIKE concat('%', #{condition.nameEndWith})
+                    </if>
+                    <if test="condition.nameContains != null and condition.nameContains != ''">
+                        AND MT.`name` LIKE concat('%', #{condition.nameContains}, '%')
+                    </if>
+                    <if test="condition.version != null and condition.version != ''">
+                        AND MT.`version` = #{condition.version}
+                    </if>
+                    <if test="condition.versionIn != null and condition.versionIn.size() > 0">
+                        AND MT.`version` IN
+                        <foreach collection="condition.versionIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.versionNotIn != null and condition.versionNotIn.size() > 0">
+                        AND MT.`version` NOT IN
+                        <foreach collection="condition.versionNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.versionIsNotEmpty != null and condition.versionIsNotEmpty == true">
+                        AND MT.`version` IS NOT NULL AND `version` != ''
+                    </if>
+                    <if test="condition.versionIsEmpty != null and condition.versionIsEmpty == true">
+                        AND (MT.`version` IS NULL OR MT.`version` = '')
+                    </if>
+                    <if test="condition.versionStartWith != null and condition.versionStartWith != ''">
+                        AND MT.`version` LIKE concat(#{condition.versionStartWith}, '%')
+                    </if>
+                    <if test="condition.versionEndWith != null and condition.versionEndWith != ''">
+                        AND MT.`version` LIKE concat('%', #{condition.versionEndWith})
+                    </if>
+                    <if test="condition.versionContains != null and condition.versionContains != ''">
+                        AND MT.`version` LIKE concat('%', #{condition.versionContains}, '%')
+                    </if>
+                    <if test="condition.engineHome != null and condition.engineHome != ''">
+                        AND MT.`engine_home` = #{condition.engineHome}
+                    </if>
+                    <if test="condition.engineHomeIn != null and condition.engineHomeIn.size() > 0">
+                        AND MT.`engine_home` IN
+                        <foreach collection="condition.engineHomeIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.engineHomeNotIn != null and condition.engineHomeNotIn.size() > 0">
+                        AND MT.`engine_home` NOT IN
+                        <foreach collection="condition.engineHomeNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.engineHomeIsNotEmpty != null and condition.engineHomeIsNotEmpty == true">
+                        AND MT.`engine_home` IS NOT NULL AND `engine_home` != ''
+                    </if>
+                    <if test="condition.engineHomeIsEmpty != null and condition.engineHomeIsEmpty == true">
+                        AND (MT.`engine_home` IS NULL OR MT.`engine_home` = '')
+                    </if>
+                    <if test="condition.engineHomeStartWith != null and condition.engineHomeStartWith != ''">
+                        AND MT.`engine_home` LIKE concat(#{condition.engineHomeStartWith}, '%')
+                    </if>
+                    <if test="condition.engineHomeEndWith != null and condition.engineHomeEndWith != ''">
+                        AND MT.`engine_home` LIKE concat('%', #{condition.engineHomeEndWith})
+                    </if>
+                    <if test="condition.engineHomeContains != null and condition.engineHomeContains != ''">
+                        AND MT.`engine_home` LIKE concat('%', #{condition.engineHomeContains}, '%')
+                    </if>
+                    <if test="condition.createTimeMin != null">
+                        <![CDATA[
+                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createTimeMax != null">
+                        <![CDATA[
+                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMin != null">
+                        <![CDATA[
+                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updateTimeMax != null">
+                        <![CDATA[
+                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        ]]>
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <if test="condition.columns != null">
+            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
+        </if>
+        <if test="condition.columns == null">
+            MT.`id`,
+            MT.`cluster`,
+            MT.`name`,
+            MT.`version`,
+            MT.`engine_home`,
+            MT.`ext_info`,
+            MT.`create_time`,
+            MT.`update_time`
+        </if>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="condition.orderBy != null">
+            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+</mapper>

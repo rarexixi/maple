@@ -83,79 +83,101 @@
 
 # 数据库设计
 
-## 作业表
+## `maple_cluster_engine`
 
-```mysql
+### ext_info 字段说明
 
-drop table if exists `maple`.`maple_engine_execution`;
-create table `maple`.`maple_engine_execution`
+### spark
 
-(
-    `id`              int                                    not null auto_increment comment '执行ID',
-    `unique_id`       varchar(32)                            not null comment '执行标识',
-    `exec_name`       varchar(32)  default ''                not null comment '执行名称',
-    `exec_comment`    varchar(256) default ''                not null comment '作业说明',
-    `content_type`    varchar(8)   default 'text'            not null comment '执行内容类型 (text, path)',
-    `content_path`    varchar(256) default ''                not null comment '执行内容路径',
-    `from_app`        varchar(16)                            not null comment '来源应用',
-    `cluster`         varchar(32)                            not null comment '提交集群',
-    `cluster_queue`   varchar(128) default ''                not null comment '集群队列',
-    `engine_category` varchar(16)  default ''                not null comment '引擎种类',
-    `engine_version`  varchar(16)  default ''                not null comment '引擎版本',
-    `priority`        tinyint                                not null comment '初始优先级',
-    `run_pri`         tinyint                                not null comment '运行优先级',
-    `pri_upgradable`  bit          default 0                 not null comment '优先级是否可升级',
-    `status`          varchar(16)  default 'CREATED'         not null comment '状态 (CREATED, ACCEPTED, STARTING, START_FAILED, RUNNING, SUCCEED, FAILED, KILLED, CANCELED, LOST, UNKNOWN)',
-    `group`           varchar(32)  default ''                not null comment '用户组',
-    `user`            varchar(32)  default ''                not null comment '用户',
-
-    `starting_time`   datetime                               null comment '任务提交时间',     -- 对应 STARTING 的时间
-    `running_time`    datetime                               null comment '任务执行开始时间', -- 对应首次 RUNNING 的时间
-    `finish_time`     datetime                               null comment '任务执行结束时间', -- 对应结束状态的时间
-    `create_time`     datetime     default current_timestamp not null comment '创建时间',
-    `update_time`     datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
-
-    primary key (`id`),
-    unique uniq_exec_unique_id (`unique_id`),
-    index idx_exec_name (`exec_name`),
-    index idx_exec_from_app (`from_app`),
-    index idx_exec_cluster_queue (`cluster`, `cluster_queue`),
-    index idx_exec_engine (`engine_category`, `engine_version`),
-    index idx_exec_status (`status`),
-    index idx_exec_group (`group`),
-    index idx_exec_user (`user`)
-) engine = InnoDB
-  default charset = utf8
-  collate = utf8_unicode_ci
-    comment = '引擎执行记录';
-
-drop table if exists `maple`.maple_engine_execution_ext_info;
-create table `maple`.`maple_engine_execution_ext_info`
-(
-    `id`            int        not null comment '执行ID',
-    `exec_content`  mediumtext null comment '执行内容',
-    `configuration` text       null comment '作业配置',
-    `ext_info`      text       null comment '扩展信息',
-    `exec_info`  text       null comment '执行信息',
-    primary key (`id`)
-) engine = InnoDB
-  default charset = utf8
-  collate = utf8_unicode_ci
-    comment = '引擎执行扩展信息';
+```json
+{
+  "envs": {
+    "HADOOP_HOME": "",
+    "HADOOP_CONF_DIR": "",
+    "YARN_CONF_DIR": ""
+  },
+  "forbiddenConfs": [
+    {
+      "name": "spark.yarn.queue",
+      "replaceParameter": "--queue",
+      "desc": "YARN 队列"
+    },
+    {
+      "name": "spark.driver.cores",
+      "replaceParameter": "--driver-cores",
+      "desc": "Spark driver vcores"
+    },
+    {
+      "name": "spark.driver.memory",
+      "replaceParameter": "--driver-memory",
+      "desc": "Spark driver 内存"
+    },
+    {
+      "name": "spark.executor.instances",
+      "replaceParameter": "--num-executors",
+      "desc": "Spark executor 内存"
+    },
+    {
+      "name": "spark.executor.cores",
+      "replaceParameter": "--executor-cores",
+      "desc": "Spark executor vcores"
+    },
+    {
+      "name": "spark.executor.memory",
+      "replaceParameter": "--executor-memory",
+      "desc": "Spark executor 内存"
+    },
+    {
+      "name": "spark.driver.extraJavaOptions",
+      "replaceParameter": "--driver-java-options",
+      "desc": "Spark driver java 启动参数"
+    },
+    {
+      "name": "spark.driver.extraLibraryPath",
+      "replaceParameter": "--driver-library-path",
+      "desc": "Spark driver java 启动参数"
+    },
+    {
+      "name": "spark.jars",
+      "replaceParameter": "--jars",
+      "desc": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
+    }
+  ]
+}
 ```
 
-- exec_content: 作业执行的内容，包括 python/sql/scala 等
+### flink
 
-  
+```json
+{
+  "envs": {
+    "HADOOP_CLASSPATH": "/opt/hadoop/current/etc/hadoop:/opt/hadoop/current/share/hadoop/common/lib/*:/opt/hadoop/current/share/hadoop/common/*:/opt/hadoop/current/share/hadoop/hdfs:/opt/hadoop/current/share/hadoop/hdfs/lib/*:/opt/hadoop/current/share/hadoop/hdfs/*:/opt/hadoop/current/share/hadoop/mapreduce/*:/opt/hadoop/current/share/hadoop/yarn:/opt/hadoop/current/share/hadoop/yarn/lib/*:/opt/hadoop/current/share/hadoop/yarn/*",
+  },
+  "forbiddenConfs": [
+  ]
+}
+```
+
+## `maple_cluster_engine_default_conf`
+
+
+
+
+## `maple_engine_execution`
+
+
+
+## `maple_engine_execution_ext_info`
+
 - configuration: 作业的配置信息，json 字符串
 
   
-- ext_info: 作业的扩展信息，todo
+- ext_info: 作业的扩展信息，json 字符串，todo
 
   
-- exec_info: 作业的执行信息，todo
+- exec_info: 作业的执行信息，json 字符串
 
-YARN
+### YARN
 
 ```json
 {
@@ -200,7 +222,7 @@ YARN
 }
 ```
 
-K8s
+### K8s
 
 ```json
 {
@@ -235,7 +257,7 @@ K8s
 }
 ```
 
-  
+
 # 作业配置
 
 ## spark

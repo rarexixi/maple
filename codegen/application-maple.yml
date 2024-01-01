@@ -37,12 +37,9 @@ generator:
     content:
       - column-name-set: datasource_config
         table-name: maple_datasource
-      - column-name-set: configuration
+      - column-name-set: configuration, exec_info
         table-name: maple_engine_execution_ext_info
       - column-name-set: ext_info
-        table-name: maple_engine_execution_ext_info
-      - column-name-set: exec_info
-        table-name: maple_engine_execution_ext_info
 
     valid-status:
       - column-name-set: deleted
