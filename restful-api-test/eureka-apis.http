@@ -1,0 +1,6 @@
+
+### 变更元数据
+
+PUT http://localhost:8761/eureka/apps/maple-persistence-service/10.124.192.5:maple-persistence-service:8100/metadata?maple-tag=test11,test-xi
+Accept: application/json
+Content-Type: application/json

@@ -90,7 +90,6 @@ pagehelper:
   support-methods-arguments: true
 # endregion
 
-
 # /actuator/info
 info:
   app:

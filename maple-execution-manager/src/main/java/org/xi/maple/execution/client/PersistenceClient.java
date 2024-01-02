@@ -1,5 +1,6 @@
 package org.xi.maple.execution.client;
 
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
@@ -13,8 +14,11 @@ import org.xi.maple.execution.client.fallback.PersistenceClientFallbackFactory;
 import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
+import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
-@FeignClient(value = MapleServiceName.PERSISTENCE_SERVICE, fallbackFactory = PersistenceClientFallbackFactory.class)
+@FeignClient(value = MapleServiceName.PERSISTENCE_SERVICE, fallbackFactory = PersistenceClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
+@LoadBalancerClient(name = MapleServiceName.PERSISTENCE_SERVICE, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface PersistenceClient {
 
     // region engine-execution

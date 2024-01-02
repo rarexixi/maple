@@ -48,9 +48,9 @@
 1. 用户发起引擎执行作业请求
 
 2. 添加作业状态为 SUBMITTED
-
+   
    1. 将作业信息存储到数据库，获取到作业ID
-
+   
    2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
 
 3. scheduler 持续消费 redis 队列，根据作业ID拿到执行详细信息
@@ -60,18 +60,18 @@
 5. execution-manager 根据引擎的类型，加载对应插件，获取到执行命令生成对象（包括模板地址，输出文件地址，模板数据对象）
 
 6. execution-manager 根据执行命令生成对象，
-
+   
    1. YARN 生成对应的脚本，并启动
-
+   
    2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
 
 如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
 
 引擎启动后自己回写状态，同时由 scheduler 监控状态
 
-   1. YARN 类型的任务由 scheduler 定时获取结束的任务，修改作业状态为对应的结束状态
+1. YARN 类型的任务由 scheduler 定时获取结束的任务，修改作业状态为对应的结束状态
 
-   2. K8s 类型的任务由 scheduler 通过 informer list-watch 机制，实时修改作业状态
+2. K8s 类型的任务由 scheduler 通过 informer list-watch 机制，实时修改作业状态
 
 启动完成后修改状态为 RUNNING
 
@@ -160,21 +160,14 @@
 
 ## `maple_cluster_engine_default_conf`
 
-
-
-
 ## `maple_engine_execution`
-
-
 
 ## `maple_engine_execution_ext_info`
 
 - configuration: 作业的配置信息，json 字符串
 
-  
 - ext_info: 作业的扩展信息，json 字符串，todo
 
-  
 - exec_info: 作业的执行信息，json 字符串
 
 ### YARN
@@ -256,7 +249,6 @@
   }
 }
 ```
-
 
 # 作业配置
 
@@ -348,7 +340,27 @@
 }
 ```
 
-
 # YARN
 
 # 作业返回详情
+
+# 其他
+
+## Eureka REST API
+
+https://github.com/Netflix/eureka/wiki/Eureka-REST-operations
+
+| **Operation**                                                     | **HTTP action**                                                                                                                                                               | **Description**                                                                                  |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Register new application instance                                 | POST /eureka/v2/apps/**appID**                                                                                                                                                | Input: JSON/XML payload HTTP Code: 204 on success                                                |
+| De-register application instance                                  | DELETE /eureka/v2/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code: 200 on success                                                                        |
+| Send application instance heartbeat                               | PUT /eureka/v2/apps/**appID**/**instanceID**                                                                                                                                  | HTTP Code:<br>* 200 on success<br>* 404 if **instanceID** doesn’t exist                          |
+| Query for all instances                                           | GET /eureka/v2/apps                                                                                                                                                           | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Query for all **appID** instances                                 | GET /eureka/v2/apps/**appID**                                                                                                                                                 | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Query for a specific **appID**/**instanceID**                     | GET /eureka/v2/apps/**appID**/**instanceID**                                                                                                                                  | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Query for a specific **instanceID**                               | GET /eureka/v2/instances/**instanceID**                                                                                                                                       | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Take instance out of service                                      | PUT /eureka/v2/apps/**appID**/**instanceID**/status?value=OUT_OF_SERVICE                                                                                                      | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
+| Move instance back into service (remove override)                 | DELETE /eureka/v2/apps/**appID**/**instanceID**/status?value=UP (The value=UP is optional, it is used as a suggestion for the fallback status due to removal of the override) | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
+| Update metadata                                                   | PUT /eureka/v2/apps/**appID**/**instanceID**/metadata?key=value                                                                                                               | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
+| Query for all instances under a particular **vip address**        | GET /eureka/v2/vips/**vipAddress**                                                                                                                                            | <br>* HTTP Code: 200 on success Output: JSON/XML<br>* 404 if the **vipAddress** does not exist.  |
+| Query for all instances under a particular **secure vip address** | GET /eureka/v2/svips/**svipAddress**                                                                                                                                          | <br>* HTTP Code: 200 on success Output: JSON/XML<br>* 404 if the **svipAddress** does not exist. |

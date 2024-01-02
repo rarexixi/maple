@@ -1,5 +1,6 @@
 package org.xi.maple.datacalc.api.client;
 
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +16,13 @@ import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 import org.xi.maple.redis.model.MapleEngineExecutionQueue;
+import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
+import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
 import java.util.List;
 
-@FeignClient(value = MapleServiceName.PERSISTENCE_SERVICE, fallbackFactory = PersistenceClientFallbackFactory.class)
+@FeignClient(value = MapleServiceName.PERSISTENCE_SERVICE, fallbackFactory = PersistenceClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
+@LoadBalancerClient(name = MapleServiceName.PERSISTENCE_SERVICE, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface PersistenceClient {
 
     @PostMapping("/engine-execution/add")
