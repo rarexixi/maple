@@ -27,8 +27,10 @@ public class ExecutionController {
 
     @PostMapping("exec")
     public ResponseEntity<Integer> submit(
-            @RequestParam("timestamp") @NotNull(message = "时间辍不能为空") Long timestamp,
-            @RequestParam("secret") @NotBlank(message = "加密字符串不能为空") String secret,
+            // @RequestParam("timestamp") @NotNull(message = "时间辍不能为空") Long timestamp,
+            // @RequestParam("secret") @NotBlank(message = "加密字符串不能为空") String secret,
+            @RequestParam("timestamp") Long timestamp,
+            @RequestParam("secret") String secret,
             @RequestBody EngineExecutionAddRequest addRequest) {
         Integer id = executionService.submit(addRequest, timestamp, secret);
         return ResponseEntity.ok(id);
@@ -36,8 +38,10 @@ public class ExecutionController {
 
     @PostMapping("exec-now")
     public ResponseEntity<Integer> submitNow(
-            @RequestParam("timestamp") @NotNull(message = "时间辍不能为空") Long timestamp,
-            @RequestParam("secret") @NotBlank(message = "加密字符串不能为空") String secret,
+            // @RequestParam("timestamp") @NotNull(message = "时间辍不能为空") Long timestamp,
+            // @RequestParam("secret") @NotBlank(message = "加密字符串不能为空") String secret,
+            @RequestParam("timestamp") Long timestamp,
+            @RequestParam("secret") String secret,
             @RequestBody EngineExecutionAddRequest addRequest) {
         Integer id = executionService.submitNow(addRequest, timestamp, secret);
         return ResponseEntity.ok(id);

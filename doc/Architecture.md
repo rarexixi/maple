@@ -270,25 +270,20 @@
    },
    "runType": "data_calc",
    "jobConf": {
-      "mainFile": ""
    },
    "runType": "sql",
    "jobConf": {
-      "mainFile": ""
    },
    "runType": "scala",
    "jobConf": {
-      "mainFile": ""
    },
    "runType": "py",
    "jobConf": {
       "pyFiles": "",    // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
-      "mainFile": "",
       "args": ""
    },
    "runType": "jar",
    "jobConf": {
-      "mainFile": "",
       "mainClass": "",
       "args": ""
    }
@@ -350,17 +345,17 @@
 
 https://github.com/Netflix/eureka/wiki/Eureka-REST-operations
 
-| **Operation**                                                     | **HTTP action**                                                                                                                                                               | **Description**                                                                                  |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Register new application instance                                 | POST /eureka/v2/apps/**appID**                                                                                                                                                | Input: JSON/XML payload HTTP Code: 204 on success                                                |
-| De-register application instance                                  | DELETE /eureka/v2/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code: 200 on success                                                                        |
-| Send application instance heartbeat                               | PUT /eureka/v2/apps/**appID**/**instanceID**                                                                                                                                  | HTTP Code:<br>* 200 on success<br>* 404 if **instanceID** doesn’t exist                          |
-| Query for all instances                                           | GET /eureka/v2/apps                                                                                                                                                           | HTTP Code: 200 on success Output: JSON/XML                                                       |
-| Query for all **appID** instances                                 | GET /eureka/v2/apps/**appID**                                                                                                                                                 | HTTP Code: 200 on success Output: JSON/XML                                                       |
-| Query for a specific **appID**/**instanceID**                     | GET /eureka/v2/apps/**appID**/**instanceID**                                                                                                                                  | HTTP Code: 200 on success Output: JSON/XML                                                       |
-| Query for a specific **instanceID**                               | GET /eureka/v2/instances/**instanceID**                                                                                                                                       | HTTP Code: 200 on success Output: JSON/XML                                                       |
-| Take instance out of service                                      | PUT /eureka/v2/apps/**appID**/**instanceID**/status?value=OUT_OF_SERVICE                                                                                                      | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
-| Move instance back into service (remove override)                 | DELETE /eureka/v2/apps/**appID**/**instanceID**/status?value=UP (The value=UP is optional, it is used as a suggestion for the fallback status due to removal of the override) | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
-| Update metadata                                                   | PUT /eureka/v2/apps/**appID**/**instanceID**/metadata?key=value                                                                                                               | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
-| Query for all instances under a particular **vip address**        | GET /eureka/v2/vips/**vipAddress**                                                                                                                                            | <br>* HTTP Code: 200 on success Output: JSON/XML<br>* 404 if the **vipAddress** does not exist.  |
-| Query for all instances under a particular **secure vip address** | GET /eureka/v2/svips/**svipAddress**                                                                                                                                          | <br>* HTTP Code: 200 on success Output: JSON/XML<br>* 404 if the **svipAddress** does not exist. |
+| **Operation**                                                     | **HTTP action**                                                                                                                                                            | **Description**                                                                                  |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------ |
+| Register new application instance                                 | POST   /eureka/apps/**appID**                                                                                                                                              | Input: JSON/XML payload HTTP Code: 204 on success                                                |
+| De-register application instance                                  | DELETE /eureka/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code: 200 on success                                                                        |
+| Send application instance heartbeat                               | PUT    /eureka/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code:<br>* 200 on success<br>* 404 if **instanceID** doesn’t exist                          |
+| Query for all instances                                           | GET    /eureka/apps                                                                                                                                                        | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Query for all **appID** instances                                 | GET    /eureka/apps/**appID**                                                                                                                                              | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Query for a specific **appID**/**instanceID**                     | GET    /eureka/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Query for a specific **instanceID**                               | GET    /eureka/instances/**instanceID**                                                                                                                                    | HTTP Code: 200 on success Output: JSON/XML                                                       |
+| Take instance out of service                                      | PUT    /eureka/apps/**appID**/**instanceID**/status?value=OUT_OF_SERVICE                                                                                                   | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
+| Move instance back into service (remove override)                 | DELETE /eureka/apps/**appID**/**instanceID**/status?value=UP (The value=UP is optional, it is used as a suggestion for the fallback status due to removal of the override) | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
+| Update metadata                                                   | PUT    /eureka/apps/**appID**/**instanceID**/metadata?key=value                                                                                                            | HTTP Code:<br>* 200 on success<br>* 500 on failure                                               |
+| Query for all instances under a particular **vip address**        | GET    /eureka/vips/**vipAddress**                                                                                                                                         | <br>* HTTP Code: 200 on success Output: JSON/XML<br>* 404 if the **vipAddress** does not exist.  |
+| Query for all instances under a particular **secure vip address** | GET    /eureka/svips/**svipAddress**                                                                                                                                       | <br>* HTTP Code: 200 on success Output: JSON/XML<br>* 404 if the **svipAddress** does not exist. |

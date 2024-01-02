@@ -30,6 +30,9 @@ public class PersistenceClientFallbackFactory implements FallbackFactory<Persist
 
             @Override
             public Integer addExecution(EngineExecutionAddRequest engineExecution) {
+                MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
+                    throw new MapleException(feignResponseError.getError().getMsg());
+                });
                 return null;
             }
 

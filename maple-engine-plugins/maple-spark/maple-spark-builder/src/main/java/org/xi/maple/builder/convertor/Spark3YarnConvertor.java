@@ -46,7 +46,9 @@ public class Spark3YarnConvertor implements MapleConvertor {
         // todo 根据 runType 设置 runConf
         if (jobConf != null) {
             jobConf.setQueue(execution.getResourceGroup());
-            jobConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), jobConf.getConf()));
+            if (execution.getEngine().getConfs() != null) {
+                jobConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), jobConf.getConf()));
+            }
         }
         execModel.setJob(jobConf);
         return execModel;

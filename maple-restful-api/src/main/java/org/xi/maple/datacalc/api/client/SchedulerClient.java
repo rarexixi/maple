@@ -18,13 +18,13 @@ public interface SchedulerClient {
 
     // region scheduler
 
-    @PutMapping("exec-now")
+    @PutMapping("/execution/exec-now")
     void submitExecution(@RequestParam("execId") int execId);
 
-    @PutMapping("kill/{id}")
+    @PutMapping("/execution/kill/{id}")
     Object killExecution(@PathVariable("id") Integer id);
 
-    @PutMapping("stop/{id}")
+    @PutMapping("/execution/stop/{id}")
     Object stopExecution(@PathVariable("id") Integer id, Map<String,?> cancelParams);
 
     // endregion

@@ -3,4 +3,4 @@
 GET http://localhost:8080/execution/detail?id=1
 Content-Type: application/json
 Accept: application/json
-maple-tag: maple-persistence-service:test11
+maple-tag: maple-persistence-service:test-xi

@@ -78,7 +78,12 @@ public class ExecutionServiceImpl implements ExecutionService {
             queueBusyCallback.run();
         } else {
             logger.info("submit execution: {}", execution);
-            executionManagerClient.execute(execution);
+            try {
+                executionManagerClient.execute(execution);
+            } catch (Throwable t) {
+                logger.error("执行作业失败，id: {}", execution.getId(), t);
+                updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "执行作业失败"));
+            }
         }
     }
 

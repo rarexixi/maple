@@ -121,4 +121,14 @@ public class EngineExecutionEntity implements Serializable {
      * 任务执行结束时间
      */
     private LocalDateTime finishTime;
+
+    /**
+     * 任务执行开始时间
+     */
+    private LocalDateTime createTime;
+
+    /**
+     * 任务执行结束时间
+     */
+    private LocalDateTime updateTime;
 }

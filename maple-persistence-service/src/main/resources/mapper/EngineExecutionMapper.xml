@@ -36,6 +36,7 @@
     </resultMap>
 
     <sql id="tableName">`maple_engine_execution`</sql>
+    <sql id="extTableName">`maple_engine_execution_ext_info`</sql>
 
     <!--插入引擎执行记录-->
     <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
@@ -52,8 +53,7 @@
             <if test="entity.resourceGroup != null">`resource_group`,</if>
             <if test="entity.engineCategory != null">`engine_category`,</if>
             <if test="entity.engineVersion != null">`engine_version`,</if>
-            <if test="entity.priority != null">`priority`,</if>
-            <if test="entity.runPri != null">`run_pri`,</if>
+            <if test="entity.priority != null">`priority`, `run_pri`,</if>
             <if test="entity.priUpgradable != null">`pri_upgradable`,</if>
             <if test="entity.group != null">`group`,</if>
             <if test="entity.user != null">`user`,</if>
@@ -62,8 +62,6 @@
             <if test="entity.startingTime != null">`starting_time`,</if>
             <if test="entity.runningTime != null">`running_time`,</if>
             <if test="entity.finishTime != null">`finish_time`,</if>
-            <if test="entity.createTime != null">`create_time`,</if>
-            <if test="entity.updateTime != null">`update_time`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
@@ -77,8 +75,7 @@
             <if test="entity.resourceGroup != null">#{entity.resourceGroup},</if>
             <if test="entity.engineCategory != null">#{entity.engineCategory},</if>
             <if test="entity.engineVersion != null">#{entity.engineVersion},</if>
-            <if test="entity.priority != null">#{entity.priority},</if>
-            <if test="entity.runPri != null">#{entity.runPri},</if>
+            <if test="entity.priority != null">#{entity.priority}, #{entity.runPri},</if>
             <if test="entity.priUpgradable != null">#{entity.priUpgradable},</if>
             <if test="entity.group != null">#{entity.group},</if>
             <if test="entity.user != null">#{entity.user},</if>
@@ -87,8 +84,6 @@
             <if test="entity.startingTime != null">#{entity.startingTime},</if>
             <if test="entity.runningTime != null">#{entity.runningTime},</if>
             <if test="entity.finishTime != null">#{entity.finishTime},</if>
-            <if test="entity.createTime != null">#{entity.createTime},</if>
-            <if test="entity.updateTime != null">#{entity.updateTime},</if>
         </trim>
     </insert>
 

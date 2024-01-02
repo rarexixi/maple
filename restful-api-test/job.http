@@ -1,29 +1,29 @@
 ###
-PATCH http://localhost:8100/engine-execution/add
+POST http://localhost:8080/execution/exec-now?timestamp=0&secret=
 Content-Type: application/json
 
 {
-  "uniqueId": "6",
-  "execName": "test-xi",
-  "execComment": "测试作业",
-  "contentType": "path",
-  "contentPath": "path",
-  "fromApp": "schedule",
+  "execFile": "hdfs://apps/maple/bml/aa.jar",
+  "fromApp":  "schedule",
+  "jobId": "1",
+  "bizId":  "1",
+  "execUniqId": "24",
+  "execName":  "测试执行",
   "cluster": "hadoop",
-  "clusterQueue": "default",
+  "resourceGroup":  "default",
   "engineCategory": "spark",
-  "engineVersion": "3.3.2",
-  "priority": "xx",
-  "priority2": "xx3",
-  "group": "group1",
-  "user": "",
-  "configuration": "{}",
-  "extInfo": "{}"
+  "engineVersion":  "3.3.2",
+  "priority": "1",
+  "priUpgradable":  false,
+  "group": "schedule-manager",
+  "user":  "xishihao",
+  "clusterAppId": "",
+  "configuration":  "{\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{},\"runType\":\"jar\",\"jobConf\":{\"mainClass\":\"org.xi.maple.test\",\"args\":\"\"}}"
 }
 
 ###
 
-POST http://localhost:8110/engine-execution/execute
+POST http://localhost:8110/execution/exec-now
 Content-Type: application/json
 
 {
@@ -59,13 +59,5 @@ Content-Type: application/json
 
 GET http://localhost:8100/engine-execution/detail?id=3
 Content-Type: application/json
-
-
-
-###
-
-GET http://172.21.216.15:8088/ws/v1/cluster/apps?applicationTags=linkis
-Content-Type: application/json
-
 
 ###

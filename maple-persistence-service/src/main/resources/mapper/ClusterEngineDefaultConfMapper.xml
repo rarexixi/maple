@@ -63,7 +63,7 @@
     </update>
 
     <!--根据主键获取集群引擎默认配置详情-->
-    <select id="detailById" resultMap="ExtResultMap">
+    <select id="detailById" resultMap="BaseResultMap">
         SELECT
             MT.`id`,
             MT.`obj_type`,
@@ -77,7 +77,7 @@
         </where>
     </select>
 
-    <select id="selectByTypeAndName" resultMap="ResultMap">
+    <select id="selectByTypeAndName" resultMap="BaseResultMap">
         SELECT
             MT.`id`,
             MT.`obj_type`,

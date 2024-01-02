@@ -1,6 +1,109 @@
 
+### 获取元数据
+
+GET http://localhost:8761/eureka/apps
+Accept: application/json
+Content-Type: application/json
+
+### 注册服务
+
+POST http://localhost:8761/eureka/apps/maple-persistence-service
+Accept: application/json
+Content-Type: application/json
+
+{
+  "instance": {
+    "instanceId": "192.168.1.8:maple-persistence-service:8101",
+    "hostName": "192.168.1.8",
+    "app": "MAPLE-PERSISTENCE-SERVICE",
+    "ipAddr": "192.168.1.8",
+    "status": "UP",
+    "overriddenStatus": "UNKNOWN",
+    "port": {
+      "$": 8101,
+      "@enabled": "true"
+    },
+    "securePort": {
+      "$": 443,
+      "@enabled": "false"
+    },
+    "countryId": 1,
+    "dataCenterInfo": {
+      "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+      "name": "MyOwn"
+    },
+    "leaseInfo": {
+      "renewalIntervalInSecs": 30,
+      "durationInSecs": 90,
+      "registrationTimestamp": 1704200376451,
+      "lastRenewalTimestamp": 1704200376451,
+      "evictionTimestamp": 0,
+      "serviceUpTimestamp": 1704200027022
+    },
+    "metadata": {
+      "maple-tag": "null",
+      "management.port": "8101"
+    },
+    "homePageUrl": "http://192.168.1.8:8101/",
+    "statusPageUrl": "http://192.168.1.8:8101/actuator/info",
+    "healthCheckUrl": "http://192.168.1.8:8101/actuator/health",
+    "vipAddress": "maple-persistence-service",
+    "secureVipAddress": "maple-persistence-service",
+    "isCoordinatingDiscoveryServer": "false",
+    "lastUpdatedTimestamp": "1704200376451",
+    "lastDirtyTimestamp": "1704200026983",
+    "actionType": "ADDED"
+  }
+}
+
+### 取消注册
+
+DELETE http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8101
+Accept: application/json
+Content-Type: application/json
+
+### 获取 APP 信息
+
+GET http://localhost:8761/eureka/apps/maple-persistence-service
+Accept: application/json
+Content-Type: application/json
+
+### 获取 APP Instance 信息
+
+GET http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8100
+Accept: application/json
+Content-Type: application/json
+
+### 发送心跳
+
+PUT http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8100
+Accept: application/json
+Content-Type: application/json
+
+### 设置 Instance 状态，UP / DOWN / OUT_OF_SERVICE
+PUT http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8100/status?value=OUT_OF_SERVICE
+Accept: application/json
+Content-Type: application/json
+
+### 设置 Instance 状态，UP
+DELETE http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8100/status?value=UP
+Accept: application/json
+Content-Type: application/json
+
 ### 变更元数据
 
-PUT http://localhost:8761/eureka/apps/maple-persistence-service/10.124.192.5:maple-persistence-service:8100/metadata?maple-tag=test11,test-xi
+PUT http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8100/metadata?maple-tag=test-xi
+Accept: application/json
+Content-Type: application/json
+
+###
+
+GET http://localhost:8761/eureka/vips/maple-persistence-service
+Accept: application/json
+Content-Type: application/json
+
+###
+
+GET http://localhost:8761/eureka/svips/maple-persistence-service
 Accept: application/json
 Content-Type: application/json
