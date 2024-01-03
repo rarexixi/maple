@@ -116,14 +116,13 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
         if (entity == null) {
             throw new MapleDataNotFoundException("引擎执行记录不存在");
         }
-        EngineExecutionStatus newStatus = EngineExecutionStatus.valueOf(updateRequest.getStatus());
-        if (newStatus.isFinalStatus()) {
+        EngineExecutionStatus oldStatus = EngineExecutionStatus.valueOf(entity.getStatus());
+        if (oldStatus.isFinalStatus()) {
             logger.error("引擎执行已结束，id: {}", id);
             return 0;
         }
 
-        EngineExecutionStatus oldStatus = EngineExecutionStatus.valueOf(entity.getStatus());
-
+        EngineExecutionStatus newStatus = EngineExecutionStatus.valueOf(updateRequest.getStatus());
         switch (newStatus) {
             case CREATED:
                 return 0;

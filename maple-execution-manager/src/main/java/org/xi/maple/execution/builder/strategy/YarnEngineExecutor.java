@@ -48,7 +48,7 @@ public class YarnEngineExecutor extends EngineExecutor {
                 startFile = fileName;
             }
         }
-        ProcessBuilder processBuilder = new ProcessBuilder("sh", getPath(executionProperties.getExecHome(), startFile));
+        ProcessBuilder processBuilder = new ProcessBuilder("sh", getPath(execHome, startFile));
 
         threadPoolTaskExecutor.submit(() -> {
             Process process = null;

@@ -21,5 +21,5 @@ public interface ClusterEngineMapper extends
         SelectByIdMapper<ClusterEngineEntityExt>,
         SelectByConditionMapper<ClusterEngineEntity, ClusterEngineSelectCondition>,
         CountByConditionMapper<ClusterEngineSelectCondition> {
-    ClusterEngineEntity detailByClusterEngineVersion(@Param("cluster") String cluster, @Param("engine") String engine, @Param("version") String version);
+    ClusterEngineEntity detailByClusterEngineVersion(@Param("cluster") String cluster, @Param("name") String name, @Param("version") String version);
 }

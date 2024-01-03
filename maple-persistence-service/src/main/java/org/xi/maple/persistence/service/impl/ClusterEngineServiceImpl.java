@@ -135,7 +135,7 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
             // todo 合并默认配置
         }
 
-        return ObjectUtils.copy(entity, EngineConf.class);
+        return engineConf;
     }
 
     /**

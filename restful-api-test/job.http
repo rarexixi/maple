@@ -3,22 +3,22 @@ POST http://localhost:8080/execution/exec-now?timestamp=0&secret=
 Content-Type: application/json
 
 {
-  "execFile": "hdfs://apps/maple/bml/aa.jar",
+  "execFile": "hdfs:///spark3/spark-examples_2.12-3.3.2.jar",
   "fromApp":  "schedule",
   "jobId": "1",
   "bizId":  "1",
-  "execUniqId": "24",
+  "execUniqId": "28",
   "execName":  "测试执行",
   "cluster": "hadoop",
   "resourceGroup":  "default",
   "engineCategory": "spark",
   "engineVersion":  "3.3.2",
-  "priority": "1",
+  "priority": 1,
   "priUpgradable":  false,
   "group": "schedule-manager",
   "user":  "xishihao",
   "clusterAppId": "",
-  "configuration":  "{\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{},\"runType\":\"jar\",\"jobConf\":{\"mainClass\":\"org.xi.maple.test\",\"args\":\"\"}}"
+  "configuration":  "{\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{},\"runType\":\"jar\",\"runConf\":{\"mainClass\":\"org.apache.spark.examples.SparkPi\",\"args\":\"10\"}}"
 }
 
 ###

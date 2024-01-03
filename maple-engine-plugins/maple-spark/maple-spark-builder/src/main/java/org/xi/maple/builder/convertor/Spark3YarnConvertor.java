@@ -41,6 +41,16 @@ public class Spark3YarnConvertor implements MapleConvertor {
     private ExecFtlModel<Spark3EngineExecution> convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
         ExecFtlModel<Spark3EngineExecution> execModel = new ExecFtlModel<>();
+        execModel.setExecId(execution.getExecId());
+        execModel.setExecFile(execution.getExecFile());
+        execModel.setFromApp(execution.getFromApp());
+        execModel.setJobId(execution.getJobId());
+        execModel.setBizId(execution.getBizId());
+        execModel.setExecUniqId(execution.getExecUniqId());
+        execModel.setExecName(execution.getExecName());
+        execModel.setResourceGroup(execution.getResourceGroup());
+        execModel.setGroup(execution.getGroup());
+        execModel.setUser(execution.getUser());
         execModel.setEngine(execution.getEngine());
         Spark3EngineExecution jobConf = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class, null);
         // todo 根据 runType 设置 runConf

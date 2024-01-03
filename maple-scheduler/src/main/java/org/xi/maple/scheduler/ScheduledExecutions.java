@@ -65,7 +65,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     /**
      * 消费作业
      */
-    @Scheduled(fixedDelay = 5000)
+    // @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
         logger.info("开始消费队列...");
 

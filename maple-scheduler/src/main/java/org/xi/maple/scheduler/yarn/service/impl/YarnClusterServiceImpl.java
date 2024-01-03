@@ -57,6 +57,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     public YarnClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
         this.client = client;
         this.updateExecStatusFunc = updateExecStatusFunc;
+        refreshAllClusterConfig();
     }
 
     @Override
@@ -119,6 +120,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
         CLUSTER_MAP.put(cluster.getName(), cluster);
     }
 
+    @Scheduled(fixedDelay = 5000)
     @Override
     public void refreshAllClusterConfig() {
         ClusterQueryRequest request = new ClusterQueryRequest();
@@ -241,7 +243,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
             if (StringUtils.isBlank(execIdStr) || !StringUtils.isNumeric(execIdStr)) {
                 break;
             }
-            Integer execId = Integer.getInteger(execIdStr);
+            Integer execId = Integer.parseInt(execIdStr);
             /*
              * NEW - 应用程序已创建但尚未提交。
              * NEW_SAVING - 应用程序新建完毕，正在保存到资源管理器（ResourceManager）。
@@ -265,6 +267,10 @@ public class YarnClusterServiceImpl implements YarnClusterService {
                 } else {
                     state = finalStatus;
                 }
+            } else if ("FAILED".equals(state)) {
+                state = EngineExecutionStatus.FAILED.toString();
+            } else if ("KILLED".equals(state)) {
+                state = EngineExecutionStatus.KILLED.toString();
             } else {
                 state = EngineExecutionStatus.RUNNING.toString();
             }

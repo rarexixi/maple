@@ -182,7 +182,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
     /**
      * 刷新 K8s 集群配置，不会重启已有集群，如果已有集群有变更，需要使用强制刷新
      */
-    @Scheduled(fixedDelay = 5000)
+    // @Scheduled(fixedDelay = 5000)
     public void refreshClusters() {
         ClusterQueryRequest request = new ClusterQueryRequest();
         request.setCategory(ClusterCategoryConstants.K8s);

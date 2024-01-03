@@ -23,7 +23,7 @@ class AppExecutionListener extends SparkListener {
 
 
   override def onApplicationEnd(applicationEnd: SparkListenerApplicationEnd): Unit = {
-    val status = if (succeeded) EngineExecutionStatus.SUCCEED else EngineExecutionStatus.FAILED
+    val status = if (succeeded) EngineExecutionStatus.SUCCEEDED else EngineExecutionStatus.FAILED
     EngineExecutionUpdateService.updateStatus(status)
     println("========================== onApplicationEnd ==========================")
   }

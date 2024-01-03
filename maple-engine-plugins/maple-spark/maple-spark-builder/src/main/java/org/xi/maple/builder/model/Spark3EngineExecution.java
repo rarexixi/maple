@@ -41,19 +41,5 @@ public class Spark3EngineExecution implements Serializable {
     // data_calc, sql, scala, py, jar
     private String runType;
 
-    private Object runConf;
-
-    @Data
-    public static class Py {
-        // --py-files PY_FILES         Comma-separated list of .zip, .egg, or .py files to place on the PYTHONPATH for Python apps.
-        private String pyFiles;
-        private String args;
-    }
-
-    @Data
-    public static class Jar {
-        // --class CLASS_NAME          Your application's main class (for Java / Scala apps).
-        private String mainClass;
-        private String args;
-    }
+    private Map<String, Object> runConf;
 }

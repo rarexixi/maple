@@ -85,3 +85,5 @@ values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark', '{"forbiddenConfs":
        (2, 'hadoop-default', 'flink', '1.16.2', '/opt/flink', '{}'),
        (1, 'k8s-default', 'spark', '3.3.2', '/opt/spark', '{}'),
        (2, 'k8s-default', 'flink', '1.16.2', '/opt/flink', '{}');
+
+

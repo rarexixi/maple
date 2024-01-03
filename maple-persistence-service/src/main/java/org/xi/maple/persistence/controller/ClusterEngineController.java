@@ -1,11 +1,10 @@
 package org.xi.maple.persistence.controller;
 
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.xi.maple.common.annotation.SetFieldTypes;
+import org.xi.maple.common.model.EngineConf;
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.ClusterEngineAddRequest;
-import org.xi.maple.persistence.model.request.ClusterEnginePatchRequest;
-import org.xi.maple.persistence.model.request.ClusterEngineQueryRequest;
-import org.xi.maple.persistence.model.request.ClusterEngineSaveRequest;
+import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.persistence.model.response.ClusterEngineDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterEngineListItemResponse;
 import org.xi.maple.persistence.service.ClusterEngineService;
@@ -57,6 +56,11 @@ public class ClusterEngineController {
     @GetMapping("detail")
     public ResponseEntity<ClusterEngineDetailResponse> getById(@RequestParam("id") @NotNull(message = "引擎ID不能为空") @Min(value = 1, message = "引擎ID必须大于0") Integer id) {
         ClusterEngineDetailResponse detail = clusterEngineService.getById(id);
+        return ResponseEntity.ok(detail);
+    }
+    @GetMapping("/detail-conf")
+    public ResponseEntity<EngineConf> getEngineConf(ClusterEngineDefaultConfGetRequest request) {
+        EngineConf detail = clusterEngineService.getEngineConf(request);
         return ResponseEntity.ok(detail);
     }
 

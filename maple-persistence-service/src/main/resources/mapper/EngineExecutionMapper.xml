@@ -75,7 +75,7 @@
             <if test="entity.resourceGroup != null">#{entity.resourceGroup},</if>
             <if test="entity.engineCategory != null">#{entity.engineCategory},</if>
             <if test="entity.engineVersion != null">#{entity.engineVersion},</if>
-            <if test="entity.priority != null">#{entity.priority}, #{entity.runPri},</if>
+            <if test="entity.priority != null">#{entity.priority}, #{entity.priority},</if>
             <if test="entity.priUpgradable != null">#{entity.priUpgradable},</if>
             <if test="entity.group != null">#{entity.group},</if>
             <if test="entity.user != null">#{entity.user},</if>

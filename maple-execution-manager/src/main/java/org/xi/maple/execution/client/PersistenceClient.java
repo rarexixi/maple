@@ -33,7 +33,7 @@ public interface PersistenceClient {
 
     // region engine
 
-    @GetMapping("/engine/conf")
+    @GetMapping("/cluster-engine/detail-conf")
     EngineConf getEngineConf(@SpringQueryMap ClusterEngineDefaultConfGetRequest request);
 
     // endregion
