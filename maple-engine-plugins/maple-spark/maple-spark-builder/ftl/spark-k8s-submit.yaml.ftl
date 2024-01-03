@@ -12,14 +12,36 @@ metadata:
 spec:
   sparkConfigMap:
   hadoopConfigMap:
-  type: Scala   # Scala, Java, Python, or R
   mode: cluster
   image:
   sparkVersion: 3.3.2
-  mainClass:
-  mainApplicationFile:
+<#if job.runType == "data_calc">
+  type: Scala
+  mainClass: xxx.xxx.xxx
+  mainApplicationFile: "local:///opt/spark/opt/maple-spark-data-calc.jar"
+<#elseif job.runType == "sql">
+  type: Scala
+  mainClass: xxx.xxx.xxx
+  mainApplicationFile: "local:///opt/spark/opt/maple-spark-data-calc.jar"
+<#elseif job.runType == "scala">
+  type: Scala
+  mainClass: xxx.xxx.xxx
+  mainApplicationFile: "local:///opt/spark/opt/maple-spark-data-calc.jar"
+<#elseif job.runType == "py">
+  type: Python   # Scala, Java, Python, or R
+  mainApplicationFile: ${execFile}
+<#elseif job.runType == "jar">
+  type: Scala
+  mainClass: ${job.runConf.mainClass}
+  mainApplicationFile: ${execFile}
+</#if>
   imagePullSecrets:
+<#if job.runConf.args??>
   arguments:
+  <#list job.runConf.args as arg>
+    - "${arg}"
+  </#list>
+</#if>
   restartPolicy:
     type: Never
   batchScheduler: volcano
@@ -66,7 +88,7 @@ spec:
     cores: ${job.driverCores}
     coreLimit: "2000m"
     memory: "${job.driverMemory}"
-    javaOptions: ""
+    javaOptions: "${job.driverJavaOptions}"
     labels:
       from-app: maple-exec
       maple-id: "${execId}"
