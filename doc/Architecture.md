@@ -267,6 +267,18 @@
    "files": "",
    "archives": "",
    "conf": {
+      // 表示客户端等待套接字建立服务器连接的毫秒数。默认值为20000毫秒
+      "spark.hadoop.ipc.client.connect.timeout": 2000,
+      // 启用 HA 后，FailoverProxyProvider 尝试故障转移的最大次数。
+      "spark.hadoop.yarn.client.failover-max-attempts": 2,
+      // 启用 HA 后，用于计算故障切换之间指数延迟的休眠基数（以毫秒为单位）。
+      // 设置后，它会覆盖 yarn.resourcemanager.connect.* 设置。
+      // 如果未设置，则使用 yarn.resourcemanager.connect.retry-interval.ms
+      "spark.hadoop.yarn.client.failover-sleep-base-ms": 2000,
+      // 启用 HA 后，故障切换之间的最长休眠时间（毫秒）。
+      // 设置后，它会覆盖 yarn.resourcemanager.connect.* 设置。
+      // 如果未设置，则使用 yarn.resourcemanager.connect.retry-interval.ms
+      "spark.hadoop.yarn.client.failover-sleep-max-ms": 4000
    },
    "runType": "data_calc",
    "jobConf": {

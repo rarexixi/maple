@@ -1,14 +1,14 @@
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: ${execName}-${execId}
+  name: SPARK-${execName}-${execId}
   namespace: ${namespace}
   labels:
     from-app: maple-exec
     maple-id: "${execId}"
     maple-app-name: "${execName}"
-    submit-user-group: "${submitUserGroup}"
-    submit-user: "${submitUser}"
+    submit-user-group: "${group}"
+    submit-user: "${user}"
 spec:
   sparkConfigMap:
   hadoopConfigMap:
@@ -50,37 +50,41 @@ spec:
     "spark.ui.proxyBase": "/ui/${namespace}/maple-spark-${execId}-ui-svc"
     "spark.ui.proxyRedirectUri": ""
     "spark.ui.port": "8080"
-    <#list sparkConfSelf as confSelf>
-    ${confSelf}
+    <#if job.conf??>
+    <#list job.conf as key, value>
+    "${key}": "${value}"
     </#list>
+    </#if>
   driver:
     env:
-    <#list envs as key, value>
+    <#if engine.envs??>
+    <#list engine.envs as key, value>
       - name: ${key}
         value: ${value}
     </#list>
-    cores: 2
+    </#if>
+    cores: ${job.driverCores}
     coreLimit: "2000m"
-    memory: "${driverMemory}"
+    memory: "${job.driverMemory}"
     javaOptions: ""
     labels:
       from-app: maple-exec
       maple-id: "${execId}"
       maple-app-name: "${execName}"
-      submit-user-group: "${submitUserGroup}"
-      submit-user: "${submitUser}"
+      submit-user-group: "${group}"
+      submit-user: "${user}"
     serviceAccount: spark
     hostAliases:
     volumeMounts:
     annotations:
     tolerations:
   executor:
-    cores: ${executorCores}
-    coreLimit: "${executorCoreLimit}"
-    instances: ${executorNum}
-    memory: "${executorMemory}"
-    <#if memoryOverhead ??>
-    memoryOverhead: "${memoryOverhead}"
+    cores: ${job.executorCores}
+    coreLimit: "${job.executorCoreLimit}"
+    instances: ${job.executorNum}
+    memory: "${job.executorMemory}"
+    <#if job.memoryOverhead??>
+    memoryOverhead: "${job.memoryOverhead}"
     </#if>
     javaOptions: ""
     labels:

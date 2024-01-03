@@ -1,7 +1,8 @@
+<#if engine.envs??>
 <#list engine.envs as key, value>
-    export ${key}=${value}
+export ${key}=${value}
 </#list>
-
+</#if>
 ${engine.engineHome}/bin/spark-submit \
     --master yarn \
     --deploy-mode cluster \
@@ -27,7 +28,7 @@ ${engine.engineHome}/bin/spark-submit \
     <#if job.archives?? && (job.archives?length > 0)>
     --archives ${job.archives} \
     </#if>
-    --conf spark.yarn.tags=maple-exec,maple-id-${mapleId} \
+    --conf spark.yarn.tags=maple-exec,maple-id-${execId} \
 <#if job.conf??>
     <#list job.conf as key, value>
     --conf ${key}=${value} \

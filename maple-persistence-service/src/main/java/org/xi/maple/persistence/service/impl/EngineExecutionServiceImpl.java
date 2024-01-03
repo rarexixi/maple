@@ -169,7 +169,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     public EngineExecutionDetailResponse getById(Integer id) {
         EngineExecutionEntityExt entity = engineExecutionMapper.detailById(id);
         if (entity == null) {
-            throw new MapleDataNotFoundException("引擎执行记录不存在");
+            throw new MapleDataNotFoundException("引擎执行记录不存在, id: " + id);
         }
         return ObjectUtils.copy(entity, EngineExecutionDetailResponse.class);
     }

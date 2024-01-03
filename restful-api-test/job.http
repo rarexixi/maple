@@ -7,9 +7,9 @@ Content-Type: application/json
   "fromApp":  "schedule",
   "jobId": "1",
   "bizId":  "1",
-  "execUniqId": "28",
+  "execUniqId": "7",
   "execName":  "测试执行",
-  "cluster": "hadoop",
+  "cluster": "hadoop-default",
   "resourceGroup":  "default",
   "engineCategory": "spark",
   "engineVersion":  "3.3.2",
@@ -18,7 +18,7 @@ Content-Type: application/json
   "group": "schedule-manager",
   "user":  "xishihao",
   "clusterAppId": "",
-  "configuration":  "{\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{},\"runType\":\"jar\",\"runConf\":{\"mainClass\":\"org.apache.spark.examples.SparkPi\",\"args\":\"10\"}}"
+  "configuration":  "{\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{\"spark.hadoop.ipc.client.connect.timeout\":3000,\"spark.hadoop.yarn.client.failover-max-attempts\":2},\"runType\":\"jar\",\"runConf\":{\"mainClass\":\"org.apache.spark.examples.SparkPi\",\"args\":\"10\"}}"
 }
 
 ###

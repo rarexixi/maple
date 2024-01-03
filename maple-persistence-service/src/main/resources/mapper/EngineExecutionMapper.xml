@@ -236,7 +236,7 @@
         FROM
         <include refid="tableName"/> MT
               JOIN <include refid="extTableName"/> EXT on MT.`id` = EXT.`id`
-              JOIN `maple_cluster` CLUSTER on MT.`cluster` = CLUSTER.`name`
+              LEFT JOIN `maple_cluster` CLUSTER on MT.`cluster` = CLUSTER.`name`
         <where>
             MT.`id` = #{id} AND EXT.`id` = #{id}
         </where>

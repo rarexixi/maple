@@ -76,14 +76,63 @@ values (1, 'test_mysql', '测试mysql', 'mysql', '5.7',
         '{"driverClassName":"com.microsoft.sqlserver.jdbc.SQLServerDriver","address":"localhost:1433","params":"{\\"encrypt\\":\\"true\\",\\"trustServerCertificate\\":\\"true\\"}","username":"xi_root","password":"123456","databaseName":"test_sqlserver_db"}');
 
 
-insert into maple.maple_cluster(name, category, address, `desc`, configuration, deleted, create_user, update_user)
+insert into maple.maple_cluster (name, category, address, `desc`, configuration, deleted, create_user, update_user)
 values ('hadoop-default', 'YARN', 'localhost:8080', '测试集群', '{}', 0, 'xi', 'xi'),
        ('k8s-default', 'K8s', 'localhost:6443', '测试集群2', '{}', 0, 'xi', 'xi');
 
 insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
-values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark', '{"forbiddenConfs": [{""}]}'),
-       (2, 'hadoop-default', 'flink', '1.16.2', '/opt/flink', '{}'),
-       (1, 'k8s-default', 'spark', '3.3.2', '/opt/spark', '{}'),
-       (2, 'k8s-default', 'flink', '1.16.2', '/opt/flink', '{}');
-
+values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark/current', '{
+  "envs": {
+    "HADOOP_HOME": "/opt/hadoop/current",
+    "HADOOP_CONF_DIR": "/opt/hadoop/current/etc/hadoop/",
+    "YARN_CONF_DIR": "/opt/hadoop/current/etc/hadoop/"
+  },
+  "forbiddenConfs": [
+    {
+      "name": "spark.yarn.queue",
+      "replaceParameter": "--queue",
+      "desc": "YARN 队列"
+    },
+    {
+      "name": "spark.driver.cores",
+      "replaceParameter": "--driver-cores",
+      "desc": "Spark driver vcores"
+    },
+    {
+      "name": "spark.driver.memory",
+      "replaceParameter": "--driver-memory",
+      "desc": "Spark driver 内存"
+    },
+    {
+      "name": "spark.executor.instances",
+      "replaceParameter": "--num-executors",
+      "desc": "Spark executor 内存"
+    },
+    {
+      "name": "spark.executor.cores",
+      "replaceParameter": "--executor-cores",
+      "desc": "Spark executor vcores"
+    },
+    {
+      "name": "spark.executor.memory",
+      "replaceParameter": "--executor-memory",
+      "desc": "Spark executor 内存"
+    },
+    {
+      "name": "spark.driver.extraJavaOptions",
+      "replaceParameter": "--driver-java-options",
+      "desc": "Spark driver java 启动参数"
+    },
+    {
+      "name": "spark.driver.extraLibraryPath",
+      "replaceParameter": "--driver-library-path",
+      "desc": "Spark driver java 启动参数"
+    },
+    {
+      "name": "spark.jars",
+      "replaceParameter": "--jars",
+      "desc": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
+    }
+  ]
+}');
 

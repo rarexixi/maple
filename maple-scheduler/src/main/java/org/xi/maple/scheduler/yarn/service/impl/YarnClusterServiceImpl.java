@@ -175,7 +175,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     public void refreshExecStatus() {
         // 获取所有未启动的任务
         Function<String, HttpUriRequest> getRequest = master -> {
-            String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=NEW,NEW_SAVING,SUBMITTED,ACCEPTED", master, MapleConstants.TAG_EXEC);
+            String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=NEW,NEW_SAVING,SUBMITTED,ACCEPTED&startedTimeBegin=%d", master, MapleConstants.TAG_EXEC, System.currentTimeMillis() - 60 * 60 * 1000);
             HttpGet request = new HttpGet(uri);
             request.addHeader("Content-Type", "application/json");
             return request;
@@ -189,7 +189,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
         };
         // 调度周期为5s，获取10s内结束的任务
         Function<String, HttpUriRequest> getFinishedRequest = master -> {
-            String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=FINISHED,FAILED,KILLED&finishedTimeBegin=", master, MapleConstants.TAG_EXEC, System.currentTimeMillis() - 10 * 1000);
+            String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=FINISHED,FAILED,KILLED&finishedTimeBegin=%d", master, MapleConstants.TAG_EXEC, System.currentTimeMillis() - 10 * 1000);
             HttpGet request = new HttpGet(uri);
             request.addHeader("Content-Type", "application/json");
             return request;
