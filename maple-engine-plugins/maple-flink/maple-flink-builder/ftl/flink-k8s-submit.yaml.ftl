@@ -54,24 +54,24 @@ spec:
     jobmanager.archive.fs.dir: hdfs://hadoop-cluster/flink-data/completed-jobs
     high-availability: kubernetes
     high-availability.storageDir: hdfs://hadoop-cluster/flink-data/ha # 这里需要注意权限
-    <#list job.extConf?keys as key>
-    <#if job.extConf[key]?is_boolean>
-    ${key}: "${job.extConf[key]?then('true', 'false')}"
+    <#list job.conf as key, value>
+    <#if value?is_boolean>
+    ${key}: "${value?then('true', 'false')}"
     <#else>
-    ${key}: "${job.extConf[key]}"
+    ${key}: "${value}"
     </#if>
     </#list>
   serviceAccount: flink
   imagePullPolicy: IfNotPresent
   jobManager:
-    replicas: ${jobmanager.replicas}
+    replicas: ${job.jobManagerReplicas}
     resource:
-      memory: "${jobmanager.memory}G"
-      cpu: ${jobmanager.cpu/jmCpuLimitFactor}
+      memory: "${job.jobManagerMemory}"
+      cpu: ${job.jobManagerCores}
   taskManager:
     resource:
-      memory: "${taskmanager.memory}G"
-      cpu: ${taskmanager.cpu/tmCpuLimitFactor}
+      memory: "${job.taskManagerMemory}G"
+      cpu: ${job.taskManagerCores}
 <#if job.runType="sql">
     jarURI: local:///opt/flink/extlib/flink-sql-exec.jar
     entryClass: org.maple.
@@ -80,10 +80,6 @@ spec:
     - "/opt/flink/extlib${job.sqlPath}"
     - "-jobName"
     - "${job.jobName}"
-    <#if (udfList?? && udfList?size > 0)>
-    - "-udf"
-    - "[<#list udfList as udf><#if (udf?index > 0)>,</#if>{\"functionName\": \"${udf.functionName}\",\"className\": \"${udf.className?replace("'", "")}\"}</#list>]"
-    </#if>
     savepointTriggerNonce: 0
     allowNonRestoredState: true
     state: running

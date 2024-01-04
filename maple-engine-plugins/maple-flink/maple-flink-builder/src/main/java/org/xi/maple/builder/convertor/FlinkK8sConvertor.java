@@ -5,7 +5,7 @@ import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
-import org.xi.maple.builder.model.FlinkEngineExecution;
+import org.xi.maple.builder.model.FlinkK8sDataModel;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
@@ -21,22 +21,33 @@ public class FlinkK8sConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        FlinkEngineExecution execConf;
-        try {
-            execConf = convert(execution);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        FlinkK8sDataModel execConf = convert(execution);
+        if (execConf == null) {
+            return null;
         }
-        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
 
-        commandGeneratorModels.add(new CommandGeneratorModel("flink-k8s-submit.yaml.ftl", "flink-k8s-submit.yaml", execConf));
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-k8s-submit.yaml.ftl", "flink-k8s-submit.yaml", execConf));
         return commandGeneratorModels;
     }
 
-    private FlinkEngineExecution convert(EngineExecutionModel execution) throws IOException {
+    @Override
+    public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
+        FlinkK8sDataModel execConf = convert(execution);
+        if (execConf == null) {
+            return null;
+        }
+
+        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-k8s-stop.yaml.ftl", "flink-k8s-stop.yaml", execConf));
+        return commandGeneratorModels;
+    }
+
+    private FlinkK8sDataModel convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
-        FlinkEngineExecution flinkEngineExecution = JsonUtils.parseObject(executionConf, FlinkEngineExecution.class);
-        assert flinkEngineExecution != null;
-        return flinkEngineExecution;
+        FlinkK8sDataModel flinkK8sDataModel = JsonUtils.parseObject(executionConf, FlinkK8sDataModel.class, null);
+        if (flinkK8sDataModel != null) {
+        }
+        return flinkK8sDataModel;
     }
 }

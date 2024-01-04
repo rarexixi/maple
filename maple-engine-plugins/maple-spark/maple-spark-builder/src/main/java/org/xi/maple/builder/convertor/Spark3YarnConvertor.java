@@ -6,7 +6,7 @@ import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.builder.model.ExecFtlModel;
-import org.xi.maple.builder.model.Spark3EngineExecution;
+import org.xi.maple.builder.model.Spark3YarnDataModel;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
@@ -22,25 +22,16 @@ public class Spark3YarnConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
+        ExecFtlModel<Spark3YarnDataModel> execConf = convert(execution);
 
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
         commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-yarn-submit.sh.ftl", "spark3-yarn-submit.sh", execConf));
         return commandGeneratorModels;
     }
 
-    @Override
-    public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
-        ExecFtlModel<Spark3EngineExecution> execConf = convert(execution);
-
-        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-stop.sh.ftl", "flink-yarn-stop.sh", execConf));
-        return commandGeneratorModels;
-    }
-
-    private ExecFtlModel<Spark3EngineExecution> convert(EngineExecutionModel execution) {
+    private ExecFtlModel<Spark3YarnDataModel> convert(EngineExecutionModel execution) {
         String executionConf = execution.getConfiguration();
-        ExecFtlModel<Spark3EngineExecution> execModel = new ExecFtlModel<>();
+        ExecFtlModel<Spark3YarnDataModel> execModel = new ExecFtlModel<>();
         execModel.setExecId(execution.getExecId());
         execModel.setExecFile(execution.getExecFile());
         execModel.setFromApp(execution.getFromApp());
@@ -52,7 +43,7 @@ public class Spark3YarnConvertor implements MapleConvertor {
         execModel.setGroup(execution.getGroup());
         execModel.setUser(execution.getUser());
         execModel.setEngine(execution.getEngine());
-        Spark3EngineExecution jobConf = JsonUtils.parseObject(executionConf, Spark3EngineExecution.class, null);
+        Spark3YarnDataModel jobConf = JsonUtils.parseObject(executionConf, Spark3YarnDataModel.class, null);
         // todo 根据 runType 设置 runConf
         if (jobConf != null) {
             jobConf.setQueue(execution.getResourceGroup());
