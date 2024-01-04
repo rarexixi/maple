@@ -31,10 +31,10 @@
         <module>maple-persistence-service</module>
         <module>maple-redis</module>
         <module>maple-restful-api</module>
-        <module>maple-scheduler</module>
+        <module>maple-manager</module>
         <module>maple-engine-plugins</module>
         <module>maple-engine-builder-base</module>
-        <module>maple-execution-manager</module>
+        <module>maple-executor</module>
         <module>maple-hadoop</module>
     </modules>
 </project>
