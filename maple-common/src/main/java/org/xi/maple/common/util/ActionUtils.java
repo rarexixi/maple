@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.function.Action;
 
+import java.util.concurrent.ScheduledFuture;
+
 /**
  * @author xishihao
  */
@@ -25,6 +27,16 @@ public class ActionUtils {
             action.run();
         } catch (Throwable t) {
             logger.error("执行失败", t);
+        }
+    }
+
+    public static void cancelScheduledFutureQuietly(ScheduledFuture<?> scheduledFuture) {
+        executeQuietly(() -> ActionUtils.cancelScheduledFuture(scheduledFuture));
+    }
+
+    public static void cancelScheduledFuture(ScheduledFuture<?> scheduledFuture) {
+        if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
+            scheduledFuture.cancel(true);
         }
     }
 }

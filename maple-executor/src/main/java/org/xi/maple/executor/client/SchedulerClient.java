@@ -11,8 +11,8 @@ import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(value = MapleServiceName.SCHEDULER_SERVICE, fallbackFactory = SchedulerClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
-@LoadBalancerClient(name = MapleServiceName.SCHEDULER_SERVICE, configuration = RandomRouteLoadBalancerConfiguration.class)
+@FeignClient(value = MapleServiceName.MANAGER, fallbackFactory = SchedulerClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
+@LoadBalancerClient(name = MapleServiceName.MANAGER, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface SchedulerClient {
 
     // region scheduler

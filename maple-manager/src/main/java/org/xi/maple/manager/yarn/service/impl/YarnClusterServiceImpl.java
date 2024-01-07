@@ -13,12 +13,16 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.function.ThrowableFunction;
+import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.JsonUtils;
+import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
@@ -32,17 +36,17 @@ import org.xi.maple.manager.yarn.service.YarnClusterService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Function;
 
 /**
  * @author xishihao
  */
 @Service("yarnClusterService")
-public class YarnClusterServiceImpl implements YarnClusterService {
+public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnClusterServiceImpl.class);
 
@@ -50,15 +54,27 @@ public class YarnClusterServiceImpl implements YarnClusterService {
 
     private final UpdateExecStatusFunc updateExecStatusFunc;
 
-    Map<String, ClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+    private final MapleManagerProperties managerProperties;
 
-    Map<String, ClusterListItemResponse> CLUSTER_MAP = new ConcurrentHashMap<>();
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-    public YarnClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
+    private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
+
+    private Map<String, ClusterQueue> CLUSTER_QUEUE_MAP;
+
+    private Map<String, ClusterListItemResponse> CLUSTER_MAP;
+
+    public YarnClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.client = client;
         this.updateExecStatusFunc = updateExecStatusFunc;
-        refreshAllClusterConfig();
+        this.managerProperties = managerProperties;
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+        this.threadPoolTaskScheduler = threadPoolTaskScheduler;
+        CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+        CLUSTER_MAP = new ConcurrentHashMap<>();
     }
+
+    // region engine operation
 
     @Override
     public Object kill(String name, String applicationId) {
@@ -72,6 +88,8 @@ public class YarnClusterServiceImpl implements YarnClusterService {
         };
         return masterExec(cluster, "Kill YARN 任务失败", getRequest, responseBody -> JsonUtils.parseObject(responseBody, YarnApplicationKillResult.class));
     }
+
+    // endregion
 
     @Override
     public void refreshExecutionStatus(String clusterName, String applicationId) {
@@ -95,7 +113,7 @@ public class YarnClusterServiceImpl implements YarnClusterService {
 
     @Override
     public void refreshExecutionsStatus(String clusterName, String states, Long startedTimeBegin, Long startedTimeEnd) {
-        ClusterListItemResponse cluster = CLUSTER_MAP.get(clusterName);
+        ClusterListItemResponse cluster = client.getClusterByName(clusterName);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=%s&startedTimeBegin=%d&startedTimeEnd=%d", master, MapleConstants.TAG_EXEC, states, startedTimeBegin, startedTimeEnd);
             HttpGet request = new HttpGet(uri);
@@ -120,7 +138,6 @@ public class YarnClusterServiceImpl implements YarnClusterService {
         CLUSTER_MAP.put(cluster.getName(), cluster);
     }
 
-    @Scheduled(fixedDelay = 5000)
     @Override
     public void refreshAllClusterConfig() {
         ClusterQueryRequest request = new ClusterQueryRequest();
@@ -134,36 +151,37 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     /**
      * 定时缓存 集群-队列 资源
      */
-    @Scheduled(fixedDelay = 5000)
     public void cacheClusterQueueInfo() {
         logger.info("刷新 YARN 队列资源...");
-        Map<String, ClusterQueue> queueMap = new HashMap<>();
+        final Map<String, ClusterQueue> queueMap = new ConcurrentHashMap<>();
         for (ClusterListItemResponse cluster : CLUSTER_MAP.values()) {
-            Function<String, HttpUriRequest> getRequest = master -> {
-                String uri = String.format("%s/ws/v1/cluster/scheduler", master);
-                HttpGet request = new HttpGet(uri);
-                request.addHeader("Content-Type", "application/json");
-                return request;
-            };
-            YarnScheduler yarnScheduler = masterExec(cluster, "获取 YARN 队列信息失败", getRequest, responseBody -> JsonUtils.parseObject(responseBody, YarnScheduler.class));
-            YarnScheduler.Scheduler scheduler;
-            YarnScheduler.SchedulerInfo schedulerInfo;
-            YarnScheduler.Queues schedulerQueues;
-            List<YarnScheduler.Queue> queues;
-            if (yarnScheduler == null
-                    || (scheduler = yarnScheduler.getScheduler()) == null
-                    || (schedulerInfo = scheduler.getSchedulerInfo()) == null
-                    || (schedulerQueues = schedulerInfo.getQueues()) == null
-                    || (queues = schedulerQueues.getQueue()) == null
-                    || queues.isEmpty()) {
-                continue;
-            }
+            threadPoolTaskExecutor.execute(() -> {
+                Function<String, HttpUriRequest> getRequest = master -> {
+                    String uri = String.format("%s/ws/v1/cluster/scheduler", master);
+                    HttpGet request = new HttpGet(uri);
+                    request.addHeader("Content-Type", "application/json");
+                    return request;
+                };
+                YarnScheduler yarnScheduler = masterExec(cluster, "获取 YARN 队列信息失败", getRequest, responseBody -> JsonUtils.parseObject(responseBody, YarnScheduler.class));
+                YarnScheduler.Scheduler scheduler;
+                YarnScheduler.SchedulerInfo schedulerInfo;
+                YarnScheduler.Queues schedulerQueues;
+                List<YarnScheduler.Queue> queues;
+                if (yarnScheduler == null
+                        || (scheduler = yarnScheduler.getScheduler()) == null
+                        || (schedulerInfo = scheduler.getSchedulerInfo()) == null
+                        || (schedulerQueues = schedulerInfo.getQueues()) == null
+                        || (queues = schedulerQueues.getQueue()) == null
+                        || queues.isEmpty()) {
+                    return;
+                }
 
-            for (YarnScheduler.Queue queue : queues) {
-                String key = ClusterQueue.getClusterQueueKey(cluster.getName(), queue.getQueueName());
-                ClusterQueue value = new YarnClusterQueue(queue.getNumPendingApplications());
-                queueMap.put(key, value);
-            }
+                for (YarnScheduler.Queue queue : queues) {
+                    String key = ClusterQueue.getClusterQueueKey(cluster.getName(), queue.getQueueName());
+                    ClusterQueue value = new YarnClusterQueue(queue.getNumPendingApplications());
+                    queueMap.put(key, value);
+                }
+            });
         }
         CLUSTER_QUEUE_MAP = queueMap;
     }
@@ -171,8 +189,8 @@ public class YarnClusterServiceImpl implements YarnClusterService {
     /**
      * 刷新引擎执行任务状态
      */
-    @Scheduled(fixedDelay = 5000)
     public void refreshExecStatus() {
+
         // 获取所有未启动的任务
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=NEW,NEW_SAVING,SUBMITTED,ACCEPTED&startedTimeBegin=%d", master, MapleConstants.TAG_EXEC, System.currentTimeMillis() - 60 * 60 * 1000);
@@ -277,5 +295,40 @@ public class YarnClusterServiceImpl implements YarnClusterService {
             EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.valueOf(state).toString(), state);
             updateExecStatusFunc.apply(execId, request);
         }
+    }
+
+    private ScheduledFuture<?> clusterConfigScheduledFuture = null;
+    private ScheduledFuture<?> clusterQueueRefreshScheduledFuture = null;
+    private ScheduledFuture<?> clusterJobScheduledFuture = null;
+
+    /**
+     * 开启刷新集群配置（仅配置内容）
+     */
+    @Override
+    public void startRefreshScheduler() {
+        clusterConfigScheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(this::refreshAllClusterConfig, managerProperties.getYarnRefreshPeriod());
+        clusterQueueRefreshScheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(this::cacheClusterQueueInfo, 5000);
+        clusterJobScheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(this::refreshExecStatus, 5000); // todo 如果状态有回调写入，可以考虑加长时间
+    }
+
+    /**
+     * 关闭刷新集群配置（仅配置内容）
+     */
+    @Override
+    public void stopRefreshScheduler() {
+        ActionUtils.cancelScheduledFuture(clusterConfigScheduledFuture);
+        ActionUtils.cancelScheduledFuture(clusterQueueRefreshScheduledFuture);
+        ActionUtils.cancelScheduledFuture(clusterJobScheduledFuture);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (managerProperties.isRefreshYarn()) {
+            startRefreshScheduler();
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            ActionUtils.executeQuietly(() -> stopRefreshScheduler());
+        }));
     }
 }

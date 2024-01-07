@@ -58,7 +58,7 @@ public class K8SEngineExecutor extends EngineExecutor {
         }
 
         for (String yamlPath : yamlFiles) {
-            ActionUtils.executeQuietly(() -> deploy(execution.getCluster(), yamlPath));
+            // ActionUtils.executeQuietly(() -> deploy(execution.getCluster(), getPath(execHome, yamlPath)));
         }
     }
 

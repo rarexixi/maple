@@ -22,3 +22,12 @@ spring:
 feign:
   okhttp:
     enabled: true
+
+maple:
+  manager:
+    consume-job: true
+    consume-job-period: 6000
+    refresh-yarn: false
+    yarn-refresh-period: 60000
+    refresh-k8s: true
+    k8s-refresh-period: 10000

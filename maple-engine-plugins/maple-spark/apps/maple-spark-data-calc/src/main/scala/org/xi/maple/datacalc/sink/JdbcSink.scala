@@ -3,7 +3,7 @@ package org.xi.maple.datacalc.sink
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.execution.datasources.jdbc.{JDBCOptions, JdbcUtils}
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.xi.maple.datacalc.api.MapleSink
+import org.xi.maple.api.MapleSink
 import org.xi.maple.datacalc.util.VariableUtils
 
 import java.sql.{Connection, DriverManager, PreparedStatement}

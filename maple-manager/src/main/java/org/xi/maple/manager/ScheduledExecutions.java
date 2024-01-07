@@ -13,7 +13,10 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.xi.maple.common.constant.EngineExecutionStatus;
+import org.xi.maple.common.util.ActionUtils;
+import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
@@ -36,35 +39,37 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledExecutions.class);
 
-    final RedissonClient redissonClient;
+    private final ExecutionService executionService;
 
-    final RedisTemplate<String, Object> redisTemplate;
-    final RedisMessageListenerContainer redisMessageListenerContainer;
+    private final MapleManagerProperties managerProperties;
 
-    final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private final RedissonClient redissonClient;
 
-    final ThreadPoolTaskScheduler threadPoolTaskScheduler;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    final ExecutionService executionService;
+    private final RedisMessageListenerContainer redisMessageListenerContainer;
 
-    final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-    public ScheduledExecutions(RedissonClient redissonClient,
-                               RedisTemplate<String, Object> redisTemplate, RedisMessageListenerContainer redisMessageListenerContainer,
-                               ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler,
-                               ExecutionService executionService) {
+    private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
+
+    private final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
+
+    public ScheduledExecutions(ExecutionService executionService, MapleManagerProperties managerProperties,
+                               RedissonClient redissonClient, RedisTemplate<String, Object> redisTemplate, RedisMessageListenerContainer redisMessageListenerContainer,
+                               ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
+        this.executionService = executionService;
+        this.managerProperties = managerProperties;
         this.redissonClient = redissonClient;
         this.redisTemplate = redisTemplate;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
-        this.executionService = executionService;
     }
 
     /**
      * 消费作业
      */
-    // @Scheduled(fixedDelay = 5000)
     public void consumeJobs() {
         logger.info("开始消费队列...");
 
@@ -122,6 +127,16 @@ public class ScheduledExecutions implements CommandLineRunner {
         }
     }
 
+    private ScheduledFuture<?> consumeJobScheduledFuture = null;
+
+    public void startConsumeJobScheduler() {
+        consumeJobScheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(this::consumeJobs, managerProperties.getConsumeJobPeriod());
+    }
+
+    public void stopConsumeJobScheduler() {
+        ActionUtils.cancelScheduledFuture(consumeJobScheduledFuture);
+    }
+
     public void clearScheduling() {
         logger.info("cancel jobs");
         futureMap.values().forEach(scheduledFuture -> scheduledFuture.cancel(true));
@@ -129,6 +144,10 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (managerProperties.isConsumeJob()) {
+            startConsumeJobScheduler();
+        }
+
         final MessageListener messageListener = (message, pattern) -> {
             logger.info("收到集群消息: {}", message);
             ClusterMessage clusterMessage = (ClusterMessage) redisTemplate.getValueSerializer().deserialize(message.getBody());
@@ -138,8 +157,9 @@ public class ScheduledExecutions implements CommandLineRunner {
         redisMessageListenerContainer.addMessageListener(messageListener, topic);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            clearScheduling();
-            redisMessageListenerContainer.removeMessageListener(messageListener, topic);
+            ActionUtils.executeQuietly(() -> stopConsumeJobScheduler());
+            ActionUtils.executeQuietly(() -> clearScheduling());
+            ActionUtils.executeQuietly(() -> redisMessageListenerContainer.removeMessageListener(messageListener, topic));
         }));
     }
 }

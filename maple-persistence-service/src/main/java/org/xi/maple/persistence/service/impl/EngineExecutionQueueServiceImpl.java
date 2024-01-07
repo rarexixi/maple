@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -35,7 +38,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
     }
 
     /**
-     * 添加执行队列
+     * 添加执行队列, 如果是新增的队列，或者队列更新时长大于30分钟, 清理缓存
      *
      * @param saveRequest 执行队列
      * @return 受影响的行数
@@ -47,8 +50,12 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
     public OperateResult<Integer> addOrUpdate(EngineExecutionQueueSaveRequest saveRequest) {
         EngineExecutionQueueEntity entity = ObjectUtils.copy(saveRequest, EngineExecutionQueueEntity.class);
         BeanUtils.copyProperties(saveRequest, entity);
-        if (engineExecutionQueueMapper.detailByPk(saveRequest.getQueueName()) == null) {
+        EngineExecutionQueueEntity oldQueue = engineExecutionQueueMapper.detailByPk(saveRequest.getQueueName());
+        if (oldQueue == null) {
             return OperateResult.newResult(engineExecutionQueueMapper.insert(entity));
+        } else if (System.currentTimeMillis() - Timestamp.valueOf(oldQueue.getUpdateTime()).getTime() > 30 * 60 * 1000) {
+            // todo 验证时区影响
+            return OperateResult.newResult(engineExecutionQueueMapper.updateByPk(entity, saveRequest.getQueueName()));
         } else {
             return OperateResult.updateResult(engineExecutionQueueMapper.updateByPk(entity, saveRequest.getQueueName()));
         }
@@ -62,6 +69,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Transactional
+    @CacheEvict(cacheNames = {"maple"}, key = "'exec-queue'")
     @Override
     public int delete(String queueName) {
         return engineExecutionQueueMapper.deleteByPk(queueName);
@@ -90,11 +98,12 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      * @param queryRequest 搜索条件
      * @return 符合条件的执行队列列表
      */
-    @Cacheable(cacheNames = {"maple"}, key = "'exec-queue'")
+    @Cacheable(cacheNames = {"maple"}, key = "'exec-queue'") // todo 考虑如何清理
     @Override
     @Transactional(readOnly = true)
     public List<EngineExecutionQueue> getList(EngineExecutionQueueQueryRequest queryRequest) {
         EngineExecutionQueueSelectCondition condition = ObjectUtils.copy(queryRequest, EngineExecutionQueueSelectCondition.class);
+        condition.setUpdateTimeMin(Timestamp.from(Instant.ofEpochMilli(System.currentTimeMillis() - 30 * 60 * 1000)).toLocalDateTime()); // 30分钟内更新过的队列, todo 验证时区影响
         List<EngineExecutionQueueEntity> list = engineExecutionQueueMapper.select(condition);
         return ObjectUtils.copy(list, EngineExecutionQueue.class);
     }

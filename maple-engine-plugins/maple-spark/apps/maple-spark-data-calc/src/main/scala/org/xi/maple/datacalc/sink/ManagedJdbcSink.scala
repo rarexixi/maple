@@ -1,7 +1,7 @@
 package org.xi.maple.datacalc.sink
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.xi.maple.datacalc.api.MapleSink
+import org.xi.maple.api.MapleSink
 import org.xi.maple.datacalc.exception.DatasourceNotConfigException
 import org.xi.maple.datacalc.model.NamedDatasource
 import org.xi.maple.datacalc.service.NamedDatasourceService

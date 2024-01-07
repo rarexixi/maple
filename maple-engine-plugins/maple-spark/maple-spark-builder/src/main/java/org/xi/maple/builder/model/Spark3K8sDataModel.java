@@ -7,6 +7,7 @@ import java.util.Map;
 
 @Data
 public class Spark3K8sDataModel implements Serializable {
+    private String namespace;
     private String sparkHome;
 
     // --queue QUEUE_NAME          The YARN queue to submit to (Default: "default").

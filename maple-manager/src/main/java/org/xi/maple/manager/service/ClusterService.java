@@ -25,4 +25,14 @@ public interface ClusterService {
      * 强制刷新所有集群配置
      */
     void refreshAllClusterConfig();
+
+    /**
+     * 开启刷新集群配置（仅配置内容）
+     */
+    void startRefreshScheduler();
+
+    /**
+     * 关闭刷新集群配置（仅配置内容）
+     */
+    void stopRefreshScheduler();
 }

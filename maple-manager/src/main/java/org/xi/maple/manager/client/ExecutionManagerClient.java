@@ -9,8 +9,8 @@ import org.xi.maple.manager.client.fallback.ExecutionManagerClientFallbackFactor
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
-@FeignClient(value = MapleServiceName.EXECUTION_SERVICE, fallbackFactory = ExecutionManagerClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
-@LoadBalancerClient(name = MapleServiceName.EXECUTION_SERVICE, configuration = RandomRouteLoadBalancerConfiguration.class)
+@FeignClient(value = MapleServiceName.EXECUTOR, fallbackFactory = ExecutionManagerClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
+@LoadBalancerClient(name = MapleServiceName.EXECUTOR, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface ExecutionManagerClient {
 
     // region engine-execution

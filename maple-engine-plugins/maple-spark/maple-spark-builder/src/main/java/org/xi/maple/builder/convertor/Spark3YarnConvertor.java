@@ -25,7 +25,7 @@ public class Spark3YarnConvertor implements MapleConvertor {
         ExecFtlModel<Spark3YarnDataModel> execConf = convert(execution);
 
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-yarn-submit.sh.ftl", "spark3-yarn-submit.sh", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark3-yarn-submit.sh.ftl", "spark3-yarn-submit.sh", execConf));
         return commandGeneratorModels;
     }
 

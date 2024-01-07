@@ -1,9 +1,9 @@
 package org.xi.maple.datacalc.util;
 
-import org.xi.maple.datacalc.api.MaplePlugin;
-import org.xi.maple.datacalc.api.MapleSink;
-import org.xi.maple.datacalc.api.MapleSource;
-import org.xi.maple.datacalc.api.MapleTransform;
+import org.xi.maple.api.MaplePlugin;
+import org.xi.maple.api.MapleSink;
+import org.xi.maple.api.MapleSource;
+import org.xi.maple.api.MapleTransform;
 import org.xi.maple.datacalc.model.SinkConfig;
 import org.xi.maple.datacalc.model.SourceConfig;
 import org.xi.maple.datacalc.model.TransformConfig;

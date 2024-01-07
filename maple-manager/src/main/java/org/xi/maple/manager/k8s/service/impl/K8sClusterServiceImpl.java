@@ -9,7 +9,8 @@ import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
@@ -17,7 +18,9 @@ import org.xi.maple.common.exception.MapleClusterConfigException;
 import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
 import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
 import org.xi.maple.common.exception.MapleK8sException;
+import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.JsonUtils;
+import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
 import org.xi.maple.persistence.model.response.ClusterDetailResponse;
 import org.xi.maple.persistence.model.response.ClusterListItemResponse;
@@ -39,60 +42,51 @@ import org.xi.maple.manager.k8s.volcano.crds.VolcanoQueue;
 import org.xi.maple.manager.k8s.volcano.crds.VolcanoQueueList;
 import org.xi.maple.manager.model.ClusterQueue;
 
-import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author xishihao
  */
 @Service("k8sClusterService")
-public class K8sClusterServiceImpl implements K8sClusterService {
+public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(K8sClusterServiceImpl.class);
 
-    private static final Map<String, Method> configSetMethodMap = getConfigSetMethodMap();
-
-    final static Map<String, ClusterQueue> CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
-
     private final PersistenceClient client;
+
     private final UpdateExecStatusFunc updateExecStatusFunc;
+
+    private final MapleManagerProperties managerProperties;
+
+    private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
+
+    private Map<String, ClusterQueue> CLUSTER_QUEUE_MAP;
+
 
     /**
      * 集群名称 -> KubernetesClient
      */
     private final Map<String, KubernetesClient> k8sClients;
 
-    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc) {
+    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.client = client;
         this.updateExecStatusFunc = updateExecStatusFunc;
+        this.managerProperties = managerProperties;
+        this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.k8sClients = new HashMap<>();
+        CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
     }
 
-    /**
-     * 动态设置 K8s 配置（暂时没用到）
-     *
-     * @return
-     */
-    private static Map<String, Method> getConfigSetMethodMap() {
-        Map<String, Method> methodMap = new HashMap<>();
-        Method[] methods = Config.class.getMethods();
-        for (Method method : methods) {
-            if (method.getName().startsWith("set") && method.getParameterCount() == 1) {
-                methodMap.put(method.getName(), method);
-            }
-        }
-        return methodMap;
-    }
-
+    // region engine operation
 
     @Override
     public List<HasMetadata> deployEngine(String clusterName, MultipartFile yamlFile) {
@@ -156,6 +150,8 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         return k8sClients.get(clusterName);
     }
 
+    // endregion
+
     @Override
     public void removeClusterConfig(String clusterName) {
         if (k8sClients.containsKey(clusterName)) {
@@ -169,21 +165,17 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     @Override
     public void addClusterConfig(ClusterDetailResponse cluster) {
-        KubernetesClient kubernetesClient = createKubernetesClient(cluster);
+        KubernetesClient kubernetesClient = new KubernetesClientBuilder().withConfig(getConfig(cluster)).build();
         k8sClients.put(cluster.getName(), kubernetesClient);
         refreshExecStatus(cluster.getName(), kubernetesClient);
     }
 
-    @Override
-    public void refreshAllClusterConfig() {
-
-    }
 
     /**
      * 刷新 K8s 集群配置，不会重启已有集群，如果已有集群有变更，需要使用强制刷新
      */
-    @Scheduled(fixedDelay = 5000)
-    public void refreshClusters() {
+    @Override
+    public void refreshAllClusterConfig() {
         ClusterQueryRequest request = new ClusterQueryRequest();
         request.setCategory(ClusterCategoryConstants.K8s);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
@@ -194,7 +186,7 @@ public class K8sClusterServiceImpl implements K8sClusterService {
             if (k8sClients.containsKey(cluster.getName())) {
                 kubernetesClient = k8sClients.get(cluster.getName());
             } else {
-                kubernetesClient = createKubernetesClient(cluster);
+                kubernetesClient = new KubernetesClientBuilder().withConfig(getConfig(cluster)).build();
                 k8sClients.put(cluster.getName(), kubernetesClient);
             }
             refreshExecStatus(cluster.getName(), kubernetesClient);
@@ -204,32 +196,6 @@ public class K8sClusterServiceImpl implements K8sClusterService {
                 removeClusterConfig(clusterName);
             }
         }
-    }
-
-    /**
-     * kebab-case to pascal-case
-     *
-     * @param content 源字符串
-     * @return 大写驼峰字符串
-     */
-    public static String kebabToPascal(String content) {
-        if (null == content) return null;
-        int contentLength = content.length();
-        if (contentLength == 0) return content;
-
-        StringBuilder stringBuilder = new StringBuilder(contentLength);
-        char[] chars = content.toCharArray();
-        stringBuilder.append(Character.toUpperCase(chars[0]));
-        for (int i = 1; i < contentLength; i++) {
-            if (chars[i] == '-') {
-                if (++i < contentLength) {
-                    stringBuilder.append(Character.toUpperCase(chars[i]));
-                }
-            } else {
-                stringBuilder.append(chars[i]);
-            }
-        }
-        return stringBuilder.toString();
     }
 
     /**
@@ -280,16 +246,6 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
     }
 
-    @PostConstruct
-    public void run() throws Exception {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (KubernetesClient kubernetesClient : k8sClients.values()) {
-                kubernetesClient.informers().stopAllRegisteredInformers();
-                kubernetesClient.close();
-            }
-        }));
-    }
-
     @Override
     public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
         return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
@@ -297,16 +253,11 @@ public class K8sClusterServiceImpl implements K8sClusterService {
 
 
     /**
-     * 根据配置的 master 和 configJson 获取 KubernetesClient
+     * 根据配置的 master 和 configJson 获取 Kubernetes 的 Config 类
      *
      * @param cluster 集群配置
-     * @return KubernetesClient
+     * @return Config
      */
-    private KubernetesClient createKubernetesClient(ClusterListItemResponse cluster) {
-        Config config = getConfig(cluster);
-        return new KubernetesClientBuilder().withConfig(config).build();
-    }
-
     private Config getConfig(ClusterListItemResponse cluster) {
         String name = cluster.getName();
         String master = cluster.getAddress();
@@ -336,5 +287,38 @@ public class K8sClusterServiceImpl implements K8sClusterService {
         Config config = kubeConfig.getConfig();
         config.setMasterUrl(master);
         return config;
+    }
+
+    private ScheduledFuture<?> clusterConfigScheduledFuture = null;
+
+    /**
+     * 开启刷新集群配置（仅配置内容）
+     */
+    @Override
+    public void startRefreshScheduler() {
+        clusterConfigScheduledFuture = threadPoolTaskScheduler.scheduleWithFixedDelay(this::refreshAllClusterConfig, managerProperties.getK8sRefreshPeriod());
+    }
+
+    /**
+     * 关闭刷新集群配置（仅配置内容）
+     */
+    @Override
+    public void stopRefreshScheduler() {
+        ActionUtils.cancelScheduledFuture(clusterConfigScheduledFuture);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (managerProperties.isRefreshK8s()) {
+            startRefreshScheduler();
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            for (KubernetesClient kubernetesClient : k8sClients.values()) {
+                ActionUtils.executeQuietly(() -> stopRefreshScheduler());
+                ActionUtils.executeQuietly(() -> kubernetesClient.informers().stopAllRegisteredInformers());
+                ActionUtils.executeQuietly(kubernetesClient::close);
+            }
+        }));
     }
 }

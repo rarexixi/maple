@@ -21,7 +21,7 @@ public class Spark3K8sConvertor implements MapleConvertor {
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
         ExecFtlModel<Spark3K8sDataModel> execConf = convert(execution);
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark-k8s-submit.yaml.ftl", "spark3-k8s-submit.yaml", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark3-k8s-submit.yaml.ftl", "spark3-k8s-submit.yaml", execConf));
         return commandGeneratorModels;
     }
 

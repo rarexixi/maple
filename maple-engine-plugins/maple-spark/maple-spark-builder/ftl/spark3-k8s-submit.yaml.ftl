@@ -2,7 +2,7 @@ apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
   name: SPARK-${execName}-${execId}
-  namespace: ${namespace}
+  namespace: ${job.namespace}
   labels:
     from-app: maple-exec
     maple-id: "${execId}"
@@ -69,7 +69,7 @@ spec:
     "spark.eventLog.dir": "hdfs://hadoop-cluster/spark/benchmark/logs/"
     "spark.kubernetes.file.upload.path": "local:///tmp/"
     "spark.kubernetes.executor.podNamePrefix": "maple-spark-${execId}"
-    "spark.ui.proxyBase": "/ui/${namespace}/maple-spark-${execId}-ui-svc"
+    "spark.ui.proxyBase": "/ui/${job.namespace}/maple-spark-${execId}-ui-svc"
     "spark.ui.proxyRedirectUri": ""
     "spark.ui.port": "8080"
     <#if job.conf??>
@@ -86,7 +86,7 @@ spec:
     </#list>
     </#if>
     cores: ${job.driverCores}
-    coreLimit: "2000m"
+    <#-- coreLimit: "${job.driverCoreLimit}" -->
     memory: "${job.driverMemory}"
     javaOptions: "${job.driverJavaOptions}"
     labels:
@@ -102,8 +102,8 @@ spec:
     tolerations:
   executor:
     cores: ${job.executorCores}
-    coreLimit: "${job.executorCoreLimit}"
-    instances: ${job.executorNum}
+    <#-- coreLimit: "${job.executorCoreLimit}" -->
+    instances: ${job.numExecutors}
     memory: "${job.executorMemory}"
     <#if job.memoryOverhead??>
     memoryOverhead: "${job.memoryOverhead}"

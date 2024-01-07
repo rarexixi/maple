@@ -60,4 +60,16 @@ public class K8sController {
         List<StatusDetails> result = clusterService.deleteEngine(clusterName, yaml);
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping("start-scheduler")
+    public ResponseEntity<Object> startScheduler() {
+        clusterService.startRefreshScheduler();
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("stop-scheduler")
+    public ResponseEntity<Object> stopScheduler() {
+        clusterService.stopRefreshScheduler();
+        return ResponseEntity.accepted().build();
+    }
 }

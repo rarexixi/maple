@@ -11,4 +11,8 @@ public interface YarnClusterService extends ClusterService {
     void refreshExecutionStatus(String clusterName, String applicationId);
 
     void refreshExecutionsStatus(String clusterName, String states, Long startedTimeBegin, Long startedTimeEnd);
+
+    void startRefreshScheduler();
+
+    void stopRefreshScheduler();
 }

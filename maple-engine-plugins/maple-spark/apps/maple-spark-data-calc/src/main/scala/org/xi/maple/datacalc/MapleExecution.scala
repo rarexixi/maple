@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
 import org.slf4j.{Logger, LoggerFactory}
-import org.xi.maple.datacalc.api._
+import org.xi.maple.api.{MapleSink, MapleSource, MapleTransform}
 import org.xi.maple.datacalc.exception.ConfigRuntimeException
 import org.xi.maple.datacalc.model._
 import org.xi.maple.datacalc.util.{JsonUtils, PluginUtil}
