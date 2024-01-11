@@ -56,11 +56,9 @@ public class RandomRouteLoadBalancer implements ReactorServiceInstanceLoadBalanc
                 list -> list == null || list.isEmpty()
                         ? Optional.empty()
                         : list.stream()
-                        .filter(str -> {
-                            String s = str.trim();
-                            return s.startsWith(serviceIdPrefix) && s.length() > serviceIdLength;
-                        })
-                        .map(str -> str.substring(serviceIdLength).trim())
+                        .map(String::trim)
+                        .filter(s -> s.startsWith(serviceIdPrefix) && s.length() > serviceIdLength)
+                        .map(s -> s.substring(serviceIdLength))
                         .findAny();
 
         Optional<String> targetInstance = getTarget.apply(headers.get(MapleHttpHeaders.INSTANCE));
