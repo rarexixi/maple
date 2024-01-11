@@ -69,10 +69,10 @@ public class RandomRouteLoadBalancer implements ReactorServiceInstanceLoadBalanc
         Optional<String> targetTag = getTarget.apply(headers.get(MapleHttpHeaders.TAG));
         return targetTag.<Function<ServiceInstance, Boolean>>map(s -> instance -> {
             String instanceTags = instance.getMetadata().get(MapleHttpHeaders.TAG);
-            if (instanceTags == null || instanceTags.trim().isEmpty()) {
+            if (instanceTags == null || (instanceTags = instanceTags.trim()).isEmpty()) {
                 return false;
             }
-            return ArrayUtils.contains(instanceTags.trim().split("\\s*,\\s*"), s);
+            return ArrayUtils.contains(instanceTags.split("\\s*,\\s*"), s);
         }).orElse(null);
     }
 
