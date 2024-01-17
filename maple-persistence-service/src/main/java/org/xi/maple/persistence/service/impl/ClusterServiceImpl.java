@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.xi.maple.common.constant.DeletedConstant;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
-import org.xi.maple.common.util.ObjectUtils;
+import org.xi.maple.common.model.ClusterMessage;
+import org.xi.maple.service.util.ObjectUtils;
 import org.xi.maple.persistence.model.request.ClusterAddRequest;
 import org.xi.maple.persistence.model.request.ClusterPatchRequest;
 import org.xi.maple.persistence.model.request.ClusterQueryRequest;
@@ -19,7 +20,6 @@ import org.xi.maple.persistence.persistence.entity.ClusterEntity;
 import org.xi.maple.persistence.persistence.entity.ClusterEntityExt;
 import org.xi.maple.persistence.persistence.mapper.ClusterMapper;
 import org.xi.maple.persistence.service.ClusterService;
-import org.xi.maple.redis.model.ClusterMessage;
 
 import java.util.List;
 

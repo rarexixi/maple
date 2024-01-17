@@ -3,7 +3,7 @@ package org.xi.maple.persistence.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xi.maple.common.util.ObjectUtils;
+import org.xi.maple.service.util.ObjectUtils;
 import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfAddRequest;
 import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfPatchRequest;
 import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfSaveRequest;

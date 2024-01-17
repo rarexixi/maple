@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.manager.service.ExecutionService;
-import org.xi.maple.redis.model.ClusterMessage;
 
 @RequestMapping("cluster")
 @RestController

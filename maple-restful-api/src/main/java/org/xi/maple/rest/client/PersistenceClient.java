@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.constant.MapleServiceName;
+import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.rest.client.fallback.PersistenceClientFallbackFactory;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
@@ -15,7 +16,6 @@ import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest
 import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-import org.xi.maple.redis.model.MapleEngineExecutionQueue;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 

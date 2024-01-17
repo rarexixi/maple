@@ -1,4 +1,4 @@
-package org.xi.maple.common.excel;
+package org.xi.maple.service.excel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

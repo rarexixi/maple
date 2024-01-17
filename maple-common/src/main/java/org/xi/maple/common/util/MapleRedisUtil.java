@@ -1,11 +1,9 @@
-package org.xi.maple.redis.util;
+package org.xi.maple.common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xi.maple.redis.model.MapleEngineExecutionQueue;
-import org.xi.maple.redis.model.MapleJobQueue;
-
-import java.util.concurrent.TimeUnit;
+import org.xi.maple.common.model.MapleEngineExecutionQueue;
+import org.xi.maple.common.model.MapleJobQueue;
 
 /**
  * @author xishihao

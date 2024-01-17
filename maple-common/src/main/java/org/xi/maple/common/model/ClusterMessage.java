@@ -1,13 +1,17 @@
-package org.xi.maple.redis.model;
+package org.xi.maple.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class ClusterMessage {
+@AllArgsConstructor
+@ToString
+public class ClusterMessage implements Serializable {
 
     public static final String CLUSTER_CHANNEL = "maple-cluster-channel";
 

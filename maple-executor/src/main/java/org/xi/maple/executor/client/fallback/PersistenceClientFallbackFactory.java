@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.model.EngineConf;
-import org.xi.maple.common.util.MapleExceptionUtils;
+import org.xi.maple.service.util.MapleExceptionUtils;
 import org.xi.maple.executor.client.PersistenceClient;
 import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;

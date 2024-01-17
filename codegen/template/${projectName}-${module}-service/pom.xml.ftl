@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>org.xi.maple</groupId>
-            <artifactId>maple-spring-common</artifactId>
+            <artifactId>maple-service-spring-boot-starter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

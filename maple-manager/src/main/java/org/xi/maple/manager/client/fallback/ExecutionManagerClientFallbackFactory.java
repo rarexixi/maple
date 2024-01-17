@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.exception.MapleException;
-import org.xi.maple.common.util.MapleExceptionUtils;
+import org.xi.maple.service.util.MapleExceptionUtils;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.manager.client.ExecutionManagerClient;
 

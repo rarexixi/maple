@@ -23,13 +23,11 @@
         <module>maple-dependencies</module>
         <module>maple-spring-dependencies</module>
         <module>maple-common</module>
-        <module>maple-spring-common</module>
         <module>maple-service-spring-boot-starter</module>
         <module>maple-eureka</module>
         <module>maple-datasource</module>
         <module>maple-persistence-models</module>
         <module>maple-persistence-service</module>
-        <module>maple-redis</module>
         <module>maple-restful-api</module>
         <module>maple-manager</module>
         <module>maple-engine-plugins</module>

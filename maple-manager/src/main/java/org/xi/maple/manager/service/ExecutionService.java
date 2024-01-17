@@ -1,10 +1,10 @@
 package org.xi.maple.manager.service;
 
+import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-import org.xi.maple.redis.model.ClusterMessage;
 
 import java.util.List;
 import java.util.Map;

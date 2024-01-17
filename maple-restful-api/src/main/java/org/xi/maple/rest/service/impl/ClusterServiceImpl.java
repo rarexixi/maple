@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.rest.service.ClusterService;
-import org.xi.maple.redis.model.ClusterMessage;
 
 @Service
 public class ClusterServiceImpl implements ClusterService {

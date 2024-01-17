@@ -1,11 +1,12 @@
-package org.xi.maple.common.util;
+package org.xi.maple.service.util;
 
 import feign.FeignException;
 import feign.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xi.maple.common.model.FeignResponseError;
+import org.xi.maple.service.model.FeignResponseError;
 import org.xi.maple.common.model.ResponseError;
+import org.xi.maple.common.util.JsonUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;

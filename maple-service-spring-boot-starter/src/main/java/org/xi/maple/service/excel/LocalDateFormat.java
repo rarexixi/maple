@@ -1,4 +1,4 @@
-package org.xi.maple.common.excel;
+package org.xi.maple.service.excel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LocalDateTimeFormat {
-	String pattern() default "yyyy-MM-dd HH:mm:ss";
+public @interface LocalDateFormat {
+	String pattern() default "yyyy-MM-dd";
 }

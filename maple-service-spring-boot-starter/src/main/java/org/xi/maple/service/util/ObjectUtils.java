@@ -1,4 +1,4 @@
-package org.xi.maple.common.util;
+package org.xi.maple.service.util;
 
 import org.springframework.beans.BeanUtils;
 

@@ -1,10 +1,11 @@
-package org.xi.maple.common.model;
+package org.xi.maple.service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import feign.FeignException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.xi.maple.common.model.ResponseError;
 
 @Data
 @NoArgsConstructor

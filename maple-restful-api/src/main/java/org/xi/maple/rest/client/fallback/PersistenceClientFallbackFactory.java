@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
-import org.xi.maple.rest.client.PersistenceClient;
 import org.xi.maple.common.exception.MapleException;
+import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.common.util.MapleExceptionUtils;
+import org.xi.maple.service.util.MapleExceptionUtils;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
@@ -15,7 +15,7 @@ import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest
 import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-import org.xi.maple.redis.model.MapleEngineExecutionQueue;
+import org.xi.maple.rest.client.PersistenceClient;
 
 import java.util.List;
 

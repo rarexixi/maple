@@ -1,8 +1,9 @@
-package org.xi.maple.redis.model;
+package org.xi.maple.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class MapleJobQueue implements Serializable {
 
     private String queueName;
@@ -34,6 +36,7 @@ public class MapleJobQueue implements Serializable {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class QueueItem implements Serializable {
 
         private Integer jobId;
