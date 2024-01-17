@@ -1,11 +1,9 @@
 package org.xi.maple.rest.service.impl;
 
-import org.redisson.api.RDeque;
-import org.redisson.api.RedissonClient;
-import org.redisson.codec.JsonJacksonCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.rest.client.PersistenceClient;
@@ -32,7 +30,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutionServiceImpl.class);
 
-    final RedissonClient redissonClient;
+    private final RedisTemplate<String, Object> redisTemplate;
     final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     final PersistenceClient persistenceClient;
     final SchedulerClient schedulerClient;
@@ -40,8 +38,8 @@ public class ExecutionServiceImpl implements ExecutionService {
     final MapleSecurityProperties securityProperties;
 
     @Autowired
-    public ExecutionServiceImpl(RedissonClient redissonClient, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient, MapleAppService mapleAppService, MapleSecurityProperties securityProperties) {
-        this.redissonClient = redissonClient;
+    public ExecutionServiceImpl(RedisTemplate<String, Object> redisTemplate, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient, MapleAppService mapleAppService, MapleSecurityProperties securityProperties) {
+        this.redisTemplate = redisTemplate;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
         this.schedulerClient = schedulerClient;
@@ -84,9 +82,8 @@ public class ExecutionServiceImpl implements ExecutionService {
             MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getResourceGroup(),
                     submitReq.getFromApp(), submitReq.getGroup(), submitReq.getPriority());
             persistenceClient.addOrUpdateExecQueue(execQueue);
-            RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(execQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
-            logger.info("插入队列：{}, id: {}", deque.getName(), id);
-            deque.addLast(new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
+            logger.info("插入队列：{}, id: {}", execQueue.getQueueName(), id);
+            redisTemplate.opsForList().leftPush(execQueue.getQueueName(), new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
             persistenceClient.updateExecutionStatusById(id, new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.ACCEPTED.toString()));
         });
         return id;

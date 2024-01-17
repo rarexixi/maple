@@ -1,9 +1,5 @@
 package org.xi.maple.manager;
 
-import org.redisson.api.RBlockingDeque;
-import org.redisson.api.RDeque;
-import org.redisson.api.RedissonClient;
-import org.redisson.codec.JsonJacksonCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -14,7 +10,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
@@ -30,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -44,8 +40,6 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     private final MapleManagerProperties managerProperties;
 
-    private final RedissonClient redissonClient;
-
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final RedisMessageListenerContainer redisMessageListenerContainer;
@@ -57,11 +51,10 @@ public class ScheduledExecutions implements CommandLineRunner {
     private final ConcurrentMap<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
 
     public ScheduledExecutions(ExecutionService executionService, MapleManagerProperties managerProperties,
-                               RedissonClient redissonClient, RedisTemplate<String, Object> redisTemplate, RedisMessageListenerContainer redisMessageListenerContainer,
+                               RedisTemplate<String, Object> redisTemplate, RedisMessageListenerContainer redisMessageListenerContainer,
                                ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.executionService = executionService;
         this.managerProperties = managerProperties;
-        this.redissonClient = redissonClient;
         this.redisTemplate = redisTemplate;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
@@ -97,14 +90,11 @@ public class ScheduledExecutions implements CommandLineRunner {
     private void consumeQueueJobs(EngineExecutionQueue executionQueue) {
         logger.info("正在消费队列作业 <{}> ...", executionQueue.getQueueName());
 
-        RBlockingDeque<MapleEngineExecutionQueue.QueueItem> blockingDeque = redissonClient.getBlockingDeque(executionQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
-        blockingDeque.poll();
-        RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(executionQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
-
         AtomicBoolean continueRunning = new AtomicBoolean(true);
         while (continueRunning.get()) {
             // 消费作业
-            MapleEngineExecutionQueue.QueueItem queueItem = deque.poll();
+            MapleEngineExecutionQueue.QueueItem queueItem = (MapleEngineExecutionQueue.QueueItem) redisTemplate.opsForList().rightPop(executionQueue.getQueueName(), 10, TimeUnit.SECONDS);
+
             // 如果队列为空，直接返回
             if (queueItem == null) {
                 logger.info("作业执行队列为空 <{}> ", executionQueue.getQueueName());
@@ -128,7 +118,7 @@ public class ScheduledExecutions implements CommandLineRunner {
             }
             threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {
                 logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getCluster(), execution.getResourceGroup());
-                deque.addFirst(queueItem);
+                redisTemplate.opsForList().rightPush(executionQueue.getQueueName(), queueItem);
                 continueRunning.set(false);
             }));
         }

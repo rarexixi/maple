@@ -29,7 +29,6 @@
         <freemarker.version>2.3.31</freemarker.version>
         <easyexcel.version>3.1.4</easyexcel.version>
         <mysql.version>8.0.28</mysql.version>
-        <redisson.version>3.17.7</redisson.version>
         <mybatis.version>3.5.11</mybatis.version>
         <kubernetes-fabric8-client.version>6.8.1</kubernetes-fabric8-client.version>
     </properties>
@@ -145,12 +144,6 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson</artifactId>
-                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>
