@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -49,6 +50,7 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
     public OperateResult<Integer> addOrUpdate(EngineExecutionQueueSaveRequest saveRequest) {
         EngineExecutionQueueEntity entity = ObjectUtils.copy(saveRequest, EngineExecutionQueueEntity.class);
         BeanUtils.copyProperties(saveRequest, entity);
+        entity.setUpdateTime(LocalDateTime.now());
         EngineExecutionQueueEntity oldQueue = engineExecutionQueueMapper.detailByPk(saveRequest.getQueueName());
         if (oldQueue == null) {
             return OperateResult.newResult(engineExecutionQueueMapper.insert(entity));

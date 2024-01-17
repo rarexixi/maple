@@ -21,7 +21,9 @@ import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -65,20 +67,33 @@ public class ScheduledExecutions implements CommandLineRunner {
      * 消费作业
      */
     public void consumeJobs() {
-        logger.info("开始消费队列...");
+        logger.info("开始刷新要消费的队列...");
 
         List<EngineExecutionQueue> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryRequest());
         if (queueList == null || queueList.isEmpty()) {
-            logger.warn("队列列表为空");
+            logger.warn("队列列表为空, 清空消费队列...");
+            for (String key : futureMap.keySet()) {
+                ActionUtils.cancelScheduledFutureQuietly(futureMap.remove(key), true);
+            }
             return;
         }
-
+        Set<String> queueSet = new HashSet<>();
         for (EngineExecutionQueue executionQueue : queueList) {
+            queueSet.add(executionQueue.getQueueName());
             if (!futureMap.containsKey(executionQueue.getQueueName())) {
+                logger.info("开始消费队列 <{}> ...", executionQueue.getQueueName());
                 ScheduledFuture<?> scheduledFuture =
-                        threadPoolTaskScheduler.scheduleWithFixedDelay(() -> consumeQueueJobs(executionQueue), 5000);
+                        threadPoolTaskScheduler.scheduleWithFixedDelay(() -> consumeQueueJobs(executionQueue), 60 * 1000);
                 futureMap.put(executionQueue.getQueueName(), scheduledFuture);
             }
+        }
+
+        for (String key : futureMap.keySet()) {
+            if (queueSet.contains(key)) {
+                continue;
+            }
+            logger.info("队列 <{}> 已经过期或者不存在，取消消费...", key);
+            ActionUtils.cancelScheduledFutureQuietly(futureMap.remove(key), true);
         }
     }
 
@@ -92,14 +107,13 @@ public class ScheduledExecutions implements CommandLineRunner {
 
         AtomicBoolean continueRunning = new AtomicBoolean(true);
         while (continueRunning.get()) {
-            // 消费作业
-            MapleEngineExecutionQueue.QueueItem queueItem = (MapleEngineExecutionQueue.QueueItem) redisTemplate.opsForList().rightPop(executionQueue.getQueueName(), 10, TimeUnit.SECONDS);
+            // 消费作业，阻塞 30 秒，30 秒后如果队列为空，直接返回 null
+            MapleEngineExecutionQueue.QueueItem queueItem = (MapleEngineExecutionQueue.QueueItem) redisTemplate.opsForList().rightPop(executionQueue.getQueueName(), 30, TimeUnit.SECONDS);
 
             // 如果队列为空，直接返回
             if (queueItem == null) {
                 logger.info("作业执行队列为空 <{}> ", executionQueue.getQueueName());
-                continueRunning.set(false);
-                return;
+                continue;
             }
             if (queueItem.getExecId() == null) {
                 logger.error("作业ID为空");
@@ -136,7 +150,7 @@ public class ScheduledExecutions implements CommandLineRunner {
 
     public void clearScheduling() {
         logger.info("cancel jobs");
-        futureMap.values().forEach(scheduledFuture -> scheduledFuture.cancel(true));
+        futureMap.values().forEach(ActionUtils::cancelScheduledFutureQuietly);
     }
 
     @Override

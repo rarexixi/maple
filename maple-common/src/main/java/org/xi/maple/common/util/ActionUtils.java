@@ -31,12 +31,20 @@ public class ActionUtils {
     }
 
     public static void cancelScheduledFutureQuietly(ScheduledFuture<?> scheduledFuture) {
-        executeQuietly(() -> ActionUtils.cancelScheduledFuture(scheduledFuture));
+        cancelScheduledFutureQuietly(scheduledFuture, true);
     }
 
     public static void cancelScheduledFuture(ScheduledFuture<?> scheduledFuture) {
+        cancelScheduledFuture(scheduledFuture, true);
+    }
+
+    public static void cancelScheduledFutureQuietly(ScheduledFuture<?> scheduledFuture, boolean mayInterruptIfRunning) {
+        executeQuietly(() -> ActionUtils.cancelScheduledFuture(scheduledFuture, mayInterruptIfRunning));
+    }
+
+    public static void cancelScheduledFuture(ScheduledFuture<?> scheduledFuture, boolean mayInterruptIfRunning) {
         if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
-            scheduledFuture.cancel(true);
+            scheduledFuture.cancel(mayInterruptIfRunning);
         }
     }
 }
