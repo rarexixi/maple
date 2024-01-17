@@ -77,11 +77,15 @@ public class ExecutionServiceImpl implements ExecutionService {
     public Integer submit(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
         checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getExecUniqId(), submitReq.getExecName());
         final Integer id = persistenceClient.addExecution(submitReq);
+        if (id == null || id < 0) {
+            return id;
+        }
         threadPoolTaskExecutor.execute(() -> {
             MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getResourceGroup(),
                     submitReq.getFromApp(), submitReq.getGroup(), submitReq.getPriority());
             persistenceClient.addOrUpdateExecQueue(execQueue);
             RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(execQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
+            logger.info("插入队列：{}, id: {}", deque.getName(), id);
             deque.addLast(new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
             persistenceClient.updateExecutionStatusById(id, new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.ACCEPTED.toString()));
         });

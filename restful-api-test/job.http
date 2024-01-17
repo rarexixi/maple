@@ -23,7 +23,7 @@ Content-Type: application/json
   "configuration":  "{\"namespace\":\"ns-tjgzvu\",\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{\"spark.hadoop.ipc.client.connect.timeout\":3000,\"spark.hadoop.yarn.client.failover-max-attempts\":2},\"runType\":\"jar\",\"runConf\":{\"mainClass\":\"org.apache.spark.examples.SparkPi\",\"args\":[\"10\"]}}"
 }
 
-### Flink
+### Spark
 
 POST http://localhost:8080/execution/exec-now?timestamp=0&secret=
 Content-Type: application/json
@@ -34,7 +34,7 @@ Content-Type: application/json
   "jobId": "1",
   "bizId":  "1",
   "execUniqId": "7",
-  "execName":  "测试执行",
+  "execName":  "test-spark-jar",
   "cluster": "hadoop-default",
   "resourceGroup":  "default",
   "engineCategory": "spark",
@@ -45,6 +45,31 @@ Content-Type: application/json
   "user":  "xishihao",
   "clusterAppId": "",
   "configuration":  "{\"driverCores\":1,\"driverMemory\":\"4g\",\"numExecutors\":2,\"executorCores\":2,\"executorMemory\":\"8g\",\"driverJavaOptions\":\"\",\"driverClassPath\":\"\",\"jars\":\"\",\"files\":\"\",\"archives\":\"\",\"conf\":{\"spark.hadoop.ipc.client.connect.timeout\":3000,\"spark.hadoop.yarn.client.failover-max-attempts\":2},\"runType\":\"jar\",\"runConf\":{\"mainClass\":\"org.apache.spark.examples.SparkPi\",\"args\":\"10\"}}"
+}
+
+
+### Flink
+
+POST http://localhost:8080/execution/exec?timestamp=0&secret=
+Content-Type: application/json
+
+{
+  "execFile": "/data_query/file/b02f6fe1-575c-4cf4-ab03-df65a3d74e69.py",
+  "fromApp":  "schedule",
+  "jobId": "1",
+  "bizId":  "201",
+  "execUniqId": "45",
+  "execName":  "test-flink-py",
+  "cluster": "k8s-test2",
+  "resourceGroup":  "default-offline",
+  "engineCategory": "flink",
+  "engineVersion":  "1.16.1",
+  "priority": 1,
+  "priUpgradable":  false,
+  "group": "schedule-manager",
+  "user":  "xishihao",
+  "clusterAppId": "",
+  "configuration":  "{\"namespace\":\"ns-tjgzvu\",\"queue\":\"\",\"jobManagerHaEnable\":\"true\",\"jobManagerReplicas\":\"2\",\"jobManagerCores\":\"1\",\"jobManagerMemory\":\"5\",\"parallelism\":\"20\",\"taskManagerCores\":\"1\",\"taskManagerMemory\":\"10\",\"numberOfTaskSlots\":\"5\",\"conf\":{\"state.backend\":\"rocksdb\",\"state.backend.incremental\":\"true\",\"restart-strategy\":\"fixeddelay\",\"restart-strategy.fixed-delay.attempts\":\"15\",\"restart-strategy.fixed-delay.delay\":\"10s\",\"execution.checkpointing.interval\":\"10min\",\"execution.checkpointing.timeout\":\"10min\",\"execution.checkpointing.unaligned\":\"false\"},\"runType\":\"py\",\"runConf\":{\"pyFiles\":\"/data_query/file/b02f6fe1-575c-4cf4-ab03-df65a3d74e69.py\",\"pyModule\":\"b02f6fe1-575c-4cf4-ab03-df65a3d74e69\",\"args\":[\"\"]}}"
 }
 
 ###

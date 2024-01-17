@@ -1,8 +1,8 @@
-<#list envs?keys as key>
-export ${key}=${envs[key]}
+<#if engine.envs??>
+<#list engine.envs as key, value>
+export ${key}=${value}
 </#list>
-# ./bin/sql-client.sh -f /path/to/your/sql-queries.sql
-
+</#if>
 ${engine.engineHome}/bin/flink run-application \
     --target yarn-application \
     --yarnqueue ${job.yarnQueue} \           # yarn.application.queue
@@ -15,25 +15,25 @@ ${engine.engineHome}/bin/flink run-application \
     --classpath ${job.classpath} \
     --detached \
     --allowNonRestoredState \
-    --parallelism ${parallelism} \
-    --restoreMode ${restoreMode} \
-    --fromSavepoint ${fromSavepoint} \
-    -Dyarn.provided.lib.dirs="${yarnFlinkLib}" \
-    -Dyarn.tags="maple-exec,maple-id-${mapleId}" \
+    --parallelism ${job.parallelism} \
+    --restoreMode ${job.restoreMode} \
+    --fromSavepoint ${job.fromSavepoint} \
+    -Dyarn.provided.lib.dirs="${job.yarnFlinkLib}" \
+    -Dyarn.tags="maple-exec,maple-id-${execId}" \
 <#if conf??>
 <#list conf as key, value>
     -D${key}=${value} \
 </#list>
 </#if>
-<#if runType == "jar">
-    --class ${mainClass} \
-    ${jarFile} ${args}
-<#elseif runType == "py">
-    --python ${python} \
-    --pyArchives ${pyArchives} \
-    --pyClientExecutable ${pyClientExecutable} \
-    --pyExecutable ${pyExecutable} \
-    --pyFiles ${pyFiles} \
-    --pyRequirements ${pyRequirements} \
-    --pyModule ${pyModule} \
+<#if job.runType == "jar">
+    --class ${job.runConf.mainClass} \
+    ${execFile} ${job.runConf.args}
+<#elseif job.runType == "py">
+    --python ${job.runConf.python} \
+    --pyArchives ${job.runConf.pyArchives} \
+    --pyClientExecutable ${job.runConf.pyClientExecutable} \
+    --pyExecutable ${job.runConf.pyExecutable} \
+    --pyFiles ${job.runConf.pyFiles} \
+    --pyRequirements ${job.runConf.pyRequirements} \
+    --pyModule ${job.runConf.pyModule} \
 </#if>

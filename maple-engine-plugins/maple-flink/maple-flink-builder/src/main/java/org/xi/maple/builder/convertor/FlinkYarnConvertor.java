@@ -5,6 +5,7 @@ import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
+import org.xi.maple.builder.model.ExecFtlModel;
 import org.xi.maple.builder.model.FlinkYarnDataModel;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
@@ -20,7 +21,7 @@ public class FlinkYarnConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        FlinkYarnDataModel execConf = convert(execution);
+        ExecFtlModel<FlinkYarnDataModel> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
@@ -32,7 +33,7 @@ public class FlinkYarnConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
-        FlinkYarnDataModel execConf = convert(execution);
+        ExecFtlModel<FlinkYarnDataModel> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
@@ -42,11 +43,15 @@ public class FlinkYarnConvertor implements MapleConvertor {
         return commandGeneratorModels;
     }
 
-    private FlinkYarnDataModel convert(EngineExecutionModel execution) {
+    private ExecFtlModel<FlinkYarnDataModel> convert(EngineExecutionModel execution) {
+        ExecFtlModel<FlinkYarnDataModel> execModel = new ExecFtlModel<>(execution);
+
         String executionConf = execution.getConfiguration();
-        FlinkYarnDataModel flinkYarnDataModel = JsonUtils.parseObject(executionConf, FlinkYarnDataModel.class, null);
-        if (flinkYarnDataModel != null) {
+        FlinkYarnDataModel jobConf = JsonUtils.parseObject(executionConf, FlinkYarnDataModel.class, null);
+        if (jobConf != null) {
         }
-        return flinkYarnDataModel;
+        execModel.setJob(jobConf);
+
+        return execModel;
     }
 }

@@ -35,7 +35,7 @@
 
 **状态流转**
 
-![](./assets/img/engine_execution_status.svg) 
+![](./assets/img/engine_execution_status.svg)
 
 ## 用户请求任务
 
@@ -48,10 +48,10 @@
 1. 用户发起引擎执行作业请求
 
 2. 添加作业状态为 SUBMITTED
-   
-   1. 将作业信息存储到数据库，获取到作业ID
-   
-   2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
+
+  1. 将作业信息存储到数据库，获取到作业ID
+
+  2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
 
 3. scheduler 持续消费 redis 队列，根据作业ID拿到执行详细信息
 
@@ -60,12 +60,13 @@
 5. execution-manager 根据引擎的类型，加载对应插件，获取到执行命令生成对象（包括模板地址，输出文件地址，模板数据对象）
 
 6. execution-manager 根据执行命令生成对象，
-   
-   1. YARN 生成对应的脚本，并启动
-   
-   2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
 
-如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service 判断作业状态为 STARTING 时才更新）
+  1. YARN 生成对应的脚本，并启动
+
+  2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
+
+如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service
+判断作业状态为 STARTING 时才更新）
 
 引擎启动后自己回写状态，同时由 scheduler 监控状态
 
@@ -89,72 +90,93 @@
 
 ### spark
 
+#### YARN
+
 ```json
 {
-  "envs": {
-    "HADOOP_HOME": "",
-    "HADOOP_CONF_DIR": "",
-    "YARN_CONF_DIR": ""
-  },
-  "forbiddenConfs": [
-    {
-      "name": "spark.yarn.queue",
-      "replaceParameter": "--queue",
-      "desc": "YARN 队列"
+    "envs": {
+        "HADOOP_HOME": "",
+        "HADOOP_CONF_DIR": "",
+        "YARN_CONF_DIR": ""
     },
-    {
-      "name": "spark.driver.cores",
-      "replaceParameter": "--driver-cores",
-      "desc": "Spark driver vcores"
-    },
-    {
-      "name": "spark.driver.memory",
-      "replaceParameter": "--driver-memory",
-      "desc": "Spark driver 内存"
-    },
-    {
-      "name": "spark.executor.instances",
-      "replaceParameter": "--num-executors",
-      "desc": "Spark executor 内存"
-    },
-    {
-      "name": "spark.executor.cores",
-      "replaceParameter": "--executor-cores",
-      "desc": "Spark executor vcores"
-    },
-    {
-      "name": "spark.executor.memory",
-      "replaceParameter": "--executor-memory",
-      "desc": "Spark executor 内存"
-    },
-    {
-      "name": "spark.driver.extraJavaOptions",
-      "replaceParameter": "--driver-java-options",
-      "desc": "Spark driver java 启动参数"
-    },
-    {
-      "name": "spark.driver.extraLibraryPath",
-      "replaceParameter": "--driver-library-path",
-      "desc": "Spark driver java 启动参数"
-    },
-    {
-      "name": "spark.jars",
-      "replaceParameter": "--jars",
-      "desc": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
-    }
-  ]
+    "forbiddenConfs": [
+        {
+            "name": "spark.yarn.queue",
+            "replaceParameter": "--queue",
+            "desc": "YARN 队列"
+        },
+        {
+            "name": "spark.driver.cores",
+            "replaceParameter": "--driver-cores",
+            "desc": "Spark driver vcores"
+        },
+        {
+            "name": "spark.driver.memory",
+            "replaceParameter": "--driver-memory",
+            "desc": "Spark driver 内存"
+        },
+        {
+            "name": "spark.executor.instances",
+            "replaceParameter": "--num-executors",
+            "desc": "Spark executor 内存"
+        },
+        {
+            "name": "spark.executor.cores",
+            "replaceParameter": "--executor-cores",
+            "desc": "Spark executor vcores"
+        },
+        {
+            "name": "spark.executor.memory",
+            "replaceParameter": "--executor-memory",
+            "desc": "Spark executor 内存"
+        },
+        {
+            "name": "spark.driver.extraJavaOptions",
+            "replaceParameter": "--driver-java-options",
+            "desc": "Spark driver java 启动参数"
+        },
+        {
+            "name": "spark.driver.extraLibraryPath",
+            "replaceParameter": "--driver-library-path",
+            "desc": "Spark driver java 启动参数"
+        },
+        {
+            "name": "spark.jars",
+            "replaceParameter": "--jars",
+            "desc": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
+        }
+    ]
 }
+```
+
+#### K8s
+
+```json
 ```
 
 ### flink
 
+#### YARN
+
 ```json
 {
-  "envs": {
-    "HADOOP_CLASSPATH": "/opt/hadoop/current/etc/hadoop:/opt/hadoop/current/share/hadoop/common/lib/*:/opt/hadoop/current/share/hadoop/common/*:/opt/hadoop/current/share/hadoop/hdfs:/opt/hadoop/current/share/hadoop/hdfs/lib/*:/opt/hadoop/current/share/hadoop/hdfs/*:/opt/hadoop/current/share/hadoop/mapreduce/*:/opt/hadoop/current/share/hadoop/yarn:/opt/hadoop/current/share/hadoop/yarn/lib/*:/opt/hadoop/current/share/hadoop/yarn/*",
-  },
-  "forbiddenConfs": [
-  ]
+    "envs": {
+        "HADOOP_CLASSPATH": "/opt/hadoop/current/etc/hadoop:/opt/hadoop/current/share/hadoop/common/lib/*:/opt/hadoop/current/share/hadoop/common/*:/opt/hadoop/current/share/hadoop/hdfs:/opt/hadoop/current/share/hadoop/hdfs/lib/*:/opt/hadoop/current/share/hadoop/hdfs/*:/opt/hadoop/current/share/hadoop/mapreduce/*:/opt/hadoop/current/share/hadoop/yarn:/opt/hadoop/current/share/hadoop/yarn/lib/*:/opt/hadoop/current/share/hadoop/yarn/*"
+    },
+    "forbiddenConfs": [
+    ]
+}
+```
+
+#### K8s
+
+```json
+{
+    "envs": {
+    },
+    "image": "",
+    "forbiddenConfs": [
+    ]
 }
 ```
 
@@ -174,44 +196,44 @@
 
 ```json
 {
-  "lastStatus": "",
-  "startInfo": {
-    "statuses": [
-      {
-        "code": "",
-        "status": "",
-        "message": "",
-        "time": ""
-      }
-    ]
-  },
-  "lastClusterStatus": "",
-  "clusterInfo": {
-    "statuses": [
-      {
-        "code": "",
-        "status": "",
-        "time": ""
-      }
-    ],
-    "resources": {
-      "memory": "",
-      "cores": ""
+    "lastStatus": "",
+    "startInfo": {
+        "statuses": [
+            {
+                "code": "",
+                "status": "",
+                "message": "",
+                "time": ""
+            }
+        ]
     },
-    "detail": {
-      // map
+    "lastClusterStatus": "",
+    "clusterInfo": {
+        "statuses": [
+            {
+                "code": "",
+                "status": "",
+                "time": ""
+            }
+        ],
+        "resources": {
+            "memory": "",
+            "cores": ""
+        },
+        "detail": {
+            // map
+        }
+    },
+    "rawStatus": "",
+    "rawInfo": {
+        "statuses": [
+            {
+                "code": "",
+                "status": "",
+                "time": ""
+            }
+        ]
     }
-  },
-  "rawStatus": "",
-  "rawInfo": {
-    "statuses": [
-      {
-        "code": "",
-        "status": "",
-        "time": ""
-      }
-    ]
-  }
 }
 ```
 
@@ -219,34 +241,34 @@
 
 ```json
 {
-  "lastStatus": "",
-  "startInfo": {
-    "statuses": [
-      {
-        "code": "",
-        "status": "",
-        "message": "",
-        "time": ""
-      }
-    ]
-  },
-  "lastClusterStatus": "",
-  "clusterInfo": {
-    "statuses": [
-      {
-        "code": "",
-        "status": "",
-        "time": ""
-      }
-    ],
-    "resources": {
-      "memory": "",
-      "cores": ""
+    "lastStatus": "",
+    "startInfo": {
+        "statuses": [
+            {
+                "code": "",
+                "status": "",
+                "message": "",
+                "time": ""
+            }
+        ]
     },
-    "detail": {
-      // map
+    "lastClusterStatus": "",
+    "clusterInfo": {
+        "statuses": [
+            {
+                "code": "",
+                "status": "",
+                "time": ""
+            }
+        ],
+        "resources": {
+            "memory": "",
+            "cores": ""
+        },
+        "detail": {
+            // map
+        }
     }
-  }
 }
 ```
 
@@ -256,49 +278,50 @@
 
 ```json
 {
-   "driverCores": "",
-   "driverMemory": "",
-   "numExecutors": "",
-   "executorCores": "",
-   "executorMemory": "",
-   "driverJavaOptions": "",
-   "driverClassPath": "",
-   "jars": "",
-   "files": "",
-   "archives": "",
-   "conf": {
-      // 表示客户端等待套接字建立服务器连接的毫秒数。默认值为20000毫秒
-      "spark.hadoop.ipc.client.connect.timeout": 2000,
-      // 启用 HA 后，FailoverProxyProvider 尝试故障转移的最大次数。
-      "spark.hadoop.yarn.client.failover-max-attempts": 2,
-      // 启用 HA 后，用于计算故障切换之间指数延迟的休眠基数（以毫秒为单位）。
-      // 设置后，它会覆盖 yarn.resourcemanager.connect.* 设置。
-      // 如果未设置，则使用 yarn.resourcemanager.connect.retry-interval.ms
-      "spark.hadoop.yarn.client.failover-sleep-base-ms": 2000,
-      // 启用 HA 后，故障切换之间的最长休眠时间（毫秒）。
-      // 设置后，它会覆盖 yarn.resourcemanager.connect.* 设置。
-      // 如果未设置，则使用 yarn.resourcemanager.connect.retry-interval.ms
-      "spark.hadoop.yarn.client.failover-sleep-max-ms": 4000
-   },
-   "runType": "data_calc",
-   "jobConf": {
-   },
-   "runType": "sql",
-   "jobConf": {
-   },
-   "runType": "scala",
-   "jobConf": {
-   },
-   "runType": "py",
-   "jobConf": {
-      "pyFiles": "",    // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
-      "args": ""
-   },
-   "runType": "jar",
-   "jobConf": {
-      "mainClass": "",
-      "args": ""
-   }
+    "driverCores": 1,
+    "driverMemory": "4g",
+    "numExecutors": 2,
+    "executorCores": 2,
+    "executorMemory": "4g",
+    "driverJavaOptions": "",
+    "driverClassPath": "",
+    "jars": "",
+    "files": "",
+    "archives": "",
+    "conf": {
+        // 表示客户端等待套接字建立服务器连接的毫秒数。默认值为20000毫秒
+        "spark.hadoop.ipc.client.connect.timeout": 2000,
+        // 启用 HA 后，FailoverProxyProvider 尝试故障转移的最大次数。
+        "spark.hadoop.yarn.client.failover-max-attempts": 2,
+        // 启用 HA 后，用于计算故障切换之间指数延迟的休眠基数（以毫秒为单位）。
+        // 设置后，它会覆盖 yarn.resourcemanager.connect.* 设置。
+        // 如果未设置，则使用 yarn.resourcemanager.connect.retry-interval.ms
+        "spark.hadoop.yarn.client.failover-sleep-base-ms": 2000,
+        // 启用 HA 后，故障切换之间的最长休眠时间（毫秒）。
+        // 设置后，它会覆盖 yarn.resourcemanager.connect.* 设置。
+        // 如果未设置，则使用 yarn.resourcemanager.connect.retry-interval.ms
+        "spark.hadoop.yarn.client.failover-sleep-max-ms": 4000
+    },
+    "runType": "data_calc",
+    "runConf": {
+    },
+    "runType": "sql",
+    "runConf": {
+    },
+    "runType": "scala",
+    "runConf": {
+    },
+    "runType": "py",
+    "runConf": {
+        "pyFiles": "",
+        // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
+        "args": ""
+    },
+    "runType": "jar",
+    "runConf": {
+        "mainClass": "",
+        "args": ""
+    }
 }
 ```
 
@@ -306,30 +329,41 @@
 
 ```json
 {
-   "runType": "data_calc",
-   "jobConf": {
-      "mainFile": ""
-   },
-   "runType": "sql",
-   "jobConf": {
-      "mainFile": ""
-   },
-   "runType": "scala",
-   "jobConf": {
-      "mainFile": ""
-   },
-   "runType": "py",
-   "jobConf": {
-      "pyFiles": "",    // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
-      "mainFile": "",
-      "args": ""
-   },
-   "runType": "jar",
-   "jobConf": {
-      "mainFile": "",
-      "mainClass": "",
-      "args": ""
-   }
+    "namespace": "",
+    "queue": "",
+    "jobManagerHaEnable": "true",
+    "jobManagerReplicas": "2",
+    "jobManagerCores": "1",
+    "jobManagerMemory": "5",
+    "parallelism": "20",
+    "taskManagerCores": "1",
+    "taskManagerMemory": "10",
+    "numberOfTaskSlots": "5",
+    "conf": {
+        "state.backend": "rocksdb",
+        "state.backend.incremental": "true",
+        "restart-strategy": "fixeddelay",
+        "restart-strategy.fixed-delay.attempts": "15",
+        "restart-strategy.fixed-delay.delay": "10s",
+        "execution.checkpointing.interval": "10min",
+        "execution.checkpointing.timeout": "10min",
+        "execution.checkpointing.unaligned": "false"
+    },
+    "runType": "sql",
+    "runConf": {
+    },
+    "runType": "py",
+    "runConf": {
+        "pyFiles": "/data_query/file/b02f6fe1-575c-4cf4-ab03-df65a3d74e69.py",
+        // 第三方库，你可以将它们打包成 .zip、.egg 或 .whl 文件
+        "pyModule": "b02f6fe1-575c-4cf4-ab03-df65a3d74e69",
+        "args": ""
+    },
+    "runType": "jar",
+    "runConf": {
+        "mainClass": "",
+        "args": ""
+    }
 }
 ```
 
@@ -337,13 +371,14 @@
 
 ```json
 {
-   "mapleId": "1",
-   "execName": "xxx_sync_task",
-   "fromApp": "schedule",
-   "queue": "default",
-   "group": "",
-   "user": "",
-   "job": {} // 上面的作业配置
+    "mapleId": "1",
+    "execName": "xxx_sync_task",
+    "fromApp": "schedule",
+    "queue": "default",
+    "group": "",
+    "user": "",
+    "job": {}
+    // 上面的作业配置
 }
 ```
 
@@ -358,7 +393,7 @@
 https://github.com/Netflix/eureka/wiki/Eureka-REST-operations
 
 | **Operation**                                                     | **HTTP action**                                                                                                                                                            | **Description**                                                                                  |
-|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------ |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
 | Register new application instance                                 | POST   /eureka/apps/**appID**                                                                                                                                              | Input: JSON/XML payload HTTP Code: 204 on success                                                |
 | De-register application instance                                  | DELETE /eureka/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code: 200 on success                                                                        |
 | Send application instance heartbeat                               | PUT    /eureka/apps/**appID**/**instanceID**                                                                                                                               | HTTP Code:<br>* 200 on success<br>* 404 if **instanceID** doesn’t exist                          |

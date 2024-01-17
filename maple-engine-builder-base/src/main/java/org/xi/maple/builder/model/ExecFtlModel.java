@@ -11,6 +11,21 @@ import org.xi.maple.common.model.EngineConf;
 @NoArgsConstructor
 @With
 public class ExecFtlModel<T> {
+
+    public ExecFtlModel(EngineExecutionModel execution) {
+        this.execId=execution.getExecId();
+        this.execFile=execution.getExecFile();
+        this.fromApp=execution.getFromApp();
+        this.jobId=execution.getJobId();
+        this.bizId=execution.getBizId();
+        this.execUniqId=execution.getExecUniqId();
+        this.execName=execution.getExecName();
+        this.resourceGroup=execution.getResourceGroup();
+        this.group=execution.getGroup();
+        this.user=execution.getUser();
+        this.engine=execution.getEngine();
+    }
+
     private Integer execId;
     private String execFile;
     private String fromApp;

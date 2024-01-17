@@ -5,12 +5,12 @@ import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.builder.model.EngineExecutionModel;
+import org.xi.maple.builder.model.ExecFtlModel;
 import org.xi.maple.builder.model.FlinkK8sDataModel;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.common.util.JsonUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class FlinkK8sConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        FlinkK8sDataModel execConf = convert(execution);
+        ExecFtlModel<FlinkK8sDataModel> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
@@ -33,7 +33,7 @@ public class FlinkK8sConvertor implements MapleConvertor {
 
     @Override
     public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
-        FlinkK8sDataModel execConf = convert(execution);
+        ExecFtlModel<FlinkK8sDataModel> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
@@ -43,11 +43,15 @@ public class FlinkK8sConvertor implements MapleConvertor {
         return commandGeneratorModels;
     }
 
-    private FlinkK8sDataModel convert(EngineExecutionModel execution) {
+    private ExecFtlModel<FlinkK8sDataModel> convert(EngineExecutionModel execution) {
+        ExecFtlModel<FlinkK8sDataModel> execModel = new ExecFtlModel<>(execution);
+
         String executionConf = execution.getConfiguration();
-        FlinkK8sDataModel flinkK8sDataModel = JsonUtils.parseObject(executionConf, FlinkK8sDataModel.class, null);
-        if (flinkK8sDataModel != null) {
+        FlinkK8sDataModel jobConf = JsonUtils.parseObject(executionConf, FlinkK8sDataModel.class, null);
+        if (jobConf != null) {
         }
-        return flinkK8sDataModel;
+        execModel.setJob(jobConf);
+
+        return execModel;
     }
 }

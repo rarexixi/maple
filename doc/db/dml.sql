@@ -136,3 +136,27 @@ values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark/current', '{
   ]
 }');
 
+
+insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
+values (2, 'k8s-default', 'spark', '3.3.2', '/opt/spark/current', '{
+
+}');
+
+
+insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
+values (3, 'hadoop-default', 'flink', '1.16', '/opt/flink/current', '{
+  "envs": {
+    "HADOOP_CLASSPATH": "/opt/hadoop/current/etc/hadoop:/opt/hadoop/current/share/hadoop/common/lib/*:/opt/hadoop/current/share/hadoop/common/*:/opt/hadoop/current/share/hadoop/hdfs:/opt/hadoop/current/share/hadoop/hdfs/lib/*:/opt/hadoop/current/share/hadoop/hdfs/*:/opt/hadoop/current/share/hadoop/mapreduce/*:/opt/hadoop/current/share/hadoop/yarn:/opt/hadoop/current/share/hadoop/yarn/lib/*:/opt/hadoop/current/share/hadoop/yarn/*",
+  },
+  "forbiddenConfs": [
+  ]
+}');
+
+
+insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
+values (4, 'k8s-default', 'flink', '1.16', '/opt/flink/current', '{
+  "envs": {
+  },
+  "forbiddenConfs": [
+  ]
+}');

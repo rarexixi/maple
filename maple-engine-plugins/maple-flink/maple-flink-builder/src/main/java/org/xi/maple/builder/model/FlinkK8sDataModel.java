@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Data
 public class FlinkK8sDataModel {
-    private String flinkHome;
+    private String namespace;
 
     private String queue;
 

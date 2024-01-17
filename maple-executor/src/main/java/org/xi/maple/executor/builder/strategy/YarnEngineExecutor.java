@@ -40,14 +40,20 @@ public class YarnEngineExecutor extends EngineExecutor {
         }
         String startFile = null;
         String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
-        for (CommandGeneratorModel generatorModel : commandGenerators) {
-            String ftlPath = generatorModel.getFtlPath();
-            String fileName = generatorModel.getFilePath();
-            ActionUtils.executeQuietly(() -> generateFile(execHome, ftlPath, fileName, generatorModel.getRequestModel()));
-            if (generatorModel.isStartCommand()) {
-                startFile = fileName;
+        try {
+            for (CommandGeneratorModel generatorModel : commandGenerators) {
+                String ftlPath = generatorModel.getFtlPath();
+                String fileName = generatorModel.getFilePath();
+                generateFile(execHome, ftlPath, fileName, generatorModel.getRequestModel());
+                if (generatorModel.isStartCommand()) {
+                    startFile = fileName;
+                }
             }
+        } catch (Throwable t) {
+            logger.error("Generate file failed!", t);
+            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
         }
+
         ProcessBuilder processBuilder = new ProcessBuilder("sh", getPath(execHome, startFile));
 
         threadPoolTaskExecutor.submit(() -> {

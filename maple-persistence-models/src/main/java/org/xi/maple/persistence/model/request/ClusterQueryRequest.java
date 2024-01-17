@@ -1,15 +1,10 @@
 package org.xi.maple.persistence.model.request;
 
+import lombok.Data;
 import org.xi.maple.common.constant.SortConstants;
 import org.xi.maple.common.model.QueryRequest;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
 
-import lombok.Data;
+import java.util.Collection;
 
 @Data
 public class ClusterQueryRequest extends QueryRequest {

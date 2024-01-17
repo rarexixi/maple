@@ -68,6 +68,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getCluster(), execution.getResourceGroup());
         } else {
             logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
+            throw new MapleClusterNotSupportException("不支持的集群类型，cluster: " + execution.getCluster() + ", queue: " + execution.getResourceGroup());
         }
         // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
         if (cachedQueueInfo == null) {

@@ -25,6 +25,6 @@ maple:
 
 feign:
   circuitbreaker:
-    enabled: true
+    enabled: false
   okhttp:
     enabled: true

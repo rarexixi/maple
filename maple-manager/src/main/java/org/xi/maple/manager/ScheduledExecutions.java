@@ -1,5 +1,6 @@
 package org.xi.maple.manager;
 
+import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RDeque;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
@@ -96,6 +97,8 @@ public class ScheduledExecutions implements CommandLineRunner {
     private void consumeQueueJobs(EngineExecutionQueue executionQueue) {
         logger.info("正在消费队列作业 <{}> ...", executionQueue.getQueueName());
 
+        RBlockingDeque<MapleEngineExecutionQueue.QueueItem> blockingDeque = redissonClient.getBlockingDeque(executionQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
+        blockingDeque.poll();
         RDeque<MapleEngineExecutionQueue.QueueItem> deque = redissonClient.getDeque(executionQueue.getQueueName(), JsonJacksonCodec.INSTANCE);
 
         AtomicBoolean continueRunning = new AtomicBoolean(true);
@@ -108,16 +111,20 @@ public class ScheduledExecutions implements CommandLineRunner {
                 continueRunning.set(false);
                 return;
             }
+            if (queueItem.getExecId() == null) {
+                logger.error("作业ID为空");
+                continue;
+            }
 
             EngineExecutionDetailResponse execution = executionService.getExecutionById(queueItem.getExecId());
             if (execution == null) {
                 logger.error("作业不存在，id: {}", queueItem.getExecId());
-                return;
+                continue;
             }
             if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getResourceGroup())) {
-                logger.info("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
+                logger.error("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
                 executionService.updateExecutionStatus(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.FAILED.toString()));
-                return;
+                continue;
             }
             threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {
                 logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getCluster(), execution.getResourceGroup());

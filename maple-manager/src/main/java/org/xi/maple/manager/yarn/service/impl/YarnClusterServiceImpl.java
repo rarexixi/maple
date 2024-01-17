@@ -18,6 +18,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
+import org.xi.maple.common.constant.DeletedConstant;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.function.ThrowableFunction;
 import org.xi.maple.common.util.ActionUtils;
@@ -142,6 +143,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     public void refreshAllClusterConfig() {
         ClusterQueryRequest request = new ClusterQueryRequest();
         request.setCategory(ClusterCategoryConstants.YARN);
+        request.setDeleted(DeletedConstant.VALID);
         List<ClusterListItemResponse> clusters = client.getClusterList(request);
         for (ClusterListItemResponse cluster : clusters) {
             CLUSTER_MAP.put(cluster.getName(), cluster);

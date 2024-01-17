@@ -6,7 +6,6 @@ import java.util.Map;
 
 @Data
 public class FlinkYarnDataModel {
-    private String flinkHome;
 
     private String queue;
 

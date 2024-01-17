@@ -1,5 +1,6 @@
 package org.xi.maple.executor.builder.strategy;
 
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -50,20 +51,20 @@ public class K8SEngineExecutor extends EngineExecutor {
         }
         String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
         List<String> yamlFiles = new ArrayList<>(commandGenerators.size());
-        for (CommandGeneratorModel generatorModel : commandGenerators) {
-            String ftlPath = generatorModel.getFtlPath();
-            String fileName = generatorModel.getFilePath();
-            ActionUtils.executeQuietly(() -> generateFile(execHome, ftlPath, fileName, generatorModel.getRequestModel()));
-            yamlFiles.add(fileName);
-        }
 
-        for (String yamlPath : yamlFiles) {
-            // ActionUtils.executeQuietly(() -> deploy(execution.getCluster(), getPath(execHome, yamlPath)));
+        try {
+            for (CommandGeneratorModel generatorModel : commandGenerators) {
+                String ftlPath = generatorModel.getFtlPath();
+                String fileName = generatorModel.getFilePath();
+                generateFile(execHome, ftlPath, fileName, generatorModel.getRequestModel());
+                yamlFiles.add(fileName);
+            }
+            for (String yamlPath : yamlFiles) {
+                schedulerClient.deploy(execution.getCluster(), Files.readString(Paths.get(getPath(execHome, yamlPath))));
+            }
+        } catch (Throwable t) {
+            logger.error("Generate file failed!", t);
+            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
         }
-    }
-
-    private List<Map<String, ?>> deploy(String cluster, String yamlPath) throws IOException {
-        // todo 拦截错误信息，修改状态
-        return schedulerClient.deploy(cluster, Files.readString(Paths.get(yamlPath)));
     }
 }
