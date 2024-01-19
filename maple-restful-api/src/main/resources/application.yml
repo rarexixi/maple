@@ -21,7 +21,8 @@ spring:
 
 maple:
   security:
-    app-check: false
+    auth: false
+    auth-expire-seconds: 10
 
 feign:
   circuitbreaker:

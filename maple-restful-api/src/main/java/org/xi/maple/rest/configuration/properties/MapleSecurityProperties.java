@@ -9,5 +9,6 @@ import org.springframework.stereotype.Component;
 @Data
 public class MapleSecurityProperties {
 
-    private Boolean appCheck = false;
+    private boolean auth = true;
+    private long authExpireSeconds = 10;
 }

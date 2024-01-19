@@ -21,7 +21,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class ReactiveResilience4JCircuitBreakerConfig {
 
-
     @Bean
     public Customizer<Resilience4JCircuitBreakerFactory> circuitBreakerFactory() {
         //自定义断路器配置

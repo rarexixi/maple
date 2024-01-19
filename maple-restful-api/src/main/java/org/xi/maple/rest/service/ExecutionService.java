@@ -30,37 +30,31 @@ public interface ExecutionService {
      * 提交执行
      *
      * @param submitReq 执行提交请求对象
-     * @param timestamp 时间戳
-     * @param secret    加密字符串
      * @return 执行记录ID
      */
-    Integer submit(EngineExecutionAddRequest submitReq, Long timestamp, String secret);
+    Integer submit(EngineExecutionAddRequest submitReq);
 
     /**
      * 立即执行，返回提交结果
      *
      * @param submitReq 执行提交请求对象
-     * @param timestamp 时间戳
-     * @param secret    加密字符串
      * @return 执行记录ID
      */
-    Integer submitNow(EngineExecutionAddRequest submitReq, Long timestamp, String secret);
+    Integer submitNow(EngineExecutionAddRequest submitReq);
 
     /**
      * 杀死执行任务
      * @param id 执行记录ID
-     * @param timestamp 时间戳
-     * @param secret 加密字符串
+     * @param app 来源应用
      * @return 执行结果
      */
-    Object kill(Integer id, Long timestamp, String secret);
+    Object kill(Integer id, String app);
 
     /**
      * 取消执行任务
      * @param id 执行记录ID
-     * @param timestamp 时间戳
-     * @param secret 加密字符串
+     * @param app 来源应用
      * @return 执行结果
      */
-    Object stop(Integer id, Long timestamp, String secret, Map<String, ?> cancelParams);
+    Object stop(Integer id, Map<String, ?> cancelParams, String app);
 }

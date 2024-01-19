@@ -8,9 +8,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
+import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.util.MapleRedisUtil;
-import org.xi.maple.common.util.SecurityUtils;
 import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
@@ -35,16 +35,14 @@ public class ExecutionServiceImpl implements ExecutionService {
     final PersistenceClient persistenceClient;
     final SchedulerClient schedulerClient;
     final MapleAppService mapleAppService;
-    final MapleSecurityProperties securityProperties;
 
     @Autowired
-    public ExecutionServiceImpl(RedisTemplate<String, Object> redisTemplate, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient, MapleAppService mapleAppService, MapleSecurityProperties securityProperties) {
+    public ExecutionServiceImpl(RedisTemplate<String, Object> redisTemplate, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient, MapleAppService mapleAppService) {
         this.redisTemplate = redisTemplate;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
         this.persistenceClient = persistenceClient;
         this.schedulerClient = schedulerClient;
         this.mapleAppService = mapleAppService;
-        this.securityProperties = securityProperties;
     }
 
     @Override
@@ -72,8 +70,7 @@ public class ExecutionServiceImpl implements ExecutionService {
      * @return 执行记录ID
      */
     @Override
-    public Integer submit(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
-        checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getExecUniqId(), submitReq.getExecName());
+    public Integer submit(EngineExecutionAddRequest submitReq) {
         final Integer id = persistenceClient.addExecution(submitReq);
         if (id == null || id < 0) {
             return id;
@@ -90,33 +87,28 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
-    public Integer submitNow(EngineExecutionAddRequest submitReq, Long timestamp, String secret) {
-        checkSecurity(submitReq.getFromApp(), secret, timestamp, submitReq.getExecUniqId(), submitReq.getExecName());
-
+    public Integer submitNow(EngineExecutionAddRequest submitReq) {
         final Integer id = persistenceClient.addExecution(submitReq);
         schedulerClient.submitExecution(id);
         return id;
     }
 
     @Override
-    public Object kill(Integer id, Long timestamp, String secret) {
+    public Object kill(Integer id, String app) {
         EngineExecutionDetailResponse detail = detail(id);
-        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getExecUniqId(), detail.getExecName());
+        if (!app.equals(detail.getFromApp())) {
+            throw new MapleValidException("任务来源应用不一致");
+        }
         return schedulerClient.killExecution(id);
     }
 
     @Override
-    public Object stop(Integer id, Long timestamp, String secret, Map<String, ?> cancelParams) {
+    public Object stop(Integer id, Map<String, ?> cancelParams, String app) {
         EngineExecutionDetailResponse detail = detail(id);
-        checkSecurity(detail.getFromApp(), secret, timestamp, detail.getExecUniqId(), detail.getExecName());
+        if (!app.equals(detail.getFromApp())) {
+            throw new MapleValidException("任务来源应用不一致");
+        }
         return schedulerClient.stopExecution(id, cancelParams);
     }
 
-    private void checkSecurity(String fromApp, String secret, Long timestamp, String... fieldValues) {
-        if (!Boolean.TRUE.equals(securityProperties.getAppCheck())) {
-            return;
-        }
-        String secretKey = mapleAppService.getAppKey(fromApp);
-        SecurityUtils.checkSecurity(secretKey, secret, timestamp, fieldValues);
-    }
 }

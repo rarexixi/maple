@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.xi.maple.common.exception.MapleAuthenticationException;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.model.ResponseError;
@@ -66,14 +67,6 @@ public class ExceptionControllerAdvice {
 
     // endregion
 
-    // 权限异常
-    // @ExceptionHandler(AuthorizationException.class)
-    // public ResponseEntity<ResponseError> AuthorizationExceptionHandler(AuthorizationException e) {
-    //     logger.error("拦截到异常", e);
-    //     String error = "权限不足";
-    //     return getError(HttpStatus.UNAUTHORIZED, error);
-    // }
-
     // 数据唯一索引或主键冲突
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<ResponseError> DuplicateKeyExceptionHandler(DuplicateKeyException e) {
@@ -88,6 +81,14 @@ public class ExceptionControllerAdvice {
         logger.error("拦截到异常", e);
         String error = e.getMessage();
         return getError(HttpStatus.NOT_FOUND, error);
+    }
+
+    // 认证失败
+    @ExceptionHandler(MapleAuthenticationException.class)
+    public ResponseEntity<ResponseError> AuthorizationExceptionHandler(MapleAuthenticationException e) {
+        logger.error("认证失败", e);
+        String error = "认证失败";
+        return getError(HttpStatus.UNAUTHORIZED, error);
     }
 
     // 自定义权限
