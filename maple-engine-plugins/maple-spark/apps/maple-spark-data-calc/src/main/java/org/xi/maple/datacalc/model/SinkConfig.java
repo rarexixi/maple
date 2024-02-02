@@ -1,10 +1,11 @@
 package org.xi.maple.datacalc.model;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.AssertTrue;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 public abstract class SinkConfig extends MaplePluginConfig implements Serializable {
@@ -13,7 +14,9 @@ public abstract class SinkConfig extends MaplePluginConfig implements Serializab
 
     protected String sourceQuery;
 
-    private Map<String, String> options = new HashMap<>();
+    private Integer numPartitions;
+
+    private Map<String, String> options = Collections.emptyMap();
 
     public String getSourceTable() {
         return sourceTable;
@@ -36,11 +39,19 @@ public abstract class SinkConfig extends MaplePluginConfig implements Serializab
         return StringUtils.isNotBlank(sourceTable) || StringUtils.isNotBlank(sourceQuery);
     }
 
+    public Integer getNumPartitions() {
+        return numPartitions;
+    }
+
+    public void setNumPartitions(Integer numPartitions) {
+        this.numPartitions = numPartitions;
+    }
+
     public Map<String, String> getOptions() {
         return options;
     }
 
     public void setOptions(Map<String, String> options) {
-        this.options = options;
+        this.options = VariableUtils.getNotNullValue(options, this.options);
     }
 }

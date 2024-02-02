@@ -8,6 +8,10 @@ class FileSource extends MapleSource[FileSourceConfig] {
 
   val defaultUriSchema = "hdfs://"
 
+  override def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+    config.setPath(VariableUtils.replaceVariables(config.getPath, variables))
+  }
+
   override def getData(spark: SparkSession): Dataset[Row] = {
     val reader = spark.read
 
@@ -15,9 +19,9 @@ class FileSource extends MapleSource[FileSourceConfig] {
       reader.options(config.getOptions)
     }
     val path = if (config.getPath.startsWith("/")) {
-      defaultUriSchema + VariableUtils.replaceVariables(config.getPath, config.getVariables)
+      defaultUriSchema + config.getPath
     } else {
-      VariableUtils.replaceVariables(config.getPath, config.getVariables)
+      config.getPath
     }
 
     logger.info(s"Load data from file <$path>")

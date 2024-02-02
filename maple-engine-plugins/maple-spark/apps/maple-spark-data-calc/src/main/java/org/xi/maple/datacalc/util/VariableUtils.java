@@ -21,6 +21,10 @@ public class VariableUtils {
     private static String DEFAULT_DATETIME_FORMATTER_STR = "yyyy-MM-dd HH:mm:ss";
     private static DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_FORMATTER_STR);
 
+    public static <T> T getNotNullValue(T newVal, T oldVal) {
+        return newVal == null ? oldVal : newVal;
+    }
+
     public static String replaceVariables(String content, Map<String, String> variables) {
         LocalDateTime localDateTime = LocalDateTime.now();
         if (variables.containsKey("execTimestamp")) {

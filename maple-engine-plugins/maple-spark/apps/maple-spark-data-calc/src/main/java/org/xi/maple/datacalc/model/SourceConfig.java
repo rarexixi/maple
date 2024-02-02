@@ -1,10 +1,11 @@
 package org.xi.maple.datacalc.model;
 
-import org.apache.commons.lang3.StringUtils;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 public abstract class SourceConfig extends MaplePluginConfig implements ResultTableConfig, Serializable {
@@ -14,9 +15,12 @@ public abstract class SourceConfig extends MaplePluginConfig implements ResultTa
 
     private Boolean persist = false;
 
+    @NotBlank
+    @Pattern(regexp = "^(MEMORY_ONLY,MEMORY_AND_DISK,MEMORY_ONLY_SER,MEMORY_AND_DISK_SER,DISK_ONLY,MEMORY_ONLY_2,MEMORY_AND_DISK_2,MEMORY_ONLY_SER_2,MEMORY_AND_DISK_SER_2,DISK_ONLY_2,OFF_HEAP)$",
+            message = "Unknown save mode: {saveMode}. Accepted save modes are 'MEMORY_ONLY','MEMORY_AND_DISK','MEMORY_ONLY_SER','MEMORY_AND_DISK_SER','DISK_ONLY','MEMORY_ONLY_2','MEMORY_AND_DISK_2','MEMORY_ONLY_SER_2','MEMORY_AND_DISK_SER_2','DISK_ONLY_2','OFF_HEAP'.")
     private String storageLevel = "MEMORY_AND_DISK";
 
-    private Map<String, String> options = new HashMap<>();
+    private Map<String, String> options = Collections.emptyMap();
 
     public String getResultTable() {
         return resultTable;
@@ -39,7 +43,7 @@ public abstract class SourceConfig extends MaplePluginConfig implements ResultTa
     }
 
     public void setStorageLevel(String storageLevel) {
-        if (StringUtils.isNotBlank(storageLevel)) this.storageLevel = storageLevel;
+        this.storageLevel = VariableUtils.getNotNullValue(storageLevel, this.storageLevel);
     }
 
     public Map<String, String> getOptions() {
@@ -47,6 +51,6 @@ public abstract class SourceConfig extends MaplePluginConfig implements ResultTa
     }
 
     public void setOptions(Map<String, String> options) {
-        this.options = options;
+        this.options = VariableUtils.getNotNullValue(options, this.options);
     }
 }

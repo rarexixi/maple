@@ -21,8 +21,6 @@ public class HiveSinkConfig extends SinkConfig {
 
     private Boolean writeAsFile = false;
 
-    private Integer numPartitions = 10;
-
     public String getTargetDatabase() {
         return targetDatabase;
     }
@@ -61,14 +59,5 @@ public class HiveSinkConfig extends SinkConfig {
 
     public void setWriteAsFile(Boolean writeAsFile) {
         this.writeAsFile = writeAsFile;
-    }
-
-    public Integer getNumPartitions() {
-        return numPartitions;
-    }
-
-    public void setNumPartitions(Integer numPartitions) {
-        if (numPartitions == null) return;
-        this.numPartitions = numPartitions > 20 ? 20 : numPartitions;
     }
 }

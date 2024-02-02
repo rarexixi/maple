@@ -1,10 +1,11 @@
 package org.xi.maple.datacalc.sink;
 
 import org.xi.maple.datacalc.model.SinkConfig;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ManagedJdbcSinkConfig extends SinkConfig {
@@ -22,9 +23,7 @@ public class ManagedJdbcSinkConfig extends SinkConfig {
     @Pattern(regexp = "^(overwrite|append|ignore|error|errorifexists)$", message = "Unknown save mode: {saveMode}. Accepted save modes are 'overwrite', 'append', 'ignore', 'error', 'errorifexists'.")
     private String saveMode = "overwrite";
 
-    private List<String> preQueries = new ArrayList<>();
-
-    private Integer numPartitions = 10;
+    private List<String> preQueries = Collections.emptyList();
 
     public String getTargetDatasource() {
         return targetDatasource;
@@ -63,15 +62,6 @@ public class ManagedJdbcSinkConfig extends SinkConfig {
     }
 
     public void setPreQueries(List<String> preQueries) {
-        this.preQueries = preQueries;
-    }
-
-    public Integer getNumPartitions() {
-        return numPartitions;
-    }
-
-    public void setNumPartitions(Integer numPartitions) {
-        if (numPartitions == null) return;
-        this.numPartitions = numPartitions > 20 ? 20 : numPartitions;
+        this.preQueries = VariableUtils.getNotNullValue(preQueries, this.preQueries);
     }
 }

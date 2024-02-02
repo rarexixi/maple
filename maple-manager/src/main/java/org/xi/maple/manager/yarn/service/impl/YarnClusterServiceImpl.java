@@ -195,12 +195,12 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
         // 获取所有未启动的任务
         Function<String, HttpUriRequest> getRequest = master -> {
-            String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=NEW,NEW_SAVING,SUBMITTED,ACCEPTED&startedTimeBegin=%d", master, MapleConstants.TAG_EXEC, System.currentTimeMillis() - 60 * 60 * 1000);
+            String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=NEW,NEW_SAVING,SUBMITTED,ACCEPTED", master, MapleConstants.TAG_EXEC);
             HttpGet request = new HttpGet(uri);
             request.addHeader("Content-Type", "application/json");
             return request;
         };
-        // 获取30分钟以内的任务, 30分钟还没启动可判定失败，todo 根据 yarn 超时时间进行判断
+        // 获取30分钟以内的任务, 30分钟还没启动可判定失败，todo 根据 yarn 超时时间进行判断，监听不能主动上报的任务
         Function<String, HttpUriRequest> getRunningRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=RUNNING&startedTimeBegin=%d", master, MapleConstants.TAG_EXEC, System.currentTimeMillis() - 30 * 60 * 1000);
             HttpGet request = new HttpGet(uri);

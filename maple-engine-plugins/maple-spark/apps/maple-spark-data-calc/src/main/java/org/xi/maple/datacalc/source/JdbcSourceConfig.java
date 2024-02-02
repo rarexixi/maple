@@ -1,7 +1,9 @@
 package org.xi.maple.datacalc.source;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xi.maple.datacalc.model.SourceConfig;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 
 public class JdbcSourceConfig extends SourceConfig {
@@ -18,7 +20,8 @@ public class JdbcSourceConfig extends SourceConfig {
     @NotBlank
     private String password;
 
-    @NotBlank
+    private String table;
+
     private String query;
 
     public String getUrl() {
@@ -53,11 +56,24 @@ public class JdbcSourceConfig extends SourceConfig {
         this.password = password;
     }
 
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
+    }
+
     public String getQuery() {
         return query;
     }
 
     public void setQuery(String query) {
         this.query = query;
+    }
+
+    @AssertTrue(message = "[table, query] cannot be blank at the same time.")
+    public boolean isSourceOK() {
+        return StringUtils.isNotBlank(table) || StringUtils.isNotBlank(query);
     }
 }

@@ -1,11 +1,15 @@
 package org.xi.maple.datacalc.model;
 
 import org.xi.maple.datacalc.util.JsonUtils;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapleGroupData extends MaplePluginConfig implements Serializable {
 
+    protected Map<String, String> variables = new HashMap<>();
     private MapleDataConfig[] sources = new MapleDataConfig[0];
     private MapleDataConfig[] transformations = new MapleDataConfig[0];
     private MapleDataConfig[] sinks = new MapleDataConfig[0];
@@ -14,10 +18,16 @@ public class MapleGroupData extends MaplePluginConfig implements Serializable {
         return sources;
     }
 
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = VariableUtils.getNotNullValue(variables, this.variables);
+    }
+
     public void setSources(MapleDataConfig[] sources) {
-        if (sources != null) {
-            this.sources = sources;
-        }
+        this.sources = VariableUtils.getNotNullValue(sources, this.sources);
     }
 
     public MapleDataConfig[] getTransformations() {
@@ -25,9 +35,7 @@ public class MapleGroupData extends MaplePluginConfig implements Serializable {
     }
 
     public void setTransformations(MapleDataConfig[] transformations) {
-        if (transformations != null) {
-            this.transformations = transformations;
-        }
+        this.transformations = VariableUtils.getNotNullValue(transformations, this.transformations);
     }
 
     public MapleDataConfig[] getSinks() {
@@ -35,9 +43,7 @@ public class MapleGroupData extends MaplePluginConfig implements Serializable {
     }
 
     public void setSinks(MapleDataConfig[] sinks) {
-        if (sinks != null) {
-            this.sinks = sinks;
-        }
+        this.sinks = VariableUtils.getNotNullValue(sinks, this.sinks);
     }
 
     public static MapleGroupData getData(String data) {

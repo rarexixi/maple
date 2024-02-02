@@ -10,8 +10,11 @@ class FileSink extends MapleSink[FileSinkConfig] {
 
   val defaultUriSchema = "hdfs://"
 
-  def output(spark: SparkSession, ds: Dataset[Row]): Unit = {
-    config.setPath(VariableUtils.replaceVariables(config.getPath, config.getVariables))
+  override def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+    config.setPath(VariableUtils.replaceVariables(config.getPath, variables))
+  }
+
+  override def output(spark: SparkSession, ds: Dataset[Row]): Unit = {
 
     val writer = ds.write.mode(config.getSaveMode)
 

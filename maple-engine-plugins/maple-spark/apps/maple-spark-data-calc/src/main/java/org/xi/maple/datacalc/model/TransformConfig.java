@@ -1,8 +1,9 @@
 package org.xi.maple.datacalc.model;
 
-import org.apache.commons.lang3.StringUtils;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 public abstract class TransformConfig extends MaplePluginConfig implements ResultTableConfig, Serializable {
@@ -14,6 +15,9 @@ public abstract class TransformConfig extends MaplePluginConfig implements Resul
 
     private Boolean persist = false;
 
+    @NotBlank
+    @Pattern(regexp = "^(MEMORY_ONLY,MEMORY_AND_DISK,MEMORY_ONLY_SER,MEMORY_AND_DISK_SER,DISK_ONLY,MEMORY_ONLY_2,MEMORY_AND_DISK_2,MEMORY_ONLY_SER_2,MEMORY_AND_DISK_SER_2,DISK_ONLY_2,OFF_HEAP)$",
+            message = "Unknown save mode: {saveMode}. Accepted save modes are 'MEMORY_ONLY','MEMORY_AND_DISK','MEMORY_ONLY_SER','MEMORY_AND_DISK_SER','DISK_ONLY','MEMORY_ONLY_2','MEMORY_AND_DISK_2','MEMORY_ONLY_SER_2','MEMORY_AND_DISK_SER_2','DISK_ONLY_2','OFF_HEAP'.")
     private String storageLevel = "MEMORY_AND_DISK";
 
     public String getSourceTable() {
@@ -45,6 +49,6 @@ public abstract class TransformConfig extends MaplePluginConfig implements Resul
     }
 
     public void setStorageLevel(String storageLevel) {
-        if (StringUtils.isNotBlank(storageLevel)) this.storageLevel = storageLevel;
+        this.storageLevel = VariableUtils.getNotNullValue(storageLevel, this.storageLevel);
     }
 }

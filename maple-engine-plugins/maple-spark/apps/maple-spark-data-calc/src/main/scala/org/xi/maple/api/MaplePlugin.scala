@@ -13,4 +13,7 @@ trait MaplePlugin[T] extends Serializable {
 
   def prepare(spark: SparkSession): Unit = {
   }
+
+  def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+  }
 }

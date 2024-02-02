@@ -1,18 +1,16 @@
 package org.xi.maple.datacalc.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class MaplePluginConfig implements Serializable {
 
-    protected Map<String, String> variables = new HashMap<>();
+    protected boolean terminate = false;
 
-    public Map<String, String> getVariables() {
-        return variables;
+    public boolean isTerminate() {
+        return terminate;
     }
 
-    public void setVariables(Map<String, String> variables) {
-        if (variables != null) this.variables = variables;
+    public void setTerminate(boolean terminate) {
+        this.terminate = terminate;
     }
 }

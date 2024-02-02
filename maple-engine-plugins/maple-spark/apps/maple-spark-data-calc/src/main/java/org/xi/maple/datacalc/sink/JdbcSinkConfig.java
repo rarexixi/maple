@@ -1,6 +1,7 @@
 package org.xi.maple.datacalc.sink;
 
 import org.xi.maple.datacalc.model.SinkConfig;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -31,8 +32,6 @@ public class JdbcSinkConfig extends SinkConfig {
     private String saveMode = "overwrite";
 
     private List<String> preQueries = new ArrayList<>();
-
-    private Integer numPartitions = 10;
 
     public String getUrl() {
         return url;
@@ -95,15 +94,6 @@ public class JdbcSinkConfig extends SinkConfig {
     }
 
     public void setPreQueries(List<String> preQueries) {
-        this.preQueries = preQueries;
-    }
-
-    public Integer getNumPartitions() {
-        return numPartitions;
-    }
-
-    public void setNumPartitions(Integer numPartitions) {
-        if (numPartitions == null) return;
-        this.numPartitions = numPartitions > 20 ? 20 : numPartitions;
+        this.preQueries = VariableUtils.getNotNullValue(preQueries, this.preQueries);
     }
 }
