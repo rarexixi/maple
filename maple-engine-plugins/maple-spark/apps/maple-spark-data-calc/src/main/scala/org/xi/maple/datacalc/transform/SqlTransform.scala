@@ -1,7 +1,7 @@
 package org.xi.maple.datacalc.transform
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.xi.maple.api.MapleTransform
+import org.xi.maple.datacalc.api.MapleTransform
 import org.xi.maple.datacalc.util.VariableUtils
 
 class SqlTransform extends MapleTransform[SqlTransformConfig] {

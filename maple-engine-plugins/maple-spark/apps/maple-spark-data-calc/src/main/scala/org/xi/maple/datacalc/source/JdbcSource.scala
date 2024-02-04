@@ -2,7 +2,7 @@ package org.xi.maple.datacalc.source
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.xi.maple.api.MapleSource
+import org.xi.maple.datacalc.api.MapleSource
 import org.xi.maple.datacalc.util.VariableUtils
 
 class JdbcSource extends MapleSource[JdbcSourceConfig] {

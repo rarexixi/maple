@@ -1,4 +1,4 @@
-package org.xi.maple.api
+package org.xi.maple.datacalc.api
 
 import org.apache.spark.sql.SparkSession
 

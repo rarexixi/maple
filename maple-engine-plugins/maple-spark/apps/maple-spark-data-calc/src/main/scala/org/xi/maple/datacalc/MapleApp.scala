@@ -5,7 +5,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.slf4j.{Logger, LoggerFactory}
 import org.xi.maple.datacalc.exception.ConfigRuntimeException
-import org.xi.maple.datacalc.model.{MapleArrayData, MapleGroupData}
+import org.xi.maple.datacalc.model.{MapleArrayData, MapleData, MapleGroupData}
 
 import java.io.IOException
 import java.nio.file.{Files, Paths}
@@ -15,30 +15,18 @@ object MapleApp {
   private val log: Logger = LoggerFactory.getLogger(MapleApp.getClass)
 
   def main(args: Array[String]): Unit = {
-    val argsMap = ArgsParser.getParams(args)
-    val config: String = if (argsMap.contains("data")) argsMap("data") else getContent(argsMap("file"))
-    argsMap.remove("data")
-    argsMap.remove("file")
+    // val argsMap = ArgsParser.getParams(args)
+    // val config: String = if (argsMap.contains("data")) argsMap("data") else getContent(argsMap("file"))
+    val config: String = getContent("/home/linkis/Projects/opensource/maple/examples/data-group.json")
+    val execType = "group"
 
-    val execType = argsMap.getOrElse("exec-type", "array")
-    if ("group" == execType) {
-      execute(spark => MapleExecution.executeGroup(spark, MapleGroupData.getData(config)))
-    } else {
-      execute(spark => MapleExecution.executeArray(spark, MapleArrayData.getData(config)))
-    }
-  }
-
-  def execute(action: SparkSession => Unit): Unit = {
-    var spark: SparkSession = null
+    val data: MapleData = if ("group" == execType) MapleGroupData.getData(config) else MapleArrayData.getData(config)
+    val spark = SparkSession.builder.config(createSparkConf()).getOrCreate()
     try {
-      spark = SparkSession.builder.config(createSparkConf()).getOrCreate()
-      action(spark)
+      val execution = new MapleExecution(spark, data.getVariables, null)
+      execution.execute(data)
     } finally {
-      try {
-        if (spark != null) spark.close()
-      } catch {
-        case t: Throwable => log.error("Close spark error", t)
-      }
+      spark.close()
     }
   }
 
@@ -68,9 +56,9 @@ object MapleApp {
     sparkConf.set("spark.sql.crossJoin.enabled", "true")
     sparkConf.set("spark.sql.codegen.wholeStage", "false")
     sparkConf.set("spark.sql.warehouse.dir", "/apps/hive/warehouse")
-//    sparkConf.set("hive.metastore.uris", "thrift://hive-meta-01:9083,thrift://hive-meta-02:9083")
-//    sparkConf.set("hive.exec.dynamic.partition", "true")
-//    sparkConf.set("hive.exec.dynamic.partition.mode", "nonstrict")
+    //    sparkConf.set("hive.metastore.uris", "thrift://hive-meta-01:9083,thrift://hive-meta-02:9083")
+    //    sparkConf.set("hive.exec.dynamic.partition", "true")
+    //    sparkConf.set("hive.exec.dynamic.partition.mode", "nonstrict")
     System.setProperty("HADOOP_USER_NAME", "azkaban")
     sparkConf
   }

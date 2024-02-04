@@ -1,4 +1,4 @@
-package org.xi.maple.api
+package org.xi.maple.datacalc.api
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.datacalc.model.SinkConfig

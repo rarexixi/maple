@@ -16,8 +16,8 @@ public abstract class TransformConfig extends MaplePluginConfig implements Resul
     private Boolean persist = false;
 
     @NotBlank
-    @Pattern(regexp = "^(MEMORY_ONLY,MEMORY_AND_DISK,MEMORY_ONLY_SER,MEMORY_AND_DISK_SER,DISK_ONLY,MEMORY_ONLY_2,MEMORY_AND_DISK_2,MEMORY_ONLY_SER_2,MEMORY_AND_DISK_SER_2,DISK_ONLY_2,OFF_HEAP)$",
-            message = "Unknown save mode: {saveMode}. Accepted save modes are 'MEMORY_ONLY','MEMORY_AND_DISK','MEMORY_ONLY_SER','MEMORY_AND_DISK_SER','DISK_ONLY','MEMORY_ONLY_2','MEMORY_AND_DISK_2','MEMORY_ONLY_SER_2','MEMORY_AND_DISK_SER_2','DISK_ONLY_2','OFF_HEAP'.")
+    @Pattern(regexp = "^(MEMORY_ONLY|MEMORY_AND_DISK|MEMORY_ONLY_SER|MEMORY_AND_DISK_SER|DISK_ONLY|MEMORY_ONLY_2|MEMORY_AND_DISK_2|MEMORY_ONLY_SER_2|MEMORY_AND_DISK_SER_2|DISK_ONLY_2|OFF_HEAP)$",
+            message = "Unknown storageLevel: {saveMode}. Accepted save modes are 'MEMORY_ONLY','MEMORY_AND_DISK','MEMORY_ONLY_SER','MEMORY_AND_DISK_SER','DISK_ONLY','MEMORY_ONLY_2','MEMORY_AND_DISK_2','MEMORY_ONLY_SER_2','MEMORY_AND_DISK_SER_2','DISK_ONLY_2','OFF_HEAP'.")
     private String storageLevel = "MEMORY_AND_DISK";
 
     public String getSourceTable() {

@@ -3,16 +3,15 @@ package org.xi.maple.datacalc.sink
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.xi.maple.api.MapleSink
+import org.xi.maple.datacalc.api.MapleSink
 import org.xi.maple.datacalc.util.VariableUtils
 
 import java.sql.{Connection, DriverManager, PreparedStatement}
-import java.util.stream.Collectors
 import scala.collection.JavaConverters._
 
 class JdbcSink extends MapleSink[JdbcSinkConfig] {
   override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
-    config.setPreQueries(config.getPreQueries.stream().map(query => VariableUtils.replaceVariables(query, variables)).collect(Collectors.toList))
+    config.setPreQueries(config.getPreQueries.asScala.map(query => VariableUtils.replaceVariables(query, variables)).asJava)
   }
 
   override def output(spark: SparkSession, ds: Dataset[Row]): Unit = {

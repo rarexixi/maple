@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-public class MapleArrayData extends MaplePluginConfig implements Serializable {
+public class MapleArrayData extends MapleData implements Serializable {
 
     protected Map<String, String> variables = Collections.emptyMap();
 
