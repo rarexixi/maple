@@ -6,7 +6,7 @@ import org.xi.maple.datacalc.util.VariableUtils
 
 class SqlTransform extends MapleTransform[SqlTransformConfig] {
 
-  override def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
     config.setSql(VariableUtils.replaceVariables(config.getSql, variables))
   }
 

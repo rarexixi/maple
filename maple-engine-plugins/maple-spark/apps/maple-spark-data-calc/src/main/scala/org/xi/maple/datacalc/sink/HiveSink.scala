@@ -12,7 +12,7 @@ class HiveSink extends MapleSink[HiveSinkConfig] {
 
   private var variables: java.util.Map[String, String] = java.util.Collections.emptyMap()
 
-  override def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
     this.variables = variables
   }
 

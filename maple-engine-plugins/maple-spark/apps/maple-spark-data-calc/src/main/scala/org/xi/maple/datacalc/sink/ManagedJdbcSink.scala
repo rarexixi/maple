@@ -10,7 +10,7 @@ import org.xi.maple.datacalc.util.VariableUtils
 import java.util.stream.Collectors
 
 class ManagedJdbcSink extends MapleSink[ManagedJdbcSinkConfig] {
-  override def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
     config.setPreQueries(config.getPreQueries.stream().map(query => VariableUtils.replaceVariables(query, variables)).collect(Collectors.toList))
   }
 

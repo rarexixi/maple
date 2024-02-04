@@ -22,7 +22,7 @@ object MapleExecution {
                                                     cr: CheckResult,
                                                     consumer: MapleSource[SR] => Unit): (SR, () => Unit) = {
     val plugin = PluginUtil.createSource[SR](dc.getName, dc.getConfig)
-    cr.checkResultTable(plugin.getConfig)
+    cr.checkPluginConfig(plugin.getConfig)
     (plugin.getConfig, () => consumer(plugin))
   }
 
@@ -30,7 +30,7 @@ object MapleExecution {
                                                           cr: CheckResult,
                                                           consumer: MapleTransform[TR] => Unit): (TR, () => Unit) = {
     val plugin = PluginUtil.createTransform[TR](dc.getName, dc.getConfig)
-    cr.checkResultTable(plugin.getConfig)
+    cr.checkPluginConfig(plugin.getConfig)
     (plugin.getConfig, () => consumer(plugin))
   }
 
@@ -51,14 +51,15 @@ object MapleExecution {
       getSourceAndCheck(dc, cr, (plugin: MapleSource[SR]) => sourceProcess(spark, plugin, gv, dsConsumer))
     }
     val transformations = mapleData.getTransformations.map { dc =>
-      getTransformAndCheck(dc,  cr, (plugin: MapleTransform[TR]) => transformProcess(spark, plugin, gv, dsConsumer))
+      getTransformAndCheck(dc, cr, (plugin: MapleTransform[TR]) => transformProcess(spark, plugin, gv, dsConsumer))
     }
     val sinks = mapleData.getSinks.map { dc =>
-      getSinkAndCheck(dc,  cr, (plugin: MapleSink[SK]) => sinkProcess(spark, plugin, gv, dsConsumer))
+      getSinkAndCheck(dc, cr, (plugin: MapleSink[SK]) => sinkProcess(spark, plugin, gv, dsConsumer))
     }
     cr.check()
 
     var isTerminate: Boolean = false
+
     def consumePlugin[T <: MaplePluginConfig](plugins: Array[(T, () => Unit)]): Unit =
       if (plugins != null && plugins.isEmpty && !isTerminate) {
         val loop = new Breaks
@@ -117,19 +118,8 @@ object MapleExecution {
     MapleTempData.clean(spark.sqlContext)
   }
 
-  private def mergeMap(map1: java.util.Map[String, String], map2: java.util.Map[String, String]): java.util.Map[String, String] = {
-    val map = if (map1 != null) map1 else new java.util.HashMap[String, String]()
-    if (map2 != null && !map2.isEmpty) {
-      map2.entrySet().forEach(entry => {
-        map.putIfAbsent(entry.getKey, entry.getValue)
-      })
-    }
-    map
-  }
-
   private def sourceProcess[T <: SourceConfig](spark: SparkSession, source: MapleSource[T], gv: java.util.Map[String, String], dfConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
-    source.replaceVariables(gv)
-    source.prepare(spark)
+    source.prepare(spark, gv)
     val ds: Dataset[Row] = source.getData(spark)
     if (dfConsumer != null) {
       dfConsumer(source.getConfig, ds)
@@ -138,8 +128,7 @@ object MapleExecution {
   }
 
   private def transformProcess[T <: TransformConfig](spark: SparkSession, transform: MapleTransform[T], gv: java.util.Map[String, String], dfConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
-    transform.replaceVariables(gv)
-    transform.prepare(spark)
+    transform.prepare(spark, gv)
     val fromDs: Dataset[Row] = if (StringUtils.isNotBlank(transform.getConfig.getSourceTable)) {
       spark.read.table(transform.getConfig.getSourceTable)
     } else {
@@ -153,8 +142,7 @@ object MapleExecution {
   }
 
   private def sinkProcess[T <: SinkConfig](spark: SparkSession, sink: MapleSink[T], gv: java.util.Map[String, String], dfConsumer: (MaplePluginConfig, Dataset[Row]) => Unit = null): Unit = {
-    sink.replaceVariables(gv)
-    sink.prepare(spark)
+    sink.prepare(spark, gv)
     val fromDs: Dataset[Row] = if (StringUtils.isBlank(sink.getConfig.getSourceQuery)) {
       spark.read.table(sink.getConfig.getSourceTable)
     } else {
@@ -184,19 +172,9 @@ object MapleExecution {
     private var success: Boolean = true
     private val set: mutable.Set[String] = mutable.Set()
 
-    val validator: Validator = Validation.buildDefaultValidatorFactory().getValidator
+    private val validator: Validator = Validation.buildDefaultValidatorFactory().getValidator
 
-    def checkResultTable[T <: MaplePluginConfig with ResultTableConfig](config: T): Unit = {
-      checkPluginConfig(config)
-      if (set.contains(config.getResultTable)) {
-        log.error(s"Result table [${config.getResultTable}] cannot be duplicate")
-        success = false
-      } else {
-        set.add(config.getResultTable)
-      }
-    }
-
-    def checkPluginConfig[T](config: MaplePluginConfig): Unit = {
+    def checkPluginConfig(config: MaplePluginConfig): Unit = {
       val violations = validator.validate(config)
       if (!violations.isEmpty) {
         success = false
@@ -208,6 +186,16 @@ object MapleExecution {
             log.error(violation.getMessage)
           }
         }
+      }
+      config match {
+        case c: ResultTableConfig =>
+          if (set.contains(c.getResultTable)) {
+            log.error(s"Result table [${c.getResultTable}] cannot be duplicate")
+            success = false
+          } else {
+            set.add(c.getResultTable)
+          }
+        case _ =>
       }
     }
 

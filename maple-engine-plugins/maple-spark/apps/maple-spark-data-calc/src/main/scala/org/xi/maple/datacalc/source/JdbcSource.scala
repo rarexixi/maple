@@ -7,7 +7,7 @@ import org.xi.maple.datacalc.util.VariableUtils
 
 class JdbcSource extends MapleSource[JdbcSourceConfig] {
 
-  override def replaceVariables(variables: java.util.Map[String, String]): Unit = {
+  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
     config.setQuery(VariableUtils.replaceVariables(config.getQuery, variables))
   }
 
