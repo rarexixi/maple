@@ -1,13 +1,13 @@
-package org.xi.maple.manager.k8s.spark.eventhandler;
+package org.xi.maple.manager.k8s.eventhandler.spark;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.manager.k8s.BaseResourceEventHandler;
-import org.xi.maple.manager.k8s.spark.crds.SparkApplication;
-import org.xi.maple.manager.k8s.spark.crds.SparkApplicationSpec;
-import org.xi.maple.manager.k8s.spark.crds.SparkApplicationStatus;
+import org.xi.maple.manager.k8s.crds.spark.SparkApplication;
+import org.xi.maple.manager.k8s.crds.spark.SparkApplicationSpec;
+import org.xi.maple.manager.k8s.crds.spark.SparkApplicationStatus;
 
 import java.util.Map;
 import java.util.function.BiFunction;

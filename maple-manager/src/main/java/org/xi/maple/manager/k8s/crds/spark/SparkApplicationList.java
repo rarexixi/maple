@@ -1,4 +1,4 @@
-package org.xi.maple.manager.k8s.spark.crds;
+package org.xi.maple.manager.k8s.crds.spark;
 
 import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.model.annotation.Group;

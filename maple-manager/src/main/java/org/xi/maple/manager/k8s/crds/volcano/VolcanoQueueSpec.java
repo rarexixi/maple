@@ -1,4 +1,4 @@
-package org.xi.maple.manager.k8s.volcano.crds;
+package org.xi.maple.manager.k8s.crds.volcano;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.fabric8.kubernetes.api.model.IntOrString;
@@ -15,13 +15,13 @@ import java.util.Map;
 @ToString(callSuper = true)
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VolcanoQueueStatus implements Serializable {
-    private Map<String, IntOrString> allocated;
-    private Integer completed;
-    private Integer inqueue;
-    private Integer pending;
-    private Map<String, Object> reservation;
-    private Integer running;
-    private String state;
-    private Integer unknown;
+public class VolcanoQueueSpec implements Serializable {
+
+    private Map<String, Object> affinity;
+    private Map<String, IntOrString> capability;
+    private Map<String, Object> extendClusters;
+    private Map<String, Object> guarantee;
+    private Boolean reclaimable;
+    private String type;
+    private Integer weight;
 }

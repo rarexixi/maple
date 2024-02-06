@@ -1,13 +1,13 @@
-package org.xi.maple.manager.k8s.flink.eventhandler;
+package org.xi.maple.manager.k8s.eventhandler.flink;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.constant.EngineCategoryConstants;
 import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
 import org.xi.maple.manager.k8s.BaseResourceEventHandler;
-import org.xi.maple.manager.k8s.flink.crds.FlinkDeployment;
-import org.xi.maple.manager.k8s.flink.crds.FlinkDeploymentSpec;
-import org.xi.maple.manager.k8s.flink.crds.FlinkDeploymentStatus;
+import org.xi.maple.manager.k8s.crds.flink.FlinkDeployment;
+import org.xi.maple.manager.k8s.crds.flink.FlinkDeploymentSpec;
+import org.xi.maple.manager.k8s.crds.flink.FlinkDeploymentStatus;
 
 import java.util.Map;
 import java.util.function.BiFunction;

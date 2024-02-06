@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.xi.maple.common.exception.MapleClusterConfigException;
 import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
 import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
 import org.xi.maple.common.exception.MapleK8sException;
+import org.xi.maple.common.function.ThrowableFunction;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
@@ -30,17 +32,17 @@ import org.xi.maple.manager.constant.K8sResourceType;
 import org.xi.maple.manager.constant.MapleConstants;
 import org.xi.maple.manager.function.UpdateExecStatusFunc;
 import org.xi.maple.manager.k8s.MapleResourceEventHandler;
-import org.xi.maple.manager.k8s.flink.crds.FlinkDeployment;
-import org.xi.maple.manager.k8s.flink.crds.FlinkDeploymentList;
-import org.xi.maple.manager.k8s.flink.eventhandler.FlinkDeploymentEventHandler;
+import org.xi.maple.manager.k8s.crds.flink.FlinkDeployment;
+import org.xi.maple.manager.k8s.crds.flink.FlinkDeploymentList;
+import org.xi.maple.manager.k8s.eventhandler.flink.FlinkDeploymentEventHandler;
 import org.xi.maple.manager.k8s.model.K8sClusterQueue;
 import org.xi.maple.manager.k8s.model.KubeConfigWithType;
 import org.xi.maple.manager.k8s.service.K8sClusterService;
-import org.xi.maple.manager.k8s.spark.crds.SparkApplication;
-import org.xi.maple.manager.k8s.spark.crds.SparkApplicationList;
-import org.xi.maple.manager.k8s.spark.eventhandler.SparkApplicationEventHandler;
-import org.xi.maple.manager.k8s.volcano.crds.VolcanoQueue;
-import org.xi.maple.manager.k8s.volcano.crds.VolcanoQueueList;
+import org.xi.maple.manager.k8s.crds.spark.SparkApplication;
+import org.xi.maple.manager.k8s.crds.spark.SparkApplicationList;
+import org.xi.maple.manager.k8s.eventhandler.spark.SparkApplicationEventHandler;
+import org.xi.maple.manager.k8s.crds.volcano.VolcanoQueue;
+import org.xi.maple.manager.k8s.crds.volcano.VolcanoQueueList;
 import org.xi.maple.manager.model.ClusterQueue;
 
 import java.io.ByteArrayInputStream;
@@ -91,64 +93,66 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
 
     @Override
     public List<HasMetadata> deployEngine(String clusterName, MultipartFile yamlFile) {
-        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
-        try (InputStream is = yamlFile.getInputStream()) {
-            return kubernetesClient.load(is).serverSideApply();
-        } catch (Throwable t) {
-            throw new MapleK8sException(t);
-        }
+        return executeInK8sClient(clusterName, kubernetesClient -> {
+            try (InputStream is = yamlFile.getInputStream()) {
+                return kubernetesClient.load(is).serverSideApply();
+            }
+        });
     }
 
     @Override
     public List<StatusDetails> deleteEngine(String clusterName, MultipartFile yamlFile) {
-        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
-        try (InputStream is = yamlFile.getInputStream()) {
-            return kubernetesClient.load(is).delete();
-        } catch (Throwable t) {
-            throw new MapleK8sException(t);
-        }
+        return executeInK8sClient(clusterName, kubernetesClient -> {
+            try (InputStream is = yamlFile.getInputStream()) {
+                return kubernetesClient.load(is).delete();
+            }
+        });
     }
 
     @Override
     public List<HasMetadata> deployEngine(String clusterName, String yaml) {
-        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
-        try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
-            return kubernetesClient.load(is).serverSideApply();
-        } catch (Throwable t) {
-            throw new MapleK8sException(t);
-        }
+        return executeInK8sClient(clusterName, kubernetesClient -> {
+            try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
+                return kubernetesClient.load(is).serverSideApply();
+            }
+        });
     }
 
     @Override
     public List<StatusDetails> deleteEngine(String clusterName, String yaml) {
-        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
-        try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
-            return kubernetesClient.load(is).delete();
-        } catch (Throwable t) {
-            throw new MapleK8sException(t);
-        }
+        return executeInK8sClient(clusterName, kubernetesClient -> {
+            try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
+                return kubernetesClient.load(is).delete();
+            }
+        });
     }
 
     @Override
     public List<StatusDetails> deleteEngine(String clusterName, String namespace, String type, String name) {
-        KubernetesClient kubernetesClient = getKubernetesClient(clusterName);
-        try {
+        return executeInK8sClient(clusterName, kubernetesClient -> {
             if (K8sResourceType.FLINK.is(type)) {
                 return kubernetesClient.resources(FlinkDeployment.class).inNamespace(namespace).withName(name).delete();
             } else if (K8sResourceType.SPARK.is(type)) {
                 return kubernetesClient.resources(SparkApplication.class).inNamespace(namespace).withName(name).delete();
+            } else {
+                throw new MapleEngineTypeNotSupportException("不支持的引擎类型: " + type);
             }
-        } catch (Throwable t) {
-            throw new MapleK8sException(t);
-        }
-        throw new MapleEngineTypeNotSupportException("不支持的引擎类型: " + type);
+        });
     }
 
-    private KubernetesClient getKubernetesClient(String clusterName) {
+    private <T> T executeInK8sClient(String clusterName, ThrowableFunction<KubernetesClient, T> executor) {
         if (!k8sClients.containsKey(clusterName)) {
             throw new MapleClusterNotConfiguredException("K8s 集群 [" + clusterName + "] 没有被配置");
         }
-        return k8sClients.get(clusterName);
+        KubernetesClient kubernetesClient = k8sClients.get(clusterName);
+        try {
+            return executor.apply(kubernetesClient);
+        } catch (KubernetesClientException e) {
+            String msg = e.getStatus() == null ? e.getMessage() : e.getStatus().getMessage();
+            throw new MapleK8sException(msg);
+        } catch (Throwable t) {
+            throw new MapleK8sException(t);
+        }
     }
 
     // endregion

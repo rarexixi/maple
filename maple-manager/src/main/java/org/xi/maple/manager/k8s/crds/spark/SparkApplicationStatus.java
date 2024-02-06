@@ -1,4 +1,4 @@
-package org.xi.maple.manager.k8s.spark.crds;
+package org.xi.maple.manager.k8s.crds.spark;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;

@@ -1,4 +1,4 @@
-package org.xi.maple.manager.k8s.volcano.crds;
+package org.xi.maple.manager.k8s.crds.volcano;
 
 import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.Namespaced;
