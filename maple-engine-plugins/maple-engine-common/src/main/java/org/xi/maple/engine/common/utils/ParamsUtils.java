@@ -14,6 +14,7 @@ public class ParamsUtils {
     public final static Integer EXEC_ID = getExecId();
     public final static String UPDATE_EXEC_STATUS_URL;
     public final static String UPDATE_EXEC_INFO_URL;
+
     static {
         String engineConfPath = System.getProperty("engine-conf-path");
         try {
@@ -21,14 +22,14 @@ public class ParamsUtils {
             UPDATE_EXEC_STATUS_URL = properties.getProperty("update-exec-status-url");
             UPDATE_EXEC_INFO_URL = properties.getProperty("update-exec-info-url");
         } catch (FileNotFoundException e) {
-            throw new MapleException("[engine-conf-path] 参数为空");
+            throw new MapleException("Parameter [engine-conf-path] is null or empty");
         }
     }
 
     public static Integer getExecId() {
         String property = System.getProperty("exec-id");
         if (property == null || "".equals(property.trim())) {
-            throw new MapleException("[exec-id] 参数为空");
+            throw new MapleException("Parameter [exec-id] is null or empty");
         }
         return Integer.valueOf(property);
     }

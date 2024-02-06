@@ -9,6 +9,10 @@ public interface MapleConvertor {
 
     List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution);
 
+    default List<CommandGeneratorModel> getUpdateCommandGenerator(EngineExecutionModel execution) {
+        return null;
+    }
+
     default List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
         return null;
     }

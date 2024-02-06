@@ -51,7 +51,7 @@ public class YarnEngineExecutor extends EngineExecutor {
             }
         } catch (Throwable t) {
             logger.error("Generate file failed!", t);
-            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+            updateExecutionStatus(execution.getId(), EngineExecutionStatus.FAILED);
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder("sh", getPath(execHome, startFile));
@@ -62,11 +62,11 @@ public class YarnEngineExecutor extends EngineExecutor {
                 process = processBuilder.start();
                 int exitcode = process.waitFor();
                 if (exitcode != 0) {
-                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+                    updateExecutionStatus(execution.getId(), EngineExecutionStatus.FAILED);
                 }
             } catch (Throwable t) {
                 logger.error("Execution[" + execution.getId() + "] starts failed!", t);
-                updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+                updateExecutionStatus(execution.getId(), EngineExecutionStatus.FAILED);
             } finally {
                 if (process != null && process.isAlive()) {
                     ActionUtils.executeQuietly(process::destroyForcibly);

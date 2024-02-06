@@ -102,7 +102,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     }
 
     /**
-     * 根据执行ID更新引擎执行状态
+     * 根据执行ID更新引擎执行状态 todo 设置回调
      *
      * @param updateRequest 更新引擎执行记录请求实体
      * @return 影响的行数
@@ -134,6 +134,11 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             case STARTING:
                 if (!oldStatus.canStart()) {
                     return 0;
+                }
+                break;
+            case FAILED:
+                if (!oldStatus.canStartFailed()) {
+                    return engineExecutionMapper.updateStatusById(id, EngineExecutionStatus.START_FAILED.toString());
                 }
                 break;
             default:
