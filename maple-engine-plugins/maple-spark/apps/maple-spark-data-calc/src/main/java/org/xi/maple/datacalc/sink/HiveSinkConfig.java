@@ -1,9 +1,12 @@
 package org.xi.maple.datacalc.sink;
 
 import org.xi.maple.datacalc.model.SinkConfig;
+import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.util.Collections;
+import java.util.Map;
 
 public class HiveSinkConfig extends SinkConfig {
 
@@ -20,6 +23,8 @@ public class HiveSinkConfig extends SinkConfig {
     private Boolean strongCheck = true;
 
     private Boolean writeAsFile = false;
+
+    protected Map<String, String> variables = Collections.emptyMap();
 
     public String getTargetDatabase() {
         return targetDatabase;
@@ -59,5 +64,13 @@ public class HiveSinkConfig extends SinkConfig {
 
     public void setWriteAsFile(Boolean writeAsFile) {
         this.writeAsFile = writeAsFile;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = VariableUtils.getNotNullValue(variables, this.variables);
     }
 }

@@ -72,7 +72,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
 
     private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    private Map<String, ClusterQueue> CLUSTER_QUEUE_MAP;
+    private final Map<String, ClusterQueue> clusterQueueMap;
 
 
     /**
@@ -86,7 +86,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
         this.managerProperties = managerProperties;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.k8sClients = new HashMap<>();
-        CLUSTER_QUEUE_MAP = new ConcurrentHashMap<>();
+        this.clusterQueueMap = new ConcurrentHashMap<>();
     }
 
     // region engine operation
@@ -232,20 +232,20 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
                     public void onAdd(VolcanoQueue volcanoQueue) {
                         String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
                         ClusterQueue clusterQueue = new K8sClusterQueue(volcanoQueue.getStatus().getPending());
-                        CLUSTER_QUEUE_MAP.put(key, clusterQueue);
+                        clusterQueueMap.put(key, clusterQueue);
                     }
 
                     @Override
                     public void onUpdate(VolcanoQueue oldVolcanoQueue, VolcanoQueue volcanoQueue) {
                         String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
                         ClusterQueue clusterQueue = new K8sClusterQueue(volcanoQueue.getStatus().getPending());
-                        CLUSTER_QUEUE_MAP.put(key, clusterQueue);
+                        clusterQueueMap.put(key, clusterQueue);
                     }
 
                     @Override
                     public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
                         String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
-                        CLUSTER_QUEUE_MAP.remove(key);
+                        clusterQueueMap.remove(key);
                     }
                 }, 10000L);
         volcanoInformer.start();
@@ -254,7 +254,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
 
     @Override
     public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
-        return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
+        return clusterQueueMap.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
     }
 
 

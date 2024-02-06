@@ -4,16 +4,25 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.datacalc.api.MapleSink
-import org.xi.maple.datacalc.util.HiveSinkUtils
+import org.xi.maple.datacalc.util.{HiveSinkUtils, VariableUtils}
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 
 class HiveSink extends MapleSink[HiveSinkConfig] {
 
-  private var variables: java.util.Map[String, String] = java.util.Collections.emptyMap()
+  private val variables: java.util.Map[String, String] = new java.util.HashMap[String, String]()
 
   override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
-    this.variables = variables
+    if (variables != null) {
+      variables.asScala.foreach { case (key, value) =>
+        this.variables.put(key, value)
+      }
+    }
+    if (config.getVariables != null) {
+      config.getVariables.asScala.foreach { case (key, value) =>
+        this.variables.put(key, VariableUtils.replaceVariables(value, variables))
+      }
+    }
   }
 
   override def output(spark: SparkSession, ds: Dataset[Row]): Unit = {

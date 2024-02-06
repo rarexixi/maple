@@ -4,19 +4,25 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
 import org.slf4j.{Logger, LoggerFactory}
-import org.xi.maple.datacalc.api.{MapleSink, MapleSource, MapleTransform}
+import org.xi.maple.datacalc.api.{Logging, MapleSink, MapleSource, MapleTransform}
 import org.xi.maple.datacalc.exception.ConfigRuntimeException
 import org.xi.maple.datacalc.model._
-import org.xi.maple.datacalc.util.{JsonUtils, PluginUtil}
+import org.xi.maple.datacalc.util.{JsonUtils, PluginUtil, VariableUtils}
 
+import java.util
 import javax.validation.{Validation, Validator}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig]
-(val spark: SparkSession, val gv: java.util.Map[String, String], val dsConsumer: (MaplePluginConfig, Dataset[Row]) => Unit) {
+class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig, T <: MapleData]
+(val spark: SparkSession, mapleData: T, val dsConsumer: (MaplePluginConfig, Dataset[Row]) => Unit) extends Logging {
 
-  private val LOG: Logger = LoggerFactory.getLogger(this.getClass)
+  private val gv: java.util.Map[String, String] = new util.HashMap[String, String]()
+  for ((k, v) <- mapleData.getVariables.asScala) {
+    gv.put(k, VariableUtils.replaceVariables(v, mapleData.getVariables))
+  }
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val VALIDATOR: Validator = Validation.buildDefaultValidatorFactory().getValidator
 
@@ -24,11 +30,11 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
   private val RESULT_TABLES: mutable.Set[String] = mutable.Set[String]()
   private val PERSIST_DATASETS: mutable.Set[Dataset[Row]] = mutable.Set[Dataset[Row]]()
 
-  def execute[T <: MapleData](mapleData: T): Unit = {
+  def execute(): Unit = {
     mapleData match {
       case groupData: MapleGroupData => executeGroup(groupData)
       case arrayData: MapleArrayData => executeArray(arrayData)
-      case _ => throw new ConfigRuntimeException("MapleData type is not supported")
+      case _ => throw new ConfigRuntimeException(s"MapleData type [${mapleData.getClass}] is not supported")
     }
   }
 
@@ -132,19 +138,19 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
     val violations = VALIDATOR.validate(config)
     if (!violations.isEmpty) {
       success = false
-      LOG.error(s"Configuration check error, ${JsonUtils.toJsonString(config)}")
+      logger.error(s"Configuration check error, ${JsonUtils.toJsonString(config)}")
       for (violation <- violations.asScala) {
         if (violation.getMessageTemplate.startsWith("{") && violation.getMessageTemplate.endsWith("}")) {
-          LOG.error(s"[${violation.getPropertyPath}] ${violation.getMessage}")
+          logger.error(s"[${violation.getPropertyPath}] ${violation.getMessage}")
         } else {
-          LOG.error(violation.getMessage)
+          logger.error(violation.getMessage)
         }
       }
     }
     config match {
       case c: ResultTableConfig =>
         if (RESULT_TABLE_SET.contains(c.getResultTable)) {
-          LOG.error(s"Result table [${c.getResultTable}] cannot be duplicate")
+          logger.error(s"Result table [${c.getResultTable}] cannot be duplicate")
           success = false
         } else {
           RESULT_TABLE_SET.add(c.getResultTable)
