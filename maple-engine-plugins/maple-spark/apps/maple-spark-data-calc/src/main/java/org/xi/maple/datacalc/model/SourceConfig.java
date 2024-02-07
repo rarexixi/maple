@@ -1,12 +1,11 @@
 package org.xi.maple.datacalc.model;
 
-import org.xi.maple.datacalc.util.VariableUtils;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class SourceConfig extends MaplePluginConfig implements ResultTableConfig, Serializable {
 
@@ -43,7 +42,7 @@ public abstract class SourceConfig extends MaplePluginConfig implements ResultTa
     }
 
     public void setStorageLevel(String storageLevel) {
-        this.storageLevel = VariableUtils.getNotNullValue(storageLevel, this.storageLevel);
+        this.storageLevel = Optional.ofNullable(storageLevel).orElse(this.storageLevel);
     }
 
     public Map<String, String> getOptions() {
@@ -51,6 +50,6 @@ public abstract class SourceConfig extends MaplePluginConfig implements ResultTa
     }
 
     public void setOptions(Map<String, String> options) {
-        this.options = VariableUtils.getNotNullValue(options, this.options);
+        this.options = Optional.ofNullable(options).orElse(this.options);
     }
 }

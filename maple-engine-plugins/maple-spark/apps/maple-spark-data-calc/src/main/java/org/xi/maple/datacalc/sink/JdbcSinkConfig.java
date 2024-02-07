@@ -1,12 +1,12 @@
 package org.xi.maple.datacalc.sink;
 
 import org.xi.maple.datacalc.model.SinkConfig;
-import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JdbcSinkConfig extends SinkConfig {
 
@@ -94,6 +94,6 @@ public class JdbcSinkConfig extends SinkConfig {
     }
 
     public void setPreQueries(List<String> preQueries) {
-        this.preQueries = VariableUtils.getNotNullValue(preQueries, this.preQueries);
+        this.preQueries = Optional.ofNullable(preQueries).orElse(this.preQueries);
     }
 }

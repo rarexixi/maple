@@ -1,12 +1,12 @@
 package org.xi.maple.datacalc.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.AssertTrue;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class SinkConfig extends MaplePluginConfig implements Serializable {
 
@@ -52,6 +52,6 @@ public abstract class SinkConfig extends MaplePluginConfig implements Serializab
     }
 
     public void setOptions(Map<String, String> options) {
-        this.options = VariableUtils.getNotNullValue(options, this.options);
+        this.options = Optional.ofNullable(options).orElse(this.options);
     }
 }

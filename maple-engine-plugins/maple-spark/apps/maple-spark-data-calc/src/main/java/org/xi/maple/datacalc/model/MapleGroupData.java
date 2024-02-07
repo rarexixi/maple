@@ -1,9 +1,9 @@
 package org.xi.maple.datacalc.model;
 
-import org.xi.maple.datacalc.util.JsonUtils;
-import org.xi.maple.datacalc.util.VariableUtils;
+import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 public class MapleGroupData extends MapleData implements Serializable {
 
@@ -16,7 +16,7 @@ public class MapleGroupData extends MapleData implements Serializable {
     }
 
     public void setSources(MapleDataConfig[] sources) {
-        this.sources = VariableUtils.getNotNullValue(sources, this.sources);
+        this.sources = Optional.ofNullable(sources).orElse(this.sources);
     }
 
     public MapleDataConfig[] getTransformations() {
@@ -24,7 +24,7 @@ public class MapleGroupData extends MapleData implements Serializable {
     }
 
     public void setTransformations(MapleDataConfig[] transformations) {
-        this.transformations = VariableUtils.getNotNullValue(transformations, this.transformations);
+        this.transformations = Optional.ofNullable(transformations).orElse(this.transformations);
     }
 
     public MapleDataConfig[] getSinks() {
@@ -32,7 +32,7 @@ public class MapleGroupData extends MapleData implements Serializable {
     }
 
     public void setSinks(MapleDataConfig[] sinks) {
-        this.sinks = VariableUtils.getNotNullValue(sinks, this.sinks);
+        this.sinks = Optional.ofNullable(sinks).orElse(this.sinks);
     }
 
     public static MapleGroupData getData(String data) {

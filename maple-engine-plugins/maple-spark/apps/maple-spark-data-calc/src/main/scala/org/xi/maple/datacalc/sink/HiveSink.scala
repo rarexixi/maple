@@ -3,8 +3,9 @@ package org.xi.maple.datacalc.sink
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.api.MapleSink
-import org.xi.maple.datacalc.util.{HiveSinkUtils, VariableUtils}
+import org.xi.maple.datacalc.util.HiveSinkUtils
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 

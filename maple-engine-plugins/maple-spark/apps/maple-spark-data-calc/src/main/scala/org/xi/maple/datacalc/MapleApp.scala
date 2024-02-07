@@ -14,12 +14,12 @@ import java.nio.file.{Files, Paths}
 object MapleApp extends Logging {
 
   def main(args: Array[String]): Unit = {
-    val argsMap = ArgsParser.getParams(args)
-    val execType = argsMap.getOrElse("exec-type", "array")
+    // val argsMap = ArgsParser.getParams(args)
+    val execType = "group" // argsMap.getOrElse("exec-type", "array")
 
-    val spark = SparkSession.builder.getOrCreate()
+    val spark = SparkSession.builder.config(createSparkConf()).getOrCreate()
     try {
-      val config: String = if (argsMap.contains("data")) argsMap("data") else getContent(spark, argsMap("file"))
+      val config: String = getContent(spark, "file:///home/linkis/Projects/opensource/maple/examples/data-group.json")
       val data: MapleData = if ("group" == execType) MapleGroupData.getData(config) else MapleArrayData.getData(config)
       val execution = new MapleExecution(spark, data, null)
       execution.execute()

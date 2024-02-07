@@ -1,7 +1,7 @@
 package org.xi.maple.datacalc.service.strategy;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xi.maple.datacalc.util.JsonUtils;
+import org.xi.maple.common.util.JsonUtils;
 
 import java.util.HashMap;
 import java.util.Map;

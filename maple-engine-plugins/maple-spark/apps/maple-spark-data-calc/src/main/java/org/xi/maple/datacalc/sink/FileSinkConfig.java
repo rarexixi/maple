@@ -1,12 +1,13 @@
 package org.xi.maple.datacalc.sink;
 
 import org.xi.maple.datacalc.model.SinkConfig;
-import org.xi.maple.datacalc.util.VariableUtils;
+import org.xi.maple.common.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class FileSinkConfig extends SinkConfig {
 
@@ -44,7 +45,7 @@ public class FileSinkConfig extends SinkConfig {
     }
 
     public void setPartitionBy(List<String> partitionBy) {
-        this.partitionBy = VariableUtils.getNotNullValue(partitionBy, this.partitionBy);
+        this.partitionBy = Optional.ofNullable(partitionBy).orElse(this.partitionBy);
     }
 
     public String getSaveMode() {

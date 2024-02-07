@@ -17,12 +17,12 @@ import java.util.regex.Pattern;
  * @author xishihao
  */
 public class VariableUtils {
-    private static Logger log = LoggerFactory.getLogger(VariableUtils.class);
-    private static Pattern DATETIME_PATTERN = Pattern.compile("\\$\\{exec_time(\\s*[-+]\\s*\\d+[yMdHms]\\s*)*(\\|[^}]+?)?}");
-    private static Pattern INCREMENT_PATTERN = Pattern.compile("[-+]\\d+[yMdHms]");
-    private static String DEFAULT_DATE_FORMATTER_STR = "yyyy-MM-dd";
-    private static String DEFAULT_DATETIME_FORMATTER_STR = "yyyy-MM-dd HH:mm:ss";
-    private static DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_FORMATTER_STR);
+    private static final Logger log = LoggerFactory.getLogger(VariableUtils.class);
+    private static final Pattern DATETIME_PATTERN = Pattern.compile("\\$\\{exec_time(\\s*[-+]\\s*\\d+[yMdHms]\\s*)*(\\|[^}]+?)?}");
+    private static final Pattern INCREMENT_PATTERN = Pattern.compile("[-+]\\d+[yMdHms]");
+    private static final String DEFAULT_DATE_FORMATTER_STR = "yyyy-MM-dd";
+    private static final String DEFAULT_DATETIME_FORMATTER_STR = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_FORMATTER_STR);
 
     /**
      * 替换变量
@@ -32,13 +32,15 @@ public class VariableUtils {
      * @return 替换后的内容
      */
     public static String replaceVariables(String content, Map<String, String> variables) {
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime localDateTime;
         if (variables.containsKey("execTimestamp")) {
             long execTimestamp = Long.parseLong(variables.get("execTimestamp"));
             localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(execTimestamp), ZoneId.of("Asia/Shanghai"));
         } else if (variables.containsKey("execDateTime")) {
             String execDateTime = variables.get("execDateTime");
             localDateTime = LocalDateTime.parse(execDateTime, DEFAULT_DATETIME_FORMATTER);
+        } else {
+            localDateTime = LocalDateTime.now();
         }
         StringSubstitutor substitutor = new StringSubstitutor(variables);
         return substitutor.replace(replaceDateTimeExpression(content, localDateTime));

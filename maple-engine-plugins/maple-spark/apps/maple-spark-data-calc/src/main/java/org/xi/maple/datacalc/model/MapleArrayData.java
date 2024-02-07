@@ -1,11 +1,11 @@
 package org.xi.maple.datacalc.model;
 
-import org.xi.maple.datacalc.util.JsonUtils;
-import org.xi.maple.datacalc.util.VariableUtils;
+import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 public class MapleArrayData extends MapleData implements Serializable {
 
@@ -18,7 +18,7 @@ public class MapleArrayData extends MapleData implements Serializable {
     }
 
     public void setVariables(Map<String, String> variables) {
-        this.variables = VariableUtils.getNotNullValue(variables, this.variables);
+        this.variables = Optional.ofNullable(variables).orElse(this.variables);
     }
 
     public MapleDataConfig[] getPlugins() {
@@ -26,7 +26,7 @@ public class MapleArrayData extends MapleData implements Serializable {
     }
 
     public void setPlugins(MapleDataConfig[] plugins) {
-        this.plugins = VariableUtils.getNotNullValue(plugins, this.plugins);
+        this.plugins = Optional.ofNullable(plugins).orElse(this.plugins);
     }
 
     public static MapleArrayData getData(String data) {

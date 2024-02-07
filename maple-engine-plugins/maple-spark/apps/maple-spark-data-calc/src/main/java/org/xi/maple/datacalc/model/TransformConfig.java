@@ -1,10 +1,9 @@
 package org.xi.maple.datacalc.model;
 
-import org.xi.maple.datacalc.util.VariableUtils;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.util.Optional;
 
 public abstract class TransformConfig extends MaplePluginConfig implements ResultTableConfig, Serializable {
 
@@ -49,6 +48,6 @@ public abstract class TransformConfig extends MaplePluginConfig implements Resul
     }
 
     public void setStorageLevel(String storageLevel) {
-        this.storageLevel = VariableUtils.getNotNullValue(storageLevel, this.storageLevel);
+        this.storageLevel = Optional.ofNullable(storageLevel).orElse(this.storageLevel);
     }
 }

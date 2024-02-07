@@ -4,12 +4,12 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
 import org.slf4j.{Logger, LoggerFactory}
+import org.xi.maple.common.util.{JsonUtils, VariableUtils}
 import org.xi.maple.datacalc.api.{Logging, MapleSink, MapleSource, MapleTransform}
 import org.xi.maple.datacalc.exception.ConfigRuntimeException
 import org.xi.maple.datacalc.model._
-import org.xi.maple.datacalc.util.{JsonUtils, PluginUtil, VariableUtils}
+import org.xi.maple.datacalc.util.PluginUtil
 
-import java.util
 import javax.validation.{Validation, Validator}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -17,12 +17,10 @@ import scala.collection.mutable
 class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig, T <: MapleData]
 (val spark: SparkSession, mapleData: T, val dsConsumer: (MaplePluginConfig, Dataset[Row]) => Unit) extends Logging {
 
-  private val gv: java.util.Map[String, String] = new util.HashMap[String, String]()
+  private val gv: java.util.Map[String, String] = new java.util.HashMap[String, String]()
   for ((k, v) <- mapleData.getVariables.asScala) {
     gv.put(k, VariableUtils.replaceVariables(v, mapleData.getVariables))
   }
-
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val VALIDATOR: Validator = Validation.buildDefaultValidatorFactory().getValidator
 
@@ -36,6 +34,7 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
       case arrayData: MapleArrayData => executeArray(arrayData)
       case _ => throw new ConfigRuntimeException(s"MapleData type [${mapleData.getClass}] is not supported")
     }
+    clean()
   }
 
   private def executeGroup(mapleData: MapleGroupData): Unit = {
@@ -43,7 +42,6 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
     val transformations = mapleData.getTransformations.map { dc => getPluginAndCheck("transformation", dc) }
     val sinks = mapleData.getSinks.map { dc => getPluginAndCheck("sink", dc) }
     executePlugins(sources ++ transformations ++ sinks)
-    clean()
   }
 
   private def executeArray(mapleData: MapleArrayData): Unit = {
@@ -52,7 +50,6 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
     }
     val plugins = mapleData.getPlugins.map { dc => getPluginAndCheck(dc.getType, dc) }
     executePlugins(plugins)
-    clean()
   }
 
   private def getPluginAndCheck(dcType: String, dc: MapleDataConfig): (MaplePluginConfig, () => Unit) = {
@@ -116,11 +113,11 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
       spark.sql(sink.getConfig.getSourceQuery)
     }
     val partitions = sink.getConfig.getNumPartitions
-    if (partitions != null && partitions > 0) {
-      sink.output(spark, fromDs.repartition(partitions))
-    } else {
-      sink.output(spark, fromDs)
-    }
+    // if (partitions != null && partitions > 0) {
+    //   sink.output(spark, fromDs.repartition(partitions))
+    // } else {
+    //   sink.output(spark, fromDs)
+    // }
   }
 
   private def tempSaveResultTable(ds: Dataset[Row], resultTableConfig: ResultTableConfig): Unit = {

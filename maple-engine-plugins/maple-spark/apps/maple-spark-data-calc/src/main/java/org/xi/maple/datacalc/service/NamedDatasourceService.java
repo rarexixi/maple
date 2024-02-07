@@ -3,7 +3,6 @@ package org.xi.maple.datacalc.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.datacalc.model.NamedDatasource;
-import org.xi.maple.datacalc.util.RsaUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +14,8 @@ public class NamedDatasourceService {
 
     private static volatile NamedDatasourceService metadataService;
 
-    private RsaUtil rsaUtil;
+    private String privateKey;
+    private String publicKey;
     private String url;
     private String username;
     private String password;
@@ -52,9 +52,8 @@ public class NamedDatasourceService {
                     metadataService.driver = properties.getProperty("jdbc.driver");
                     metadataService.getDatabasesSql = properties.getProperty("get-database-sql");
 
-                    String publicKey = properties.getProperty("crypto.rsa-public-key");
-                    String privateKey = properties.getProperty("crypto.rsa-private-key");
-                    metadataService.rsaUtil = new RsaUtil(publicKey, privateKey);
+                    metadataService.publicKey = properties.getProperty("crypto.rsa-public-key");
+                    metadataService.privateKey = properties.getProperty("crypto.rsa-private-key");
                 }
             }
         }
@@ -72,11 +71,8 @@ public class NamedDatasourceService {
         Map<String, NamedDatasource> result = new HashMap<>();
         if (mappingNames == null || mappingNames.isEmpty()) return result;
 
-        StringBuilder sb = new StringBuilder("?");
-        int size = mappingNames.size();
-        for (int i = 1; i < size; i++) {
-            sb.append(", ?");
-        }
+        StringBuilder sb = new StringBuilder(mappingNames.size() * 2);
+        sb.append("?").append(", ?".repeat(mappingNames.size() - 1));
         String sql = getDatabasesSql.replace("${names}", sb);
 
         try {

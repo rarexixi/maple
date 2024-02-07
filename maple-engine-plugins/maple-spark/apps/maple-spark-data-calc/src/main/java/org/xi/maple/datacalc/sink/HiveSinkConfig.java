@@ -1,12 +1,12 @@
 package org.xi.maple.datacalc.sink;
 
 import org.xi.maple.datacalc.model.SinkConfig;
-import org.xi.maple.datacalc.util.VariableUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 public class HiveSinkConfig extends SinkConfig {
 
@@ -71,6 +71,6 @@ public class HiveSinkConfig extends SinkConfig {
     }
 
     public void setVariables(Map<String, String> variables) {
-        this.variables = VariableUtils.getNotNullValue(variables, this.variables);
+        this.variables = Optional.ofNullable(variables).orElse(this.variables);
     }
 }

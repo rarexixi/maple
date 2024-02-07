@@ -1,5 +1,6 @@
 package org.xi.maple.datacalc.util;
 
+import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.datacalc.api.MaplePlugin;
 import org.xi.maple.datacalc.api.MapleSink;
 import org.xi.maple.datacalc.api.MapleSource;
@@ -11,7 +12,6 @@ import org.xi.maple.datacalc.sink.*;
 import org.xi.maple.datacalc.source.*;
 import org.xi.maple.datacalc.transform.*;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class PluginUtil {
 
     private static Map<String, Class<?>> getSourcePlugins() {
         Map<String, Class<?>> classMap = new HashMap<>();
-        classMap.put("managed_jdbc", org.xi.maple.datacalc.source.ManagedJdbcSource.class);
+        classMap.put("managed_jdbc", ManagedJdbcSource.class);
         classMap.put("jdbc", JdbcSource.class);
         classMap.put("file", FileSource.class);
         return classMap;
@@ -39,7 +39,7 @@ public class PluginUtil {
 
     private static Map<String, Class<?>> getSinkPlugins() {
         Map<String, Class<?>> classMap = new HashMap<>();
-        classMap.put("managed_jdbc", org.xi.maple.datacalc.sink.ManagedJdbcSink.class);
+        classMap.put("managed_jdbc", ManagedJdbcSink.class);
         classMap.put("jdbc", JdbcSink.class);
         classMap.put("hive", HiveSink.class);
         classMap.put("file", FileSink.class);
@@ -59,15 +59,14 @@ public class PluginUtil {
     }
 
     static <T extends MaplePlugin> T createPlugin(Map<String, Class<?>> pluginMap, String name, Map<String, Object> config) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Class<?> type = pluginMap.get(name);
-        ParameterizedType genericSuperclass = (ParameterizedType) type.getGenericInterfaces()[0];
-        Class<?> configType = (Class<?>) genericSuperclass.getActualTypeArguments()[0];
-        T plugin = (T) type.getDeclaredConstructor().newInstance();
-        try {
-            plugin.setConfig(JsonUtils.convertValue(config, configType));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Class<?> pluginClass = pluginMap.get(name);
+        if (pluginClass == null) {
+            throw new IllegalArgumentException("Plugin name not found in the map: " + name);
         }
+        ParameterizedType genericSuperclass = (ParameterizedType) pluginClass.getGenericInterfaces()[0];
+        Class<?> configType = (Class<?>) genericSuperclass.getActualTypeArguments()[0];
+        T plugin = (T) pluginClass.getDeclaredConstructor().newInstance();
+        plugin.setConfig(JsonUtils.convertValue(config, configType));
         return plugin;
     }
 }
