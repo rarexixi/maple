@@ -3,7 +3,6 @@ package org.xi.maple.datacalc
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
-import org.slf4j.{Logger, LoggerFactory}
 import org.xi.maple.common.util.{JsonUtils, VariableUtils}
 import org.xi.maple.datacalc.api.{Logging, MapleSink, MapleSource, MapleTransform}
 import org.xi.maple.datacalc.exception.ConfigRuntimeException
@@ -113,11 +112,11 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
       spark.sql(sink.getConfig.getSourceQuery)
     }
     val partitions = sink.getConfig.getNumPartitions
-    // if (partitions != null && partitions > 0) {
-    //   sink.output(spark, fromDs.repartition(partitions))
-    // } else {
-    //   sink.output(spark, fromDs)
-    // }
+    if (partitions != null && partitions > 0) {
+      sink.output(spark, fromDs.repartition(partitions))
+    } else {
+      sink.output(spark, fromDs)
+    }
   }
 
   private def tempSaveResultTable(ds: Dataset[Row], resultTableConfig: ResultTableConfig): Unit = {

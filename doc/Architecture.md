@@ -6,11 +6,11 @@
 
 用于接收任务请求
 
-### maple-scheduler 调度器
+### maple-manager 管理器
 
-用于消费和管理任务
+用于消费和管理任务，监控任务状态
 
-### maple-execution-manager 执行管理器
+### maple-executor 任务管理器
 
 负责引擎的创建，任务执行
 
@@ -348,6 +348,9 @@
         "execution.checkpointing.interval": "10min",
         "execution.checkpointing.timeout": "10min",
         "execution.checkpointing.unaligned": "false"
+    },
+    "runType": "data_calc",
+    "runConf": {
     },
     "runType": "sql",
     "runConf": {
