@@ -5,9 +5,10 @@ import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
 import org.xi.maple.common.util.{JsonUtils, VariableUtils}
 import org.xi.maple.datacalc.api.{Logging, MapleSink, MapleSource, MapleTransform}
-import org.xi.maple.datacalc.exception.ConfigRuntimeException
 import org.xi.maple.datacalc.model._
-import org.xi.maple.datacalc.util.PluginUtil
+import org.xi.maple.datacalc.spark.exception.ConfigRuntimeException
+import org.xi.maple.datacalc.spark.model.{MapleArrayData, MapleData, MapleDataConfig, MapleGroupData, MaplePluginConfig, ResultTableConfig, SinkConfig, SourceConfig, TransformConfig}
+import org.xi.maple.datacalc.spark.util.PluginUtil
 
 import javax.validation.{Validation, Validator}
 import scala.collection.JavaConverters._

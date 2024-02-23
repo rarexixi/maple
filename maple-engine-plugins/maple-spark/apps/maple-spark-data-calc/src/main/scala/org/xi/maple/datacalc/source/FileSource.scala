@@ -3,6 +3,7 @@ package org.xi.maple.datacalc.source
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.api.MapleSource
+import org.xi.maple.datacalc.spark.source.FileSourceConfig
 
 class FileSource extends MapleSource[FileSourceConfig] {
 

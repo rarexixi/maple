@@ -15,5 +15,6 @@
 
     <modules>
         <module>maple-flink-builder</module>
+        <module>apps/maple-flink-data-calc</module>
     </modules>
 </project>

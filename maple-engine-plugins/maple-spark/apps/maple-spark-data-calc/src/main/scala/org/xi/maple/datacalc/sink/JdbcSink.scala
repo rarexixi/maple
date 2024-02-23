@@ -5,6 +5,7 @@ import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.api.MapleSink
+import org.xi.maple.datacalc.spark.sink.JdbcSinkConfig
 
 import java.sql.{Connection, DriverManager, PreparedStatement}
 import scala.collection.JavaConverters._

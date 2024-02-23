@@ -8,7 +8,7 @@ import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.types.StructField
 import org.slf4j.{Logger, LoggerFactory}
-import org.xi.maple.datacalc.exception.HiveSinkException
+import org.xi.maple.datacalc.spark.exception.HiveSinkException
 
 object HiveSinkUtils {
 
