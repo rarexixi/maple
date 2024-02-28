@@ -1,12 +1,11 @@
-package org.xi.maple.datacalc.sink
+package org.xi.maple.datacalc.spark.sink
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.common.util.VariableUtils
-import org.xi.maple.datacalc.api.MapleSink
+import org.xi.maple.datacalc.spark.api.MapleSink
 import org.xi.maple.datacalc.spark.exception.DatasourceNotConfigException
 import org.xi.maple.datacalc.spark.model.NamedDatasource
 import org.xi.maple.datacalc.spark.service.NamedDatasourceService
-import org.xi.maple.datacalc.spark.sink.{JdbcSinkConfig, ManagedJdbcSinkConfig}
 
 import scala.collection.JavaConverters._
 

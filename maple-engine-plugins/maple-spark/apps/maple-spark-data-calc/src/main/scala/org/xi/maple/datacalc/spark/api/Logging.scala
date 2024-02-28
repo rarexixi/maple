@@ -1,4 +1,4 @@
-package org.xi.maple.datacalc.api
+package org.xi.maple.datacalc.spark.api
 
 import org.slf4j.{Logger, LoggerFactory}
 

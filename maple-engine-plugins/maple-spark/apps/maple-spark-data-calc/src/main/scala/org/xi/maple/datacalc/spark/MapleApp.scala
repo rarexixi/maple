@@ -1,7 +1,7 @@
-package org.xi.maple.datacalc
+package org.xi.maple.datacalc.spark
 
 import org.apache.spark.sql.SparkSession
-import org.xi.maple.datacalc.api.Logging
+import org.xi.maple.datacalc.spark.api.Logging
 import org.xi.maple.datacalc.spark.model.{MapleArrayData, MapleData, MapleGroupData}
 
 object MapleApp extends Logging {

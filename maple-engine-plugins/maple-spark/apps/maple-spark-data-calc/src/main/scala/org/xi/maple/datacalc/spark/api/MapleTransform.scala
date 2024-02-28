@@ -1,4 +1,4 @@
-package org.xi.maple.datacalc.api
+package org.xi.maple.datacalc.spark.api
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.datacalc.spark.model.TransformConfig

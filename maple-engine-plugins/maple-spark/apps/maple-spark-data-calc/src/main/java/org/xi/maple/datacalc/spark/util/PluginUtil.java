@@ -1,16 +1,16 @@
 package org.xi.maple.datacalc.spark.util;
 
 import org.xi.maple.common.util.JsonUtils;
-import org.xi.maple.datacalc.api.MaplePlugin;
-import org.xi.maple.datacalc.api.MapleSink;
-import org.xi.maple.datacalc.api.MapleSource;
-import org.xi.maple.datacalc.api.MapleTransform;
+import org.xi.maple.datacalc.spark.api.MaplePlugin;
+import org.xi.maple.datacalc.spark.api.MapleSink;
+import org.xi.maple.datacalc.spark.api.MapleSource;
+import org.xi.maple.datacalc.spark.api.MapleTransform;
 import org.xi.maple.datacalc.spark.model.SinkConfig;
 import org.xi.maple.datacalc.spark.model.SourceConfig;
 import org.xi.maple.datacalc.spark.model.TransformConfig;
-import org.xi.maple.datacalc.sink.*;
-import org.xi.maple.datacalc.source.*;
-import org.xi.maple.datacalc.transform.*;
+import org.xi.maple.datacalc.spark.sink.*;
+import org.xi.maple.datacalc.spark.source.*;
+import org.xi.maple.datacalc.spark.transform.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;

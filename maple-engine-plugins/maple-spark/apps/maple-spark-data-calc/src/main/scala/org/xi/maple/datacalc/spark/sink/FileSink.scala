@@ -1,9 +1,8 @@
-package org.xi.maple.datacalc.sink
+package org.xi.maple.datacalc.spark.sink
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.common.util.VariableUtils
-import org.xi.maple.datacalc.api.MapleSink
-import org.xi.maple.datacalc.spark.sink.FileSinkConfig
+import org.xi.maple.datacalc.spark.api.MapleSink
 
 import scala.collection.JavaConverters._
 

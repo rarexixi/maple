@@ -1,4 +1,4 @@
-package org.xi.maple.datacalc.util
+package org.xi.maple.datacalc.spark.util
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql._

@@ -1,11 +1,10 @@
-package org.xi.maple.datacalc.source
+package org.xi.maple.datacalc.spark.source
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.xi.maple.common.util.VariableUtils
-import org.xi.maple.datacalc.api.MapleSource
+import org.xi.maple.datacalc.spark.api.MapleSource
 import org.xi.maple.datacalc.spark.exception.DatasourceNotConfigException
 import org.xi.maple.datacalc.spark.service.NamedDatasourceService
-import org.xi.maple.datacalc.spark.source.{JdbcSourceConfig, ManagedJdbcSourceConfig}
 
 class ManagedJdbcSource extends MapleSource[ManagedJdbcSourceConfig] {
 
