@@ -1,6 +1,6 @@
 package org.xi.maple.datacalc.spark.source
 
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSource
 
@@ -8,11 +8,11 @@ class FileSource extends MapleSource[FileSourceConfig] {
 
   val defaultUriSchema = "hdfs://"
 
-  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
+  override protected def prepare(): Unit = {
     config.setPath(VariableUtils.replaceVariables(config.getPath, variables))
   }
 
-  override def getData(spark: SparkSession): Dataset[Row] = {
+  override def getData: Dataset[Row] = {
     val reader = spark.read
 
     if (config.getOptions != null && !config.getOptions.isEmpty) {

@@ -1,6 +1,6 @@
 package org.xi.maple.datacalc.spark.sink
 
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSink
 
@@ -10,11 +10,11 @@ class FileSink extends MapleSink[FileSinkConfig] {
 
   val defaultUriSchema = "hdfs://"
 
-  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
+  override protected def prepare(): Unit = {
     config.setPath(VariableUtils.replaceVariables(config.getPath, variables))
   }
 
-  override def output(spark: SparkSession, ds: Dataset[Row]): Unit = {
+  override def output(ds: Dataset[Row]): Unit = {
 
     val writer = ds.write.mode(config.getSaveMode)
 

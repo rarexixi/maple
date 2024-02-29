@@ -2,7 +2,7 @@ package org.xi.maple.datacalc.spark.sink
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSink
 
@@ -10,11 +10,11 @@ import java.sql.{Connection, DriverManager, PreparedStatement}
 import scala.collection.JavaConverters._
 
 class JdbcSink extends MapleSink[JdbcSinkConfig] {
-  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
+  override protected def prepare(): Unit = {
     config.setPreQueries(config.getPreQueries.asScala.map(query => VariableUtils.replaceVariables(query, variables)).asJava)
   }
 
-  override def output(spark: SparkSession, ds: Dataset[Row]): Unit = {
+  override def output(ds: Dataset[Row]): Unit = {
     val targetTable = config.getTargetDatabase + "." + config.getTargetTable
     var options = Map(
       "url" -> config.getUrl,

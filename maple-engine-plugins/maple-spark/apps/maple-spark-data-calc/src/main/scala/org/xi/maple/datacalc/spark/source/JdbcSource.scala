@@ -1,17 +1,17 @@
 package org.xi.maple.datacalc.spark.source
 
 import org.apache.commons.lang3.StringUtils
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSource
 
 class JdbcSource extends MapleSource[JdbcSourceConfig] {
 
-  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
+  override protected def prepare(): Unit = {
     config.setQuery(VariableUtils.replaceVariables(config.getQuery, variables))
   }
 
-  override def getData(spark: SparkSession): Dataset[Row] = {
+  override def getData: Dataset[Row] = {
     val reader = spark.read.format("jdbc")
     if (config.getOptions != null && !config.getOptions.isEmpty) {
       reader.options(config.getOptions)

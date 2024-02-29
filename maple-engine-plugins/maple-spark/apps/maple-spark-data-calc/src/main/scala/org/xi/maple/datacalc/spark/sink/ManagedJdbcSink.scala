@@ -1,6 +1,6 @@
 package org.xi.maple.datacalc.spark.sink
 
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSink
 import org.xi.maple.datacalc.spark.exception.DatasourceNotConfigException
@@ -10,11 +10,11 @@ import org.xi.maple.datacalc.spark.service.NamedDatasourceService
 import scala.collection.JavaConverters._
 
 class ManagedJdbcSink extends MapleSink[ManagedJdbcSinkConfig] {
-  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
+  override protected def prepare(): Unit = {
     config.setPreQueries(config.getPreQueries.asScala.map(query => VariableUtils.replaceVariables(query, variables)).asJava)
   }
 
-  override def output(spark: SparkSession, ds: Dataset[Row]): Unit = {
+  override def output(ds: Dataset[Row]): Unit = {
     val datasource: NamedDatasource = NamedDatasourceService.getDatasource(config.getTargetDatasource)
     if (datasource == null) {
       throw new DatasourceNotConfigException(s"Datasource ${config.getTargetDatasource} is not configured!")
@@ -36,6 +36,6 @@ class ManagedJdbcSink extends MapleSink[ManagedJdbcSinkConfig] {
 
     val sinkPlugin = new JdbcSink()
     sinkPlugin.setConfig(jdbcConfig)
-    sinkPlugin.output(spark, ds)
+    sinkPlugin.output(ds)
   }
 }

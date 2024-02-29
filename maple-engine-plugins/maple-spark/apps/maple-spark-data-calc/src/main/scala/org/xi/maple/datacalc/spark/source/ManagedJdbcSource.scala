@@ -1,6 +1,6 @@
 package org.xi.maple.datacalc.spark.source
 
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSource
 import org.xi.maple.datacalc.spark.exception.DatasourceNotConfigException
@@ -8,11 +8,11 @@ import org.xi.maple.datacalc.spark.service.NamedDatasourceService
 
 class ManagedJdbcSource extends MapleSource[ManagedJdbcSourceConfig] {
 
-  override def prepare(spark: SparkSession, variables: java.util.Map[String, String]): Unit = {
+  override protected def prepare(): Unit = {
     config.setQuery(VariableUtils.replaceVariables(config.getQuery, variables))
   }
 
-  override def getData(spark: SparkSession): Dataset[Row] = {
+  override def getData: Dataset[Row] = {
     val datasource = NamedDatasourceService.getDatasource(config.getDatasource)
     if (datasource == null) {
       throw new DatasourceNotConfigException(s"Datasource ${config.getDatasource} is not configured!")
@@ -32,6 +32,6 @@ class ManagedJdbcSource extends MapleSource[ManagedJdbcSourceConfig] {
 
     val sourcePlugin = new JdbcSource()
     sourcePlugin.setConfig(jdbcConfig)
-    sourcePlugin.getData(spark)
+    sourcePlugin.getData
   }
 }
