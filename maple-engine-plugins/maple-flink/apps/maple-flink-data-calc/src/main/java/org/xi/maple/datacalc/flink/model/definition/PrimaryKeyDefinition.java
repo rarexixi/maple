@@ -1,4 +1,4 @@
-package org.xi.maple.datacalc.flink.model;
+package org.xi.maple.datacalc.flink.model.definition;
 
 import lombok.Data;
 

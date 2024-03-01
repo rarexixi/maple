@@ -1,4 +1,4 @@
-package org.xi.maple.datacalc.flink.model;
+package org.xi.maple.datacalc.flink.model.definition;
 
 import lombok.Data;
 
@@ -6,5 +6,5 @@ import lombok.Data;
 public class WatermarkDefinition {
 
     String columnName;
-    String strategyExpression;
+    String expression;
 }
