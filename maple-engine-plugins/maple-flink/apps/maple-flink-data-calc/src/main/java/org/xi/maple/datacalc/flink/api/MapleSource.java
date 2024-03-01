@@ -2,7 +2,8 @@ package org.xi.maple.datacalc.flink.api;
 
 import org.apache.flink.table.api.TableDescriptor;
 import org.apache.flink.table.api.TableEnvironment;
-import org.xi.maple.datacalc.flink.model.definition.TableDefinition;
+import org.xi.maple.datacalc.flink.model.CreateTableConfig;
+import org.xi.maple.datacalc.flink.util.TableUtils;
 
 import java.util.Map;
 
@@ -14,10 +15,10 @@ public abstract class MapleSource<T extends MapleSource.SourceConfig> extends Ma
 
     @Override
     public void define() {
-        TableDescriptor tableDescriptor = config.getTableDescriptor();
+        TableDescriptor tableDescriptor = TableUtils.getTableDescriptor(config);
         tableEnv.createTemporaryTable(config.getResultTable(), tableDescriptor);
     }
 
-    public static abstract class SourceConfig extends TableDefinition {
+    public static abstract class SourceConfig extends CreateTableConfig {
     }
 }

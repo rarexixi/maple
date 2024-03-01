@@ -77,6 +77,63 @@ create table `maple`.`maple_datasource`
 
 # endregion
 
+# region material
+
+drop table if exists `maple`.`maple_material`;
+create table `maple`.`maple_material`
+(
+    `id`             int                                   not null auto_increment,
+    `name`           varchar(32)                           not null comment '素材名称',
+    `desc`           varchar(256)                          not null comment '素材描述',
+    `material_type`  varchar(32)                           not null comment '素材类型',
+    `visibility`     varchar(32)                           not null comment '可见范围 (system, group, private)',
+    `latest_version` int         default 1                 not null comment '最新版本',
+
+    `group`          varchar(32) default ''                not null comment '用户组',
+    `user`           varchar(32) default ''                not null comment '用户',
+
+    `deleted`        tinyint     default 0                 not null comment '是否删除',
+    `create_user`    int         default 0                 not null comment '创建人',
+    `update_user`    int         default 0                 not null comment '修改人',
+    `create_time`    datetime    default current_timestamp not null comment '创建时间',
+    `update_time`    datetime    default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    unique `uniq_material_name` (`name`),
+    index `idx_material_type` (`material_type`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '素材配置';
+
+
+drop table if exists `maple`.`maple_material_version`;
+create table `maple`.`maple_material_version`
+(
+    `id`             int                                not null auto_increment,
+    `material_id`    int                                not null comment '素材ID',
+    `store_path`     varchar(256)                       not null comment '存储路径', -- 例如 HDFS 路径
+    `file_sha256`    char(64)                           not null comment '文件SHA256',
+    `desc`           varchar(256)                       not null comment '版本描述',
+    `version`        int                                not null comment '版本',
+    `version_config` text                               not null comment '版本配置JSON',
+
+    `deleted`        tinyint  default 0                 not null comment '是否删除',
+    `create_user`    int      default 0                 not null comment '创建人',
+    `update_user`    int      default 0                 not null comment '修改人',
+    `create_time`    datetime default current_timestamp not null comment '创建时间',
+    `update_time`    datetime default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`),
+    unique `uniq_material_version` (`material_id`, `version`),
+    index `idx_material_id` (`material_id`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = '素材版本配置';
+
+# endregion
+
 # region application
 
 drop table if exists `maple`.`maple_application`;
@@ -143,6 +200,26 @@ create table `maple`.`maple_cluster_engine`
   default charset = utf8
   collate = utf8_unicode_ci
     comment = '集群引擎';
+
+drop table if exists `maple`.`maple_udf`;
+create table `maple`.`maple_udf`
+(
+    `id`               int                                    not null auto_increment comment '引擎ID',
+    `material_id`      int                  not null comment '物料ID',
+    `material_version` int                  not null comment '物料版本',
+    `function_name`             varchar(32)  default ''                not null comment '方法名称',
+    `main_class`          varchar(256)  default ''                not null comment '方法主类',
+    `engine_home`      varchar(256) default ''                not null comment '引擎目录',
+    `ext_info`         text                                   not null comment '扩展信息',
+
+    `create_time`      datetime     default current_timestamp not null comment '创建时间',
+    `update_time`      datetime     default current_timestamp not null on update current_timestamp comment '更新时间',
+
+    primary key (`id`)
+) engine = InnoDB
+  default charset = utf8
+  collate = utf8_unicode_ci
+    comment = 'UDF';
 
 drop table if exists `maple`.`maple_cluster_engine_default_conf`;
 create table `maple`.`maple_cluster_engine_default_conf`

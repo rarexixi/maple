@@ -6,13 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.common.util.VariableUtils;
-import org.xi.maple.datacalc.flink.api.TableDefine;
-import org.xi.maple.datacalc.flink.api.TableInsert;
-import org.xi.maple.datacalc.flink.api.MaplePlugin;
 import org.xi.maple.datacalc.flink.exception.ConfigRuntimeException;
 import org.xi.maple.datacalc.flink.model.*;
 import org.xi.maple.datacalc.flink.model.definition.*;
-import org.xi.maple.datacalc.flink.util.PluginUtil;
+import org.xi.maple.datacalc.flink.util.ConfigUtil;
+import org.xi.maple.datacalc.flink.util.TableUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -21,9 +19,9 @@ import javax.validation.ValidatorFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MapleExecution<T extends MapleData> {
+public class MapleExecutionConfig<T extends MapleData> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MapleExecution.class);
+    private static final Logger logger = LoggerFactory.getLogger(MapleExecutionConfig.class);
 
     final TableEnvironment tableEnv;
 
@@ -33,7 +31,7 @@ public class MapleExecution<T extends MapleData> {
 
     final Set<String> registerTableSet;
 
-    public MapleExecution(TableEnvironment tableEnv, T mapleData) {
+    public MapleExecutionConfig(TableEnvironment tableEnv, T mapleData) {
         this.tableEnv = tableEnv;
         this.mapleData = mapleData;
         this.gv = new HashMap<>();
@@ -52,15 +50,15 @@ public class MapleExecution<T extends MapleData> {
     }
 
     private void executeGroup(MapleGroupData mapleData) {
-        List<MaplePlugin> executions = new ArrayList<>();
+        List<MaplePluginConfig> executions = new ArrayList<>();
         for (MapleDataConfig dc : mapleData.getSources()) {
-            executions.add(getExecution("source", dc));
+            executions.add(getExecutionConfig("source", dc));
         }
         for (MapleDataConfig dc : mapleData.getTransformations()) {
-            executions.add(getExecution("transform", dc));
+            executions.add(getExecutionConfig("transform", dc));
         }
         for (MapleDataConfig dc : mapleData.getSinks()) {
-            executions.add(getExecution("sink", dc));
+            executions.add(getExecutionConfig("sink", dc));
         }
         executePlugins(executions);
     }
@@ -69,48 +67,53 @@ public class MapleExecution<T extends MapleData> {
         if (mapleData.getPlugins() == null || mapleData.getPlugins().length == 0) {
             throw new ConfigRuntimeException("plugins is empty");
         }
-        List<MaplePlugin> executions = Arrays.stream(mapleData.getPlugins()).map(dc -> getExecution(dc.getType(), dc)).collect(Collectors.toList());
+        List<MaplePluginConfig> executions = Arrays.stream(mapleData.getPlugins()).map(this::getExecutionConfig).collect(Collectors.toList());
         executePlugins(executions);
     }
 
-    private MaplePlugin getExecution(String dcType, MapleDataConfig dc) {
-        switch (dcType) {
-            case "source":
-                return PluginUtil.createSource(dc.getName(), dc.getConfig(), tableEnv, gv);
-            case "transform":
-                return PluginUtil.createTransform(dc.getName(), dc.getConfig(), tableEnv, gv);
-            case "sink":
-                return PluginUtil.createSink(dc.getName(), dc.getConfig(), tableEnv, gv);
-            default:
-                throw new ConfigRuntimeException("[" + dcType + "] is not a valid type");
-        }
+    private MaplePluginConfig getExecutionConfig(MapleDataConfig dc) {
+        return ConfigUtil.createConfig(dc.getType(), dc.getName(), dc.getConfig());
     }
 
-    private void executePlugins(List<MaplePlugin> executions) {
+    private MaplePluginConfig getExecutionConfig(String dcType, MapleDataConfig dc) {
+        return ConfigUtil.createConfig(dcType, dc.getName(), dc.getConfig());
+    }
+
+    private void executePlugins(List<MaplePluginConfig> executions) {
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
             Validator validator = validatorFactory.getValidator();
-            for (MaplePlugin execution : executions) {
-                if (!checkPluginConfig(validator, execution.getConfig())) {
+            for (MaplePluginConfig executionConfig : executions) {
+                if (!checkPluginConfig(validator, executionConfig)) {
                     throw new ConfigRuntimeException("Config data valid failed");
                 }
             }
         }
         StatementSet statementSet = tableEnv.createStatementSet();
-        for (MaplePlugin execution : executions) {
-            if (execution instanceof TableDefine) {
-                TableDefine tableDefine = (TableDefine) execution;
-                tableDefine.define();
+        for (MaplePluginConfig executionConfig : executions) {
+            if (executionConfig instanceof CustomCreateTableConfig) {
+                CustomCreateTableConfig tableDefinition = (CustomCreateTableConfig) executionConfig;
+                tableEnv.executeSql(tableDefinition.getCreateSql());
+            } else if (executionConfig instanceof CreateTableConfig) {
+                CreateTableConfig createTableConfig = (CreateTableConfig) executionConfig;
+                TableDescriptor tableDescriptor = TableUtils.getTableDescriptor(createTableConfig);
+                tableEnv.createTemporaryTable(createTableConfig.getResultTable(), tableDescriptor);
+                if (createTableConfig instanceof InsertTableConfig) {
+                    InsertTableConfig insertTableConfig = (InsertTableConfig) createTableConfig;
+                    // statementSet.addInsertSql(insertTableConfig.getInsertSql());
+                }
+            } else if (executionConfig instanceof CreateViewConfig) {
+                CreateViewConfig createViewConfig = (CreateViewConfig) executionConfig;
+                Table view = tableEnv.sqlQuery(createViewConfig.getSelectSql());
+                tableEnv.createTemporaryView(createViewConfig.getViewName(), view);
+            } else if (executionConfig instanceof CustomInsertTableConfig) {
+                CustomInsertTableConfig insertTableConfig = (CustomInsertTableConfig) executionConfig;
+                statementSet.addInsertSql(insertTableConfig.getInsertSql());
             }
-            if (execution instanceof TableInsert) {
-                TableInsert tableInsert = (TableInsert) execution;
-                statementSet.addInsertSql(tableInsert.getInsertSql());
-            }
-            if (execution.getConfig().isTerminate()) {
+            if (executionConfig.isTerminate()) {
                 break;
             }
         }
-        TableResult tableResult = statementSet.execute();
-
+        statementSet.execute(); // todo
     }
 
     private boolean checkPluginConfig(Validator validator, MaplePluginConfig config) {
