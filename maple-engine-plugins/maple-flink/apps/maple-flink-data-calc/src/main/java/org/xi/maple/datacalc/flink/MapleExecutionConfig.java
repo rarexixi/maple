@@ -1,14 +1,17 @@
 package org.xi.maple.datacalc.flink;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.table.api.*;
+import org.apache.flink.table.api.StatementSet;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableDescriptor;
+import org.apache.flink.table.api.TableEnvironment;
+import org.apache.flink.table.catalog.Column;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.common.util.VariableUtils;
+import org.xi.maple.datacalc.flink.api.ResultTableConfig;
 import org.xi.maple.datacalc.flink.exception.ConfigRuntimeException;
 import org.xi.maple.datacalc.flink.model.*;
-import org.xi.maple.datacalc.flink.model.definition.*;
 import org.xi.maple.datacalc.flink.util.ConfigUtil;
 import org.xi.maple.datacalc.flink.util.TableUtils;
 
@@ -17,7 +20,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MapleExecutionConfig<T extends MapleData> {
 
@@ -50,15 +52,16 @@ public class MapleExecutionConfig<T extends MapleData> {
     }
 
     private void executeGroup(MapleGroupData mapleData) {
-        List<MaplePluginConfig> executions = new ArrayList<>();
+        int initialCapacity = mapleData.getSources().length + mapleData.getTransformations().length + mapleData.getSinks().length;
+        List<MaplePluginConfig> executions = new ArrayList<>(initialCapacity);
         for (MapleDataConfig dc : mapleData.getSources()) {
-            executions.add(getExecutionConfig("source", dc));
+            executions.add(ConfigUtil.createConfig(ConfigUtil.ExecutionType.SOURCE, dc.getName(), dc.getConfig()));
         }
         for (MapleDataConfig dc : mapleData.getTransformations()) {
-            executions.add(getExecutionConfig("transform", dc));
+            executions.add(ConfigUtil.createConfig(ConfigUtil.ExecutionType.TRANSFORM, dc.getName(), dc.getConfig()));
         }
         for (MapleDataConfig dc : mapleData.getSinks()) {
-            executions.add(getExecutionConfig("sink", dc));
+            executions.add(ConfigUtil.createConfig(ConfigUtil.ExecutionType.SINK, dc.getName(), dc.getConfig()));
         }
         executePlugins(executions);
     }
@@ -67,16 +70,11 @@ public class MapleExecutionConfig<T extends MapleData> {
         if (mapleData.getPlugins() == null || mapleData.getPlugins().length == 0) {
             throw new ConfigRuntimeException("plugins is empty");
         }
-        List<MaplePluginConfig> executions = Arrays.stream(mapleData.getPlugins()).map(this::getExecutionConfig).collect(Collectors.toList());
+        List<MaplePluginConfig> executions = new ArrayList<>(mapleData.getPlugins().length);
+        for (MapleDataConfig dc : mapleData.getPlugins()) {
+            executions.add(ConfigUtil.createConfig(dc.getType(), dc.getName(), dc.getConfig()));
+        }
         executePlugins(executions);
-    }
-
-    private MaplePluginConfig getExecutionConfig(MapleDataConfig dc) {
-        return ConfigUtil.createConfig(dc.getType(), dc.getName(), dc.getConfig());
-    }
-
-    private MaplePluginConfig getExecutionConfig(String dcType, MapleDataConfig dc) {
-        return ConfigUtil.createConfig(dcType, dc.getName(), dc.getConfig());
     }
 
     private void executePlugins(List<MaplePluginConfig> executions) {
@@ -99,7 +97,13 @@ public class MapleExecutionConfig<T extends MapleData> {
                 tableEnv.createTemporaryTable(createTableConfig.getResultTable(), tableDescriptor);
                 if (createTableConfig instanceof InsertTableConfig) {
                     InsertTableConfig insertTableConfig = (InsertTableConfig) createTableConfig;
-                    // statementSet.addInsertSql(insertTableConfig.getInsertSql());
+                    String selectSourceTable = insertTableConfig.getSelectSourceTable();
+                    Table sourceTable = tableEnv.sqlQuery(selectSourceTable);
+                    List<Column> columns = sourceTable.getResolvedSchema().getColumns(); // todo check
+                    if (columns.size() != insertTableConfig.getColumns().size()) {
+                        throw new ConfigRuntimeException("The number of columns in the source table and the target table is inconsistent");
+                    }
+                    statementSet.addInsertSql(insertTableConfig.getInsertSql());
                 }
             } else if (executionConfig instanceof CreateViewConfig) {
                 CreateViewConfig createViewConfig = (CreateViewConfig) executionConfig;
@@ -130,21 +134,13 @@ public class MapleExecutionConfig<T extends MapleData> {
             }
             return false;
         }
-        if (config instanceof CreateTableConfig) {
-            CreateTableConfig c = (CreateTableConfig) config;
-            StringBuilder tableName = new StringBuilder();
-            if (StringUtils.isNotBlank(c.getCatalogName())) {
-                tableName.append(c.getCatalogName()).append(".");
-            }
-            if (StringUtils.isNotBlank(c.getDatabaseName())) {
-                tableName.append(c.getDatabaseName()).append(".");
-            }
-            tableName.append(c.getTableName());
-            if (registerTableSet.contains(tableName.toString())) {
-                logger.error("Result table [{}] cannot be duplicate", tableName);
+        if (config instanceof ResultTableConfig) {
+            ResultTableConfig c = (ResultTableConfig) config;
+            if (registerTableSet.contains(c.getResultTable())) {
+                logger.error("Result table or view [{}] cannot be duplicate", c.getResultTable());
                 success = false;
             } else {
-                registerTableSet.add(tableName.toString());
+                registerTableSet.add(c.getResultTable());
             }
         }
         return success;

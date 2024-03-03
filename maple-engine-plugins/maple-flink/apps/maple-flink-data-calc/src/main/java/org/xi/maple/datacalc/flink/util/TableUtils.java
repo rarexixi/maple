@@ -28,6 +28,20 @@ public class TableUtils {
         return "";
     }
 
+    public static String getResultTable(String catalogName, String databaseName, String tableName) {
+        StringBuilder tableNameBuilder = new StringBuilder();
+        if (StringUtils.isNotBlank(catalogName)) {
+            tableNameBuilder.append(catalogName).append(".");
+        }
+
+        if (StringUtils.isNotBlank(databaseName)) {
+            tableNameBuilder.append(databaseName).append(".");
+        }
+
+        tableNameBuilder.append(tableName);
+        return tableNameBuilder.toString();
+    }
+
     public static List<BaseColumn> get(String createSql) throws SqlParseException {
         SqlParser.Config sqlParserConfig = SqlParser.configBuilder()
                 .setParserFactory(FlinkSqlParserImpl.FACTORY)

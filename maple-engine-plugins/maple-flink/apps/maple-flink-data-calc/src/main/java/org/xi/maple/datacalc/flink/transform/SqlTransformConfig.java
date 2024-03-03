@@ -1,9 +1,9 @@
 package org.xi.maple.datacalc.flink.transform;
 
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.xi.maple.datacalc.flink.api.ResultTableConfig;
 import org.xi.maple.datacalc.flink.model.MaplePluginConfig;
+import org.xi.maple.datacalc.flink.util.TableUtils;
 
 import javax.validation.constraints.NotBlank;
 
@@ -18,16 +18,6 @@ public class SqlTransformConfig extends MaplePluginConfig implements ResultTable
 
     @Override
     public String getResultTable() {
-        StringBuilder viewNameBuilder = new StringBuilder();
-        if (StringUtils.isNotBlank(catalogName)) {
-            viewNameBuilder.append(catalogName).append(".");
-        }
-
-        if (StringUtils.isNotBlank(databaseName)) {
-            viewNameBuilder.append(databaseName).append(".");
-        }
-
-        viewNameBuilder.append(viewName);
-        return viewNameBuilder.toString();
+        return TableUtils.getResultTable(catalogName, databaseName, viewName);
     }
 }

@@ -1,10 +1,10 @@
 package org.xi.maple.datacalc.flink.model;
 
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.datacalc.flink.api.ResultTableConfig;
 import org.xi.maple.datacalc.flink.model.definition.*;
+import org.xi.maple.datacalc.flink.util.TableUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -68,16 +68,6 @@ public abstract class CreateTableConfig extends MaplePluginConfig implements Res
     }
 
     public String getResultTable() {
-        StringBuilder tableNameBuilder = new StringBuilder();
-        if (StringUtils.isNotBlank(catalogName)) {
-            tableNameBuilder.append(catalogName).append(".");
-        }
-
-        if (StringUtils.isNotBlank(databaseName)) {
-            tableNameBuilder.append(databaseName).append(".");
-        }
-
-        tableNameBuilder.append(tableName);
-        return tableNameBuilder.toString();
+        return TableUtils.getResultTable(catalogName, databaseName, tableName);
     }
 }
