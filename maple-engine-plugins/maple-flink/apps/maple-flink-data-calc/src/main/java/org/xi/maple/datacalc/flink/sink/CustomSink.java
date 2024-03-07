@@ -4,6 +4,7 @@ import lombok.Data;
 import org.apache.flink.table.api.TableEnvironment;
 import org.xi.maple.datacalc.flink.api.*;
 import org.xi.maple.datacalc.flink.model.MaplePluginConfig;
+import org.xi.maple.datacalc.flink.util.TableUtils;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class CustomSink extends MaplePlugin<CustomSink.Config> implements TableD
 
     @Override
     public void define() {
-        tableEnv.executeSql(config.getSql());
+        tableEnv.executeSql(config.getCreateSql());
     }
 
     @Override
@@ -24,12 +25,18 @@ public class CustomSink extends MaplePlugin<CustomSink.Config> implements TableD
     }
 
     @Data
-    public static class Config extends MaplePluginConfig implements ResultTableConfig {
-        String sql;
+    public static class Config extends MaplePluginConfig implements ResultTableConfig, TableInsert {
+        String createSql;
+        String insertSql;
 
         @Override
         public String getResultTable() {
-            return null;
+            return TableUtils.getTableName(createSql);
+        }
+
+        @Override
+        public String getInsertSql() {
+            return insertSql;
         }
     }
 }

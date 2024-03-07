@@ -1,5 +1,7 @@
 package org.xi.maple.datacalc.flink.api;
 
-public interface TableDefine {
+import java.io.Serializable;
+
+public interface TableDefine extends Serializable {
     void define();
 }

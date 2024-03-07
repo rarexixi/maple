@@ -30,7 +30,7 @@ public class PluginUtil {
 
     private static Map<String, Class<?>> getTransformPlugins() {
         Map<String, Class<?>> classMap = new HashMap<>();
-        classMap.put("sql", SqlTransform.class);
+        classMap.put("sql", CreateViewTransform.class);
         return classMap;
     }
 
@@ -42,16 +42,21 @@ public class PluginUtil {
         return classMap;
     }
 
-    public static <T extends MaplePluginConfig> MaplePlugin<T> createSource(String name, Map<String, Object> config, TableEnvironment tableEnv, Map<String, String> variables) {
-        return createPlugin(SOURCE_PLUGINS, name, config, tableEnv, variables);
+    public static <T extends MaplePluginConfig> MaplePlugin<T> createExecution(String executionType, String name, Map<String, Object> config, TableEnvironment tableEnv, Map<String, String> variables) {
+        return createExecution(ExecutionType.valueOf(executionType.toUpperCase()), name, config, tableEnv, variables);
     }
 
-    public static <T extends MaplePluginConfig> MaplePlugin<T> createTransform(String name, Map<String, Object> config, TableEnvironment tableEnv, Map<String, String> variables) {
-        return createPlugin(TRANSFORM_PLUGINS, name, config, tableEnv, variables);
-    }
-
-    public static <T extends MaplePluginConfig> MaplePlugin<T> createSink(String name, Map<String, Object> config, TableEnvironment tableEnv, Map<String, String> variables) {
-        return createPlugin(SINK_PLUGINS, name, config, tableEnv, variables);
+    public static <T extends MaplePluginConfig> MaplePlugin<T> createExecution(ExecutionType executionType, String name, Map<String, Object> config, TableEnvironment tableEnv, Map<String, String> variables) {
+        switch (executionType) {
+            case SOURCE:
+                return createPlugin(SOURCE_PLUGINS, name, config, tableEnv, variables);
+            case TRANSFORM:
+                return createPlugin(TRANSFORM_PLUGINS, name, config, tableEnv, variables);
+            case SINK:
+                return createPlugin(SINK_PLUGINS, name, config, tableEnv, variables);
+            default:
+                throw new ConfigRuntimeException("[" + executionType + "] is not a valid type");
+        }
     }
 
     static <C extends MaplePluginConfig, T extends MaplePlugin<C>> T createPlugin(Map<String, Class<?>> pluginMap, String name, Map<String, Object> config, TableEnvironment tableEnv, Map<String, String> variables) {
@@ -76,5 +81,9 @@ public class PluginUtil {
         ParameterizedType genericSuperclass = (ParameterizedType) pluginClass.getAnnotatedSuperclass().getType();
         Class<?> configType = (Class<?>) genericSuperclass.getActualTypeArguments()[0];
         System.out.println(configType);
+    }
+
+    public enum ExecutionType {
+        SOURCE, TRANSFORM, SINK;
     }
 }

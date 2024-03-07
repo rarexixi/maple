@@ -1,5 +1,7 @@
 package org.xi.maple.datacalc.flink.api;
 
-public interface TableInsert {
+import java.io.Serializable;
+
+public interface TableInsert extends Serializable {
     String getInsertSql();
 }

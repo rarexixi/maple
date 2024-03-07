@@ -14,22 +14,22 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public abstract class CreateTableConfig extends MaplePluginConfig implements ResultTableConfig {
+public abstract class StructTableConfig extends MaplePluginConfig implements ResultTableConfig {
 
-    String catalogName;
-    String databaseName;
+    protected String catalogName;
+    protected String databaseName;
     @NotBlank
-    String tableName;
-    String comment;
+    protected String tableName;
+    protected String comment;
     @NotEmpty
     @Valid
-    List<BaseColumn> columns;
-    PrimaryKeyDefinition primaryKey;
+    protected List<BaseColumn> columns;
+    protected PrimaryKeyDefinition primaryKey;
 
-    WatermarkDefinition watermark;
-    String[] partitionColumns;
+    protected WatermarkDefinition watermark;
+    protected String[] partitionColumns;
 
-    private Map<String, String> options = new LinkedHashMap<>();
+    protected Map<String, String> options = new LinkedHashMap<>();
 
     public Map<String, String> getOptions() {
         return options;

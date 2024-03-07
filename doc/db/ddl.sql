@@ -205,10 +205,10 @@ drop table if exists `maple`.`maple_udf`;
 create table `maple`.`maple_udf`
 (
     `id`               int                                    not null auto_increment comment '引擎ID',
-    `material_id`      int                  not null comment '物料ID',
-    `material_version` int                  not null comment '物料版本',
-    `function_name`             varchar(32)  default ''                not null comment '方法名称',
-    `main_class`          varchar(256)  default ''                not null comment '方法主类',
+    `material_id`      int                                    not null comment '物料ID',
+    `material_version` int                                    not null comment '物料版本',
+    `function_name`    varchar(32)  default ''                not null comment '方法名称',
+    `main_class`       varchar(256) default ''                not null comment '方法主类',
     `engine_home`      varchar(256) default ''                not null comment '引擎目录',
     `ext_info`         text                                   not null comment '扩展信息',
 

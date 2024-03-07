@@ -7,7 +7,7 @@ import org.xi.maple.datacalc.flink.model.MaplePluginConfig;
 import java.util.Map;
 
 @Data
-public abstract class MaplePlugin<T extends MaplePluginConfig> {
+public abstract class MaplePlugin<T extends MaplePluginConfig> implements TableDefine {
 
     protected final TableEnvironment tableEnv;
     protected final Map<String, String> gv;
