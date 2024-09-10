@@ -39,7 +39,7 @@
       </template>
     </a-table>
   </div>
-  <datasource-type-add-or-edit :pk="editPk" :visible="addOrEditDrawerVisible" :operateType="operateType" @save="save" />
+  <datasource-type-add-or-edit :pk="editPk" :opened="addOrEditDrawerOpened" :operateType="operateType" @save="save" />
 </template>
 
 <script lang="ts">
@@ -74,8 +74,8 @@ export default defineComponent({
     const { rowSelection, selectedRowKeys, selectedRows, emptySelected } = getSelection(unref(dataList))
 
 
-    const { editPk, addOrEditDrawerVisible, operateType, add, del, edit, switchDeleted, save } = getOperations(unref(dataList), search)
-    provide('closeAddOrEditDrawer', () => addOrEditDrawerVisible.value = false)
+    const { editPk, addOrEditDrawerOpened, operateType, add, del, edit, switchDeleted, save } = getOperations(unref(dataList), search)
+    provide('closeAddOrEditDrawer', () => addOrEditDrawerOpened.value = false)
 
     onMounted(() => {
       search()
@@ -91,7 +91,7 @@ export default defineComponent({
       search,
       dataList,
       operateType,
-      addOrEditDrawerVisible,
+      addOrEditDrawerOpened,
       editPk,
       add,
       edit,

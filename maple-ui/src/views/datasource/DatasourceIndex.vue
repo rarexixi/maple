@@ -59,7 +59,7 @@
     <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total"
       :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper size="small"></a-pagination>
   </div>
-  <datasource-add-or-edit :pk="editPk" :type-version="typeVersion" :visible="addOrEditDrawerVisible"
+  <datasource-add-or-edit :pk="editPk" :type-version="typeVersion" :opened="addOrEditDrawerOpened"
     :operateType="operateType" @save="save" />
 </template>
 
@@ -100,8 +100,8 @@ export default defineComponent({
     })
     const getDatasourceTypeSelectList = listSearch({ url: '/datasource-type/list', method: 'GET' }, datasourceTypeSearchParams, convertList)
 
-    const { editPk, typeVersion, addOrEditDrawerVisible, operateType, add, del, edit, switchDeleted, save } = getOperations(dataPageList, search)
-    provide('closeAddOrEditDrawer', () => addOrEditDrawerVisible.value = false)
+    const { editPk, typeVersion, addOrEditDrawerOpened, operateType, add, del, edit, switchDeleted, save } = getOperations(dataPageList, search)
+    provide('closeAddOrEditDrawer', () => addOrEditDrawerOpened.value = false)
     provide('typeMap', typeMap)
 
     onMounted(() => {
@@ -129,7 +129,7 @@ export default defineComponent({
       search,
       dataPageList,
       operateType,
-      addOrEditDrawerVisible,
+      addOrEditDrawerOpened,
       editPk,
       typeVersion,
       add,

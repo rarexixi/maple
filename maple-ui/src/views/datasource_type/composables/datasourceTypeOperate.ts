@@ -6,7 +6,7 @@ import { reactive, ref } from "vue"
 
 export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () => void) {
     const operateType = ref(common.DataOperationType.default)
-    const visible = ref(false)
+    const opened = ref(false)
     const editPk = reactive({
         typeCode: '',
     })
@@ -16,7 +16,7 @@ export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () =>
         editPk.typeCode = ''
         editIndex.value = -1
         operateType.value = common.DataOperationType.create
-        visible.value = true
+        opened.value = true
     }
 
     const edit = (item: any, index: number, copy = false) => {
@@ -28,7 +28,7 @@ export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () =>
             editIndex.value = index
             operateType.value = common.DataOperationType.update
         }
-        visible.value = true
+        opened.value = true
     }
 
     const save = (detail: any) => {
@@ -65,5 +65,5 @@ export function getOperations(dataList: UnwrapRef<any[]>, operateCallback: () =>
         })
     }
 
-    return { editPk, addOrEditDrawerVisible: visible, operateType, add, del, edit, switchDeleted, save }
+    return { editPk, addOrEditDrawerOpened: opened, operateType, add, del, edit, switchDeleted, save }
 }

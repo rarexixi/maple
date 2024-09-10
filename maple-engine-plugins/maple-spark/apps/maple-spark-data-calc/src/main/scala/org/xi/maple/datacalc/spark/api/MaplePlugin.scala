@@ -33,7 +33,7 @@ trait MaplePlugin[T] extends Serializable {
     exec()
   }
 
-  protected def prepare(): Unit
+  protected def prepare(): Unit = {}
 
   protected def exec(): Unit
 

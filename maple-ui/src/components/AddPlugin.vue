@@ -13,9 +13,9 @@ export default defineComponent({
   setup(props, { emit }) {
 
     const pluginGroup = reactive({
-      sources: ['jdbc', 'managed_jdbc', 'file'],
+      sources: ['jdbc', 'managed_jdbc', 'doris', 'starrocks', 'file'],
       transformations: ['sql'],
-      sinks: ['hive', 'jdbc', 'managed_jdbc', 'file'],
+      sinks: ['hive', 'jdbc', 'doris', 'starrocks', 'managed_jdbc', 'file'],
     })
 
     const plugins = computed(() => {

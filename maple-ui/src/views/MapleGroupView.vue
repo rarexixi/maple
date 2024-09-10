@@ -2,10 +2,14 @@
 import { defineComponent, reactive, ref, toRaw, watch } from "vue"
 import FileSource from "@/components/source/FileSource.vue"
 import JdbcSource from "@/components/source/JdbcSource.vue"
+import DorisSource from "@/components/source/DorisSource.vue"
+import StarRocksSource from "@/components/source/StarRocksSource.vue"
 import ManagedJdbcSource from "@/components/source/ManagedJdbcSource.vue"
 import SqlTransformation from "@/components/transformation/SqlTransformation.vue"
 import FileSink from "@/components/sink/FileSink.vue"
 import JdbcSink from "@/components/sink/JdbcSink.vue"
+import DorisSink from "@/components/sink/DorisSink.vue"
+import StarRocksSink from "@/components/sink/StarRocksSink.vue"
 import ManagedJdbcSink from "@/components/sink/ManagedJdbcSink.vue"
 import HiveSink from "@/components/sink/HiveSink.vue"
 import AddPlugin from "@/components/AddPlugin.vue"
@@ -22,10 +26,14 @@ export default defineComponent({
     PluginOperations,
     FileSource,
     JdbcSource,
+    DorisSource,
+    StarRocksSource,
     ManagedJdbcSource,
     SqlTransformation,
     FileSink,
     JdbcSink,
+    DorisSink,
+    StarRocksSink,
     ManagedJdbcSink,
     HiveSink,
   },

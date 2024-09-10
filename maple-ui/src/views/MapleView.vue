@@ -22,13 +22,15 @@ export default defineComponent({
 <template>
   <a-breadcrumb separator="/">
     <a-breadcrumb-item>数据计算配置</a-breadcrumb-item>
-    <a-radio-group v-model:value="mode">
+    <a-breadcrumb-item>
+      <a-radio-group v-model:value="mode">
         <a-radio value="array">数组</a-radio>
         <a-radio value="group">分组</a-radio>
       </a-radio-group>
+    </a-breadcrumb-item>
   </a-breadcrumb>
-  <maple-array-view v-show="mode == 'array'"/>
-  <maple-group-view v-show="mode == 'group'"/>
+  <maple-array-view v-if="mode == 'array'"/>
+  <maple-group-view v-if="mode == 'group'"/>
 </template>
 
 <style lang="less" scoped>

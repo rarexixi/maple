@@ -1,6 +1,6 @@
 <#include "/include/table/properties.ftl">
 <template>
-    <a-drawer :visible="visible" :title="title" @close="closeDrawer" width="600px">
+    <a-drawer :open="opened" :title="title" @close="closeDrawer" width="600px">
         <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{span: 4}" :wrapper-col="{span: 20}">
             <a-row :gutter="10">
             <#list table.columnsExceptBase as column>
@@ -115,7 +115,7 @@ export default defineComponent({
             type: Number,
             default: () => common.DataOperationType.default
         },
-        visible: {
+        opened: {
             type: Boolean,
             default: () => false
         },
@@ -128,7 +128,7 @@ export default defineComponent({
         </#list>
     },
     setup(props, { emit }) {
-        const { pk, operateType, visible } = toRefs(props)
+        const { pk, operateType, opened } = toRefs(props)
         const title = ref<string>('')
         const formRef = ref()
         const detail = reactive<any>({
@@ -183,7 +183,7 @@ export default defineComponent({
             }
         }
 
-        watch(visible, getDetail)
+        watch(opened, getDetail)
 
         const save = () => {
             formRef.value.validate().then(() => {

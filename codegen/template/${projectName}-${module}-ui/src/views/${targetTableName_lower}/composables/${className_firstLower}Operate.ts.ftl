@@ -7,7 +7,7 @@ import { reactive, ref, UnwrapRef } from "vue"
 
 export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback: () => void) {
     const operateType = ref(common.DataOperationType.default)
-    const visible = ref(false)
+    const opened = ref(false)
     const editPk = reactive({
         <#list pks as column>
         <#include "/include/column/properties.ftl">
@@ -27,7 +27,7 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
         </#list>
         editIndex.value = -1
         operateType.value = common.DataOperationType.create
-        visible.value = true
+        opened.value = true
     }
 
     const edit = (item: any, index: number, copy = false) => {
@@ -42,7 +42,7 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
             editIndex.value = index
             operateType.value = common.DataOperationType.update
         }
-        visible.value = true
+        opened.value = true
     }
 
     const save = (detail: any) => {
@@ -84,5 +84,5 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
         })
     }
 
-    return { editPk, addOrEditDrawerVisible: visible, operateType, add, del, edit<#if table.validStatusColumn??>, switchDeleted</#if>, save }
+    return { editPk, addOrEditDrawerOpened: opened, operateType, add, del, edit<#if table.validStatusColumn??>, switchDeleted</#if>, save }
 }

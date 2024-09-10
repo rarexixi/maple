@@ -133,7 +133,7 @@
         </a-table>
         <a-pagination v-model:current="pageNum" v-model:pageSize="pageSize" :total="dataPageList.total" :page-size-options="pageSizeOptions" show-size-changer show-quick-jumper></a-pagination>
     </div>
-    <${tablePath}-add-or-edit :pk="editPk" :visible="addOrEditDrawerVisible" :operateType="operateType" @save="save"<#list table.fkSelectColumns as column><#include "/include/column/properties.ftl"> :${columnExceptKey}-select-list="${fieldNameExceptKey}SelectList"</#list> />
+    <${tablePath}-add-or-edit :pk="editPk" :opened="addOrEditDrawerOpened" :operateType="operateType" @save="save"<#list table.fkSelectColumns as column><#include "/include/column/properties.ftl"> :${columnExceptKey}-select-list="${fieldNameExceptKey}SelectList"</#list> />
 </template>
 
 <script lang="ts">
@@ -204,8 +204,8 @@ export default defineComponent({
         const get${propertyExceptKey}SelectList = listSearch({ url: '/${column.fkSelectColumn.foreignTargetTableName?replace("_", "-")}/list', method: 'GET' }, ${fieldNameExceptKey}SerarchParams)
         </#list>
 
-        const { editPk, addOrEditDrawerVisible, operateType, add, del, edit<#if table.validStatusColumn??>, switchDeleted</#if>, save } = getOperations(dataPageList, search)
-        provide('closeAddOrEditDrawer', () => addOrEditDrawerVisible.value = false)
+        const { editPk, addOrEditDrawerOpened, operateType, add, del, edit<#if table.validStatusColumn??>, switchDeleted</#if>, save } = getOperations(dataPageList, search)
+        provide('closeAddOrEditDrawer', () => addOrEditDrawerOpened.value = false)
 
         onMounted(() => {
             search()
@@ -235,7 +235,7 @@ export default defineComponent({
             search,
             dataPageList,
             operateType,
-            addOrEditDrawerVisible,
+            addOrEditDrawerOpened,
             editPk,
             add,
             edit,

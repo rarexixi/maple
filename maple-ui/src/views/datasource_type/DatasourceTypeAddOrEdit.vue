@@ -1,5 +1,5 @@
 <template>
-  <a-drawer :visible="visible" :title="title" @close="closeDrawer" width="60%">
+  <a-drawer :open="opened" :title="title" @close="closeDrawer" width="60%">
     <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{ style: { width: '80px' } }">
       <a-row>
         <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -28,56 +28,89 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <h3>数据源配置管理</h3>
-      <div style="width: 100%; overflow-x: auto;">
-        <a-space v-for="(configKey, index) in detail.configKeys" style="width: 1750px; overflow-x: auto"
-          :key="configKey.id">
-          <a-form-item>
-            {{ index + 1 }}
-            <a-button type="link" @click="() => removeConfigKey(configKey)" danger>
-              <template #icon>
-                <MinusCircleOutlined />
-              </template>
-            </a-button>
-          </a-form-item>
-          <a-form-item label="版本" :name="['configKeys', index, 'versions']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.versions" />
-          </a-form-item>
-          <a-form-item label="配置编码" :name="['configKeys', index, 'keyCode']" :label-col="subFormLabelCol"
-            :rules="[{ required: true, message: '配置编码不能为空', trigger: 'blur' }]">
-            <a-input v-model:value="configKey.keyCode" />
-          </a-form-item>
-          <a-form-item label="配置名" :name="['configKeys', index, 'keyName']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.keyName" style="width: 120px" />
-          </a-form-item>
-          <a-form-item label="默认值" :name="['configKeys', index, 'defaultValue']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.defaultValue" />
-          </a-form-item>
-          <a-form-item label="类型" :name="['configKeys', index, 'valueType']" :label-col="subFormLabelCol">
-            <a-select v-model:value="configKey.valueType" style="width: 120px">
-              <a-select-option value="STRING">STRING</a-select-option>
-              <a-select-option value="TEXT">TEXT</a-select-option>
-              <a-select-option value="PASSWORD">PASSWORD</a-select-option>
-              <a-select-option value="JSON">JSON</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="必填" :name="['configKeys', index, 'required']" :label-col="subFormLabelCol">
-            <a-switch v-model:checked="configKey.required" :checked-value="1" :un-checked-value="0" />
-          </a-form-item>
-          <a-form-item label="校验正则" :name="['configKeys', index, 'valueRegex']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.valueRegex" style="width: 250px" />
-          </a-form-item>
-          <a-form-item label="配置说明" :name="['configKeys', index, 'description']" :label-col="subFormLabelCol">
-            <a-input v-model:value="configKey.description" style="width: 250px" />
-          </a-form-item>
-        </a-space>
-      </div>
-      <a-form-item>
-        <a-button type="dashed" block @click="addConfigKey">
-          <PlusOutlined />
+      <h3>
+        <span style="font-weight: bold">数据源配置管理</span>
+        <a-button type="dashed" @click="addConfigKey" style="margin-left: 10px">
+          <PlusOutlined/>
           添加配置项
         </a-button>
-      </a-form-item>
+      </h3>
+      <div style="width: 100%; overflow-x: auto;">
+        <table class="config-keys-table" style="text-align: left;">
+          <thead>
+          <tr>
+            <th style="position: sticky; left: 0; z-index: 2"></th>
+            <th style="position: sticky; left: 32px; z-index: 2">配置编码</th>
+            <th>配置名</th>
+            <th>版本</th>
+            <th>默认值</th>
+            <th>类型</th>
+            <th>必填</th>
+            <th>校验正则</th>
+            <th>配置说明</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(configKey, index) in detail.configKeys">
+            <td style="position: sticky; left: 0; z-index: 2;">
+              <a-form-item style="width: 30px">
+                <a-button type="link" @click="() => removeConfigKey(configKey)" danger>
+                  <template #icon>
+                    <MinusCircleOutlined/>
+                  </template>
+                </a-button>
+              </a-form-item>
+            </td>
+            <td style="position: sticky; left: 32px; z-index: 2;">
+              <a-form-item label="" :name="['configKeys', index, 'keyCode']" :label-col="subFormLabelCol"
+                           :rules="[{ required: true, message: '配置编码不能为空', trigger: 'blur' }]">
+                <a-input v-model:value="configKey.keyCode" style="width: 170px"/>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'keyName']" :label-col="subFormLabelCol">
+                <a-input v-model:value="configKey.keyName" style="width: 120px"/>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'versions']" :label-col="subFormLabelCol">
+                <a-input v-model:value="configKey.versions" style="width: 170px"/>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'defaultValue']" :label-col="subFormLabelCol">
+                <a-input v-model:value="configKey.defaultValue" style="width: 170px"/>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'valueType']" :label-col="subFormLabelCol">
+                <a-select v-model:value="configKey.valueType" style="width: 120px">
+                  <a-select-option value="STRING">STRING</a-select-option>
+                  <a-select-option value="TEXT">TEXT</a-select-option>
+                  <a-select-option value="PASSWORD">PASSWORD</a-select-option>
+                  <a-select-option value="JSON">JSON</a-select-option>
+                </a-select>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'required']" :label-col="subFormLabelCol">
+                <a-switch v-model:checked="configKey.required" :checked-value="1" :un-checked-value="0"/>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'valueRegex']" :label-col="subFormLabelCol">
+                <a-input v-model:value="configKey.valueRegex" style="width: 250px"/>
+              </a-form-item>
+            </td>
+            <td>
+              <a-form-item label="" :name="['configKeys', index, 'description']" :label-col="subFormLabelCol">
+                <a-input v-model:value="configKey.description" style="width: 250px"/>
+              </a-form-item>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
       <a-form-item>
         <a-button type="primary" html-type="submit">保存</a-button>
         <a-button style="margin-left: 10px" @click="closeDrawer">取消</a-button>
@@ -133,13 +166,13 @@ export default defineComponent({
       type: Number,
       default: () => common.DataOperationType.default
     },
-    visible: {
+    opened: {
       type: Boolean,
       default: () => false
     },
   },
   setup(props, { emit }) {
-    const { pk, operateType, visible } = toRefs(props)
+    const { pk, operateType, opened } = toRefs(props)
     const title = ref<string>('')
     const formRef = ref()
     const detail = reactive<any>({
@@ -182,7 +215,7 @@ export default defineComponent({
       }
     }
 
-    watch(visible, getDetail)
+    watch(opened, getDetail)
 
     const save = () => {
       formRef.value.validate().then(() => {
@@ -239,4 +272,19 @@ export default defineComponent({
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+
+.config-keys-table {
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.config-keys-table th,
+.config-keys-table td {
+  background-color: #ffffff !important;
+}
+
+.config-keys-table th {
+  padding: 3px;
+}
+</style>

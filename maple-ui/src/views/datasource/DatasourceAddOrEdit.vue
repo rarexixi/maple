@@ -1,5 +1,5 @@
 <template>
-  <a-drawer :visible="visible" :title="`${title} ${typeMap[detail.datasourceType]} ${detail.version}`"
+  <a-drawer :open="opened" :title="`${title} ${typeMap[detail.datasourceType]} ${detail.version}`"
     @close="closeDrawer" width="600px">
     <a-form ref="formRef" :model="detail" @finish="save" :rules="rules" :label-col="{ span: 4 }"
       :wrapper-col="{ span: 20 }">
@@ -9,7 +9,7 @@
       <a-form-item ref="description" label="描述" name="description">
         <a-input v-model:value.trim="detail.description" type="text" />
       </a-form-item>
-      <template v-for="(item, _index) in datasourceTypeDetail.configKeys" :key="index">
+      <template v-for="(item, index) in datasourceTypeDetail.configKeys" :key="index">
         <a-form-item :ref="item.keyCode" :label="item.keyName" :name="['datasourceConfig', item.keyCode]"
           :rules="getRules(item)">
           <template v-if="item.valueType === 'STRING'">
@@ -75,13 +75,13 @@ export default defineComponent({
       type: Number,
       default: () => common.DataOperationType.default
     },
-    visible: {
+    opened: {
       type: Boolean,
       default: () => false
     },
   },
   setup(props, { emit }) {
-    const { pk, typeVersion, operateType, visible } = toRefs(props)
+    const { pk, typeVersion, operateType, opened } = toRefs(props)
     const title = ref<string>('')
     const formRef = ref()
     const detail = reactive<any>({
@@ -142,7 +142,7 @@ export default defineComponent({
       }
     }
 
-    watch(visible, getDetail)
+    watch(opened, getDetail)
 
     const save = () => {
       formRef.value.validate().then(() => {

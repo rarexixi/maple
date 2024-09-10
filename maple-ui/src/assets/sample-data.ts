@@ -38,6 +38,31 @@ const PluginModels: any = {
                 query: '',
             }
         }),
+        'doris': () => ({
+            type: 'source',
+            name: 'doris',
+            config: {
+                ...getBaseSource(),
+                fenodes: '',
+                user: '',
+                password: '',
+                database: '',
+                table: '',
+            }
+        }),
+        'star_rocks': () => ({
+            type: 'source',
+            name: 'starrocks',
+            config: {
+                ...getBaseSource(),
+                feHttpUrl: '',
+                feJdbcUrl: '',
+                user: '',
+                password: '',
+                database: '',
+                table: '',
+            }
+        }),
         'managed_jdbc': () => ({
             type: 'source',
             name: 'managed_jdbc',
@@ -88,6 +113,35 @@ const PluginModels: any = {
                 ...getBaseSink(),
                 url: '',
                 driver: '',
+                user: '',
+                password: '',
+                targetDatabase: '',
+                targetTable: '',
+                saveMode: 'overwrite',
+                preQueries: [],
+            }
+        }),
+        'doris': () => ({
+            type: 'sink',
+            name: 'doris',
+            config: {
+                ...getBaseSink(),
+                fenodes: '',
+                user: '',
+                password: '',
+                targetDatabase: '',
+                targetTable: '',
+                saveMode: 'overwrite',
+                preQueries: [],
+            }
+        }),
+        'star_rocks': () => ({
+            type: 'sink',
+            name: 'starrocks',
+            config: {
+                ...getBaseSink(),
+                feHttpUrl: '',
+                feJdbcUrl: '',
                 user: '',
                 password: '',
                 targetDatabase: '',
@@ -386,7 +440,6 @@ const SampleArrayConfig: any = {
             }
         },
         {
-            "type": "source",
             "name": "sql",
             "type": "transformation",
             "config": {

@@ -7,7 +7,7 @@ import { reactive, ref } from "vue"
 
 export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback: () => void) {
     const operateType = ref(common.DataOperationType.default)
-    const visible = ref(false)
+    const opened = ref(false)
     const typeVersion = ref(['', ''])
     const editPk = reactive({
         id: undefined
@@ -19,7 +19,7 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
         typeVersion.value = dsType.keyPath
         editIndex.value = -1
         operateType.value = common.DataOperationType.create
-        visible.value = true
+        opened.value = true
     }
 
     const edit = (item: any, index: number, copy = false) => {
@@ -31,7 +31,7 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
             editIndex.value = index
             operateType.value = common.DataOperationType.update
         }
-        visible.value = true
+        opened.value = true
     }
 
     const save = (detail: any) => {
@@ -68,5 +68,5 @@ export function getOperations(dataPageList: UnwrapRef<PageInfo>, operateCallback
         })
     }
 
-    return { editPk, typeVersion, addOrEditDrawerVisible: visible, operateType, add, del, edit, switchDeleted, save }
+    return { editPk, typeVersion, addOrEditDrawerOpened: opened, operateType, add, del, edit, switchDeleted, save }
 }

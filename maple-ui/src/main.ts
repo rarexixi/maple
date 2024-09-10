@@ -4,7 +4,7 @@ import router from './router'
 import Antd, { message, Input } from 'ant-design-vue'
 import * as AntdIcons from '@ant-design/icons-vue'
 
-import 'ant-design-vue/dist/antd.css'
+import 'ant-design-vue/dist/reset.css'
 import '@/assets/styles/antv-override.less'
 import '@/assets/main.css'
 
