@@ -51,7 +51,7 @@ generator:
   common-properties:
     projectName: maple
     module: persistence
-    serviceApplicatioName: MapleDatasourceApplication
+    serviceApplicationName: MapleDatasourceApplication
     servicePort: 8082
     modulePackage: org.xi.maple.persistence
     commonPackage: org.xi.maple.common
