@@ -1,25 +1,26 @@
 package org.xi.maple.persistence.service.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.xi.maple.common.constant.DeletedConstant;
+import org.xi.maple.common.constant.ValidConstant;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.service.util.ObjectUtils;
-import org.xi.maple.persistence.model.request.ClusterAddRequest;
-import org.xi.maple.persistence.model.request.ClusterPatchRequest;
-import org.xi.maple.persistence.model.request.ClusterQueryRequest;
-import org.xi.maple.persistence.model.request.ClusterSaveRequest;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.persistence.persistence.condition.ClusterSelectCondition;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.persistence.condition.ClusterFilterCondition;
+import org.xi.maple.persistence.persistence.condition.ClusterPkCondition;
 import org.xi.maple.persistence.persistence.entity.ClusterEntity;
 import org.xi.maple.persistence.persistence.entity.ClusterEntityExt;
 import org.xi.maple.persistence.persistence.mapper.ClusterMapper;
+import org.xi.maple.persistence.model.request.ClusterQueryReq;
+import org.xi.maple.persistence.model.request.ClusterSaveReq;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.ClusterItemResp;
 import org.xi.maple.persistence.service.ClusterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,122 +37,153 @@ public class ClusterServiceImpl implements ClusterService {
     final ClusterMapper clusterMapper;
     final RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
     public ClusterServiceImpl(ClusterMapper clusterMapper, RedisTemplate<String, Object> redisTemplate) {
         this.clusterMapper = clusterMapper;
         this.redisTemplate = redisTemplate;
     }
 
-
     /**
      * 添加集群
      *
-     * @param addRequest 集群
+     * @param createReq 集群
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public ClusterDetailResponse add(ClusterAddRequest addRequest) {
-        ClusterEntity entity = ObjectUtils.copy(addRequest, ClusterEntity.class);
+    public ClusterDetailResp create(ClusterSaveReq createReq) {
+        ClusterEntity entity = ObjectUtils.copy(createReq, ClusterEntity.class);
         clusterMapper.insert(entity);
-        sendRefreshClusterMsg(ClusterMessage.Type.ADD, addRequest.getName());
+        sendRefreshClusterMsg(ClusterMessage.Type.ADD, createReq.getName());
         return getByName(entity.getName());
     }
+
+
+    // region 删除/启用/禁用
 
     /**
      * 删除集群
      *
-     * @param patchRequest 删除条件请求
+     * @param name       集群名称
+     * @param baseEntity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public int delete(ClusterPatchRequest patchRequest) {
-        int count = clusterMapper.deleteByPk(patchRequest.getName());
-        sendRefreshClusterMsg(ClusterMessage.Type.DELETE, patchRequest.getName());
-        return count;
+    public int deleteByName(String name, BaseEntity baseEntity) {
+        ClusterPkCondition condition = getPkCondition(name);
+        sendRefreshClusterMsg(ClusterMessage.Type.DELETE, name);
+        return clusterMapper.deleteByCondition(condition);
     }
 
     /**
      * 禁用集群
      *
-     * @param patchRequest 禁用条件请求
+     * @param name       集群名称
+     * @param baseEntity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public int disable(ClusterPatchRequest patchRequest) {
-        ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
-        entity.setDeleted(DeletedConstant.INVALID);
-        int count = clusterMapper.updateByPk(entity, patchRequest.getName());
-        sendRefreshClusterMsg(ClusterMessage.Type.DELETE, patchRequest.getName());
-        return count;
+    public int disableByName(String name, BaseEntity baseEntity) {
+        ClusterPkCondition condition = getPkCondition(name);
+        ClusterEntity entity = ObjectUtils.copy(baseEntity, ClusterEntity.class);
+        entity.setDisabled(ValidConstant.INVALID);
+        sendRefreshClusterMsg(ClusterMessage.Type.DELETE, name);
+        return clusterMapper.patchByCondition(condition, entity);
     }
 
     /**
      * 启用集群
      *
-     * @param patchRequest 启用条件请求
+     * @param name       集群名称
+     * @param baseEntity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public int enable(ClusterPatchRequest patchRequest) {
-        ClusterEntity entity = ObjectUtils.copy(patchRequest, ClusterEntity.class, "name");
-        entity.setDeleted(DeletedConstant.VALID);
-        int count = clusterMapper.updateByPk(entity, patchRequest.getName());
-        sendRefreshClusterMsg(ClusterMessage.Type.ADD, patchRequest.getName());
-        return count;
+    public int enableByName(String name, BaseEntity baseEntity) {
+        ClusterPkCondition condition = getPkCondition(name);
+        ClusterEntity entity = ObjectUtils.copy(baseEntity, ClusterEntity.class);
+        entity.setDisabled(ValidConstant.VALID);
+        sendRefreshClusterMsg(ClusterMessage.Type.ADD, name);
+        return clusterMapper.patchByCondition(condition, entity);
     }
 
+    // endregion 删除/启用/禁用
+
+    // region 更新
+
     /**
-     * 根据集群名称更新集群
+     * 根据更新集群
      *
-     * @param saveRequest 保存集群请求实体
+     * @param name    集群名称
+     * @param saveReq 保存集群请求实体
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest) {
-        ClusterEntity entity = ObjectUtils.copy(saveRequest, ClusterEntity.class);
-        clusterMapper.updateByPk(entity, saveRequest.getName());
-        sendRefreshClusterMsg(ClusterMessage.Type.UPDATE, saveRequest.getName());
-        return getByName(saveRequest.getName());
+    public ClusterDetailResp patchByName(String name, ClusterSaveReq saveReq) {
+        ClusterPkCondition condition = getPkCondition(name);
+        ClusterEntity entity = ObjectUtils.copy(saveReq, ClusterEntity.class);
+        clusterMapper.patchByCondition(condition, entity);
+        sendRefreshClusterMsg(ClusterMessage.Type.UPDATE, saveReq.getName());
+        return getByName(name);
     }
 
     /**
-     * 根据集群名称获取集群详情
+     * 根据更新集群
+     *
+     * @param name    集群名称
+     * @param saveReq 保存集群请求实体
+     * @return 更新后的集群详情
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    @Override
+    @Transactional
+    public ClusterDetailResp updateByName(String name, ClusterSaveReq saveReq) {
+        ClusterEntity entity = ObjectUtils.copy(saveReq, ClusterEntity.class);
+        clusterMapper.updateByName(name, entity);
+        sendRefreshClusterMsg(ClusterMessage.Type.UPDATE, name);
+        return getByName(name);
+    }
+    // endregion 更新
+
+    // region 详情
+
+    /**
+     * 根据获取集群详情
      *
      * @param name 集群名称
      * @return 集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
-    @Transactional(readOnly = true)
-    public ClusterDetailResponse getByName(String name) {
-        ClusterEntityExt entity = clusterMapper.detailByPk(name);
+    public ClusterDetailResp getByName(String name) {
+        ClusterEntityExt entity = clusterMapper.getByName(name);
         if (entity == null) {
             throw new MapleDataNotFoundException("集群不存在");
         }
-        return ObjectUtils.copy(entity, ClusterDetailResponse.class);
+        return ObjectUtils.copy(entity, ClusterDetailResp.class);
     }
+    // endregion 详情
 
     /**
      * 获取集群列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @return 符合条件的集群列表
      */
     @Override
-    @Transactional(readOnly = true)
-    public List<ClusterListItemResponse> getList(ClusterQueryRequest queryRequest) {
-        ClusterSelectCondition condition = ObjectUtils.copy(queryRequest, ClusterSelectCondition.class);
-        List<ClusterEntity> list = clusterMapper.select(condition);
-        return ObjectUtils.copy(list, ClusterListItemResponse.class);
+    public List<ClusterItemResp> getList(ClusterQueryReq queryReq) {
+        ClusterFilterCondition condition = ObjectUtils.copy(queryReq, ClusterFilterCondition.class);
+        List<ClusterEntity> list = clusterMapper.select(condition, null, queryReq.getSort());
+        return ObjectUtils.copy(list, ClusterItemResp.class);
     }
 
     private void sendRefreshClusterMsg(ClusterMessage.Type type, String clusterName) {
@@ -160,5 +192,11 @@ public class ClusterServiceImpl implements ClusterService {
         } catch (Throwable t) {
             logger.error("发送集群刷新消息失败, cluster: {}, type: {}", clusterName, type, t);
         }
+    }
+
+    private ClusterPkCondition getPkCondition(String name) {
+        ClusterPkCondition condition = new ClusterPkCondition();
+        condition.setName(name);
+        return condition;
     }
 }

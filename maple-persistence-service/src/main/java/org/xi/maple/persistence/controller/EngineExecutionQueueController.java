@@ -1,9 +1,13 @@
 package org.xi.maple.persistence.controller;
 
+import org.xi.maple.common.annotation.Jsr303ValidGroup;
+import org.xi.maple.common.annotation.SetFieldTypes;
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueItemResp;
 import org.xi.maple.persistence.service.EngineExecutionQueueService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +19,15 @@ import javax.validation.constraints.*;
 import java.net.URI;
 import java.util.List;
 
+import static org.xi.maple.common.constant.SetFieldType.*;
+
 @CrossOrigin
-@RequestMapping("/engine-execution-queue")
+@RequestMapping(EngineExecutionQueueController.BASE_URL)
 @RestController
 @Validated
 public class EngineExecutionQueueController {
+
+    public static final String BASE_URL = "/api/engine-execution-queues";
 
     private final EngineExecutionQueueService engineExecutionQueueService;
 
@@ -28,26 +36,44 @@ public class EngineExecutionQueueController {
         this.engineExecutionQueueService = engineExecutionQueueService;
     }
 
-    @PostMapping("/add-or-update")
-    public ResponseEntity<OperateResult<Integer>> add(@Validated @RequestBody EngineExecutionQueueSaveRequest engineExecutionQueue) {
-        OperateResult<Integer> result = engineExecutionQueueService.addOrUpdate(engineExecutionQueue);
-        return ResponseEntity.created(URI.create("")).body(result);
+    // region 创建
+
+    @PostMapping
+    public ResponseEntity<OperateResult<Integer>> upsert(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) EngineExecutionQueueSaveReq engineExecutionQueue) {
+        OperateResult<Integer> result = engineExecutionQueueService.upsert(engineExecutionQueue);
+        String detailPath = String.format("%s/%s", BASE_URL, engineExecutionQueue.getQueueName());
+        return ResponseEntity.created(URI.create(detailPath)).body(result);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Integer> delete(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName) {
-        Integer count = engineExecutionQueueService.delete(queueName);
+    // endregion 创建
+
+    // region 删除/启用/禁用
+
+    @DeleteMapping("/{queueName}")
+    public ResponseEntity<Integer> deleteByQueueName(
+            @PathVariable("queueName") @NotBlank(message = "queueName(执行队列名)不能为空") String queueName,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = engineExecutionQueueService.deleteByQueueName(queueName, baseEntity);
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<EngineExecutionQueue> getByQueueName(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName) {
-        EngineExecutionQueue detail = engineExecutionQueueService.getByQueueName(queueName);
+    // endregion 删除/启用/禁用
+
+    // region 详情
+
+    @GetMapping("/{queueName}")
+    public ResponseEntity<EngineExecutionQueueDetailResp> getByQueueName(
+            @PathVariable("queueName") @Validated @NotBlank(message = "queueName(执行队列名)不能为空") String queueName
+    ) {
+        EngineExecutionQueueDetailResp detail = engineExecutionQueueService.getByQueueName(queueName);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<EngineExecutionQueue>> getList(EngineExecutionQueueQueryRequest queryRequest) {
-        return ResponseEntity.ok(engineExecutionQueueService.getList(queryRequest));
+    // endregion 详情
+
+    @GetMapping("/all")
+    public ResponseEntity<List<EngineExecutionQueueItemResp>> getList(EngineExecutionQueueQueryReq queryReq) {
+        return ResponseEntity.ok(engineExecutionQueueService.getList(queryReq));
     }
 }

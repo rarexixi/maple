@@ -10,8 +10,8 @@
         <result property="fromApp" column="from_app"/>
         <result property="group" column="group"/>
         <result property="priority" column="priority"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <sql id="tableName">`maple_engine_execution_queue`</sql>
@@ -26,8 +26,8 @@
             <if test="entity.fromApp != null">`from_app`,</if>
             <if test="entity.group != null">`group`,</if>
             <if test="entity.priority != null">`priority`,</if>
-            <if test="entity.createTime != null">`create_time`,</if>
-            <if test="entity.updateTime != null">`update_time`,</if>
+            <if test="entity.createdAt != null">`created_at`,</if>
+            <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.queueName != null">#{entity.queueName},</if>
@@ -36,26 +36,50 @@
             <if test="entity.fromApp != null">#{entity.fromApp},</if>
             <if test="entity.group != null">#{entity.group},</if>
             <if test="entity.priority != null">#{entity.priority},</if>
-            <if test="entity.createTime != null">#{entity.createTime},</if>
-            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+            <if test="entity.createdAt != null">#{entity.createdAt},</if>
+            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
         </trim>
     </insert>
 
-    <!--根据主键条件删除执行队列-->
-    <delete id="deleteByPk">
+    <!--todo 插入具体的列-->
+    <!--批量插入执行队列-->
+    <insert id="batchInsert">
+        insert into <include refid="tableName"/>
+        (
+            `queue_name`,
+            `cluster`,
+            `cluster_queue`,
+            `from_app`,
+            `group`,
+            `priority`,
+            `created_at`,
+            `updated_at`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.queueName},
+            #{item.cluster},
+            #{item.clusterQueue},
+            #{item.fromApp},
+            #{item.group},
+            #{item.priority},
+            #{item.createdAt},
+            #{item.updatedAt}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据条件删除执行队列-->
+    <delete id="deleteByCondition">
         DELETE FROM <include refid="tableName"/>
-        <where>
-            `queue_name` = #{pk}
-        </where>
+        <include refid="updateByPkWhere"/>
     </delete>
 
-    <!--根据主键条件更新执行队列-->
-    <update id="updateByPk">
+    <!--根据条件更新执行队列实体不为空的字段-->
+    <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
-            <if test="entity.queueName != null">
-                `queue_name` = #{entity.queueName},
-            </if>
             <if test="entity.cluster != null">
                 `cluster` = #{entity.cluster},
             </if>
@@ -71,36 +95,98 @@
             <if test="entity.priority != null">
                 `priority` = #{entity.priority},
             </if>
-            <if test="entity.createTime != null">
-                `create_time` = #{entity.createTime},
-            </if>
-            <if test="entity.updateTime != null">
-                `update_time` = #{entity.updateTime}
+            <if test="entity.updatedAt != null">
+                `updated_at` = #{entity.updatedAt}
             </if>
         </set>
+        <include refid="updateByPkWhere"/>
+    </update>
+
+    <!--根据条件更新执行队列所有字段-->
+    <update id="updateByQueueName">
+        UPDATE <include refid="tableName"/>
+        <set>
+            `cluster` = #{entity.cluster},
+            `cluster_queue` = #{entity.clusterQueue},
+            `from_app` = #{entity.fromApp},
+            `group` = #{entity.group},
+            `priority` = #{entity.priority},
+            `updated_at` = #{entity.updatedAt}
+        </set>
         <where>
-            `queue_name` = #{pk}
+            `queue_name` = #{queueName}
         </where>
     </update>
 
     <!--根据主键获取执行队列详情-->
-    <select id="detailByPk" resultMap="BaseResultMap">
-        SELECT DISTINCT
-        MT.`queue_name`,
-        MT.`cluster`,
-        MT.`cluster_queue`,
-        MT.`from_app`,
-        MT.`group`,
-        MT.`priority`,
-        MT.`create_time`,
-        MT.`update_time`
+    <select id="getByQueueName" resultMap="BaseResultMap">
+        SELECT
+            MT.`queue_name`,
+            MT.`cluster`,
+            MT.`cluster_queue`,
+            MT.`from_app`,
+            MT.`group`,
+            MT.`priority`,
+            MT.`created_at`,
+            MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
         <where>
-            MT.`queue_name` = #{pk}
+            MT.`queue_name` = #{queueName}
         </where>
     </select>
 
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="BaseResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
+            </when>
+            <otherwise>
+                MT.`queue_name`,
+                MT.`cluster`,
+                MT.`cluster_queue`,
+                MT.`from_app`,
+                MT.`group`,
+                MT.`priority`,
+                MT.`created_at`,
+                MT.`updated_at`
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <choose>
+                    <when test="condition.queueName != null">
+                        `queue_name` = #{condition.queueName}
+                    </when>
+                    <otherwise>
+                        `queue_name` IN
+                        <foreach collection="condition.queueNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
     <sql id="where">
         <where>
             <if test="condition == null">1!=1</if>
@@ -257,55 +343,28 @@
                         AND MT.`priority` <= #{condition.priorityMax}
                         ]]>
                     </if>
-                    <if test="condition.createTimeMin != null">
+                    <if test="condition.createdAtMin != null">
                         <![CDATA[
-                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        AND MT.`created_at` >= #{condition.createdAtMin}
                         ]]>
                     </if>
-                    <if test="condition.createTimeMax != null">
+                    <if test="condition.createdAtMax != null">
                         <![CDATA[
-                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        AND MT.`created_at` <= #{condition.createdAtMax}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMin != null">
+                    <if test="condition.updatedAtMin != null">
                         <![CDATA[
-                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        AND MT.`updated_at` >= #{condition.updatedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMax != null">
+                    <if test="condition.updatedAtMax != null">
                         <![CDATA[
-                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        AND MT.`updated_at` <= #{condition.updatedAtMax}
                         ]]>
                     </if>
                 </trim>
             </if>
         </where>
     </sql>
-    <select id="select" resultMap="BaseResultMap">
-        SELECT
-        <if test="condition.columns != null">
-            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
-        </if>
-        <if test="condition.columns == null">
-            MT.`queue_name`,
-            MT.`cluster`,
-            MT.`cluster_queue`,
-            MT.`from_app`,
-            MT.`group`,
-            MT.`priority`,
-            MT.`create_time`,
-            MT.`update_time`
-        </if>
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-        <if test="condition.orderBy != null">
-            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
-        </if>
-    </select>
-
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-    </select>
 </mapper>

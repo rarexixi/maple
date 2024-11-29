@@ -1,7 +1,7 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.persistence.entity;
 
-import ${modulePackage}.model.BaseEntity;
+import ${commonPackage}.model.BaseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

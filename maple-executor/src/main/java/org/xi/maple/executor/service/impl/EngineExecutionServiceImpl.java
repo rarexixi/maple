@@ -8,7 +8,7 @@ import org.xi.maple.executor.builder.EngineExecutor;
 import org.xi.maple.executor.builder.strategy.K8SEngineExecutor;
 import org.xi.maple.executor.builder.strategy.YarnEngineExecutor;
 import org.xi.maple.executor.service.EngineExecutionService;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     }
 
     @Override
-    public void execute(EngineExecutionDetailResponse execution) {
+    public void execute(EngineExecutionDetailResp execution) {
         getEngineBuilder(execution.getClusterCategory()).execute(execution);
     }
 

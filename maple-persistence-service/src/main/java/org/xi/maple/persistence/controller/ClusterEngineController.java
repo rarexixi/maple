@@ -1,12 +1,15 @@
 package org.xi.maple.persistence.controller;
 
-import org.springframework.cloud.openfeign.SpringQueryMap;
+import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.annotation.SetFieldTypes;
 import org.xi.maple.common.model.EngineConf;
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.*;
-import org.xi.maple.persistence.model.response.ClusterEngineDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterEngineListItemResponse;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
+import org.xi.maple.persistence.model.request.ClusterEngineQueryReq;
+import org.xi.maple.persistence.model.request.ClusterEngineSaveReq;
+import org.xi.maple.persistence.model.response.ClusterEngineDetailResp;
+import org.xi.maple.persistence.model.response.ClusterEngineItemResp;
 import org.xi.maple.persistence.service.ClusterEngineService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +17,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 
+import static org.xi.maple.common.constant.SetFieldType.*;
+
 @CrossOrigin
-@RequestMapping("cluster-engine")
+@RequestMapping(ClusterEngineController.BASE_URL)
 @RestController
 @Validated
 public class ClusterEngineController {
+
+    public static final String BASE_URL = "/api/cluster-engines";
 
     private final ClusterEngineService clusterEngineService;
 
@@ -34,47 +38,82 @@ public class ClusterEngineController {
         this.clusterEngineService = clusterEngineService;
     }
 
-    @PostMapping("add")
-    public ResponseEntity<ClusterEngineDetailResponse> add(@Validated @RequestBody @SetFieldTypes(types = {"create"}) ClusterEngineAddRequest clusterEngine) {
-        ClusterEngineDetailResponse detail = clusterEngineService.add(clusterEngine);
-        return ResponseEntity.created(URI.create("")).body(detail);
+    // region 创建
+
+    @PostMapping
+    public ResponseEntity<ClusterEngineDetailResp> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) ClusterEngineSaveReq clusterEngine) {
+        ClusterEngineDetailResp detail = clusterEngineService.create(clusterEngine);
+        String detailPath = String.format("%s/%s", BASE_URL, detail.getId());
+        return ResponseEntity.created(URI.create(detailPath)).body(detail);
     }
 
-    @DeleteMapping("delete")
-    public ResponseEntity<Integer> delete(@Validated @SetFieldTypes(types = {"update"}) ClusterEnginePatchRequest patchRequest) {
-        Integer count = clusterEngineService.delete(patchRequest);
+    // endregion 创建
+
+    // region 删除/启用/禁用
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Integer> deleteById(
+            @PathVariable("id") @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = clusterEngineService.deleteById(id, baseEntity);
         return ResponseEntity.ok(count);
     }
 
+    // endregion 删除/启用/禁用
 
-    @PatchMapping("update")
-    public ResponseEntity<ClusterEngineDetailResponse> updateById(@Validated @RequestBody @SetFieldTypes(types = {"update"}) ClusterEngineSaveRequest clusterEngine) {
-        ClusterEngineDetailResponse detail = clusterEngineService.updateById(clusterEngine);
+    // region 更新
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClusterEngineDetailResp> updateById(
+            @PathVariable("id") @Validated @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id,
+            @Validated({Jsr303ValidGroup.Put.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterEngineSaveReq clusterEngine
+    ) {
+        ClusterEngineDetailResp detail = clusterEngineService.updateById(id, clusterEngine);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("detail")
-    public ResponseEntity<ClusterEngineDetailResponse> getById(@RequestParam("id") @NotNull(message = "引擎ID不能为空") @Min(value = 1, message = "引擎ID必须大于0") Integer id) {
-        ClusterEngineDetailResponse detail = clusterEngineService.getById(id);
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClusterEngineDetailResp> patchById(
+            @PathVariable("id") @Validated @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id,
+            @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterEngineSaveReq clusterEngine
+    ) {
+        ClusterEngineDetailResp detail = clusterEngineService.patchById(id, clusterEngine);
         return ResponseEntity.ok(detail);
     }
-    @GetMapping("/detail-conf")
+
+    // endregion 更新
+
+    // region 详情
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClusterEngineDetailResp> getById(
+            @PathVariable("id") @Validated @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id
+    ) {
+        ClusterEngineDetailResp detail = clusterEngineService.getById(id);
+        return ResponseEntity.ok(detail);
+    }
+
+    // todo
+    @GetMapping("/{id}/conf")
     public ResponseEntity<EngineConf> getEngineConf(ClusterEngineDefaultConfGetRequest request) {
         EngineConf detail = clusterEngineService.getEngineConf(request);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("list")
-    public ResponseEntity<List<ClusterEngineListItemResponse>> getList(ClusterEngineQueryRequest queryRequest) {
-        return ResponseEntity.ok(clusterEngineService.getList(queryRequest));
+    // endregion 详情
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ClusterEngineItemResp>> getList(ClusterEngineQueryReq queryReq) {
+        return ResponseEntity.ok(clusterEngineService.getList(queryReq));
     }
 
-    @GetMapping("page-list")
-    public ResponseEntity<PageList<ClusterEngineListItemResponse>> getPageList(
-            ClusterEngineQueryRequest queryRequest,
+    @GetMapping
+    public ResponseEntity<PageList<ClusterEngineItemResp>> getPageList(
+            ClusterEngineQueryReq queryReq,
             @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "50") @Min(value = 1, message = "分页大小必须大于0") Integer pageSize
     ) {
-        return ResponseEntity.ok(clusterEngineService.getPageList(queryRequest, pageNum, pageSize));
+        return ResponseEntity.ok(clusterEngineService.getPageList(queryReq, pageNum, pageSize));
     }
 }

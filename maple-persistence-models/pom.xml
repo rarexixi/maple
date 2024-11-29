@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>maple-persistence-models</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <name>maple-persistence-models</name>
 
     <dependencies>
         <dependency>
@@ -24,17 +24,10 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

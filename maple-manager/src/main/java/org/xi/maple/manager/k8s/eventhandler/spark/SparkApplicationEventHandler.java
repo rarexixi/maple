@@ -3,7 +3,7 @@ package org.xi.maple.manager.k8s.eventhandler.spark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.constant.EngineCategoryConstants;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.manager.k8s.BaseResourceEventHandler;
 import org.xi.maple.manager.k8s.crds.spark.SparkApplication;
 import org.xi.maple.manager.k8s.crds.spark.SparkApplicationSpec;
@@ -16,17 +16,17 @@ public class SparkApplicationEventHandler extends BaseResourceEventHandler<Spark
 
     private static final Logger logger = LoggerFactory.getLogger(SparkApplicationEventHandler.class);
 
-    public SparkApplicationEventHandler(BiFunction<Integer, EngineExecutionUpdateStatusRequest, Integer> updateFunc) {
+    public SparkApplicationEventHandler(BiFunction<Integer, EngineExecutionStatusUpdateReq, Integer> updateFunc) {
         super(logger, updateFunc, EngineCategoryConstants.SPARK);
     }
 
     @Override
-    public EngineExecutionUpdateStatusRequest getState(SparkApplication obj) {
+    public EngineExecutionStatusUpdateReq getState(SparkApplication obj) {
         Map<String, Object> applicationState;
         if (obj.getStatus() != null && (applicationState = obj.getStatus().getApplicationState()) != null && applicationState.containsKey("state")) {
             String raw_status = String.valueOf(applicationState.get("state"));
             String status = ""; // todo
-            return new EngineExecutionUpdateStatusRequest(status, raw_status);
+            return new EngineExecutionStatusUpdateReq(status, raw_status);
         }
         return null;
     }

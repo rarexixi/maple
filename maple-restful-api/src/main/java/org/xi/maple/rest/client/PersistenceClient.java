@@ -3,53 +3,56 @@ package org.xi.maple.rest.client;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.constant.MapleServiceName;
-import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.rest.client.fallback.PersistenceClientFallbackFactory;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.persistence.model.request.*;
+import org.xi.maple.persistence.model.response.*;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
 import java.util.List;
 
-@FeignClient(value = MapleServiceName.PERSISTENCE, fallbackFactory = PersistenceClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
+@FeignClient(value = MapleServiceName.PERSISTENCE, configuration = MapleFeignHeadersInterceptor.class)
 @LoadBalancerClient(name = MapleServiceName.PERSISTENCE, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface PersistenceClient {
 
-    @PostMapping("/engine-execution/add")
-    Integer addExecution(@RequestBody EngineExecutionAddRequest engineExecution);
+    // region engine-execution
 
-    @GetMapping("/engine-execution/detail")
-    EngineExecutionDetailResponse getExecutionById(@RequestParam("id") Integer id);
+    @PostMapping("/api/engine-executions")
+    Integer addExecution(@RequestBody EngineExecutionSaveReq req);
 
-    @PatchMapping("/engine-execution/update-status/{id}")
-    Integer updateExecutionStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateStatusRequest);
+    @GetMapping("/api/engine-executions/{id}")
+    EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);
 
-    @PatchMapping("/engine-execution/update-ext-info")
-    Integer updateExecutionInfoById(@RequestParam("id")Integer id, @RequestBody EngineExecutionUpdateRequest updateRequest);
+    @PatchMapping("/api/engine-executions/{id}/status")
+    Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
+    @PatchMapping("/api/engine-executions/{id}/ext-info")
+    Integer updateExecutionInfoById(@PathVariable("id") Integer id, @RequestBody EngineExecutionExtUpdateReq req);
 
-    @PostMapping("/engine-execution-queue/add-or-update")
-    OperateResult<Integer> addOrUpdateExecQueue(@RequestBody MapleEngineExecutionQueue engineExecutionQueue);
+    // endregion
 
-    @DeleteMapping("/engine-execution-queue/delete")
-    Integer deleteExecQueue(@RequestParam("queueName") String queueName);
+    // region engine-execution-queue
 
-    @GetMapping("/engine-execution-queue/detail")
-    EngineExecutionQueue getExecQueueByName(@RequestParam("queueName") String queueName);
+    @PostMapping("/api/engine-execution-queues")
+    OperateResult<Integer> upsertExecQueue(@RequestBody EngineExecutionQueueSaveReq req);
 
-    @GetMapping("/engine-execution-queue/list")
-    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryRequest queryRequest);
+    @DeleteMapping("/api/engine-execution-queues/{queueName}")
+    Integer deleteExecQueue(@PathVariable("queueName") String queueName);
 
-    @GetMapping("/application/detail")
-    ApplicationDetailResponse getByAppName(@RequestParam("appName") String appName);
+    @GetMapping("/api/engine-execution-queues/{queueName}")
+    EngineExecutionQueue getExecQueueByName(@PathVariable("queueName") String queueName);
+
+    @GetMapping("/api/engine-execution-queues/all")
+    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryReq req);
+
+    // endregion
+
+    // region application
+
+    @GetMapping("/api/applications/{appName}")
+    ApplicationDetailResp getByAppName(@PathVariable("appName") String appName);
+
+    // endregion
 }

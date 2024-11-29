@@ -1,12 +1,14 @@
 package org.xi.maple.persistence.controller;
 
+import org.xi.maple.common.annotation.Jsr303ValidGroup;
+import org.xi.maple.common.annotation.SetFieldTypes;
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
+import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionItemResp;
 import org.xi.maple.persistence.service.EngineExecutionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +19,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.*;
 import java.net.URI;
 
+import static org.xi.maple.common.constant.SetFieldType.*;
+
 @CrossOrigin
-@RequestMapping("engine-execution")
+@RequestMapping(EngineExecutionController.BASE_URL)
 @RestController
 @Validated
 public class EngineExecutionController {
+
+    public static final String BASE_URL = "/api/engine-executions";
 
     private final EngineExecutionService engineExecutionService;
 
@@ -30,36 +36,60 @@ public class EngineExecutionController {
         this.engineExecutionService = engineExecutionService;
     }
 
-    @PostMapping("add")
-    public ResponseEntity<Integer> add(@Validated @RequestBody EngineExecutionAddRequest engineExecution) {
-        Integer id = engineExecutionService.add(engineExecution);
-        return ResponseEntity.created(URI.create("")).body(id);
+    // region 创建
+
+    @PostMapping
+    public ResponseEntity<Integer> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) EngineExecutionSaveReq engineExecution) {
+        Integer id = engineExecutionService.create(engineExecution);
+        String detailPath = String.format("%s/%s", BASE_URL, id);
+        return ResponseEntity.created(URI.create(detailPath)).body(id);
     }
 
-    @PatchMapping("update-status/{id}")
-    public ResponseEntity<Integer> updateStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateRequest) {
+    // endregion 创建
+
+    // region 更新
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Integer> updateStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionStatusUpdateReq updateRequest) {
         int count = engineExecutionService.updateStatusById(id, updateRequest);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/update-ext-info/{id}")
-    public ResponseEntity<Integer> updateExtInfoById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateRequest updateRequest) {
-        int count = engineExecutionService.updateExtInfoById(id, updateRequest);
+    @PatchMapping("/{id}/ext-info")
+    public ResponseEntity<Integer> patchExtInfoById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionExtUpdateReq updateRequest) {
+        int count = engineExecutionService.patchExtInfoById(id, updateRequest);
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("detail")
-    public ResponseEntity<EngineExecutionDetailResponse> getById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id) {
-        EngineExecutionDetailResponse detail = engineExecutionService.getById(id);
+    @PatchMapping("/{id}")
+    public ResponseEntity<EngineExecutionDetailResp> patchById(
+            @PathVariable("id") @Validated @NotNull(message = "id(执行ID)不能为空") @Min(value = 1, message = "id(执行ID)必须大于0") Integer id,
+            @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) EngineExecutionSaveReq engineExecution
+    ) {
+        EngineExecutionDetailResp detail = engineExecutionService.patchById(id, engineExecution);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("page-list")
-    public ResponseEntity<PageList<EngineExecutionListItemResponse>> getPageList(
-            EngineExecutionQueryRequest queryRequest,
+    // endregion 更新
+
+    // region 详情
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EngineExecutionDetailResp> getById(
+            @PathVariable("id") @Validated @NotNull(message = "id(执行ID)不能为空") @Min(value = 1, message = "id(执行ID)必须大于0") Integer id
+    ) {
+        EngineExecutionDetailResp detail = engineExecutionService.getById(id);
+        return ResponseEntity.ok(detail);
+    }
+
+    // endregion 详情
+
+    @GetMapping
+    public ResponseEntity<PageList<EngineExecutionItemResp>> getPageList(
+            EngineExecutionQueryReq queryReq,
             @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "50") @Min(value = 1, message = "分页大小必须大于0") Integer pageSize
     ) {
-        return ResponseEntity.ok(engineExecutionService.getPageList(queryRequest, pageNum, pageSize));
+        return ResponseEntity.ok(engineExecutionService.getPageList(queryReq, pageNum, pageSize));
     }
 }

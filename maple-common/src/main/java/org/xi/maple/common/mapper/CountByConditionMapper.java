@@ -1,20 +1,18 @@
 package org.xi.maple.common.mapper;
 
 import org.apache.ibatis.annotations.Param;
-import org.xi.maple.common.model.SelectCondition;
-
-import java.util.List;
+import org.xi.maple.common.model.db.condition.FilterCondition;
 
 /**
  * @author xishihao
  */
-public interface CountByConditionMapper<C extends SelectCondition> {
+public interface CountByConditionMapper<C extends FilterCondition> {
 
     /**
-     * 根据条件查询
+     * 根据条件查询总数
      *
      * @param condition 查询条件
-     * @return 实体列表
+     * @return 总数
      */
     int count(@Param("condition") C condition);
 }

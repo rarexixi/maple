@@ -1,7 +1,7 @@
 package org.xi.maple.executor.service;
 
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 public interface EngineExecutionService {
-    void execute(EngineExecutionDetailResponse execution);
+    void execute(EngineExecutionDetailResp execution);
 }

@@ -1,9 +1,9 @@
 package org.xi.maple.manager.service;
 
 import org.xi.maple.common.model.ClusterMessage;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 
 import java.util.List;
@@ -13,17 +13,17 @@ public interface ExecutionService {
 
     void submitExecution(int execId);
 
-    void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback);
+    void submitExecution(EngineExecutionDetailResp execution, Runnable queueBusyCallback);
 
     Object kill(Integer id);
 
     Object stop(Integer id, Map<String, ?> cancelParams);
 
-    List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest request);
+    List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryReq request);
 
-    EngineExecutionDetailResponse getExecutionById(int execId);
+    EngineExecutionDetailResp getExecutionById(int execId);
 
-    void updateExecutionStatus(int execId, EngineExecutionUpdateStatusRequest statusRequest);
+    void updateExecutionStatus(int execId, EngineExecutionStatusUpdateReq statusRequest);
 
     void refreshCluster(ClusterMessage clusterMessage);
 }

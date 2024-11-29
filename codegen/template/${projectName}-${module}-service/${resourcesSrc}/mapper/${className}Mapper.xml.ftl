@@ -59,28 +59,19 @@
         </foreach>
     </insert>
 
-    <!--根据<#if (table.hasUniPk)>${uniPkComment}<#else>主键条件</#if>删除${tableComment}-->
-    <delete id="<#if (table.hasUniPk)><#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>deleteById<#else>deleteByPk</#if><#else>deleteByCondition</#if>">
+    <!--根据条件删除${tableComment}-->
+    <delete id="deleteByCondition">
         DELETE FROM <include refid="tableName"/>
-        <where>
-        <#if (table.hasUniPk)>
-            `${uniPk.columnName}` = <@mapperEl uniPkFieldName/>
-        <#else>
-        <#list pks as column>
-            <#include "/include/column/properties.ftl">
-            <#if (column_index > 0)>AND </#if>`${column.columnName}` = <@mapperEl 'condition.' + fieldName/>
-        </#list>
-        </#if>
-        </where>
+        <include refid="updateByPkWhere"/>
     </delete>
 
-    <!--根据<#if (table.hasUniPk)>${uniPkComment}<#else>主键条件</#if>更新${tableComment}-->
-    <update id="<#if (table.hasUniPk)><#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>updateById<#else>updateByPk</#if><#else>updateByCondition</#if>">
+    <!--根据条件更新${tableComment}实体不为空的字段-->
+    <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
             <#list table.columns as column>
             <#include "/include/column/properties.ftl">
-            <#if (column.pk && column.autoIncrement)>
+            <#if (column.pk || column.cannotUpdate)>
             <#else>
             <if test="entity.${fieldName} != null">
                 `${column.columnName}` = <@mapperEl 'entity.' + fieldName/><#if column?has_next>,</#if>
@@ -88,20 +79,31 @@
             </#if>
             </#list>
         </set>
-        <where>
-        <#if (table.hasUniPk)>
-            `${uniPk.columnName}` = <@mapperEl uniPkFieldName/>
-        <#else>
-        <#list pks as column>
+        <include refid="updateByPkWhere"/>
+    </update>
+
+    <!--根据条件更新${tableComment}所有字段-->
+    <update id="updateBy<@pkTrav "pk_fun_names" />">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <#list table.columns as column>
             <#include "/include/column/properties.ftl">
-            <#if (column_index > 0)>AND </#if>`${column.columnName}` = <@mapperEl 'condition.' + fieldName/>
-        </#list>
-        </#if>
+            <#if (column.validStatus || column.pk || column.cannotUpdate)>
+            <#else>
+            `${column.columnName}` = <@mapperEl 'entity.' + fieldName/><#if column?has_next>,</#if>
+            </#if>
+            </#list>
+        </set>
+        <where>
+            <#list pks as column>
+            <#include "/include/column/properties.ftl">
+            <#if (column_index > 0)>AND </#if>`${column.columnName}` = <@mapperEl fieldName/>
+            </#list>
         </where>
     </update>
 
     <!--根据主键获取${tableComment}详情-->
-    <select id="<#if (table.hasUniPk)><#if (uniPkFieldType == "Integer") && (uniPkFieldName == "id")>detailById<#else>detailByPk</#if><#else>detailByCondition</#if>" resultMap="ExtResultMap">
+    <select id="getBy<@pkTrav "pk_fun_names" />" resultMap="ExtResultMap">
         SELECT
         <#assign fkIndex = 0>
         <#list table.columns as column>
@@ -122,17 +124,66 @@
             </#list>
         </#if>
         <where>
-        <#if (table.hasUniPk)>
-            `${uniPk.columnName}` = <@mapperEl uniPkFieldName/>
-        <#else>
         <#list pks as column>
             <#include "/include/column/properties.ftl">
             <#if (column_index > 0)>AND </#if>MT.`${column.columnName}` = <@mapperEl fieldName/>
         </#list>
-        </#if>
         </where>
     </select>
 
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`<@$ 'it'/>`</foreach>
+            </when>
+            <otherwise>
+                <#list table.columns as column>
+                MT.`${column.columnName}`<#if column?has_next>,</#if>
+                </#list>
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.<@$ 'key'/> <@$ 'val'/></foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <#if (table.hasUniPk)>
+                <choose>
+                    <when test="condition.${uniPkFieldName} != null">
+                        `${uniPk.columnName}` = <@mapperEl 'condition.' + uniPkFieldName/>
+                    </when>
+                    <otherwise>
+                        `${uniPk.columnName}` IN
+                        <foreach collection="condition.${fieldName}In" item="it" open="(" close=")" separator=","><@mapperEl 'it'/></foreach>
+                    </otherwise>
+                </choose>
+                <#else>
+                <#list pks as column>
+                    <#include "/include/column/properties.ftl">
+                    <#if (column_index > 0)>AND </#if>`${column.columnName}` = <@mapperEl 'condition.' + fieldName/>
+                </#list>
+                </#if>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
     <sql id="where">
         <where>
             <if test="condition == null">1!=1</if>
@@ -200,26 +251,4 @@
             </if>
         </where>
     </sql>
-    <select id="select" resultMap="ExtResultMap">
-        SELECT
-        <if test="condition.columns != null">
-            <foreach collection="condition.columns" item="it" separator=",">MT.`<@$ 'it'/>`</foreach>
-        </if>
-        <if test="condition.columns == null">
-            <#list table.columns as column>
-            MT.`${column.columnName}`<#if column?has_next>,</#if>
-            </#list>
-        </if>
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-        <if test="condition.orderBy != null">
-            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.<@$ 'key'/> <@$ 'val'/></foreach>
-        </if>
-    </select>
-
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-    </select>
 </mapper>

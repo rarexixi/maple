@@ -9,11 +9,11 @@
         <result property="address" column="address"/>
         <result property="desc" column="desc"/>
         <result property="configuration" column="configuration"/>
-        <result property="deleted" column="deleted"/>
-        <result property="createUser" column="create_user"/>
-        <result property="updateUser" column="update_user"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
+        <result property="disabled" column="disabled"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEntityExt">
     </resultMap>
@@ -29,11 +29,11 @@
             <if test="entity.address != null">`address`,</if>
             <if test="entity.desc != null">`desc`,</if>
             <if test="entity.configuration != null">`configuration`,</if>
-            <if test="entity.deleted != null">`deleted`,</if>
-            <if test="entity.createUser != null">`create_user`,</if>
-            <if test="entity.updateUser != null">`update_user`,</if>
-            <if test="entity.createTime != null">`create_time`,</if>
-            <if test="entity.updateTime != null">`update_time`,</if>
+            <if test="entity.disabled != null">`disabled`,</if>
+            <if test="entity.createdBy != null">`created_by`,</if>
+            <if test="entity.updatedBy != null">`updated_by`,</if>
+            <if test="entity.createdAt != null">`created_at`,</if>
+            <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.name != null">#{entity.name},</if>
@@ -41,11 +41,11 @@
             <if test="entity.address != null">#{entity.address},</if>
             <if test="entity.desc != null">#{entity.desc},</if>
             <if test="entity.configuration != null">#{entity.configuration},</if>
-            <if test="entity.deleted != null">#{entity.deleted},</if>
-            <if test="entity.createUser != null">#{entity.createUser},</if>
-            <if test="entity.updateUser != null">#{entity.updateUser},</if>
-            <if test="entity.createTime != null">#{entity.createTime},</if>
-            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+            <if test="entity.disabled != null">#{entity.disabled},</if>
+            <if test="entity.createdBy != null">#{entity.createdBy},</if>
+            <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
+            <if test="entity.createdAt != null">#{entity.createdAt},</if>
+            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
         </trim>
     </insert>
 
@@ -59,11 +59,11 @@
             `address`,
             `desc`,
             `configuration`,
-            `deleted`,
-            `create_user`,
-            `update_user`,
-            `create_time`,
-            `update_time`
+            `disabled`,
+            `created_by`,
+            `updated_by`,
+            `created_at`,
+            `updated_at`
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -73,30 +73,25 @@
             #{item.address},
             #{item.desc},
             #{item.configuration},
-            #{item.deleted},
-            #{item.createUser},
-            #{item.updateUser},
-            #{item.createTime},
-            #{item.updateTime}
+            #{item.disabled},
+            #{item.createdBy},
+            #{item.updatedBy},
+            #{item.createdAt},
+            #{item.updatedAt}
         )
         </foreach>
     </insert>
 
-    <!--根据集群名称删除集群-->
-    <delete id="deleteByPk">
+    <!--根据条件删除集群-->
+    <delete id="deleteByCondition">
         DELETE FROM <include refid="tableName"/>
-        <where>
-            `name` = #{name}
-        </where>
+        <include refid="updateByPkWhere"/>
     </delete>
 
-    <!--根据集群名称更新集群-->
-    <update id="updateByPk">
+    <!--根据条件更新集群实体不为空的字段-->
+    <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
-            <if test="entity.name != null">
-                `name` = #{entity.name},
-            </if>
             <if test="entity.category != null">
                 `category` = #{entity.category},
             </if>
@@ -109,21 +104,29 @@
             <if test="entity.configuration != null">
                 `configuration` = #{entity.configuration},
             </if>
-            <if test="entity.deleted != null">
-                `deleted` = #{entity.deleted},
+            <if test="entity.disabled != null">
+                `disabled` = #{entity.disabled},
             </if>
-            <if test="entity.createUser != null">
-                `create_user` = #{entity.createUser},
+            <if test="entity.updatedBy != null">
+                `updated_by` = #{entity.updatedBy},
             </if>
-            <if test="entity.updateUser != null">
-                `update_user` = #{entity.updateUser},
+            <if test="entity.updatedAt != null">
+                `updated_at` = #{entity.updatedAt}
             </if>
-            <if test="entity.createTime != null">
-                `create_time` = #{entity.createTime},
-            </if>
-            <if test="entity.updateTime != null">
-                `update_time` = #{entity.updateTime}
-            </if>
+        </set>
+        <include refid="updateByPkWhere"/>
+    </update>
+
+    <!--根据条件更新集群所有字段-->
+    <update id="updateByName">
+        UPDATE <include refid="tableName"/>
+        <set>
+            `category` = #{entity.category},
+            `address` = #{entity.address},
+            `desc` = #{entity.desc},
+            `configuration` = #{entity.configuration},
+            `updated_by` = #{entity.updatedBy},
+            `updated_at` = #{entity.updatedAt}
         </set>
         <where>
             `name` = #{name}
@@ -131,25 +134,78 @@
     </update>
 
     <!--根据主键获取集群详情-->
-    <select id="detailByPk" resultMap="ExtResultMap">
+    <select id="getByName" resultMap="ExtResultMap">
         SELECT
             MT.`name`,
             MT.`category`,
             MT.`address`,
             MT.`desc`,
             MT.`configuration`,
-            MT.`deleted`,
-            MT.`create_user`,
-            MT.`update_user`,
-            MT.`create_time`,
-            MT.`update_time`
+            MT.`disabled`,
+            MT.`created_by`,
+            MT.`updated_by`,
+            MT.`created_at`,
+            MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
         <where>
-            `name` = #{name}
+            MT.`name` = #{name}
         </where>
     </select>
 
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
+            </when>
+            <otherwise>
+                MT.`name`,
+                MT.`category`,
+                MT.`address`,
+                MT.`desc`,
+                MT.`configuration`,
+                MT.`disabled`,
+                MT.`created_by`,
+                MT.`updated_by`,
+                MT.`created_at`,
+                MT.`updated_at`
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <choose>
+                    <when test="condition.name != null">
+                        `name` = #{condition.name}
+                    </when>
+                    <otherwise>
+                        `name` IN
+                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
     <sql id="where">
         <where>
             <if test="condition == null">1!=1</if>
@@ -259,102 +315,73 @@
                     <if test="condition.descContains != null and condition.descContains != ''">
                         AND MT.`desc` LIKE concat('%', #{condition.descContains}, '%')
                     </if>
-                    <if test="condition.deleted != null">
-                        AND MT.`deleted` = #{condition.deleted}
+                    <if test="condition.disabled != null">
+                        AND MT.`disabled` = #{condition.disabled}
                     </if>
-                    <if test="condition.createUser != null">
-                        AND MT.`create_user` = #{condition.createUser}
+                    <if test="condition.createdBy != null">
+                        AND MT.`created_by` = #{condition.createdBy}
                     </if>
-                    <if test="condition.createUserIn != null and condition.createUserIn.size() > 0">
-                        AND MT.`create_user` IN
-                        <foreach collection="condition.createUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.createdByIn != null and condition.createdByIn.size() > 0">
+                        AND MT.`created_by` IN
+                        <foreach collection="condition.createdByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.createUserNotIn != null and condition.createUserNotIn.size() > 0">
-                        AND MT.`create_user` NOT IN
-                        <foreach collection="condition.createUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.createdByNotIn != null and condition.createdByNotIn.size() > 0">
+                        AND MT.`created_by` NOT IN
+                        <foreach collection="condition.createdByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.createUserMin != null">
+                    <if test="condition.createdByMin != null">
                         <![CDATA[
-                        AND MT.`create_user` >= #{condition.createUserMin}
+                        AND MT.`created_by` >= #{condition.createdByMin}
                         ]]>
                     </if>
-                    <if test="condition.createUserMax != null">
+                    <if test="condition.createdByMax != null">
                         <![CDATA[
-                        AND MT.`create_user` <= #{condition.createUserMax}
+                        AND MT.`created_by` <= #{condition.createdByMax}
                         ]]>
                     </if>
-                    <if test="condition.updateUser != null">
-                        AND MT.`update_user` = #{condition.updateUser}
+                    <if test="condition.updatedBy != null">
+                        AND MT.`updated_by` = #{condition.updatedBy}
                     </if>
-                    <if test="condition.updateUserIn != null and condition.updateUserIn.size() > 0">
-                        AND MT.`update_user` IN
-                        <foreach collection="condition.updateUserIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.updatedByIn != null and condition.updatedByIn.size() > 0">
+                        AND MT.`updated_by` IN
+                        <foreach collection="condition.updatedByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.updateUserNotIn != null and condition.updateUserNotIn.size() > 0">
-                        AND MT.`update_user` NOT IN
-                        <foreach collection="condition.updateUserNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.updatedByNotIn != null and condition.updatedByNotIn.size() > 0">
+                        AND MT.`updated_by` NOT IN
+                        <foreach collection="condition.updatedByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.updateUserMin != null">
+                    <if test="condition.updatedByMin != null">
                         <![CDATA[
-                        AND MT.`update_user` >= #{condition.updateUserMin}
+                        AND MT.`updated_by` >= #{condition.updatedByMin}
                         ]]>
                     </if>
-                    <if test="condition.updateUserMax != null">
+                    <if test="condition.updatedByMax != null">
                         <![CDATA[
-                        AND MT.`update_user` <= #{condition.updateUserMax}
+                        AND MT.`updated_by` <= #{condition.updatedByMax}
                         ]]>
                     </if>
-                    <if test="condition.createTimeMin != null">
+                    <if test="condition.createdAtMin != null">
                         <![CDATA[
-                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        AND MT.`created_at` >= #{condition.createdAtMin}
                         ]]>
                     </if>
-                    <if test="condition.createTimeMax != null">
+                    <if test="condition.createdAtMax != null">
                         <![CDATA[
-                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        AND MT.`created_at` <= #{condition.createdAtMax}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMin != null">
+                    <if test="condition.updatedAtMin != null">
                         <![CDATA[
-                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        AND MT.`updated_at` >= #{condition.updatedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMax != null">
+                    <if test="condition.updatedAtMax != null">
                         <![CDATA[
-                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        AND MT.`updated_at` <= #{condition.updatedAtMax}
                         ]]>
                     </if>
                 </trim>
             </if>
         </where>
     </sql>
-    <select id="select" resultMap="ExtResultMap">
-        SELECT
-        <if test="condition.columns != null">
-            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
-        </if>
-        <if test="condition.columns == null">
-            MT.`name`,
-            MT.`category`,
-            MT.`address`,
-            MT.`desc`,
-            MT.`configuration`,
-            MT.`deleted`,
-            MT.`create_user`,
-            MT.`update_user`,
-            MT.`create_time`,
-            MT.`update_time`
-        </if>
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-        <if test="condition.orderBy != null">
-            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
-        </if>
-    </select>
-
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-    </select>
 </mapper>

@@ -1,13 +1,13 @@
 package org.xi.maple.persistence.controller;
 
+import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.annotation.SetFieldTypes;
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.ApplicationAddRequest;
-import org.xi.maple.persistence.model.request.ApplicationPatchRequest;
-import org.xi.maple.persistence.model.request.ApplicationQueryRequest;
-import org.xi.maple.persistence.model.request.ApplicationSaveRequest;
-import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
-import org.xi.maple.persistence.model.response.ApplicationListItemResponse;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.ApplicationQueryReq;
+import org.xi.maple.persistence.model.request.ApplicationSaveReq;
+import org.xi.maple.persistence.model.response.ApplicationDetailResp;
+import org.xi.maple.persistence.model.response.ApplicationItemResp;
 import org.xi.maple.persistence.service.ApplicationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +15,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 
+import static org.xi.maple.common.constant.SetFieldType.*;
+
 @CrossOrigin
-@RequestMapping("/application")
+@RequestMapping(ApplicationController.BASE_URL)
 @RestController
 @Validated
 public class ApplicationController {
+
+    public static final String BASE_URL = "/api/applications";
 
     private final ApplicationService applicationService;
 
@@ -35,56 +36,93 @@ public class ApplicationController {
         this.applicationService = applicationService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApplicationDetailResponse> add(@Validated @RequestBody @SetFieldTypes(types = {"create"}) ApplicationAddRequest application) {
-        ApplicationDetailResponse detail = applicationService.add(application);
-        return ResponseEntity.created(URI.create("")).body(detail);
+    // region 创建
+
+    @PostMapping
+    public ResponseEntity<ApplicationDetailResp> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) ApplicationSaveReq application) {
+        ApplicationDetailResp detail = applicationService.create(application);
+        String detailPath = String.format("%s/%s", BASE_URL, detail.getAppName());
+        return ResponseEntity.created(URI.create(detailPath)).body(detail);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Integer> delete(@Validated @SetFieldTypes(types = {"update"}) ApplicationPatchRequest patchRequest) {
-        Integer count = applicationService.delete(patchRequest);
-        return ResponseEntity.ok(count);
-    }
+    // endregion 创建
 
-    @PatchMapping("/disable")
-    public ResponseEntity<Integer> disable(@Validated @SetFieldTypes(types = {"update"}) ApplicationPatchRequest patchRequest) {
-        Integer count = applicationService.disable(patchRequest);
-        return ResponseEntity.ok(count);
-    }
+    // region 删除/启用/禁用
 
-    @PatchMapping("/enable")
-    public ResponseEntity<Integer> enable(@Validated @SetFieldTypes(types = {"update"}) ApplicationPatchRequest patchRequest) {
-        Integer count = applicationService.enable(patchRequest);
-        return ResponseEntity.ok(count);
-    }
-
-    @PatchMapping("/update")
-    public ResponseEntity<ApplicationDetailResponse> updateByAppName(
-            @Validated @RequestBody @SetFieldTypes(types = {"update"}) ApplicationSaveRequest application,
-            @RequestParam("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName
+    @DeleteMapping("/{appName}")
+    public ResponseEntity<Integer> deleteByAppName(
+            @PathVariable("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
     ) {
-        ApplicationDetailResponse detail = applicationService.updateByAppName(application, appName);
+        Integer count = applicationService.deleteByAppName(appName, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    @PatchMapping("/disable/{appName}")
+    public ResponseEntity<Integer> disableByAppName(
+            @PathVariable("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = applicationService.disableByAppName(appName, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    @PatchMapping("/enable/{appName}")
+    public ResponseEntity<Integer> enableByAppName(
+            @PathVariable("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = applicationService.enableByAppName(appName, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    // endregion 删除/启用/禁用
+
+    // region 更新
+
+    @PutMapping("/{appName}")
+    public ResponseEntity<ApplicationDetailResp> updateByAppName(
+            @PathVariable("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName,
+            @Validated({Jsr303ValidGroup.Put.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ApplicationSaveReq application
+    ) {
+        ApplicationDetailResp detail = applicationService.updateByAppName(appName, application);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<ApplicationDetailResponse> getByAppName(@RequestParam("appName") @NotBlank(message = "应用名称不能为空") String appName) {
-        ApplicationDetailResponse detail = applicationService.getByAppName(appName);
+    @PatchMapping("/{appName}")
+    public ResponseEntity<ApplicationDetailResp> patchByAppName(
+            @PathVariable("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName,
+            @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ApplicationSaveReq application
+    ) {
+        ApplicationDetailResp detail = applicationService.patchByAppName(appName, application);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<ApplicationListItemResponse>> getList(ApplicationQueryRequest queryRequest) {
-        return ResponseEntity.ok(applicationService.getList(queryRequest));
+    // endregion 更新
+
+    // region 详情
+
+    @GetMapping("/{appName}")
+    public ResponseEntity<ApplicationDetailResp> getByAppName(
+            @PathVariable("appName") @NotBlank(message = "appName(应用名称)不能为空") String appName
+    ) {
+        ApplicationDetailResp detail = applicationService.getByAppName(appName);
+        return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/page-list")
-    public ResponseEntity<PageList<ApplicationListItemResponse>> getPageList(
-            ApplicationQueryRequest queryRequest,
+    // endregion 详情
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ApplicationItemResp>> getList(ApplicationQueryReq queryReq) {
+        return ResponseEntity.ok(applicationService.getList(queryReq));
+    }
+
+    @GetMapping
+    public ResponseEntity<PageList<ApplicationItemResp>> getPageList(
+            ApplicationQueryReq queryReq,
             @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "50") @Min(value = 1, message = "分页大小必须大于0") Integer pageSize
     ) {
-        return ResponseEntity.ok(applicationService.getPageList(queryRequest, pageNum, pageSize));
+        return ResponseEntity.ok(applicationService.getPageList(queryReq, pageNum, pageSize));
     }
 }

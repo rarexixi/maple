@@ -1,11 +1,10 @@
 package org.xi.maple.persistence.service;
 
-import org.xi.maple.persistence.model.request.ClusterAddRequest;
-import org.xi.maple.persistence.model.request.ClusterPatchRequest;
-import org.xi.maple.persistence.model.request.ClusterQueryRequest;
-import org.xi.maple.persistence.model.request.ClusterSaveRequest;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.ClusterQueryReq;
+import org.xi.maple.persistence.model.request.ClusterSaveReq;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.ClusterItemResp;
 
 import java.util.List;
 
@@ -19,62 +18,76 @@ public interface ClusterService {
     /**
      * 添加集群
      *
-     * @param addRequest 集群
+     * @param createReq 集群
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResponse add(ClusterAddRequest addRequest);
+    ClusterDetailResp create(ClusterSaveReq createReq);
 
     /**
      * 删除集群
      *
-     * @param patchRequest 删除条件请求
+     * @param name 集群名称
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int delete(ClusterPatchRequest patchRequest);
+    int deleteByName(String name, BaseEntity entity);
 
     /**
      * 禁用集群
      *
-     * @param patchRequest 禁用条件请求
+     * @param name 集群名称
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int disable(ClusterPatchRequest patchRequest);
+    int disableByName(String name, BaseEntity entity);
 
     /**
      * 启用集群
      *
-     * @param patchRequest 启用条件请求
+     * @param name 集群名称
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int enable(ClusterPatchRequest patchRequest);
+    int enableByName(String name, BaseEntity entity);
 
     /**
-     * 根据集群名称更新集群
+     * 根据更新集群
      *
-     * @param saveRequest 保存集群请求实体
+     * @param name 集群名称
+     * @param saveReq 保存集群请求实体
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResponse updateByName(ClusterSaveRequest saveRequest);
+    ClusterDetailResp patchByName(String name, ClusterSaveReq saveReq);
 
     /**
-     * 根据集群名称获取集群详情
+     * 根据更新集群
+     *
+     * @param name 集群名称
+     * @param saveReq 保存集群请求实体
+     * @return 更新后的集群详情
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    ClusterDetailResp updateByName(String name, ClusterSaveReq saveReq);
+
+    /**
+     * 根据获取集群详情
      *
      * @param name 集群名称
      * @return 集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResponse getByName(String name);
+    ClusterDetailResp getByName(String name);
 
     /**
      * 获取集群列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @return 符合条件的集群列表
      */
-    List<ClusterListItemResponse> getList(ClusterQueryRequest queryRequest);
+    List<ClusterItemResp> getList(ClusterQueryReq queryReq);
 }

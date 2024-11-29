@@ -1,29 +1,28 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.service.impl;
 
-import ${commonPackage}.constant.DeletedConstant;
+import ${commonPackage}.constant.ValidConstant;
 import ${commonPackage}.exception.MapleDataNotFoundException;
 import ${commonPackage}.model.PageList;
-import ${commonPackage}.util.ObjectUtils;
-import ${modulePackage}.persistence.condition.${className}SelectCondition;
-import ${modulePackage}.persistence.condition.${className}UpdateCondition;
+import ${commonPackage}.model.BaseEntity;
+import ${commonStarterPackage}.util.ObjectUtils;
+import ${modulePackage}.persistence.condition.${className}FilterCondition;
+import ${modulePackage}.persistence.condition.${className}PkCondition;
 import ${modulePackage}.persistence.entity.${className}Entity;
 import ${modulePackage}.persistence.entity.${className}EntityExt;
 import ${modulePackage}.persistence.mapper.${className}Mapper;
-import ${modulePackage}.model.request.${className}AddRequest;
-import ${modulePackage}.model.request.${className}PatchRequest;
-import ${modulePackage}.model.request.${className}QueryRequest;
-import ${modulePackage}.model.request.${className}SaveRequest;
-import ${modulePackage}.model.response.${className}DetailResponse;
-import ${modulePackage}.model.response.${className}ListItemResponse;
+import ${modulePackage}.model.request.${className}QueryReq;
+import ${modulePackage}.model.request.${className}SaveReq;
+import ${modulePackage}.model.response.${className}DetailResp;
+import ${modulePackage}.model.response.${className}ItemResp;
 import ${modulePackage}.service.${className}Service;
+import com.github.pagehelper.ISelect;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,16 +43,16 @@ public class ${className}ServiceImpl implements ${className}Service {
     /**
      * 添加${tableComment}
      *
-     * @param addRequest ${tableComment}
+     * @param createReq ${tableComment}
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
     @Transactional
-    public ${className}DetailResponse add(${className}AddRequest addRequest) {
-        ${className}Entity entity = ObjectUtils.copy(addRequest, ${className}Entity.class);
+    public ${className}DetailResp create(${className}SaveReq createReq) {
+        ${className}Entity entity = ObjectUtils.copy(createReq, ${className}Entity.class);
         ${classNameFirstLower}Mapper.insert(entity);
-        return getBy<#include "/include/table/pk_fun_names.ftl">(<#list pks as column><#include "/include/column/properties.ftl">entity.get${propertyName}()<#if (column?has_next)>, </#if></#list>);
+        return getBy<@pkTrav "pk_fun_names" />(<#list pks as column><#include "/include/column/properties.ftl">entity.get${propertyName}()<#if (column?has_next)>, </#if></#list>);
     }
 
     /**
@@ -65,110 +64,107 @@ public class ${className}ServiceImpl implements ${className}Service {
      */
     @Override
     @Transactional
-    public int batchAdd(Collection<${className}AddRequest> list) {
+    public int batchCreate(List<${className}SaveReq> list) {
         List<${className}Entity> entityList = ObjectUtils.copy(list, ${className}Entity.class);
         return ${classNameFirstLower}Mapper.batchInsert(entityList);
     }
 
-    <#-- region 删除/启用/禁用 -->
+    // region 删除<#if hasValidStatusColumn>/启用/禁用</#if>
+
     /**
      * 删除${tableComment}
      *
-     * @param patchRequest 删除条件请求
+     <@pkTrav "batch_pk_params_comment" true "     "/>
+     * @param baseEntity
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
     @Transactional
-    public int delete(${className}PatchRequest patchRequest) {
-        <#if (table.hasUniPk)>
-        <#else>
-            ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
-        </#if>
-        return ${classNameFirstLower}Mapper.deleteBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(<#if (table.hasUniPk)>patchRequest.get${uniPkPropertyName}()<#else>condition</#if>);
+    public int deleteBy<@pkTrav "pk_fun_names" />(<@pkTrav "batch_pk_params" true /> BaseEntity baseEntity) {
+        ${className}PkCondition condition = getPkCondition(<@pkTrav "batch_pk_values" />);
+        return ${classNameFirstLower}Mapper.deleteByCondition(condition);
     }
-    <#if table.validStatusColumn??>
+    <#if hasValidStatusColumn>
 
     /**
      * 禁用${tableComment}
      *
-     * @param patchRequest 禁用条件请求
+     <@pkTrav "batch_pk_params_comment" true "     "/>
+     * @param baseEntity
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
     @Transactional
-    public int disable(${className}PatchRequest patchRequest) {
-        <#if (table.hasUniPk)>
-        <#else>
-        ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
-        </#if>
-        ${className}Entity entity = ObjectUtils.copy(patchRequest, ${className}Entity.class<#list pks as column><#include "/include/column/properties.ftl">, "${fieldName}"</#list>);
-        entity.setDeleted(DeletedConstant.INVALID);
-        return ${classNameFirstLower}Mapper.updateBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(entity, <#if (table.hasUniPk)>patchRequest.get${uniPkPropertyName}()<#else>condition</#if>);
+    public int disableBy<@pkTrav "pk_fun_names" />(<@pkTrav "batch_pk_params" true /> BaseEntity baseEntity) {
+        ${className}PkCondition condition = getPkCondition(<@pkTrav "batch_pk_values" />);
+        ${className}Entity entity = ObjectUtils.copy(baseEntity, ${className}Entity.class);
+        entity.set${validStatusPropertyName}(ValidConstant.INVALID);
+        return ${classNameFirstLower}Mapper.patchByCondition(condition, entity);
     }
 
     /**
      * 启用${tableComment}
      *
-     * @param patchRequest 启用条件请求
+     <@pkTrav "batch_pk_params_comment" true "     "/>
+     * @param baseEntity
      * @return 受影响的行数
      * @author ${author}
      */
     @Override
     @Transactional
-    public int enable(${className}PatchRequest patchRequest) {
-        <#if (table.hasUniPk)>
-        <#else>
-        ${className}UpdateCondition condition = ObjectUtils.copy(patchRequest, ${className}UpdateCondition.class);
-        </#if>
-        ${className}Entity entity = ObjectUtils.copy(patchRequest, ${className}Entity.class<#list pks as column><#include "/include/column/properties.ftl">, "${fieldName}"</#list>);
-        entity.setDeleted(DeletedConstant.VALID);
-        return ${classNameFirstLower}Mapper.updateBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(entity, <#if (table.hasUniPk)>patchRequest.get${uniPkPropertyName}()<#else>condition</#if>);
+    public int enableBy<@pkTrav "pk_fun_names" />(<@pkTrav "batch_pk_params" true /> BaseEntity baseEntity) {
+        ${className}PkCondition condition = getPkCondition(<@pkTrav "batch_pk_values" />);
+        ${className}Entity entity = ObjectUtils.copy(baseEntity, ${className}Entity.class);
+        entity.set${validStatusPropertyName}(ValidConstant.VALID);
+        return ${classNameFirstLower}Mapper.patchByCondition(condition, entity);
     }
     </#if>
-    <#-- endregion 删除/启用/禁用 -->
 
-    <#-- region 更新 -->
+    // endregion 删除<#if hasValidStatusColumn>/启用/禁用</#if>
+
+    // region 更新
 
     /**
-     * 根据<#include "/include/table/pk_fun_comment.ftl">更新${tableComment}
+     * 根据<@pkTrav "pk_fun_comments" />更新${tableComment}非空字段
      *
-     * @param saveRequest 保存${tableComment}请求实体
-     <#list pks as column>
-     <#include "/include/column/properties.ftl">
-     * @param ${fieldName} ${columnFullComment}
-     </#list>
+     <@pkTrav "pk_params_comment" true "     "/>
+     * @param saveReq 保存${tableComment}请求实体
      * @return 更新后的${tableComment}详情
      * @author ${author}
      */
     @Override
     @Transactional
-    public ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest, <#include "/include/table/pk_params.ftl">) {
-        <#if (table.hasUniPk)>
-        <#else>
-        ${className}UpdateCondition condition = new ${className}UpdateCondition();
-        <#list pks as column>
-        <#include "/include/column/properties.ftl">
-        condition.set${propertyName}(${fieldName});
-        </#list>
-        </#if>
-        ${className}Entity entity = ObjectUtils.copy(saveRequest, ${className}Entity.class);
-        ${classNameFirstLower}Mapper.updateBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else>Condition</#if>(entity, <#if (table.hasUniPk)><#include "/include/table/pk_values.ftl"><#else>condition</#if>);
-        ${className}DetailResponse result;
-        if (<#list pks as column><#include "/include/column/properties.ftl">saveRequest.get${propertyName}() == null<#if (column?has_next)> || </#if></#list>) {
-            result = getBy<#include "/include/table/pk_fun_names.ftl">(<#include "/include/table/pk_values.ftl">);
-        } else {
-            result = getBy<#include "/include/table/pk_fun_names.ftl">(<#list pks as column><#include "/include/column/properties.ftl">saveRequest.get${propertyName}()<#if (column?has_next)>, </#if></#list>);
-        }
-        return result;
+    public ${className}DetailResp patchBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_params" true /> ${className}SaveReq saveReq) {
+        ${className}PkCondition condition = getPkCondition(<@pkTrav "pk_values" />);
+        ${className}Entity entity = ObjectUtils.copy(saveReq, ${className}Entity.class);
+        ${classNameFirstLower}Mapper.patchByCondition(condition, entity);
+        return getBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_values" />);
     }
-    <#-- endregion 更新 -->
-
-    <#-- region 详情 -->
 
     /**
-     * 根据<#include "/include/table/pk_fun_comment.ftl">获取${tableComment}详情
+     * 根据<@pkTrav "pk_fun_comments" />更新${tableComment}所有字段
+     *
+     <@pkTrav "pk_params_comment" true "     "/>
+     * @param saveReq 保存${tableComment}请求实体
+     * @return 更新后的${tableComment}详情
+     * @author ${author}
+     */
+    @Override
+    @Transactional
+    public ${className}DetailResp updateBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_params" true /> ${className}SaveReq saveReq) {
+        ${className}Entity entity = ObjectUtils.copy(saveReq, ${className}Entity.class);
+        ${classNameFirstLower}Mapper.updateBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_values" true /> entity);
+        return getBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_values" />);
+    }
+
+    // endregion 更新
+
+    // region 详情
+
+    /**
+     * 根据<@pkTrav "pk_fun_comments" />获取${tableComment}详情
      *
      <#list pks as column>
      <#include "/include/column/properties.ftl">
@@ -178,43 +174,71 @@ public class ${className}ServiceImpl implements ${className}Service {
      * @author ${author}
      */
     @Override
-    public ${className}DetailResponse getBy<#include "/include/table/pk_fun_names.ftl">(<#include "/include/table/pk_params.ftl">) {
-        ${className}EntityExt entity = ${classNameFirstLower}Mapper.detailBy<#if hasUniId>Id<#elseif (table.hasUniPk)>Pk<#else></#if>(<#include "/include/table/pk_values.ftl">);
+    public ${className}DetailResp getBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_params" />) {
+        ${className}EntityExt entity = ${classNameFirstLower}Mapper.getBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_values" />);
         if (entity == null) {
             throw new MapleDataNotFoundException("${tableComment}不存在");
         }
-        return ObjectUtils.copy(entity, ${className}DetailResponse.class);
+        return ObjectUtils.copy(entity, ${className}DetailResp.class);
     }
-    <#-- endregion 详情 -->
+
+    // endregion 详情
 
     /**
      * 获取${tableComment}列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @return 符合条件的${tableComment}列表
      */
     @Override
-    public List<${className}ListItemResponse> getList(${className}QueryRequest queryRequest) {
-        ${className}SelectCondition condition = ObjectUtils.copy(queryRequest, ${className}SelectCondition.class);
-        List<${className}Entity> list = ${classNameFirstLower}Mapper.select(condition);
-        return ObjectUtils.copy(list, ${className}ListItemResponse.class);
+    public List<${className}ItemResp> getList(${className}QueryReq queryReq) {
+        ${className}FilterCondition condition = ObjectUtils.copy(queryReq, ${className}FilterCondition.class);
+        List<${className}Entity> list = ${classNameFirstLower}Mapper.select(condition, null, queryReq.getSort());
+        return ObjectUtils.copy(list, ${className}ItemResp.class);
     }
 
     /**
      * 分页获取${tableComment}列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @param pageNum      页码
      * @param pageSize     分页大小
      * @return 符合条件的${tableComment}分页列表
      */
     @Override
-    public PageList<${className}ListItemResponse> getPageList(${className}QueryRequest queryRequest, Integer pageNum, Integer pageSize) {
+    public PageList<${className}ItemResp> getPageList(${className}QueryReq queryReq, Integer pageNum, Integer pageSize) {
 
-        ${className}SelectCondition condition = ObjectUtils.copy(queryRequest, ${className}SelectCondition.class);
-        PageInfo<${className}EntityExt> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> ${classNameFirstLower}Mapper.select(condition));
+        ${className}FilterCondition condition = ObjectUtils.copy(queryReq, ${className}FilterCondition.class);
+        ISelect select = () -> ${classNameFirstLower}Mapper.select(condition, null, queryReq.getSort());
+        PageInfo<${className}EntityExt> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(select);
 
-        List<${className}ListItemResponse> list = ObjectUtils.copy(pageInfo.getList(), ${className}ListItemResponse.class);
+        List<${className}ItemResp> list = ObjectUtils.copy(pageInfo.getList(), ${className}ItemResp.class);
         return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);
     }
+
+    private ${className}PkCondition getPkCondition(<@pkTrav "pk_params" />) {
+        ${className}PkCondition condition = new ${className}PkCondition();
+        <#list pks as column>
+        <#include "/include/column/properties.ftl">
+        condition.set${propertyName}(${fieldName});
+        </#list>
+        return condition;
+    }
+    <#if (table.hasUniPk)>
+
+    private ${className}PkCondition getPkCondition(<@pkTrav "batch_pk_params" />) {
+        ${className}PkCondition condition = new ${className}PkCondition();
+        <#list pks as column>
+        <#include "/include/column/properties.ftl">
+        if (${fieldName}List.isEmpty()) {
+            return null;
+        } else if (${fieldName}List.size() == 1) {
+            condition.set${propertyName}(${fieldName}List.get(0));
+        } else {
+            condition.set${propertyName}In(${fieldName}List);
+        }
+        </#list>
+        return condition;
+    }
+    </#if>
 }

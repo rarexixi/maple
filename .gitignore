@@ -65,3 +65,5 @@ metastore_db
 core-site.xml
 hdfs-site.xml
 hive-site.xml
+
+codegen/gen

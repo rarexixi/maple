@@ -10,8 +10,8 @@
         <result property="version" column="version"/>
         <result property="engineHome" column="engine_home"/>
         <result property="extInfo" column="ext_info"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEngineEntityExt">
     </resultMap>
@@ -28,8 +28,8 @@
             <if test="entity.version != null">`version`,</if>
             <if test="entity.engineHome != null">`engine_home`,</if>
             <if test="entity.extInfo != null">`ext_info`,</if>
-            <if test="entity.createTime != null">`create_time`,</if>
-            <if test="entity.updateTime != null">`update_time`,</if>
+            <if test="entity.createdAt != null">`created_at`,</if>
+            <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
@@ -38,8 +38,8 @@
             <if test="entity.version != null">#{entity.version},</if>
             <if test="entity.engineHome != null">#{entity.engineHome},</if>
             <if test="entity.extInfo != null">#{entity.extInfo},</if>
-            <if test="entity.createTime != null">#{entity.createTime},</if>
-            <if test="entity.updateTime != null">#{entity.updateTime},</if>
+            <if test="entity.createdAt != null">#{entity.createdAt},</if>
+            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
         </trim>
     </insert>
 
@@ -54,8 +54,8 @@
             `version`,
             `engine_home`,
             `ext_info`,
-            `create_time`,
-            `update_time`
+            `created_at`,
+            `updated_at`
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -66,22 +66,20 @@
             #{item.version},
             #{item.engineHome},
             #{item.extInfo},
-            #{item.createTime},
-            #{item.updateTime}
+            #{item.createdAt},
+            #{item.updatedAt}
         )
         </foreach>
     </insert>
 
-    <!--根据引擎ID删除集群引擎-->
-    <delete id="deleteById">
+    <!--根据条件删除集群引擎-->
+    <delete id="deleteByCondition">
         DELETE FROM <include refid="tableName"/>
-        <where>
-            `id` = #{id}
-        </where>
+        <include refid="updateByPkWhere"/>
     </delete>
 
-    <!--根据引擎ID更新集群引擎-->
-    <update id="updateById">
+    <!--根据条件更新集群引擎实体不为空的字段-->
+    <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
             <if test="entity.cluster != null">
@@ -99,12 +97,23 @@
             <if test="entity.extInfo != null">
                 `ext_info` = #{entity.extInfo},
             </if>
-            <if test="entity.createTime != null">
-                `create_time` = #{entity.createTime},
+            <if test="entity.updatedAt != null">
+                `updated_at` = #{entity.updatedAt}
             </if>
-            <if test="entity.updateTime != null">
-                `update_time` = #{entity.updateTime}
-            </if>
+        </set>
+        <include refid="updateByPkWhere"/>
+    </update>
+
+    <!--根据条件更新集群引擎所有字段-->
+    <update id="updateById">
+        UPDATE <include refid="tableName"/>
+        <set>
+            `cluster` = #{entity.cluster},
+            `name` = #{entity.name},
+            `version` = #{entity.version},
+            `engine_home` = #{entity.engineHome},
+            `ext_info` = #{entity.extInfo},
+            `updated_at` = #{entity.updatedAt}
         </set>
         <where>
             `id` = #{id}
@@ -112,7 +121,7 @@
     </update>
 
     <!--根据主键获取集群引擎详情-->
-    <select id="detailById" resultMap="ExtResultMap">
+    <select id="getById" resultMap="ExtResultMap">
         SELECT
             MT.`id`,
             MT.`cluster`,
@@ -120,17 +129,17 @@
             MT.`version`,
             MT.`engine_home`,
             MT.`ext_info`,
-            MT.`create_time`,
-            MT.`update_time`
+            MT.`created_at`,
+            MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
         <where>
-            `id` = #{id}
+            MT.`id` = #{id}
         </where>
     </select>
 
     <!--根据集群，引擎名称，引擎版本获取集群引擎详情-->
-    <select id="detailByClusterEngineVersion" resultMap="ExtResultMap">
+    <select id="getByClusterEngineVersion" resultMap="ExtResultMap">
         SELECT
             MT.`id`,
             MT.`cluster`,
@@ -138,8 +147,8 @@
             MT.`version`,
             MT.`engine_home`,
             MT.`ext_info`,
-            MT.`create_time`,
-            MT.`update_time`
+            MT.`created_at`,
+            MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
         <where>
@@ -147,6 +156,57 @@
         </where>
     </select>
 
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
+            </when>
+            <otherwise>
+                MT.`id`,
+                MT.`cluster`,
+                MT.`name`,
+                MT.`version`,
+                MT.`engine_home`,
+                MT.`ext_info`,
+                MT.`created_at`,
+                MT.`updated_at`
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <choose>
+                    <when test="condition.id != null">
+                        `id` = #{condition.id}
+                    </when>
+                    <otherwise>
+                        `id` IN
+                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
     <sql id="where">
         <where>
             <if test="condition == null">1!=1</if>
@@ -277,55 +337,28 @@
                     <if test="condition.engineHomeContains != null and condition.engineHomeContains != ''">
                         AND MT.`engine_home` LIKE concat('%', #{condition.engineHomeContains}, '%')
                     </if>
-                    <if test="condition.createTimeMin != null">
+                    <if test="condition.createdAtMin != null">
                         <![CDATA[
-                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        AND MT.`created_at` >= #{condition.createdAtMin}
                         ]]>
                     </if>
-                    <if test="condition.createTimeMax != null">
+                    <if test="condition.createdAtMax != null">
                         <![CDATA[
-                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        AND MT.`created_at` <= #{condition.createdAtMax}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMin != null">
+                    <if test="condition.updatedAtMin != null">
                         <![CDATA[
-                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        AND MT.`updated_at` >= #{condition.updatedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMax != null">
+                    <if test="condition.updatedAtMax != null">
                         <![CDATA[
-                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        AND MT.`updated_at` <= #{condition.updatedAtMax}
                         ]]>
                     </if>
                 </trim>
             </if>
         </where>
     </sql>
-    <select id="select" resultMap="ExtResultMap">
-        SELECT
-        <if test="condition.columns != null">
-            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
-        </if>
-        <if test="condition.columns == null">
-            MT.`id`,
-            MT.`cluster`,
-            MT.`name`,
-            MT.`version`,
-            MT.`engine_home`,
-            MT.`ext_info`,
-            MT.`create_time`,
-            MT.`update_time`
-        </if>
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-        <if test="condition.orderBy != null">
-            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
-        </if>
-    </select>
-
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-    </select>
 </mapper>

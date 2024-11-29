@@ -1,0 +1,173 @@
+<script setup lang="ts">
+import { computed, reactive, ref, toRaw, watch } from "vue"
+import { request } from "@/utils/request-utils";
+
+import FileSource from "@/components/data-calc/source/FileSource.vue"
+import JdbcSource from "@/components/data-calc/source/JdbcSource.vue"
+import DorisSource from "@/components/data-calc/source/DorisSource.vue"
+import StarRocksSource from "@/components/data-calc/source/StarRocksSource.vue"
+import ManagedJdbcSource from "@/components/data-calc/source/ManagedJdbcSource.vue"
+import SqlTransformation from "@/components/data-calc/transformation/SqlTransformation.vue"
+import FileSink from "@/components/data-calc/sink/FileSink.vue"
+import JdbcSink from "@/components/data-calc/sink/JdbcSink.vue"
+import DorisSink from "@/components/data-calc/sink/DorisSink.vue"
+import StarRocksSink from "@/components/data-calc/sink/StarRocksSink.vue"
+import ManagedJdbcSink from "@/components/data-calc/sink/ManagedJdbcSink.vue"
+import HiveSink from "@/components/data-calc/sink/HiveSink.vue"
+
+import AddPlugin from "@/components/data-calc/AddTypedPlugin.vue"
+import PluginOperations from "@/components/data-calc/PluginOperations.vue"
+import InputStringMap from "@/components/data-calc/InputStringMap.vue"
+import SampleData from "@/assets/sample-data"
+import { useBreadcrumbStore } from "@/stores/breadcrumbs"
+
+const {setBreadcrumb} = useBreadcrumbStore()
+setBreadcrumb([{text: '数据计算配置-数组方式'}])
+
+const mapleConfig = reactive({
+  ...SampleData.SampleArrayConfig
+})
+
+const code = ref("")
+const codeView = ref(false)
+const pageConfig = reactive(Array<any>())
+
+for (let i = 0; i < mapleConfig.plugins.length; i++) {
+  pageConfig.push({expand: true})
+}
+
+const addPlugin = (type: string, name: string, index: number = -1) => {
+  let plugin = SampleData.PluginModels[type][name]()
+  let plugins = mapleConfig.plugins
+  if (index < 0 || index >= plugins.length) {
+    pageConfig.push({expand: true});
+    plugins.push(plugin);
+  } else {
+    pageConfig.splice(index, 0, {expand: true});
+    plugins.splice(index, 0, plugin);
+  }
+}
+
+const delPlugin = (index: number = -1) => {
+  console.log(index)
+  let plugins = mapleConfig.plugins
+  if (index >= 0 && index < plugins.length) {
+    plugins.splice(index, 1)
+    pageConfig.splice(index, 1)
+  }
+}
+
+const variables = reactive({})
+const getCode = (showCode: boolean) => {
+  if (showCode) {
+    const requestConfig = {
+      url: "/ftl/get-array-code",
+      method: 'POST',
+      data: toRaw(mapleConfig)
+    }
+    request(requestConfig).then(response => {
+      code.value = response
+    })
+  } else {
+    code.value = ''
+  }
+}
+watch(codeView, () => getCode(codeView.value))
+
+const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(mapleConfig, null, 4))
+
+</script>
+
+<template>
+  <a-row style="height: 100%; padding: 10px">
+    <a-col :span="12" style="height: 100%; overflow: auto;">
+      <a-typography-title :level="4">全局变量</a-typography-title>
+      <InputStringMap v-model:value="mapleConfig.variables" />
+      <a-divider />
+      <template v-for="(item, index) in mapleConfig.plugins" :key="`${item.type}_${index}`">
+        <AddPlugin @add="(type: string, name: string) => addPlugin(type, name, index)" />
+        <a-card>
+          <a-flex :justify="'space-between'" :align="'center'">
+            <span>
+            <template v-if="item.type == 'sink'">
+              <PluginOperations v-model:value="pageConfig[index]" :index="index"
+                                @delete="() => delPlugin(index)" />
+              <template v-if="item.name === 'file'">
+                写入路径: {{ item.config.path }}
+              </template>
+              <template v-else>
+                输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
+              </template>
+            </template>
+            <template v-else>
+              <PluginOperations v-model:expand="pageConfig[index].expand" :index="index"
+                                @delete="() => delPlugin(index)" />
+              注册表名：{{ item.config.resultTable }}
+            </template>
+            </span>
+            <span>{{ item.name }} - <a-typography-text strong>{{ item.type }}</a-typography-text></span>
+          </a-flex>
+          <!--<component :is="`${item.name.replace('_', '-')}-${item.type}`" v-model:value="item.config" :name="`${item.type}_${index}`"
+            v-show="pageConfig[index].expand" />-->
+          <template v-if="item.type == 'source'">
+            <DorisSource v-if="item.name == 'doris'" v-model:value="item.config" :name="`source_${index}`"
+                         v-show="pageConfig[index].expand" />
+            <FileSource v-else-if="item.name == 'file'" v-model:value="item.config" :name="`source_${index}`"
+                        v-show="pageConfig[index].expand" />
+            <JdbcSource v-else-if="item.name == 'jdbc'" v-model:value="item.config" :name="`source_${index}`"
+                        v-show="pageConfig[index].expand" />
+            <ManagedJdbcSource v-else-if="item.name == 'managed_jdbc'" v-model:value="item.config"
+                               :name="`source_${index}`"
+                               v-show="pageConfig[index].expand" />
+            <StarRocksSource v-else-if="item.name == 'star_rocks'" v-model:value="item.config" :name="`source_${index}`"
+                             v-show="pageConfig[index].expand" />
+          </template>
+          <template v-else-if="item.type == 'transformation'">
+            <SqlTransformation v-if="item.name == 'sql'" v-model:value="item.config"
+                               :name="`transformation_${index}`" v-show="pageConfig[index].expand" />
+          </template>
+          <template v-else-if="item.type == 'sink'">
+            <DorisSink v-if="item.name == 'doris'" v-model:value="item.config" :name="`source_${index}`"
+                       v-show="pageConfig[index].expand" />
+            <FileSink v-else-if="item.name == 'file'" v-model:value="item.config" :name="`source_${index}`"
+                      v-show="pageConfig[index].expand" />
+            <HiveSink v-else-if="item.name == 'hive'" v-model:value="item.config" :name="`source_${index}`"
+                      v-show="pageConfig[index].expand" />
+            <JdbcSink v-else-if="item.name == 'jdbc'" v-model:value="item.config" :name="`source_${index}`"
+                      v-show="pageConfig[index].expand" />
+            <ManagedJdbcSink v-else-if="item.name == 'managed_jdbc'" v-model:value="item.config"
+                             :name="`source_${index}`"
+                             v-show="pageConfig[index].expand" />
+            <StarRocksSink v-else-if="item.name == 'star_rocks'" v-model:value="item.config" :name="`source_${index}`"
+                           v-show="pageConfig[index].expand" />
+          </template>
+        </a-card>
+      </template>
+      <AddPlugin @add="(type: string, name: string) => addPlugin(type, name)" />
+    </a-col>
+    <a-col :span="12" style="height: 100%">
+      <a-radio-group v-model:value="codeView">
+        <a-radio-button :value="false">JSON</a-radio-button>
+        <a-radio-button :value="true">Scala</a-radio-button>
+      </a-radio-group>
+      <a-button type="link" v-if="codeView" @click="() => getCode(true)">
+        <template #icon>
+          <reload-outlined />
+        </template>
+      </a-button>
+      <pre v-html="previewCode" style="height: calc(100% - 24px); width: 100%; overflow: auto" />
+    </a-col>
+  </a-row>
+</template>
+
+<style lang="less" scoped>
+pre {
+  font-size: 12px;
+}
+
+textarea {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+  monospace;
+  font-size: 12px;
+}
+</style>

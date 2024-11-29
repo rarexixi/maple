@@ -25,7 +25,6 @@
         <module>maple-common</module>
         <module>maple-service-spring-boot-starter</module>
         <module>maple-eureka</module>
-        <module>maple-datasource</module>
         <module>maple-persistence-models</module>
         <module>maple-persistence-service</module>
         <module>maple-restful-api</module>
@@ -34,5 +33,7 @@
         <module>maple-engine-builder-base</module>
         <module>maple-executor</module>
         <module>maple-hadoop</module>
+        <module>maple-mp-models</module>
+        <module>maple-mp-service</module>
     </modules>
 </project>

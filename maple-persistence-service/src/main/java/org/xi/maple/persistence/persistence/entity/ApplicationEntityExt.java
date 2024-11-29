@@ -1,8 +1,5 @@
 package org.xi.maple.persistence.persistence.entity;
 
-import java.math.BigDecimal;
-import java.util.Collection;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

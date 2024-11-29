@@ -1,13 +1,9 @@
 package org.xi.maple.persistence.controller;
 
+import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.annotation.SetFieldTypes;
-import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfAddRequest;
-import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfPatchRequest;
-import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfQueryRequest;
-import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfSaveRequest;
-import org.xi.maple.persistence.model.response.ClusterEngineDefaultConfDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterEngineDefaultConfListItemResponse;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfSaveReq;
 import org.xi.maple.persistence.service.ClusterEngineDefaultConfService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
+
+import static org.xi.maple.common.constant.SetFieldType.*;
 
 @CrossOrigin
-@RequestMapping("cluster-engine-default-conf")
+@RequestMapping(ClusterEngineDefaultConfController.BASE_URL)
 @RestController
 @Validated
 public class ClusterEngineDefaultConfController {
+
+    public static final String BASE_URL = "/api/cluster-engine-default-conves";
 
     private final ClusterEngineDefaultConfService clusterEngineDefaultConfService;
 
@@ -35,21 +31,49 @@ public class ClusterEngineDefaultConfController {
         this.clusterEngineDefaultConfService = clusterEngineDefaultConfService;
     }
 
-    @PostMapping("add")
-    public ResponseEntity<Integer> add(@Validated @RequestBody @SetFieldTypes(types = {"create"}) ClusterEngineDefaultConfAddRequest clusterEngineDefaultConf) {
-        int result = clusterEngineDefaultConfService.add(clusterEngineDefaultConf);
-        return ResponseEntity.created(URI.create("")).body(result);
+    // region 创建
+
+    @PostMapping
+    public ResponseEntity<Integer> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) ClusterEngineDefaultConfSaveReq clusterEngineDefaultConf) {
+        Integer id = clusterEngineDefaultConfService.create(clusterEngineDefaultConf);
+        String detailPath = String.format("%s/%s", BASE_URL, id);
+        return ResponseEntity.created(URI.create(detailPath)).body(id);
     }
 
-    @DeleteMapping("delete")
-    public ResponseEntity<Integer> delete(@Validated @SetFieldTypes(types = {"update"}) ClusterEngineDefaultConfPatchRequest patchRequest) {
-        Integer count = clusterEngineDefaultConfService.delete(patchRequest);
+    // endregion 创建
+
+    // region 删除
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Integer> deleteById(
+            @PathVariable("id") @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = clusterEngineDefaultConfService.deleteById(id, baseEntity);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("update")
-    public ResponseEntity<Integer> updateById(@Validated @RequestBody @SetFieldTypes(types = {"update"}) ClusterEngineDefaultConfSaveRequest clusterEngineDefaultConf) {
-        int result = clusterEngineDefaultConfService.updateById(clusterEngineDefaultConf);
+    // endregion 删除
+
+    // region 更新
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Integer> updateById(
+            @PathVariable("id") @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id,
+            @Validated({Jsr303ValidGroup.Put.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterEngineDefaultConfSaveReq clusterEngineDefaultConf
+    ) {
+        Integer result = clusterEngineDefaultConfService.updateById(id, clusterEngineDefaultConf);
         return ResponseEntity.ok(result);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Integer> patchById(
+            @PathVariable("id") @NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer id,
+            @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterEngineDefaultConfSaveReq clusterEngineDefaultConf
+    ) {
+        Integer result = clusterEngineDefaultConfService.patchById(id, clusterEngineDefaultConf);
+        return ResponseEntity.ok(result);
+    }
+
+    // endregion 更新
 }

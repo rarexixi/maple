@@ -1,56 +1,109 @@
-<template>
-    <a-config-provider :locale="zhCN">
-        <a-layout>
-            <a-layout-sider breakpoint="lg" collapsed-width="0" @collapse="onCollapse" @breakpoint="onBreakpoint" :style="{ height: '100vh', overflow: 'auto' }">
-                <div class="logo" />
-                <nav-menu :menus="menus"></nav-menu>
-            </a-layout-sider>
-            <a-layout :style="{ height: '100vh', overflow: 'auto' }">
-                <!-- <a-layout-header :style="{ marginBottom: '10px', background: '#fff', padding: 0 }"></a-layout-header> -->
-                <a-layout-content :style="{ overflow: 'auto' }">
-                    <router-view />
-                </a-layout-content>
-            </a-layout>
-        </a-layout>
-    </a-config-provider>
-</template>
+<script setup lang="ts">
+import { RouterView, RouterLink } from 'vue-router'
+import { h, ref } from "vue"
+import { useBreadcrumbStore } from "@/stores/breadcrumbs"
+import zhCN from "ant-design-vue/es/locale/zh_CN"
+import type { MenuProps } from "ant-design-vue";
+import * as AntdIcons from '@ant-design/icons-vue'
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import zhCN from 'ant-design-vue/es/locale/zh_CN';
-import NavMenu from './components/NavMenu.vue';
+const breadcrumbsStore = useBreadcrumbStore()
+const collapsed = ref<boolean>(false)
+const selectedKeys = ref<string[]>(['1'])
+const selectedKeys2 = ref<string[]>(['1'])
+const navMenuItems = ref<MenuProps['items']>([
+<#list tableModels as table>
+<#include "/include/table/properties.ftl">
+  {
+    key: '${classNameFirstLower}',
+    icon: () => h(AntdIcons['SettingOutlined']),
+    label: h(RouterLink, {to: '/${tablePath}'}, `${tableComment}`),
+    title: '${classNameFirstLower}',
+  },
+</#list>
+])
 
-const menus = [
-    {
-        name: 'test', path: 'test', type: 'sub-menu',
-        children: [
-            { name: 'list-slot-test', path: '/list-slot-test', type: 'menu-item' },
-            { name: 'provide-test', path: '/provide-test', type: 'menu-item' },
-            { name: 'setup-test', path: '/setup-test', type: 'menu-item' },
-        ]
-    },
-    { name: 'sys-dept', path: '/sys-dept', type: 'menu-item' },
-    { name: 'sys-user', path: '/sys-user', type: 'menu-item' },
-    { name: 'sys-config', path: '/sys-config', type: 'menu-item' },
-    { name: 'sys-role', path: '/sys-role', type: 'menu-item' },
-    { name: 'sys-operator-menu', path: '/sys-operator-menu', type: 'menu-item' },
-]
+const headerNavMenuItems = ref<MenuProps['items']>([
+  {
+    key: 'user',
+    icon: () => h(AntdIcons['UserOutlined']),
+    label: 'rarexixi',
+    title: 'user',
+    children: [
+      {
+        key: 'profile',
+        label: '个人信息',
+        title: 'profile',
+      },
+      {
+        key: 'logout',
+        label: '退出',
+        title: 'logout',
+      }
+    ]
+  }
+])
 
-export default defineComponent({
-    components: { NavMenu },
-    setup() {
-        return {
-            zhCN,
-            menus
-        }
-    },
-})
 </script>
 
-<style lang="less">
+<template>
+  <a-config-provider :locale="zhCN" :component-size="'small'">
+    <a-layout>
+      <a-layout-sider width="250" v-model:collapsed="collapsed">
+        <div class="logo">
+          <HomeOutlined />
+          <span class="logo-text">MAPLE</span>
+        </div>
+        <a-menu v-model:selectedKeys="selectedKeys" :items="navMenuItems" theme="dark" />
+      </a-layout-sider>
+      <a-layout>
+        <a-layout-header style="background: #ffffff; box-shadow: 0 3px 3px rgba(0,0,0,0.05); padding: 0; z-index: 2;">
+          <a-flex :style="{ width: '100%', height: '100%', padding: '0 12px' }" :align="'center'">
+            <a-button type="text" @click="() => (collapsed = !collapsed)"
+                      style="font-size: 1.5rem; display: inline-block; height: 64px; margin-right: 20px;">
+              <menu-unfold-outlined v-if="collapsed" />
+              <menu-fold-outlined v-else />
+            </a-button>
+            <a-breadcrumb style="line-height: 64px; width: 50%; font-size: 1rem">
+              <template v-for="item in breadcrumbsStore.breadcrumbs">
+                <a-breadcrumb-item :href="item.path">{{ item.text }}</a-breadcrumb-item>
+              </template>
+            </a-breadcrumb>
+            <a-flex :style="{ width: '100%', height: '100%' }" :justify="'flex-end'" :align="'center'">
+              <a-menu mode="horizontal" v-model:selectedKeys="selectedKeys2" :items="headerNavMenuItems" />
+            </a-flex>
+          </a-flex>
+        </a-layout-header>
+        <a-layout-content
+            :style="{ background: '#efefef', padding: 0, margin: 0, height: 'calc(100vh - 96px)', overflow: 'auto' }">
+          <RouterView />
+        </a-layout-content>
+        <a-layout-footer style="text-align: center; height: 32px; line-height: 32px; padding: 0">
+          Ant Design ©2018 Created by Ant UED
+        </a-layout-footer>
+      </a-layout>
+    </a-layout>
+  </a-config-provider>
+</template>
+
+<style scoped>
 .logo {
-    height: 32px;
-    background: rgba(255, 255, 255, 0.3);
-    margin: 16px;
+  float: left;
+  font-size: 32px;
+  text-align: left;
+  font-weight: bold;
+  line-height: 64px;
+  height: 64px;
+  width: 100%;
+  color: #ffffff;
+  padding: 0 24px;
+  overflow: hidden;
+}
+
+.logo .logo-text {
+  margin-left: 1rem;
+}
+
+:deep .ant-layout-sider-collapsed .logo > .logo-text {
+  display: none;
 }
 </style>

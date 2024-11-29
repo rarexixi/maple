@@ -1,7 +1,7 @@
 package org.xi.maple.persistence.model.request;
 
 import lombok.Data;
-import org.xi.maple.persistence.model.BaseEntity;
+import org.xi.maple.common.model.BaseEntity;
 
 import javax.validation.constraints.NotNull;
 

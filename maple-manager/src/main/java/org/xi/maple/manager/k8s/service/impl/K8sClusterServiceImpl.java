@@ -15,7 +15,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
-import org.xi.maple.common.constant.DeletedConstant;
+import org.xi.maple.common.constant.ValidConstant;
 import org.xi.maple.common.exception.MapleClusterConfigException;
 import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
 import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
@@ -24,9 +24,9 @@ import org.xi.maple.common.function.ThrowableFunction;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
-import org.xi.maple.persistence.model.request.ClusterQueryRequest;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
+import org.xi.maple.persistence.model.request.ClusterQueryReq;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.ClusterItemResp;
 import org.xi.maple.manager.client.PersistenceClient;
 import org.xi.maple.manager.constant.K8sResourceType;
 import org.xi.maple.manager.constant.MapleConstants;
@@ -64,7 +64,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
 
     private static final Logger logger = LoggerFactory.getLogger(K8sClusterServiceImpl.class);
 
-    private final PersistenceClient client;
+    private final PersistenceClient persistenceClient;
 
     private final UpdateExecStatusFunc updateExecStatusFunc;
 
@@ -80,8 +80,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
      */
     private final Map<String, KubernetesClient> k8sClients;
 
-    public K8sClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
-        this.client = client;
+    public K8sClusterServiceImpl(PersistenceClient persistenceClient, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
+        this.persistenceClient = persistenceClient;
         this.updateExecStatusFunc = updateExecStatusFunc;
         this.managerProperties = managerProperties;
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
@@ -169,7 +169,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     }
 
     @Override
-    public void addClusterConfig(ClusterDetailResponse cluster) {
+    public void addClusterConfig(ClusterDetailResp cluster) {
         KubernetesClient kubernetesClient = new KubernetesClientBuilder().withConfig(getConfig(cluster)).build();
         k8sClients.put(cluster.getName(), kubernetesClient);
         refreshExecStatus(cluster.getName(), kubernetesClient);
@@ -181,12 +181,12 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
      */
     @Override
     public void refreshAllClusterConfig() {
-        ClusterQueryRequest request = new ClusterQueryRequest();
+        ClusterQueryReq request = new ClusterQueryReq();
         request.setCategory(ClusterCategoryConstants.K8s);
-        request.setDeleted(DeletedConstant.VALID);
-        List<ClusterListItemResponse> clusters = client.getClusterList(request);
+        request.setDisabled(ValidConstant.VALID);
+        List<ClusterItemResp> clusters = persistenceClient.getClusterList(request);
         final Set<String> clusterNames = new HashSet<>(clusters.size());
-        for (ClusterListItemResponse cluster : clusters) {
+        for (ClusterItemResp cluster : clusters) {
             clusterNames.add(cluster.getName());
             KubernetesClient kubernetesClient;
             if (k8sClients.containsKey(cluster.getName())) {
@@ -264,7 +264,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
      * @param cluster 集群配置
      * @return Config
      */
-    private Config getConfig(ClusterListItemResponse cluster) {
+    private Config getConfig(ClusterItemResp cluster) {
         String name = cluster.getName();
         String master = cluster.getAddress();
         String configJson = cluster.getConfiguration();

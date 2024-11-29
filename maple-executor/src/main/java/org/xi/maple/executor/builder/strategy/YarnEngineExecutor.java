@@ -14,7 +14,7 @@ import org.xi.maple.executor.builder.spi.EnginePluginService;
 import org.xi.maple.executor.client.PersistenceClient;
 import org.xi.maple.executor.configuration.ExecutionProperties;
 import org.xi.maple.executor.configuration.PluginProperties;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class YarnEngineExecutor extends EngineExecutor {
         super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
     }
 
-    public void execute(EngineExecutionDetailResponse execution) {
+    public void execute(EngineExecutionDetailResp execution) {
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {
             logger.error("Execution[" + execution.getId() + "] starts failed!");

@@ -5,7 +5,7 @@ spring:
     name: maple-eureka
 eureka:
   client:
-    fetchRegistry: false
+    fetch-registry: false
     registerWithEureka: false
     serviceUrl:
       defaultZone: http://127.0.0.1:${server.port}/eureka/

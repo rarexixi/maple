@@ -1,7 +1,8 @@
 package org.xi.maple.persistence.persistence.mapper;
 
 import org.xi.maple.common.mapper.*;
-import org.xi.maple.persistence.persistence.condition.EngineExecutionSelectCondition;
+import org.xi.maple.persistence.persistence.condition.EngineExecutionFilterCondition;
+import org.xi.maple.persistence.persistence.condition.EngineExecutionPkCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
@@ -19,9 +20,11 @@ import java.util.Collection;
 public interface EngineExecutionMapper extends
         InsertMapper<EngineExecutionEntity>,
         BatchInsertMapper<EngineExecutionEntity>,
-        SelectByIdMapper<EngineExecutionEntityExt>,
-        SelectByConditionMapper<EngineExecutionEntity, EngineExecutionSelectCondition>,
-        CountByConditionMapper<EngineExecutionSelectCondition> {
+        PatchByConditionMapper<EngineExecutionEntity, EngineExecutionPkCondition>,
+        SelectByConditionMapper<EngineExecutionEntity, EngineExecutionFilterCondition>,
+        CountByConditionMapper<EngineExecutionFilterCondition> {
+
+    EngineExecutionEntityExt getById(@Param("id") Integer id);
 
     /**
      * 添加引擎执行记录扩展信息
@@ -56,5 +59,5 @@ public interface EngineExecutionMapper extends
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateExtInfoById(@Param("id") Integer id, @Param("entity") EngineExecutionExtInfoEntity extInfoEntity);
+    int patchExtInfoById(@Param("id") Integer id, @Param("entity") EngineExecutionExtInfoEntity extInfoEntity);
 }

@@ -3,67 +3,59 @@ package org.xi.maple.manager.client;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.persistence.model.request.*;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
-import org.xi.maple.manager.client.fallback.PersistenceClientFallbackFactory;
+import org.xi.maple.persistence.model.response.*;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@FeignClient(value = MapleServiceName.PERSISTENCE, fallbackFactory = PersistenceClientFallbackFactory.class, configuration = MapleFeignHeadersInterceptor.class)
+@FeignClient(value = MapleServiceName.PERSISTENCE, configuration = MapleFeignHeadersInterceptor.class)
 @LoadBalancerClient(name = MapleServiceName.PERSISTENCE, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface PersistenceClient {
 
     // region engine-execution
 
-    @PostMapping("/engine-execution/add")
-    Integer addExecution(@Validated @RequestBody EngineExecutionAddRequest engineExecution);
+    @PostMapping("/engine-executions")
+    Integer addExecution(@RequestBody EngineExecutionSaveReq req);
 
-    @GetMapping("/engine-execution/detail")
-    EngineExecutionDetailResponse getExecutionById(@RequestParam("id") @NotNull(message = "执行ID不能为空") @Min(value = 1, message = "执行ID必须大于0") Integer id);
+    @GetMapping("/engine-executions/{id}")
+    EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);
 
-    @PatchMapping("/engine-execution/update-status/{id}")
-    Integer updateExecutionStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionUpdateStatusRequest updateStatusRequest);
+    @PatchMapping("/engine-executions/{id}/status")
+    Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
-    @PatchMapping("/engine-execution/update-ext-info")
-    Integer updateExecutionExtInfoById(@RequestParam("id") Integer id, @Validated @RequestBody EngineExecutionUpdateRequest updateRequest);
+    @PatchMapping("/engine-executions/{id}/ext-info")
+    Integer updateExecutionExtInfoById(@PathVariable("id") Integer id, @RequestBody EngineExecutionExtUpdateReq req);
 
     // endregion
 
     // region engine-execution-queue
 
-    @PostMapping("/engine-execution-queue/add-or-update")
-    OperateResult<Integer> addOrUpdateExecQueue(@Validated @RequestBody EngineExecutionQueueSaveRequest engineExecutionQueue);
+    @PostMapping("/engine-execution-queues")
+    OperateResult<Integer> upsertExecQueue(@RequestBody EngineExecutionQueueSaveReq req);
 
-    @DeleteMapping("/engine-execution-queue/delete")
-    Integer deleteExecQueue(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
+    @DeleteMapping("/engine-execution-queues/{queueName}")
+    Integer deleteExecQueue(@PathVariable("queueName") String queueName);
 
-    @GetMapping("/engine-execution-queue/detail")
-    EngineExecutionQueue getExecQueueByName(@RequestParam("queueName") @NotBlank(message = "执行队列名不能为空") String queueName);
+    @GetMapping("/engine-execution-queues/{queueName}")
+    EngineExecutionQueue getExecQueueByName(@PathVariable("queueName") String queueName);
 
-    @GetMapping("/engine-execution-queue/list")
-    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryRequest queryRequest);
+    @GetMapping("/engine-execution-queues/all")
+    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryReq req);
 
     // endregion
 
     // region cluster
 
-    @GetMapping("/cluster/detail")
-    ClusterDetailResponse getClusterByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name);
+    @GetMapping("/clusters/{name}")
+    ClusterDetailResp getClusterByName(@PathVariable("name") String name);
 
-    @GetMapping("/cluster/list")
-    List<ClusterListItemResponse> getClusterList(@SpringQueryMap ClusterQueryRequest queryRequest);
+    @GetMapping("/clusters/all")
+    List<ClusterItemResp> getClusterList(@SpringQueryMap ClusterQueryReq queryReq);
 
     // endregion
 }

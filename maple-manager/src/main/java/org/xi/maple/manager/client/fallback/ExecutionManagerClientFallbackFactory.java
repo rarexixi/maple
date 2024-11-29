@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.service.util.MapleExceptionUtils;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.manager.client.ExecutionManagerClient;
 
 @Component
@@ -19,7 +19,7 @@ public class ExecutionManagerClientFallbackFactory implements FallbackFactory<Ex
         return new ExecutionManagerClient() {
 
             @Override
-            public void execute(EngineExecutionDetailResponse execution) {
+            public void execute(EngineExecutionDetailResp execution) {
                 MapleExceptionUtils.getFeignResponseError(cause).ifPresent(feignResponseError -> {
                     throw new MapleException(feignResponseError.getError().getMsg());
                 });

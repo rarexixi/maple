@@ -11,19 +11,21 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import org.apache.commons.lang3.StringUtils;
-import org.xi.maple.common.model.MapleJsonFormatProperties;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 /**
  * @author xishihao
  */
 public class JsonUtils {
+
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String TIME_FORMAT = "HH:mm:ss";
 
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = getDateTimeObjectMapper();
 
@@ -84,23 +86,15 @@ public class JsonUtils {
         return mapper.convertValue(fromValue, clazz);
     }
 
-    public static ObjectMapper getDateTimeObjectMapper(MapleJsonFormatProperties jsonFormatProperties) {
-        return getDateTimeObjectMapper(jsonFormatProperties.getDateTimeFormat(),
-                jsonFormatProperties.getDateFormat(),
-                jsonFormatProperties.getTimeFormat());
-    }
-
     public static ObjectMapper getDateTimeObjectMapper() {
-        return getDateTimeObjectMapper(MapleJsonFormatProperties.DATETIME_FORMAT,
-                MapleJsonFormatProperties.DATE_FORMAT,
-                MapleJsonFormatProperties.TIME_FORMAT);
+        return getDateTimeObjectMapper(DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT);
     }
 
     public static ObjectMapper getDateTimeObjectMapper(String datetimeFormatStr, String dateFormatStr, String timeFormatStr) {
 
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern(datetimeFormatStr);
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(dateFormatStr);
-        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern(timeFormatStr);
+        DateTimeFormatter dateTimeFormat = StringUtils.isBlank(datetimeFormatStr) ? DateTimeFormatter.ofPattern(DATETIME_FORMAT) : DateTimeFormatter.ofPattern(datetimeFormatStr);
+        DateTimeFormatter dateFormat = StringUtils.isBlank(dateFormatStr) ? DateTimeFormatter.ofPattern(DATE_FORMAT) : DateTimeFormatter.ofPattern(dateFormatStr);
+        DateTimeFormatter timeFormat = StringUtils.isBlank(timeFormatStr) ? DateTimeFormatter.ofPattern(TIME_FORMAT) : DateTimeFormatter.ofPattern(timeFormatStr);
 
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormat));

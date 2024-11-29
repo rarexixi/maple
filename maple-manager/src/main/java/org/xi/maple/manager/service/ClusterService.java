@@ -1,6 +1,6 @@
 package org.xi.maple.manager.service;
 
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
 import org.xi.maple.manager.model.ClusterQueue;
 
 public interface ClusterService {
@@ -19,7 +19,7 @@ public interface ClusterService {
      *
      * @param cluster 集群详情
      */
-    void addClusterConfig(ClusterDetailResponse cluster);
+    void addClusterConfig(ClusterDetailResp cluster);
 
     /**
      * 强制刷新所有集群配置

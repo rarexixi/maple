@@ -15,8 +15,8 @@ import org.xi.maple.executor.builder.spi.EnginePluginService;
 import org.xi.maple.executor.configuration.PluginProperties;
 import org.xi.maple.executor.service.EngineExecutionService;
 import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -55,7 +55,7 @@ public abstract class EngineExecutor implements EngineExecutionService {
      * @return 修改的数据量
      */
     protected Integer updateExecutionStatus(Integer id, EngineExecutionStatus status) {
-        return persistenceClient.updateExecutionStatusById(id, new EngineExecutionUpdateStatusRequest(status.toString())); // todo
+        return persistenceClient.updateExecutionStatusById(id, new EngineExecutionStatusUpdateReq(status.toString())); // todo
     }
 
     protected long getPid(Process process) {
@@ -77,7 +77,7 @@ public abstract class EngineExecutor implements EngineExecutionService {
         return String.join("/", more).replaceAll("/+", "/");
     }
 
-    protected EngineExecutionModel convert(EngineExecutionDetailResponse execution) {
+    protected EngineExecutionModel convert(EngineExecutionDetailResp execution) {
         ClusterEngineDefaultConfGetRequest request = new ClusterEngineDefaultConfGetRequest(execution.getCluster(), execution.getEngineCategory(), execution.getEngineVersion(), execution.getGroup(), execution.getUser());
         EngineConf engineConf = persistenceClient.getEngineConf(request);
         return new EngineExecutionModel().withExecId(execution.getId())

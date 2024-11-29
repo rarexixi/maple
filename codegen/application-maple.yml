@@ -12,16 +12,55 @@ generator:
     template: ./template/                       # 模版路径
     out: ../                                    # 输出路径
   files:
-    ignore: include/, .DS_Store
-    aggregate: src/router/index.ts.ftl, views/Home.vue, .env, .env.development, .env.production, .env.test
-    copy: public/favicon.ico, public/index.html, src/assets/, src/components/, src/composables/, src/mixin/, src/store/, src/utils/, src/App.vue, src/base_config.js, src/main.js, .browserslistrc, .eslintrc.js, .gitignore, babel.config.js, package.json, tsconfig.json, vue.config.js
+    ignore:
+      - include/
+      - .DS_Store
+    aggregate:
+      - src/router/index.ts.ftl
+      - src/App.vue
+      - .env
+      - .env.development
+      - .env.production
+      - .env.test
+      - src/composables/service-apis.ts
+    copy:
+      - public/favicon.ico
+      - public/index.html
+      - src/assets/
+      - src/components/ant-ext
+      - src/components/DataOperations.vue
+      - src/components/TableOperations.vue
+      - src/components/UpsertCard.vue
+      - src/composables/common.ts
+      - src/composables/models.ts
+      - src/composables/requests.ts
+      - src/composables/table-operations.ts
+      - src/composables/table-selection.ts
+      - src/mixin/
+      - src/store/
+      - src/utils/
+      - src/App.vue,
+      - src/base_config.js,
+      - src/main.js,
+      - .gitignore
+      - env.d.ts
+      - index.html
+      - package.json
+      - package-lock.json
+      - README.md
+      - tsconfig.app.json
+      - tsconfig.json
+      - tsconfig.node.json
+      - vite.config.ts
 
   columns:
     base:
-      column-name-set: deleted, create_user, update_user, create_time, update_time
+      column-name-set: disabled,created_by,created_at,updated_by,updated_at
       table-name: maple_datasource_type
     not-required:
-      - column-name-set: create_time, update_time
+      - column-name-set: created_at
+    cannot-update:
+      - column-name-set: created_by,created_at
 #    img-url:
 #    video-url:
 #    doc-url:
@@ -42,7 +81,7 @@ generator:
       - column-name-set: ext_info
 
     valid-status:
-      - column-name-set: deleted
+      - column-name-set: disabled
         status:
           valid: 0
           invalid: 1
@@ -51,10 +90,11 @@ generator:
   common-properties:
     projectName: maple
     module: persistence
-    serviceApplicationName: MapleDatasourceApplication
+    serviceApplicationName: MaplePersistenceApplication
     servicePort: 8082
     modulePackage: org.xi.maple.persistence
     commonPackage: org.xi.maple.common
+    commonStarterPackage: org.xi.maple.service
 
     author: 郗世豪（rarexixi@gmail.com）
     javaSrc: src/main/java

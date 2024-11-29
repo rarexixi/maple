@@ -1,20 +1,34 @@
 <#macro $ value>${r"$"}{${value}}</#macro>
 server.port=${servicePort}
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.enabled=true
+server.servlet.encoding.force=true
+
+# ?????????? Bean
+spring.main.allow-bean-definition-overriding: true
 spring.application.name=${projectName}-${module}-service
 spring.jackson.date-format=java.text.SimpleDateFormat
 
 spring.servlet.multipart.max-file-size=200MB
 spring.servlet.multipart.max-request-size=256MB
 
-server.servlet.encoding.charset=UTF-8
-server.servlet.encoding.enabled=true
-server.servlet.encoding.force=true
-
 # region datasoruce
 spring.datasource.url=${dbUrl}
 spring.datasource.username=${dbUsername}
 spring.datasource.password=${dbPassword}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# endregion
+#
+# region redis
+spring.cache.type=redis
+spring.redis.host=localhost
+spring.redis.port=6379
+#spring.redis.cluster.nodes=
+#spring.redis.cluster.max-redirects=
+spring.redis.lettuce.pool.max-active=8
+spring.redis.lettuce.pool.max-wait=-1ms
+spring.redis.lettuce.pool.max-idle=8
+spring.redis.lettuce.pool.min-idle=0
 # endregion
 #
 # region mybatis
@@ -37,5 +51,9 @@ pagehelper.params="count=countSql"
 pagehelper.support-methods-arguments=true
 # endregion
 
-# /actuator/info 显示信息
 info.app.name=<@$ 'spring.application.name'/>
+
+maple.aspect.controller-method-pattern=execution(public * ${modulePackage}.controller..*.*(..))
+maple.json-format.date-time-format=yyyy-MM-dd HH:mm:ss
+maple.json-format.date-format=yyyy-MM-dd
+maple.json-format.time-format=HH:mm:ss

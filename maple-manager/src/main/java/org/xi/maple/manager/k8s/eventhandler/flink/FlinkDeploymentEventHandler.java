@@ -3,7 +3,7 @@ package org.xi.maple.manager.k8s.eventhandler.flink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.constant.EngineCategoryConstants;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.manager.k8s.BaseResourceEventHandler;
 import org.xi.maple.manager.k8s.crds.flink.FlinkDeployment;
 import org.xi.maple.manager.k8s.crds.flink.FlinkDeploymentSpec;
@@ -16,18 +16,18 @@ public class FlinkDeploymentEventHandler extends BaseResourceEventHandler<FlinkD
 
     private static final Logger logger = LoggerFactory.getLogger(FlinkDeploymentEventHandler.class);
 
-    public FlinkDeploymentEventHandler(BiFunction<Integer, EngineExecutionUpdateStatusRequest, Integer> updateFunc) {
+    public FlinkDeploymentEventHandler(BiFunction<Integer, EngineExecutionStatusUpdateReq, Integer> updateFunc) {
         super(logger, updateFunc, EngineCategoryConstants.FLINK);
     }
 
     @Override
-    public EngineExecutionUpdateStatusRequest getState(FlinkDeployment obj) {
+    public EngineExecutionStatusUpdateReq getState(FlinkDeployment obj) {
         Map<String, Object> jobStatus;
         if (obj.getStatus() != null && (jobStatus = obj.getStatus().getJobStatus()) != null && jobStatus.containsKey("state")) {
 
             String raw_status = String.valueOf(jobStatus.get("state"));
             String status = ""; // todo
-            return new EngineExecutionUpdateStatusRequest(status, raw_status);
+            return new EngineExecutionStatusUpdateReq(status, raw_status);
         }
         return null;
     }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xi.maple.executor.service.EngineExecutionService;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 @RestController
 @RequestMapping("engine-execution")
@@ -19,7 +19,7 @@ public class EngineExecutionController {
     }
 
     @PostMapping("execute")
-    public ResponseEntity<Void> execute(@RequestBody EngineExecutionDetailResponse execution) {
+    public ResponseEntity<Void> execute(@RequestBody EngineExecutionDetailResp execution) {
         engineExecutionService.execute(execution);
         return ResponseEntity.ok().build();
     }

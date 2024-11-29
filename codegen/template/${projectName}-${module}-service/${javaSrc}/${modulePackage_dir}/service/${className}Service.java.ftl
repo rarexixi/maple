@@ -2,14 +2,12 @@
 package ${modulePackage}.service;
 
 import ${commonPackage}.model.PageList;
-import ${modulePackage}.model.request.${className}AddRequest;
-import ${modulePackage}.model.request.${className}PatchRequest;
-import ${modulePackage}.model.request.${className}QueryRequest;
-import ${modulePackage}.model.request.${className}SaveRequest;
-import ${modulePackage}.model.response.${className}DetailResponse;
-import ${modulePackage}.model.response.${className}ListItemResponse;
+import ${commonPackage}.model.BaseEntity;
+import ${modulePackage}.model.request.${className}QueryReq;
+import ${modulePackage}.model.request.${className}SaveReq;
+import ${modulePackage}.model.response.${className}DetailResp;
+import ${modulePackage}.model.response.${className}ItemResp;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,11 +20,11 @@ public interface ${className}Service {
     /**
      * 添加${tableComment}
      *
-     * @param addRequest ${tableComment}
+     * @param createReq ${tableComment}
      * @return 受影响的行数
      * @author ${author}
      */
-    ${className}DetailResponse add(${className}AddRequest addRequest);
+    ${className}DetailResp create(${className}SaveReq createReq);
 
     /**
      * 批量添加${tableComment}
@@ -35,87 +33,96 @@ public interface ${className}Service {
      * @return 受影响的行数
      * @author ${author}
      */
-    int batchAdd(Collection<${className}AddRequest> list);
+    int batchCreate(List<${className}SaveReq> list);
 
-    <#-- region 删除/启用/禁用 -->
+    // region 删除<#if hasValidStatusColumn>/启用/禁用</#if>
+
     /**
      * 删除${tableComment}
      *
-     * @param patchRequest 删除条件请求
+     <@pkTrav "batch_pk_params_comment" true "     "/>
+     * @param entity
      * @return 受影响的行数
      * @author ${author}
      */
-    int delete(${className}PatchRequest patchRequest);
-    <#if table.validStatusColumn??>
+    int deleteBy<@pkTrav "pk_fun_names" />(<@pkTrav "batch_pk_params" true /> BaseEntity entity);
+    <#if hasValidStatusColumn>
 
     /**
      * 禁用${tableComment}
      *
-     * @param patchRequest 禁用条件请求
+     <@pkTrav "batch_pk_params_comment" true "     "/>
+     * @param entity
      * @return 受影响的行数
      * @author ${author}
      */
-    int disable(${className}PatchRequest patchRequest);
+    int disableBy<@pkTrav "pk_fun_names" />(<@pkTrav "batch_pk_params" true /> BaseEntity entity);
 
     /**
      * 启用${tableComment}
      *
-     * @param patchRequest 启用条件请求
+     <@pkTrav "batch_pk_params_comment" true "     "/>
+     * @param entity
      * @return 受影响的行数
      * @author ${author}
      */
-    int enable(${className}PatchRequest patchRequest);
+    int enableBy<@pkTrav "pk_fun_names" />(<@pkTrav "batch_pk_params" true /> BaseEntity entity);
     </#if>
-    <#-- endregion 删除/启用/禁用 -->
 
-    <#-- region 更新 -->
+    // endregion 删除<#if hasValidStatusColumn>/启用/禁用</#if>
+
+    // region 更新
 
     /**
-     * 根据<#include "/include/table/pk_fun_comment.ftl">更新${tableComment}
+     * 根据<@pkTrav "pk_fun_comments" />更新${tableComment}非空字段
      *
-     * @param saveRequest 保存${tableComment}请求实体
-     <#if (!table.hasAutoIncUniPk)>
-     <#list pks as column>
-     <#include "/include/column/properties.ftl">
-     * @param ${fieldName} ${columnFullComment}
-     </#list>
-     </#if>
+     <@pkTrav "pk_params_comment" true "     "/>
+     * @param saveReq 保存${tableComment}请求实体
      * @return 更新后的${tableComment}详情
      * @author ${author}
      */
-    ${className}DetailResponse updateBy<#include "/include/table/pk_fun_names.ftl">(${className}SaveRequest saveRequest<#if (!table.hasAutoIncUniPk)>, <#include "/include/table/pk_params.ftl"></#if>);
-    <#-- endregion 更新 -->
-
-    <#-- region 详情 -->
+    ${className}DetailResp patchBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_params" true /> ${className}SaveReq saveReq);
 
     /**
-     * 根据<#include "/include/table/pk_fun_comment.ftl">获取${tableComment}详情
+     * 根据<@pkTrav "pk_fun_comments" />更新${tableComment}所有字段
      *
-     <#list pks as column>
-     <#include "/include/column/properties.ftl">
-     * @param ${fieldName} ${columnFullComment}
-     </#list>
+     <@pkTrav "pk_params_comment" true "     "/>
+     * @param saveReq 保存${tableComment}请求实体
+     * @return 更新后的${tableComment}详情
+     * @author ${author}
+     */
+    ${className}DetailResp updateBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_params" true /> ${className}SaveReq saveReq);
+
+    // endregion 更新
+
+    // region 详情
+
+    /**
+     * 根据<@pkTrav "pk_fun_comments" />获取${tableComment}详情
+     *
+     <@pkTrav "pk_params_comment" true "     "/>
      * @return ${tableComment}详情
      * @author ${author}
      */
-    ${className}DetailResponse getBy<#include "/include/table/pk_fun_names.ftl">(<#include "/include/table/pk_params.ftl">);
-    <#-- endregion 详情 -->
+    ${className}DetailResp getBy<@pkTrav "pk_fun_names" />(<@pkTrav "pk_params" false />);
+
+    // endregion 详情
 
     /**
      * 获取${tableComment}列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @return 符合条件的${tableComment}列表
      */
-    List<${className}ListItemResponse> getList(${className}QueryRequest queryRequest);
+    List<${className}ItemResp> getList(${className}QueryReq queryReq);
 
     /**
      * 分页获取${tableComment}列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @param pageNum      页码
      * @param pageSize     分页大小
      * @return 符合条件的${tableComment}分页列表
      */
-    PageList<${className}ListItemResponse> getPageList(${className}QueryRequest queryRequest, Integer pageNum, Integer pageSize);
+    PageList<${className}ItemResp> getPageList(${className}QueryReq queryReq, Integer pageNum, Integer pageSize);
 }

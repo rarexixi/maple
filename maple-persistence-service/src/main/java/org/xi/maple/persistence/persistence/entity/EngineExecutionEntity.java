@@ -1,11 +1,11 @@
 package org.xi.maple.persistence.persistence.entity;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 引擎执行记录实体
@@ -110,25 +110,25 @@ public class EngineExecutionEntity implements Serializable {
     /**
      * 任务提交时间
      */
-    private LocalDateTime startingTime;
+    private LocalDateTime submittedAt;
 
     /**
      * 任务执行开始时间
      */
-    private LocalDateTime runningTime;
+    private LocalDateTime startedAt;
 
     /**
      * 任务执行结束时间
      */
-    private LocalDateTime finishTime;
+    private LocalDateTime finishedAt;
 
     /**
-     * 任务执行开始时间
+     * 创建时间
      */
-    private LocalDateTime createTime;
+    private LocalDateTime createdAt;
 
     /**
-     * 任务执行结束时间
+     * 更新时间
      */
-    private LocalDateTime updateTime;
+    private LocalDateTime updatedAt;
 }

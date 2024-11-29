@@ -1,1 +1,0 @@
-<#list 0..classNameLength as i> </#list>

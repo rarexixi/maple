@@ -1,9 +1,10 @@
 package org.xi.maple.persistence.persistence.entity;
 
+import org.xi.maple.common.model.BaseEntity;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.xi.maple.persistence.model.BaseEntity;
 
 /**
  * 集群引擎实体

@@ -16,9 +16,9 @@ import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
 import org.xi.maple.manager.service.ExecutionService;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 
 import java.util.HashSet;
@@ -69,7 +69,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     public void consumeJobs() {
         logger.info("开始刷新要消费的队列...");
 
-        List<EngineExecutionQueue> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryRequest());
+        List<EngineExecutionQueue> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryReq());
         if (queueList == null || queueList.isEmpty()) {
             logger.warn("队列列表为空, 清空消费队列...");
             for (String key : futureMap.keySet()) {
@@ -120,14 +120,14 @@ public class ScheduledExecutions implements CommandLineRunner {
                 continue;
             }
 
-            EngineExecutionDetailResponse execution = executionService.getExecutionById(queueItem.getExecId());
+            EngineExecutionDetailResp execution = executionService.getExecutionById(queueItem.getExecId());
             if (execution == null) {
                 logger.error("作业不存在，id: {}", queueItem.getExecId());
                 continue;
             }
             if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getResourceGroup())) {
                 logger.error("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
-                executionService.updateExecutionStatus(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.FAILED.toString()));
+                executionService.updateExecutionStatus(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.FAILED.toString()));
                 continue;
             }
             threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {

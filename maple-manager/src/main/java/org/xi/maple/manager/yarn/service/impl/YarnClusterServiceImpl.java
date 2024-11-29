@@ -18,16 +18,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
-import org.xi.maple.common.constant.DeletedConstant;
+import org.xi.maple.common.constant.ValidConstant;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.function.ThrowableFunction;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
-import org.xi.maple.persistence.model.request.ClusterQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
+import org.xi.maple.persistence.model.request.ClusterQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.ClusterItemResp;
 import org.xi.maple.manager.client.PersistenceClient;
 import org.xi.maple.manager.constant.MapleConstants;
 import org.xi.maple.manager.function.UpdateExecStatusFunc;
@@ -51,7 +51,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     private static final Logger logger = LoggerFactory.getLogger(YarnClusterServiceImpl.class);
 
-    private final PersistenceClient client;
+    private final PersistenceClient persistenceClient;
 
     private final UpdateExecStatusFunc updateExecStatusFunc;
 
@@ -63,10 +63,10 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     private Map<String, ClusterQueue> CLUSTER_QUEUE_MAP;
 
-    private Map<String, ClusterListItemResponse> CLUSTER_MAP;
+    private Map<String, ClusterItemResp> CLUSTER_MAP;
 
-    public YarnClusterServiceImpl(PersistenceClient client, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
-        this.client = client;
+    public YarnClusterServiceImpl(PersistenceClient persistenceClient, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
+        this.persistenceClient = persistenceClient;
         this.updateExecStatusFunc = updateExecStatusFunc;
         this.managerProperties = managerProperties;
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
@@ -79,7 +79,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     @Override
     public Object kill(String name, String applicationId) {
-        ClusterListItemResponse cluster = CLUSTER_MAP.get(name);
+        ClusterItemResp cluster = CLUSTER_MAP.get(name);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps/%s/state", master, applicationId);
             HttpPut request = new HttpPut(uri);
@@ -94,7 +94,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     @Override
     public void refreshExecutionStatus(String clusterName, String applicationId) {
-        ClusterListItemResponse cluster = CLUSTER_MAP.get(clusterName);
+        ClusterItemResp cluster = CLUSTER_MAP.get(clusterName);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps/%s", master, applicationId);
             HttpGet request = new HttpGet(uri);
@@ -114,7 +114,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     @Override
     public void refreshExecutionsStatus(String clusterName, String states, Long startedTimeBegin, Long startedTimeEnd) {
-        ClusterListItemResponse cluster = client.getClusterByName(clusterName);
+        ClusterItemResp cluster = persistenceClient.getClusterByName(clusterName);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=%s&startedTimeBegin=%d&startedTimeEnd=%d", master, MapleConstants.TAG_EXEC, states, startedTimeBegin, startedTimeEnd);
             HttpGet request = new HttpGet(uri);
@@ -135,17 +135,17 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     }
 
     @Override
-    public void addClusterConfig(ClusterDetailResponse cluster) {
+    public void addClusterConfig(ClusterDetailResp cluster) {
         CLUSTER_MAP.put(cluster.getName(), cluster);
     }
 
     @Override
     public void refreshAllClusterConfig() {
-        ClusterQueryRequest request = new ClusterQueryRequest();
+        ClusterQueryReq request = new ClusterQueryReq();
         request.setCategory(ClusterCategoryConstants.YARN);
-        request.setDeleted(DeletedConstant.VALID);
-        List<ClusterListItemResponse> clusters = client.getClusterList(request);
-        for (ClusterListItemResponse cluster : clusters) {
+        request.setDisabled(ValidConstant.VALID);
+        List<ClusterItemResp> clusters = persistenceClient.getClusterList(request);
+        for (ClusterItemResp cluster : clusters) {
             CLUSTER_MAP.put(cluster.getName(), cluster);
         }
     }
@@ -156,7 +156,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     public void cacheClusterQueueInfo() {
         logger.info("刷新 YARN 队列资源...");
         final Map<String, ClusterQueue> queueMap = new ConcurrentHashMap<>();
-        for (ClusterListItemResponse cluster : CLUSTER_MAP.values()) {
+        for (ClusterItemResp cluster : CLUSTER_MAP.values()) {
             threadPoolTaskExecutor.execute(() -> {
                 Function<String, HttpUriRequest> getRequest = master -> {
                     String uri = String.format("%s/ws/v1/cluster/scheduler", master);
@@ -214,14 +214,14 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
             request.addHeader("Content-Type", "application/json");
             return request;
         };
-        for (ClusterListItemResponse cluster : CLUSTER_MAP.values()) {
+        for (ClusterItemResp cluster : CLUSTER_MAP.values()) {
             masterExec(cluster, "获取 YARN 运行之前的作业信息失败", getRequest, this::refresh);
             masterExec(cluster, "获取 YARN 正在运行中的作业信息失败", getRunningRequest, this::refresh);
             masterExec(cluster, "获取 YARN 结束的作业信息失败", getFinishedRequest, this::refresh);
         }
     }
 
-    private <T> T masterExec(ClusterListItemResponse cluster, String errorMsg, Function<String, HttpUriRequest> getExecRequest, ThrowableFunction<String, T> execResponse) {
+    private <T> T masterExec(ClusterItemResp cluster, String errorMsg, Function<String, HttpUriRequest> getExecRequest, ThrowableFunction<String, T> execResponse) {
         String[] masters = cluster.getAddress().split("[,;]");
         for (String master : masters) {
             HttpUriRequest request = getExecRequest.apply(master);
@@ -294,7 +294,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
             } else {
                 state = EngineExecutionStatus.RUNNING.toString();
             }
-            EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.valueOf(state).toString(), state);
+            EngineExecutionStatusUpdateReq request = new EngineExecutionStatusUpdateReq(EngineExecutionStatus.valueOf(state).toString(), state);
             updateExecStatusFunc.apply(execId, request);
         }
     }

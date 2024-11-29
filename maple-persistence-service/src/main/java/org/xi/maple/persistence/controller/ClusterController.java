@@ -1,27 +1,32 @@
 package org.xi.maple.persistence.controller;
 
+import org.xi.maple.common.annotation.Jsr303ValidGroup;
+import org.xi.maple.common.annotation.SetFieldTypes;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.ClusterQueryReq;
+import org.xi.maple.persistence.model.request.ClusterSaveReq;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.ClusterItemResp;
+import org.xi.maple.persistence.service.ClusterService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.xi.maple.common.annotation.SetFieldTypes;
-import org.xi.maple.persistence.model.request.ClusterAddRequest;
-import org.xi.maple.persistence.model.request.ClusterPatchRequest;
-import org.xi.maple.persistence.model.request.ClusterQueryRequest;
-import org.xi.maple.persistence.model.request.ClusterSaveRequest;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.ClusterListItemResponse;
-import org.xi.maple.persistence.service.ClusterService;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 import java.net.URI;
 import java.util.List;
 
+import static org.xi.maple.common.constant.SetFieldType.*;
+
 @CrossOrigin
-@RequestMapping("/cluster")
+@RequestMapping(ClusterController.BASE_URL)
 @RestController
 @Validated
 public class ClusterController {
+
+    public static final String BASE_URL = "/api/clusters";
 
     private final ClusterService clusterService;
 
@@ -30,46 +35,84 @@ public class ClusterController {
         this.clusterService = clusterService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ClusterDetailResponse> add(@Validated @RequestBody @SetFieldTypes(types = {"create"}) ClusterAddRequest cluster) {
-        ClusterDetailResponse detail = clusterService.add(cluster);
-        return ResponseEntity.created(URI.create("")).body(detail);
+    // region 创建
+
+    @PostMapping
+    public ResponseEntity<ClusterDetailResp> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) ClusterSaveReq cluster) {
+        ClusterDetailResp detail = clusterService.create(cluster);
+        String detailPath = String.format("%s/%s", BASE_URL, detail.getName());
+        return ResponseEntity.created(URI.create(detailPath)).body(detail);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Integer> delete(@Validated @SetFieldTypes(types = {"update"}) ClusterPatchRequest patchRequest) {
-        Integer count = clusterService.delete(patchRequest);
-        return ResponseEntity.ok(count);
-    }
+    // endregion 创建
 
-    @PatchMapping("/disable")
-    public ResponseEntity<Integer> disable(@Validated @SetFieldTypes(types = {"update"}) ClusterPatchRequest patchRequest) {
-        Integer count = clusterService.disable(patchRequest);
-        return ResponseEntity.ok(count);
-    }
+    // region 删除/启用/禁用
 
-    @PatchMapping("/enable")
-    public ResponseEntity<Integer> enable(@Validated @SetFieldTypes(types = {"update"}) ClusterPatchRequest patchRequest) {
-        Integer count = clusterService.enable(patchRequest);
-        return ResponseEntity.ok(count);
-    }
-
-    @PatchMapping("/update")
-    public ResponseEntity<ClusterDetailResponse> updateByName(
-            @Validated @RequestBody @SetFieldTypes(types = {"update"}) ClusterSaveRequest cluster
+    @DeleteMapping("/{name}")
+    public ResponseEntity<Integer> deleteByName(
+            @PathVariable("name") @NotBlank(message = "name(集群名称)不能为空") String name,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
     ) {
-        ClusterDetailResponse detail = clusterService.updateByName(cluster);
+        Integer count = clusterService.deleteByName(name, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    @PatchMapping("/disable/{name}")
+    public ResponseEntity<Integer> disableByName(
+            @PathVariable("name") @NotBlank(message = "name(集群名称)不能为空") String name,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = clusterService.disableByName(name, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    @PatchMapping("/enable/{name}")
+    public ResponseEntity<Integer> enableByName(
+            @PathVariable("name") @NotBlank(message = "name(集群名称)不能为空") String name,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = clusterService.enableByName(name, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    // endregion 删除/启用/禁用
+
+    // region 更新
+
+    @PutMapping("/{name}")
+    public ResponseEntity<ClusterDetailResp> updateByName(
+            @PathVariable("name") @Validated @NotBlank(message = "name(集群名称)不能为空") String name,
+            @Validated({Jsr303ValidGroup.Put.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterSaveReq cluster
+    ) {
+        ClusterDetailResp detail = clusterService.updateByName(name, cluster);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<ClusterDetailResponse> getByName(@RequestParam("name") @NotBlank(message = "集群名称不能为空") String name) {
-        ClusterDetailResponse detail = clusterService.getByName(name);
+    @PatchMapping("/{name}")
+    public ResponseEntity<ClusterDetailResp> patchByName(
+            @PathVariable("name") @Validated @NotBlank(message = "name(集群名称)不能为空") String name,
+            @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterSaveReq cluster
+    ) {
+        ClusterDetailResp detail = clusterService.patchByName(name, cluster);
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<ClusterListItemResponse>> getList(ClusterQueryRequest queryRequest) {
-        return ResponseEntity.ok(clusterService.getList(queryRequest));
+    // endregion 更新
+
+    // region 详情
+
+    @GetMapping("/{name}")
+    public ResponseEntity<ClusterDetailResp> getByName(
+            @PathVariable("name") @Validated @NotBlank(message = "name(集群名称)不能为空") String name
+    ) {
+        ClusterDetailResp detail = clusterService.getByName(name);
+        return ResponseEntity.ok(detail);
+    }
+
+    // endregion 详情
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ClusterItemResp>> getList(ClusterQueryReq queryReq) {
+        return ResponseEntity.ok(clusterService.getList(queryReq));
     }
 }

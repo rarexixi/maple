@@ -1,12 +1,11 @@
 package org.xi.maple.service.configuration;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
-import org.xi.maple.common.model.MapleJsonFormatProperties;
+import org.xi.maple.service.configuration.properties.MapleJsonFormatProperties;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.service.configuration.properties.MapleProperties;
 
@@ -27,9 +26,10 @@ public class MapleJacksonConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = JsonUtils.getDateTimeObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper;
+        String dateTimeFormat = jsonFormatProperties.getDateTimeFormat();
+        String dateFormat = jsonFormatProperties.getDateFormat();
+        String timeFormat = jsonFormatProperties.getTimeFormat();
+        return JsonUtils.getDateTimeObjectMapper(dateTimeFormat, dateFormat, timeFormat);
     }
 
     /*@Bean

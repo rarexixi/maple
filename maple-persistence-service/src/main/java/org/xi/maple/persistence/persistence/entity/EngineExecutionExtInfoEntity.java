@@ -1,10 +1,11 @@
 package org.xi.maple.persistence.persistence.entity;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serializable;
 
 /**
  * 引擎执行扩展信息实体

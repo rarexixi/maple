@@ -8,9 +8,20 @@ server:
 
 spring:
   main:
-    allow-bean-definition-overriding: true
+    allow-bean-definition-overriding: true # 是否允许覆盖已定义的 Bean
   application:
     name: maple-persistence-service
+  jackson:
+    date-format: java.text.SimpleDateFormat
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 256MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/maple?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&rewriteBatchedStatements=true&useServerPrepStmts=true&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
+    username: xi_root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
   cache:
     type: redis
   redis:
@@ -25,21 +36,21 @@ spring:
         max-wait: -1ms
         max-idle: 8
         min-idle: 0
-  jackson:
-    date-format: java.text.SimpleDateFormat
 
-  servlet:
-    multipart:
-      max-file-size: 200MB
-      max-request-size: 256MB
+mybatis:
+  type-aliases-package: org.xi.maple.persistence.persistence.mapper
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    cache-enabled: false
+    lazy-loading-enabled: false
+    multiple-result-sets-enabled: true
+    use-column-label: true
+    use-generated-keys: false
+    default-executor-type: simple
+    default-statement-timeout: 25000
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
 
-# region datasoruce
-  datasource:
-    url: jdbc:mysql://localhost:3306/maple?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&useServerPrepStmts=true&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
-    username: xi_root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-# endregion
 management:
   endpoints:
     # 关闭所有的检查项
@@ -67,30 +78,12 @@ management:
       disk: false
       uptime: false
       integration: false
-# region mybatis
-mybatis:
-  type-aliases-package: org.xi.maple.persistence.persistence.mapper
-  mapper-locations: classpath:mapper/*.xml
-  configuration:
-    cache-enabled: false
-    lazy-loading-enabled: false
-    multiple-result-sets-enabled: true
-    use-column-label: true
-    use-generated-keys: false
-    default-executor-type: simple
-    default-statement-timeout: 25000
-    map-underscore-to-camel-case: true
-    call-setters-on-nulls: true
-# endregion
 
-# region pagehelper
 pagehelper:
   reasonable: true
   params: "count=countSql"
   support-methods-arguments: true
-# endregion
 
-# /actuator/info
 info:
   app:
     name: ${spring.application.name}
@@ -100,3 +93,5 @@ maple:
     date-time-format: yyyy-MM-dd HH:mm:ss
     date-format: yyyy-MM-dd
     time-format: HH:mm:ss
+  aspect:
+    controller-method-pattern: "execution(public * org.xi.maple.persistence.controller..*.*(..))"

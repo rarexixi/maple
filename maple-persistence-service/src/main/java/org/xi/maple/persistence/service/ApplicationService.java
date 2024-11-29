@@ -1,14 +1,12 @@
 package org.xi.maple.persistence.service;
 
 import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.ApplicationAddRequest;
-import org.xi.maple.persistence.model.request.ApplicationPatchRequest;
-import org.xi.maple.persistence.model.request.ApplicationQueryRequest;
-import org.xi.maple.persistence.model.request.ApplicationSaveRequest;
-import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
-import org.xi.maple.persistence.model.response.ApplicationListItemResponse;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.ApplicationQueryReq;
+import org.xi.maple.persistence.model.request.ApplicationSaveReq;
+import org.xi.maple.persistence.model.response.ApplicationDetailResp;
+import org.xi.maple.persistence.model.response.ApplicationItemResp;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,11 +19,11 @@ public interface ApplicationService {
     /**
      * 添加访问程序
      *
-     * @param addRequest 访问程序
+     * @param createReq 访问程序
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ApplicationDetailResponse add(ApplicationAddRequest addRequest);
+    ApplicationDetailResp create(ApplicationSaveReq createReq);
 
     /**
      * 批量添加访问程序
@@ -34,44 +32,57 @@ public interface ApplicationService {
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int batchAdd(Collection<ApplicationAddRequest> list);
+    int batchCreate(List<ApplicationSaveReq> list);
 
     /**
      * 删除访问程序
      *
-     * @param patchRequest 删除条件请求
+     * @param appName 应用名称
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int delete(ApplicationPatchRequest patchRequest);
+    int deleteByAppName(String appName, BaseEntity entity);
 
     /**
      * 禁用访问程序
      *
-     * @param patchRequest 禁用条件请求
+     * @param appName 应用名称
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int disable(ApplicationPatchRequest patchRequest);
+    int disableByAppName(String appName, BaseEntity entity);
 
     /**
      * 启用访问程序
      *
-     * @param patchRequest 启用条件请求
+     * @param appName 应用名称
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int enable(ApplicationPatchRequest patchRequest);
+    int enableByAppName(String appName, BaseEntity entity);
+
+    /**
+     * 根据更新访问程序
+     *
+     * @param appName 应用名称
+     * @param saveReq 保存访问程序请求实体
+     * @return 更新后的访问程序详情
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    ApplicationDetailResp patchByAppName(String appName, ApplicationSaveReq saveReq);
 
     /**
      * 根据应用名称更新访问程序
      *
-     * @param saveRequest 保存访问程序请求实体
      * @param appName 应用名称
+     * @param saveReq 保存访问程序请求实体
      * @return 更新后的访问程序详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ApplicationDetailResponse updateByAppName(ApplicationSaveRequest saveRequest, String appName);
+    ApplicationDetailResp updateByAppName(String appName, ApplicationSaveReq saveReq);
 
     /**
      * 根据应用名称获取访问程序详情
@@ -80,23 +91,23 @@ public interface ApplicationService {
      * @return 访问程序详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ApplicationDetailResponse getByAppName(String appName);
+    ApplicationDetailResp getByAppName(String appName);
 
     /**
      * 获取访问程序列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @return 符合条件的访问程序列表
      */
-    List<ApplicationListItemResponse> getList(ApplicationQueryRequest queryRequest);
+    List<ApplicationItemResp> getList(ApplicationQueryReq queryReq);
 
     /**
      * 分页获取访问程序列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @param pageNum      页码
      * @param pageSize     分页大小
      * @return 符合条件的访问程序分页列表
      */
-    PageList<ApplicationListItemResponse> getPageList(ApplicationQueryRequest queryRequest, Integer pageNum, Integer pageSize);
+    PageList<ApplicationItemResp> getPageList(ApplicationQueryReq queryReq, Integer pageNum, Integer pageSize);
 }

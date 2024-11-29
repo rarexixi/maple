@@ -1,9 +1,11 @@
 package org.xi.maple.persistence.service;
 
 import org.xi.maple.common.model.OperateResult;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.common.model.BaseEntity;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueItemResp;
 
 import java.util.List;
 
@@ -21,31 +23,32 @@ public interface EngineExecutionQueueService {
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    OperateResult<Integer> addOrUpdate(EngineExecutionQueueSaveRequest saveRequest);
+    OperateResult<Integer> upsert(EngineExecutionQueueSaveReq saveRequest);
 
     /**
      * 删除执行队列
      *
-     * @param queueName 执行队列名
+     * @param queueName  执行队列名
+     * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int delete(String queueName);
+    int deleteByQueueName(String queueName, BaseEntity entity);
 
     /**
-     * 根据执行队列名获取执行队列详情
+     * 根据获取执行队列详情
      *
      * @param queueName 执行队列名
      * @return 执行队列详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    EngineExecutionQueue getByQueueName(String queueName);
+    EngineExecutionQueueDetailResp getByQueueName(String queueName);
 
     /**
      * 获取执行队列列表
      *
-     * @param queryRequest 搜索条件
+     * @param queryReq 搜索条件
      * @return 符合条件的执行队列列表
      */
-    List<EngineExecutionQueue> getList(EngineExecutionQueueQueryRequest queryRequest);
+    List<EngineExecutionQueueItemResp> getList(EngineExecutionQueueQueryReq queryReq);
 }

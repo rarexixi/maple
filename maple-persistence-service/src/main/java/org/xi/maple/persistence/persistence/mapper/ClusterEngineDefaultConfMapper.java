@@ -1,12 +1,11 @@
 package org.xi.maple.persistence.persistence.mapper;
 
+import org.xi.maple.common.mapper.*;
+import org.xi.maple.persistence.persistence.condition.ClusterEngineDefaultConfFilterCondition;
+import org.xi.maple.persistence.persistence.condition.ClusterEngineDefaultConfPkCondition;
+import org.xi.maple.persistence.persistence.entity.ClusterEngineDefaultConfEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.xi.maple.common.mapper.DeleteByIdMapper;
-import org.xi.maple.common.mapper.InsertMapper;
-import org.xi.maple.common.mapper.SelectByIdMapper;
-import org.xi.maple.common.mapper.UpdateByIdMapper;
-import org.xi.maple.persistence.persistence.entity.ClusterEngineDefaultConfEntity;
 
 /**
  * 集群引擎默认配置数据访问
@@ -16,9 +15,15 @@ import org.xi.maple.persistence.persistence.entity.ClusterEngineDefaultConfEntit
 @Mapper
 public interface ClusterEngineDefaultConfMapper extends
         InsertMapper<ClusterEngineDefaultConfEntity>,
-        DeleteByIdMapper,
-        UpdateByIdMapper<ClusterEngineDefaultConfEntity>,
-        SelectByIdMapper<ClusterEngineDefaultConfEntity> {
+        BatchInsertMapper<ClusterEngineDefaultConfEntity>,
+        DeleteByConditionMapper<ClusterEngineDefaultConfPkCondition>,
+        PatchByConditionMapper<ClusterEngineDefaultConfEntity, ClusterEngineDefaultConfPkCondition>,
+        SelectByConditionMapper<ClusterEngineDefaultConfEntity, ClusterEngineDefaultConfFilterCondition>,
+        CountByConditionMapper<ClusterEngineDefaultConfFilterCondition> {
 
-    ClusterEngineDefaultConfEntity selectByTypeAndName(@Param("engineId") Integer engineId, @Param("objType") String objType, @Param("objName") String objName);
+    int updateById(@Param("id") Integer id, @Param("entity") ClusterEngineDefaultConfEntity entity);
+
+    ClusterEngineDefaultConfEntity getById(@Param("id") Integer id);
+
+    ClusterEngineDefaultConfEntity getByTypeAndName(@Param("engineId") Integer engineId, @Param("objType") String objType, @Param("objName") String objName);
 }

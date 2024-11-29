@@ -1,13 +1,13 @@
 package org.xi.maple.manager.function;
 
 import org.springframework.stereotype.Component;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.manager.client.PersistenceClient;
 
 import java.util.function.BiFunction;
 
 @Component
-public class UpdateExecStatusFunc implements BiFunction<Integer, EngineExecutionUpdateStatusRequest, Integer> {
+public class UpdateExecStatusFunc implements BiFunction<Integer, EngineExecutionStatusUpdateReq, Integer> {
 
     private final PersistenceClient persistenceClient;
 
@@ -16,7 +16,7 @@ public class UpdateExecStatusFunc implements BiFunction<Integer, EngineExecution
     }
 
     @Override
-    public Integer apply(Integer id, EngineExecutionUpdateStatusRequest request) {
+    public Integer apply(Integer id, EngineExecutionStatusUpdateReq request) {
         return persistenceClient.updateExecutionStatusById(id, request);
     }
 }

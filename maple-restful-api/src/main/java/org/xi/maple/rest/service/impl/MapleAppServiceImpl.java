@@ -4,7 +4,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.xi.maple.rest.client.PersistenceClient;
 import org.xi.maple.rest.service.MapleAppService;
-import org.xi.maple.persistence.model.response.ApplicationDetailResponse;
+import org.xi.maple.persistence.model.response.ApplicationDetailResp;
 
 @Service
 public class MapleAppServiceImpl implements MapleAppService {
@@ -18,7 +18,7 @@ public class MapleAppServiceImpl implements MapleAppService {
     @Cacheable(cacheNames = {"maple-app"}, key = "#appName")
     @Override
     public String getAppKey(String appName) {
-        ApplicationDetailResponse app = persistenceClient.getByAppName(appName);
+        ApplicationDetailResp app = persistenceClient.getByAppName(appName);
         return app == null ? "" : app.getAccessKey();
     }
 }

@@ -22,11 +22,11 @@
         <result property="user" column="user"/>
         <result property="clusterAppId" column="cluster_app_id"/>
         <result property="status" column="status"/>
-        <result property="startingTime" column="starting_time"/>
-        <result property="runningTime" column="running_time"/>
-        <result property="finishTime" column="finish_time"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
+        <result property="submittedAt" column="submitted_at"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="finishedAt" column="finished_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt">
         <result property="clusterCategory" column="cluster_category"/>
@@ -59,9 +59,11 @@
             <if test="entity.user != null">`user`,</if>
             <if test="entity.clusterAppId != null">`cluster_app_id`,</if>
             <if test="entity.status != null">`status`,</if>
-            <if test="entity.startingTime != null">`starting_time`,</if>
-            <if test="entity.runningTime != null">`running_time`,</if>
-            <if test="entity.finishTime != null">`finish_time`,</if>
+            <if test="entity.submittedAt != null">`submitted_at`,</if>
+            <if test="entity.startedAt != null">`started_at`,</if>
+            <if test="entity.finishedAt != null">`finished_at`,</if>
+            <if test="entity.createdAt != null">`created_at`,</if>
+            <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
@@ -81,9 +83,11 @@
             <if test="entity.user != null">#{entity.user},</if>
             <if test="entity.clusterAppId != null">#{entity.clusterAppId},</if>
             <if test="entity.status != null">#{entity.status},</if>
-            <if test="entity.startingTime != null">#{entity.startingTime},</if>
-            <if test="entity.runningTime != null">#{entity.runningTime},</if>
-            <if test="entity.finishTime != null">#{entity.finishTime},</if>
+            <if test="entity.submittedAt != null">#{entity.submittedAt},</if>
+            <if test="entity.startedAt != null">#{entity.startedAt},</if>
+            <if test="entity.finishedAt != null">#{entity.finishedAt},</if>
+            <if test="entity.createdAt != null">#{entity.createdAt},</if>
+            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
         </trim>
     </insert>
 
@@ -126,11 +130,11 @@
             `user`,
             `cluster_app_id`,
             `status`,
-            `starting_time`,
-            `running_time`,
-            `finish_time`,
-            `create_time`,
-            `update_time`
+            `submitted_at`,
+            `started_at`,
+            `finished_at`,
+            `created_at`,
+            `updated_at`
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -153,11 +157,11 @@
             #{item.user},
             #{item.clusterAppId},
             #{item.status},
-            #{item.startingTime},
-            #{item.runningTime},
-            #{item.finishTime},
-            #{item.createTime},
-            #{item.updateTime}
+            #{item.submittedAt},
+            #{item.startedAt},
+            #{item.finishedAt},
+            #{item.createdAt},
+            #{item.updatedAt}
         )
         </foreach>
     </insert>
@@ -182,6 +186,77 @@
         </foreach>
     </insert>
 
+    <!--根据条件更新引擎执行记录实体不为空的字段-->
+    <update id="patchByCondition">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.execFile != null">
+                `exec_file` = #{entity.execFile},
+            </if>
+            <if test="entity.fromApp != null">
+                `from_app` = #{entity.fromApp},
+            </if>
+            <if test="entity.jobId != null">
+                `job_id` = #{entity.jobId},
+            </if>
+            <if test="entity.bizId != null">
+                `biz_id` = #{entity.bizId},
+            </if>
+            <if test="entity.execUniqId != null">
+                `exec_uniq_id` = #{entity.execUniqId},
+            </if>
+            <if test="entity.execName != null">
+                `exec_name` = #{entity.execName},
+            </if>
+            <if test="entity.cluster != null">
+                `cluster` = #{entity.cluster},
+            </if>
+            <if test="entity.resourceGroup != null">
+                `resource_group` = #{entity.resourceGroup},
+            </if>
+            <if test="entity.engineCategory != null">
+                `engine_category` = #{entity.engineCategory},
+            </if>
+            <if test="entity.engineVersion != null">
+                `engine_version` = #{entity.engineVersion},
+            </if>
+            <if test="entity.priority != null">
+                `priority` = #{entity.priority},
+            </if>
+            <if test="entity.runPri != null">
+                `run_pri` = #{entity.runPri},
+            </if>
+            <if test="entity.priUpgradable != null">
+                `pri_upgradable` = #{entity.priUpgradable},
+            </if>
+            <if test="entity.group != null">
+                `group` = #{entity.group},
+            </if>
+            <if test="entity.user != null">
+                `user` = #{entity.user},
+            </if>
+            <if test="entity.clusterAppId != null">
+                `cluster_app_id` = #{entity.clusterAppId},
+            </if>
+            <if test="entity.status != null">
+                `status` = #{entity.status},
+            </if>
+            <if test="entity.submittedAt != null">
+                `submitted_at` = #{entity.submittedAt},
+            </if>
+            <if test="entity.startedAt != null">
+                `started_at` = #{entity.startedAt},
+            </if>
+            <if test="entity.finishedAt != null">
+                `finished_at` = #{entity.finishedAt},
+            </if>
+            <if test="entity.updatedAt != null">
+                `updated_at` = #{entity.updatedAt}
+            </if>
+        </set>
+        <include refid="updateByPkWhere"/>
+    </update>
+
     <update id="updateStatusById">
         UPDATE <include refid="tableName"/>
         <set>
@@ -192,12 +267,19 @@
         </where>
     </update>
 
-    <update id="updateExtInfoById">
+    <!--根据条件更新引擎执行扩展信息实体不为空的字段-->
+    <update id="patchExtInfoById">
         UPDATE <include refid="extTableName"/>
         <set>
-            <if test="entity.configuration != null">`configuration` = #{entity.execInfo},</if>
-            <if test="entity.extInfo != null">`ext_info` = #{entity.execInfo},</if>
-            <if test="entity.execInfo != null">`exec_info` = #{entity.execInfo},</if>
+            <if test="entity.configuration != null">
+                `configuration` = #{entity.configuration},
+            </if>
+            <if test="entity.extInfo != null">
+                `ext_info` = #{entity.extInfo},
+            </if>
+            <if test="entity.execInfo != null">
+                `exec_info` = #{entity.execInfo}
+            </if>
         </set>
         <where>
             `id` = #{id}
@@ -205,43 +287,110 @@
     </update>
 
     <!--根据主键获取引擎执行记录详情-->
-    <select id="detailById" resultMap="ExtResultMap">
-        SELECT MT.`id`,
-               MT.`exec_file`,
-               MT.`from_app`,
-               MT.`job_id`,
-               MT.`biz_id`,
-               MT.`exec_uniq_id`,
-               MT.`exec_name`,
-               MT.`cluster`,
-               CLUSTER.`category` as `cluster_category`,
-               MT.`resource_group`,
-               MT.`engine_category`,
-               MT.`engine_version`,
-               MT.`priority`,
-               MT.`run_pri`,
-               MT.`pri_upgradable`,
-               MT.`group`,
-               MT.`user`,
-               MT.`cluster_app_id`,
-               MT.`status`,
-               MT.`starting_time`,
-               MT.`running_time`,
-               MT.`finish_time`,
-               MT.`create_time`,
-               MT.`update_time`,
-               EXT.`configuration`,
-               EXT.`ext_info`,
-               EXT.`exec_info`
+    <select id="getById" resultMap="ExtResultMap">
+        SELECT
+            MT.`id`,
+            MT.`exec_file`,
+            MT.`from_app`,
+            MT.`job_id`,
+            MT.`biz_id`,
+            MT.`exec_uniq_id`,
+            MT.`exec_name`,
+            MT.`cluster`,
+            CLUSTER.`category` as `cluster_category`,
+            MT.`resource_group`,
+            MT.`engine_category`,
+            MT.`engine_version`,
+            MT.`priority`,
+            MT.`run_pri`,
+            MT.`pri_upgradable`,
+            MT.`group`,
+            MT.`user`,
+            MT.`cluster_app_id`,
+            MT.`status`,
+            MT.`submitted_at`,
+            MT.`started_at`,
+            MT.`finished_at`,
+            MT.`created_at`,
+            MT.`updated_at`,
+            EXT.`configuration`,
+            EXT.`ext_info`,
+            EXT.`exec_info`
         FROM
         <include refid="tableName"/> MT
               JOIN <include refid="extTableName"/> EXT on MT.`id` = EXT.`id`
               LEFT JOIN `maple_cluster` CLUSTER on MT.`cluster` = CLUSTER.`name`
         <where>
-            MT.`id` = #{id} AND EXT.`id` = #{id}
+            MT.`id` = #{id}
         </where>
     </select>
 
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
+            </when>
+            <otherwise>
+                MT.`id`,
+                MT.`exec_file`,
+                MT.`from_app`,
+                MT.`job_id`,
+                MT.`biz_id`,
+                MT.`exec_uniq_id`,
+                MT.`exec_name`,
+                MT.`cluster`,
+                MT.`resource_group`,
+                MT.`engine_category`,
+                MT.`engine_version`,
+                MT.`priority`,
+                MT.`run_pri`,
+                MT.`pri_upgradable`,
+                MT.`group`,
+                MT.`user`,
+                MT.`cluster_app_id`,
+                MT.`status`,
+                MT.`submitted_at`,
+                MT.`started_at`,
+                MT.`finished_at`,
+                MT.`created_at`,
+                MT.`updated_at`
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <choose>
+                    <when test="condition.id != null">
+                        `id` = #{condition.id}
+                    </when>
+                    <otherwise>
+                        `id` IN
+                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
     <sql id="where">
         <where>
             <if test="condition == null">1!=1</if>
@@ -674,118 +823,76 @@
                     <if test="condition.statusContains != null and condition.statusContains != ''">
                         AND MT.`status` LIKE concat('%', #{condition.statusContains}, '%')
                     </if>
-                    <if test="condition.startingTimeMin != null">
+                    <if test="condition.submittedAtMin != null">
                         <![CDATA[
-                        AND MT.`starting_time` >= #{condition.startingTimeMin}
+                        AND MT.`submitted_at` >= #{condition.submittedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.startingTimeMax != null">
+                    <if test="condition.submittedAtMax != null">
                         <![CDATA[
-                        AND MT.`starting_time` <= #{condition.startingTimeMax}
+                        AND MT.`submitted_at` <= #{condition.submittedAtMax}
                         ]]>
                     </if>
-                    <if test="condition.startingTimeIsNotNull != null and condition.startingTimeIsNotNull == true">
-                        AND MT.`starting_time` IS NOT NULL
+                    <if test="condition.submittedAtIsNotNull != null and condition.submittedAtIsNotNull == true">
+                        AND MT.`submitted_at` IS NOT NULL
                     </if>
-                    <if test="condition.startingTimeIsNull != null and condition.startingTimeIsNull == true">
-                        AND MT.`starting_time` IS NULL
+                    <if test="condition.submittedAtIsNull != null and condition.submittedAtIsNull == true">
+                        AND MT.`submitted_at` IS NULL
                     </if>
-                    <if test="condition.runningTimeMin != null">
+                    <if test="condition.startedAtMin != null">
                         <![CDATA[
-                        AND MT.`running_time` >= #{condition.runningTimeMin}
+                        AND MT.`started_at` >= #{condition.startedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.runningTimeMax != null">
+                    <if test="condition.startedAtMax != null">
                         <![CDATA[
-                        AND MT.`running_time` <= #{condition.runningTimeMax}
+                        AND MT.`started_at` <= #{condition.startedAtMax}
                         ]]>
                     </if>
-                    <if test="condition.runningTimeIsNotNull != null and condition.runningTimeIsNotNull == true">
-                        AND MT.`running_time` IS NOT NULL
+                    <if test="condition.startedAtIsNotNull != null and condition.startedAtIsNotNull == true">
+                        AND MT.`started_at` IS NOT NULL
                     </if>
-                    <if test="condition.runningTimeIsNull != null and condition.runningTimeIsNull == true">
-                        AND MT.`running_time` IS NULL
+                    <if test="condition.startedAtIsNull != null and condition.startedAtIsNull == true">
+                        AND MT.`started_at` IS NULL
                     </if>
-                    <if test="condition.finishTimeMin != null">
+                    <if test="condition.finishedAtMin != null">
                         <![CDATA[
-                        AND MT.`finish_time` >= #{condition.finishTimeMin}
+                        AND MT.`finished_at` >= #{condition.finishedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.finishTimeMax != null">
+                    <if test="condition.finishedAtMax != null">
                         <![CDATA[
-                        AND MT.`finish_time` <= #{condition.finishTimeMax}
+                        AND MT.`finished_at` <= #{condition.finishedAtMax}
                         ]]>
                     </if>
-                    <if test="condition.finishTimeIsNotNull != null and condition.finishTimeIsNotNull == true">
-                        AND MT.`finish_time` IS NOT NULL
+                    <if test="condition.finishedAtIsNotNull != null and condition.finishedAtIsNotNull == true">
+                        AND MT.`finished_at` IS NOT NULL
                     </if>
-                    <if test="condition.finishTimeIsNull != null and condition.finishTimeIsNull == true">
-                        AND MT.`finish_time` IS NULL
+                    <if test="condition.finishedAtIsNull != null and condition.finishedAtIsNull == true">
+                        AND MT.`finished_at` IS NULL
                     </if>
-                    <if test="condition.createTimeMin != null">
+                    <if test="condition.createdAtMin != null">
                         <![CDATA[
-                        AND MT.`create_time` >= #{condition.createTimeMin}
+                        AND MT.`created_at` >= #{condition.createdAtMin}
                         ]]>
                     </if>
-                    <if test="condition.createTimeMax != null">
+                    <if test="condition.createdAtMax != null">
                         <![CDATA[
-                        AND MT.`create_time` <= #{condition.createTimeMax}
+                        AND MT.`created_at` <= #{condition.createdAtMax}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMin != null">
+                    <if test="condition.updatedAtMin != null">
                         <![CDATA[
-                        AND MT.`update_time` >= #{condition.updateTimeMin}
+                        AND MT.`updated_at` >= #{condition.updatedAtMin}
                         ]]>
                     </if>
-                    <if test="condition.updateTimeMax != null">
+                    <if test="condition.updatedAtMax != null">
                         <![CDATA[
-                        AND MT.`update_time` <= #{condition.updateTimeMax}
+                        AND MT.`updated_at` <= #{condition.updatedAtMax}
                         ]]>
                     </if>
                 </trim>
             </if>
         </where>
     </sql>
-    <select id="select" resultMap="ExtResultMap">
-        SELECT
-        <if test="condition.columns != null">
-            <foreach collection="condition.columns" item="it" separator=",">MT.`${it}`</foreach>
-        </if>
-        <if test="condition.columns == null">
-            MT.`id`,
-            MT.`exec_file`,
-            MT.`from_app`,
-            MT.`job_id`,
-            MT.`biz_id`,
-            MT.`exec_uniq_id`,
-            MT.`exec_name`,
-            MT.`cluster`,
-            MT.`resource_group`,
-            MT.`engine_category`,
-            MT.`engine_version`,
-            MT.`priority`,
-            MT.`run_pri`,
-            MT.`pri_upgradable`,
-            MT.`group`,
-            MT.`user`,
-            MT.`cluster_app_id`,
-            MT.`status`,
-            MT.`starting_time`,
-            MT.`running_time`,
-            MT.`finish_time`,
-            MT.`create_time`,
-            MT.`update_time`
-        </if>
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-        <if test="condition.orderBy != null">
-            ORDER BY <foreach collection="condition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
-        </if>
-    </select>
-
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-    </select>
 </mapper>

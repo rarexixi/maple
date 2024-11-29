@@ -4,8 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.annotation.MapleAppAuthentication;
 import org.xi.maple.rest.service.ExecutionService;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,14 +28,14 @@ public class ExecutionController {
 
     @MapleAppAuthentication(app = "#addRequest.fromApp", value = "#submitReq.execUniqId + '#;' + #submitReq.execName")
     @PostMapping("exec")
-    public ResponseEntity<Integer> submit(@RequestBody EngineExecutionAddRequest addRequest) {
+    public ResponseEntity<Integer> submit(@RequestBody EngineExecutionSaveReq addRequest) {
         Integer id = executionService.submit(addRequest);
         return ResponseEntity.ok(id);
     }
 
     @MapleAppAuthentication(app = "#addRequest.fromApp", value = "#submitReq.execUniqId + '#;' + #submitReq.execName")
     @PostMapping("exec-now")
-    public ResponseEntity<Integer> submitNow(@RequestBody EngineExecutionAddRequest addRequest) {
+    public ResponseEntity<Integer> submitNow(@RequestBody EngineExecutionSaveReq addRequest) {
         Integer id = executionService.submitNow(addRequest);
         return ResponseEntity.ok(id);
     }
@@ -57,8 +57,8 @@ public class ExecutionController {
     }
 
     @GetMapping("detail")
-    public ResponseEntity<EngineExecutionDetailResponse> detail(@RequestParam("id") Integer id) {
-        EngineExecutionDetailResponse detail = executionService.detail(id);
+    public ResponseEntity<EngineExecutionDetailResp> detail(@RequestParam("id") Integer id) {
+        EngineExecutionDetailResp detail = executionService.detail(id);
         return ResponseEntity.ok(detail);
     }
 }

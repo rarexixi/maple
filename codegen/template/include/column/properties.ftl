@@ -16,7 +16,7 @@
 <#assign isContent = (column.content || column.dataType?contains("text"))>
 <#assign isInteger = (column.dataType?contains("int"))>
 <#assign isDecimal = (column.dataType == "double" || column.dataType == "float" || column.dataType == "decimal" || column.dataType == "numeric")>
-<#assign isString = (column.dataType?ends_with("char"))>
+<#assign isString = (column.dataType?ends_with("char") || column.dataType?ends_with("json"))>
 <#assign isDate = (column.dataType == "date")>
 <#assign isTime = (column.dataType == "time")>
 <#assign isDateTime = (column.dataType?contains("date") || column.dataType?contains("time"))>

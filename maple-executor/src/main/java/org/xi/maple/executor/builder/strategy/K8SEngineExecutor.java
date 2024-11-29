@@ -1,6 +1,5 @@
 package org.xi.maple.executor.builder.strategy;
 
-import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -9,21 +8,18 @@ import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.builder.model.CommandGeneratorModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleException;
-import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.executor.builder.EngineExecutor;
 import org.xi.maple.executor.builder.spi.EnginePluginService;
 import org.xi.maple.executor.client.PersistenceClient;
 import org.xi.maple.executor.client.SchedulerClient;
 import org.xi.maple.executor.configuration.ExecutionProperties;
 import org.xi.maple.executor.configuration.PluginProperties;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class K8SEngineExecutor extends EngineExecutor {
@@ -37,7 +33,7 @@ public class K8SEngineExecutor extends EngineExecutor {
         this.schedulerClient = schedulerClient;
     }
 
-    public void execute(EngineExecutionDetailResponse execution) {
+    public void execute(EngineExecutionDetailResp execution) {
 
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {

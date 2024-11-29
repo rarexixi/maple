@@ -14,10 +14,10 @@ import org.xi.maple.manager.k8s.service.K8sClusterService;
 import org.xi.maple.manager.model.ClusterQueue;
 import org.xi.maple.manager.service.ExecutionService;
 import org.xi.maple.manager.yarn.service.YarnClusterService;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.ClusterDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionQueue;
 
 import java.util.List;
@@ -48,19 +48,19 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public void submitExecution(int execId) {
-        EngineExecutionDetailResponse execution = persistenceClient.getExecutionById(execId);
+        EngineExecutionDetailResp execution = persistenceClient.getExecutionById(execId);
         if (execution == null) {
             logger.error("作业不存在，id: {}", execId);
             return;
         }
         submitExecution(execution, () -> {
             logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
-            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列资源不足"));
+            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列资源不足"));
         });
     }
 
     @Override
-    public void submitExecution(EngineExecutionDetailResponse execution, Runnable queueBusyCallback) {
+    public void submitExecution(EngineExecutionDetailResp execution, Runnable queueBusyCallback) {
         ClusterQueue cachedQueueInfo = null;
         if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
             cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getCluster(), execution.getResourceGroup());
@@ -74,7 +74,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         if (cachedQueueInfo == null) {
             logger.error("队列不存在，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
             // 修改作业状态
-            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列不存在"));
+            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列不存在"));
         } else if (!cachedQueueInfo.idle()) {
             queueBusyCallback.run();
         } else {
@@ -83,14 +83,14 @@ public class ExecutionServiceImpl implements ExecutionService {
                 executionManagerClient.execute(execution);
             } catch (Throwable t) {
                 logger.error("执行作业失败，id: {}", execution.getId(), t);
-                updateExecStatusFunc.apply(execution.getId(), new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.START_FAILED.toString(), "", 12, "执行作业失败"));
+                updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "执行作业失败"));
             }
         }
     }
 
     @Override
     public Object kill(Integer id) {
-        EngineExecutionDetailResponse execution = getExecutionById(id);
+        EngineExecutionDetailResp execution = getExecutionById(id);
         if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
             return null; // k8sClusterService.deleteEngine(execution.getCluster(), execution.getNamespace(), execution.getClusterCategory(), execution.getExecUniqId());
         } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
@@ -102,24 +102,24 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public Object stop(Integer id, Map<String, ?> cancelParams) {
-        EngineExecutionDetailResponse execution = getExecutionById(id);
+        EngineExecutionDetailResp execution = getExecutionById(id);
         // execution.getConfiguration().putAll(cancelParams);
         // executionManagerClient.stop(execution);
         return null;
     }
 
     @Override
-    public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryRequest request) {
+    public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryReq request) {
         return persistenceClient.getExecQueueList(request);
     }
 
     @Override
-    public EngineExecutionDetailResponse getExecutionById(int execId) {
+    public EngineExecutionDetailResp getExecutionById(int execId) {
         return persistenceClient.getExecutionById(execId);
     }
 
     @Override
-    public void updateExecutionStatus(int execId, EngineExecutionUpdateStatusRequest statusRequest) {
+    public void updateExecutionStatus(int execId, EngineExecutionStatusUpdateReq statusRequest) {
         updateExecStatusFunc.apply(execId, statusRequest);
     }
 
@@ -130,7 +130,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             k8sClusterService.removeClusterConfig(clusterName);
             yarnClusterService.removeClusterConfig(clusterName);
         } else {
-            ClusterDetailResponse cluster = persistenceClient.getClusterByName(clusterName);
+            ClusterDetailResp cluster = persistenceClient.getClusterByName(clusterName);
             if (ClusterCategoryConstants.K8s.equals(cluster.getCategory())) {
                 if (ClusterMessage.Type.UPDATE == clusterMessage.getType()) {
                     k8sClusterService.removeClusterConfig(clusterName);

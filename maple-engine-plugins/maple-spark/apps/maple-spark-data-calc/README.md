@@ -110,7 +110,7 @@ spark-submit \
             "name": "sql",
             "config": {
                 "resultTable": "spark_00002",
-                "sql": "select * from spark_00001 where create_time > '2021-08-30' limit 100"
+                "sql": "select * from spark_00001 where created_at > '2021-08-30' limit 100"
             }
         }
     ],

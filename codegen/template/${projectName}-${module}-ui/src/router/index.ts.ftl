@@ -1,25 +1,17 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import Home from '@/views/Home.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 
-const routes: Array<RouteRecordRaw> = [
-    {
-        path: '/',
-        name: 'Home',
-        component: Home
-    },
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
 <#list tableModels as table>
 <#include "/include/table/properties.ftl">
     {
-        path: '/${tableShortPath}',
-        name: '${classNameFirstLower}',
-        component: () => import('@/views/${targetTableName}/${className}Index.vue')
+      path: '/${tablePath}',
+      name: '${classNameFirstLower}',
+      component: () => import('@/views/${tablePath}/${className}IndexView.vue')
     },
 </#list>
-]
-
-const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
-    routes
+  ]
 })
 
 export default router

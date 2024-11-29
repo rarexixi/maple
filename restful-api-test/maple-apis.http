@@ -4,3 +4,67 @@ GET http://localhost:8080/execution/detail?id=1
 Content-Type: application/json
 Accept: application/json
 maple-tag: maple-persistence-service:test-xi
+
+###
+
+GET http://localhost:8082/test/1
+Content-Type: application/json
+Accept: application/json
+
+###
+
+GET http://localhost:8082/test/list/str
+Content-Type: application/json
+Accept: application/json
+
+###
+
+PATCH http://localhost:8100/api/applications/enable/1
+Content-Type: application/json
+Accept: application/json
+
+
+###
+
+DELETE http://localhost:8082/test/1,2,3
+Content-Type: application/json
+Accept: application/json
+
+{
+  "age": 12
+}
+
+###
+
+POST http://localhost:8082/test
+Content-Type: application/json
+Accept: application/json
+
+{
+  "age": 12
+}
+
+###
+
+PUT http://localhost:8082/test
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "age": 1
+}
+
+###
+
+
+
+PATCH http://localhost:8082/test
+Content-Type: application/json
+Accept: application/json
+
+{
+  "age": 1
+}
+
+

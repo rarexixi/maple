@@ -8,8 +8,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.engine.common.utils.ParamsUtils;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
+import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 
 import java.io.IOException;
 
@@ -21,14 +21,14 @@ public class EngineExecutionUpdateService {
     public static void updateStatus(EngineExecutionStatus status) {
         Integer execId = ParamsUtils.EXEC_ID;
         String updateExecStatusUrl = ParamsUtils.UPDATE_EXEC_STATUS_URL;
-        EngineExecutionUpdateStatusRequest request = new EngineExecutionUpdateStatusRequest(status.toString());
+        EngineExecutionStatusUpdateReq request = new EngineExecutionStatusUpdateReq(status.toString());
         post(execId, updateExecStatusUrl, request);
     }
 
     public static void updateInfo(String info) {
         Integer execId = ParamsUtils.EXEC_ID;
         String updateExecInfoUrl = ParamsUtils.UPDATE_EXEC_INFO_URL;
-        EngineExecutionUpdateRequest request = new EngineExecutionUpdateRequest();
+        EngineExecutionExtUpdateReq request = new EngineExecutionExtUpdateReq();
         request.setExtInfo(info);
         post(execId, updateExecInfoUrl, request);
     }

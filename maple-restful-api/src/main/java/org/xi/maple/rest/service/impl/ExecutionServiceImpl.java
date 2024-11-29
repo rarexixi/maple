@@ -11,14 +11,15 @@ import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.util.MapleRedisUtil;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
+import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.rest.client.PersistenceClient;
 import org.xi.maple.rest.client.SchedulerClient;
-import org.xi.maple.rest.configuration.properties.MapleSecurityProperties;
 import org.xi.maple.rest.service.ExecutionService;
 import org.xi.maple.rest.service.MapleAppService;
+import org.xi.maple.service.util.ObjectUtils;
 
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public String getExecutionStatus(Integer jobId) {
-        EngineExecutionDetailResponse detail = persistenceClient.getExecutionById(jobId);
+        EngineExecutionDetailResp detail = persistenceClient.getExecutionById(jobId);
         if (detail == null) {
             throw new MapleDataNotFoundException(String.format("作业 %s 不存在", jobId));
         }
@@ -55,7 +56,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
-    public EngineExecutionDetailResponse detail(Integer id) {
+    public EngineExecutionDetailResp detail(Integer id) {
         return persistenceClient.getExecutionById(id);
     }
 
@@ -70,7 +71,7 @@ public class ExecutionServiceImpl implements ExecutionService {
      * @return 执行记录ID
      */
     @Override
-    public Integer submit(EngineExecutionAddRequest submitReq) {
+    public Integer submit(EngineExecutionSaveReq submitReq) {
         final Integer id = persistenceClient.addExecution(submitReq);
         if (id == null || id < 0) {
             return id;
@@ -78,16 +79,17 @@ public class ExecutionServiceImpl implements ExecutionService {
         threadPoolTaskExecutor.execute(() -> {
             MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getResourceGroup(),
                     submitReq.getFromApp(), submitReq.getGroup(), submitReq.getPriority());
-            persistenceClient.addOrUpdateExecQueue(execQueue);
+            EngineExecutionQueueSaveReq saveReq = ObjectUtils.copy(execQueue, EngineExecutionQueueSaveReq.class);
+            persistenceClient.upsertExecQueue(saveReq);
             logger.info("插入队列：{}, id: {}", execQueue.getQueueName(), id);
             redisTemplate.opsForList().leftPush(execQueue.getQueueName(), new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
-            persistenceClient.updateExecutionStatusById(id, new EngineExecutionUpdateStatusRequest(EngineExecutionStatus.ACCEPTED.toString()));
+            persistenceClient.updateExecutionStatusById(id, new EngineExecutionStatusUpdateReq(EngineExecutionStatus.ACCEPTED.toString()));
         });
         return id;
     }
 
     @Override
-    public Integer submitNow(EngineExecutionAddRequest submitReq) {
+    public Integer submitNow(EngineExecutionSaveReq submitReq) {
         final Integer id = persistenceClient.addExecution(submitReq);
         schedulerClient.submitExecution(id);
         return id;
@@ -95,7 +97,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public Object kill(Integer id, String app) {
-        EngineExecutionDetailResponse detail = detail(id);
+        EngineExecutionDetailResp detail = detail(id);
         if (!app.equals(detail.getFromApp())) {
             throw new MapleValidException("任务来源应用不一致");
         }
@@ -104,7 +106,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public Object stop(Integer id, Map<String, ?> cancelParams, String app) {
-        EngineExecutionDetailResponse detail = detail(id);
+        EngineExecutionDetailResp detail = detail(id);
         if (!app.equals(detail.getFromApp())) {
             throw new MapleValidException("任务来源应用不一致");
         }

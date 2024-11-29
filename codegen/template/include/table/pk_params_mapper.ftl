@@ -1,1 +1,0 @@
-<#list pks as column><#include "/include/column/properties.ftl"><#if (column_index > 0)>, </#if>@Param("${fieldName}") ${fieldType} ${fieldName}</#list>

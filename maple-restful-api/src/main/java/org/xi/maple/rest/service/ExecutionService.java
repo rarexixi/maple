@@ -1,7 +1,7 @@
 package org.xi.maple.rest.service;
 
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
+import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public interface ExecutionService {
      * @param id 执行记录ID
      * @return 作业详情
      */
-    EngineExecutionDetailResponse detail(Integer id);
+    EngineExecutionDetailResp detail(Integer id);
 
     /**
      * 提交执行
@@ -32,7 +32,7 @@ public interface ExecutionService {
      * @param submitReq 执行提交请求对象
      * @return 执行记录ID
      */
-    Integer submit(EngineExecutionAddRequest submitReq);
+    Integer submit(EngineExecutionSaveReq submitReq);
 
     /**
      * 立即执行，返回提交结果
@@ -40,7 +40,7 @@ public interface ExecutionService {
      * @param submitReq 执行提交请求对象
      * @return 执行记录ID
      */
-    Integer submitNow(EngineExecutionAddRequest submitReq);
+    Integer submitNow(EngineExecutionSaveReq submitReq);
 
     /**
      * 杀死执行任务

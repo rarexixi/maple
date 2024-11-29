@@ -1,6 +1,26 @@
 package org.xi.maple.persistence.service.impl;
 
+import org.xi.maple.common.constant.EngineExecutionStatus;
+import org.xi.maple.common.exception.MapleDataInsertException;
+import org.xi.maple.common.exception.MapleDataNotFoundException;
+import org.xi.maple.common.model.PageList;
+import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
+import org.xi.maple.service.util.ObjectUtils;
+import org.xi.maple.persistence.persistence.condition.EngineExecutionFilterCondition;
+import org.xi.maple.persistence.persistence.condition.EngineExecutionPkCondition;
+import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
+import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
+import org.xi.maple.persistence.persistence.mapper.EngineExecutionMapper;
+import org.xi.maple.persistence.model.request.EngineExecutionQueryReq;
+import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
+import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionItemResp;
+import org.xi.maple.persistence.service.EngineExecutionService;
+
 import com.github.pagehelper.Page;
+import com.github.pagehelper.ISelect;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -10,26 +30,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xi.maple.common.constant.EngineExecutionStatus;
-import org.xi.maple.common.exception.MapleDataInsertException;
-import org.xi.maple.common.exception.MapleDataNotFoundException;
-import org.xi.maple.common.model.PageList;
-import org.xi.maple.service.util.ObjectUtils;
-import org.xi.maple.persistence.model.request.EngineExecutionAddRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionUpdateStatusRequest;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResponse;
-import org.xi.maple.persistence.model.response.EngineExecutionListItemResponse;
-import org.xi.maple.persistence.persistence.condition.EngineExecutionSelectCondition;
-import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
-import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
-import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
-import org.xi.maple.persistence.persistence.mapper.EngineExecutionMapper;
-import org.xi.maple.persistence.service.EngineExecutionService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -53,17 +55,17 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     /**
      * 添加引擎执行记录
      *
-     * @param addRequest 引擎执行记录
-     * @return 引擎执行记录ID
+     * @param createReq 引擎执行记录
+     * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
-    public Integer add(EngineExecutionAddRequest addRequest) {
-        EngineExecutionEntity entity = ObjectUtils.copy(addRequest, EngineExecutionEntity.class);
+    @Transactional
+    public Integer create(EngineExecutionSaveReq createReq) {
+        EngineExecutionEntity entity = ObjectUtils.copy(createReq, EngineExecutionEntity.class);
         int count = engineExecutionMapper.insert(entity);
         if (count > 0) {
-            EngineExecutionExtInfoEntity extInfoEntity = ObjectUtils.copy(addRequest, EngineExecutionExtInfoEntity.class);
+            EngineExecutionExtInfoEntity extInfoEntity = ObjectUtils.copy(createReq, EngineExecutionExtInfoEntity.class);
             extInfoEntity.setId(entity.getId());
             engineExecutionMapper.insertExt(extInfoEntity);
             return entity.getId();
@@ -75,13 +77,13 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * 批量添加引擎执行记录
      *
      * @param list 引擎执行记录列表
-     * @return 引擎执行记录ID列表
+     * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @Override
-    public List<Integer> batchAdd(Collection<EngineExecutionAddRequest> list) {
-        if (list == null || list.size() == 0) {
+    @Transactional
+    public List<Integer> batchCreate(List<EngineExecutionSaveReq> list) {
+        if (list == null || list.isEmpty()) {
             return new ArrayList<>(0);
         }
         List<EngineExecutionEntity> entityList = ObjectUtils.copy(list, EngineExecutionEntity.class);
@@ -101,6 +103,8 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
         throw new MapleDataInsertException("批量插入失败");
     }
 
+    // region 更新
+
     /**
      * 根据执行ID更新引擎执行状态 todo 设置回调
      *
@@ -108,11 +112,11 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @CacheEvict(cacheNames = {"maple-execution"}, key = "#id")
+    @Transactional
     @Override
-    public int updateStatusById(int id, EngineExecutionUpdateStatusRequest updateRequest) {
-        EngineExecutionEntityExt entity = engineExecutionMapper.detailById(id);
+    public int updateStatusById(int id, EngineExecutionStatusUpdateReq updateRequest) {
+        EngineExecutionEntityExt entity = engineExecutionMapper.getById(id);
         if (entity == null) {
             throw new MapleDataNotFoundException("引擎执行记录不存在");
         }
@@ -154,16 +158,39 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    @Transactional
     @CacheEvict(cacheNames = {"maple-execution"}, key = "#id")
+    @Transactional
     @Override
-    public int updateExtInfoById(int id, EngineExecutionUpdateRequest updateRequest) {
+    public int patchExtInfoById(int id, EngineExecutionExtUpdateReq updateRequest) {
         EngineExecutionExtInfoEntity entity = ObjectUtils.copy(updateRequest, EngineExecutionExtInfoEntity.class);
-        return engineExecutionMapper.updateExtInfoById(id, entity);
+        entity.setId(id);
+        return engineExecutionMapper.patchExtInfoById(id, entity);
     }
 
     /**
-     * 根据执行ID获取引擎执行记录详情
+     * 根据执行ID更新引擎执行信息
+     *
+     * @param id      执行ID
+     * @param saveReq 保存引擎执行记录请求实体
+     * @return 更新后的引擎执行记录详情
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    @CacheEvict(cacheNames = {"maple-execution"}, key = "#id")
+    @Override
+    @Transactional
+    public EngineExecutionDetailResp patchById(Integer id, EngineExecutionSaveReq saveReq) {
+        EngineExecutionPkCondition condition = getPkCondition(id);
+        EngineExecutionEntity entity = ObjectUtils.copy(saveReq, EngineExecutionEntity.class);
+        engineExecutionMapper.patchByCondition(condition, entity);
+        return getById(id);
+    }
+
+    // endregion 更新
+
+    // region 详情
+
+    /**
+     * 根据获取引擎执行记录详情
      *
      * @param id 执行ID
      * @return 引擎执行记录详情
@@ -171,30 +198,39 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      */
     @Cacheable(cacheNames = {"maple-execution"}, key = "#id")
     @Override
-    public EngineExecutionDetailResponse getById(Integer id) {
-        EngineExecutionEntityExt entity = engineExecutionMapper.detailById(id);
+    public EngineExecutionDetailResp getById(Integer id) {
+        EngineExecutionEntityExt entity = engineExecutionMapper.getById(id);
         if (entity == null) {
-            throw new MapleDataNotFoundException("引擎执行记录不存在, id: " + id);
+            throw new MapleDataNotFoundException("引擎执行记录不存在");
         }
-        return ObjectUtils.copy(entity, EngineExecutionDetailResponse.class);
+        return ObjectUtils.copy(entity, EngineExecutionDetailResp.class);
     }
+
+    // endregion 详情
 
     /**
      * 分页获取引擎执行记录列表
      *
-     * @param queryRequest 搜索条件
-     * @param pageNum      页码
-     * @param pageSize     分页大小
+     * @param queryReq 搜索条件
+     * @param pageNum  页码
+     * @param pageSize 分页大小
      * @return 符合条件的引擎执行记录分页列表
      */
     @Override
-    public PageList<EngineExecutionListItemResponse> getPageList(EngineExecutionQueryRequest queryRequest, Integer pageNum, Integer pageSize) {
+    public PageList<EngineExecutionItemResp> getPageList(EngineExecutionQueryReq queryReq, Integer pageNum, Integer pageSize) {
 
-        EngineExecutionSelectCondition condition = ObjectUtils.copy(queryRequest, EngineExecutionSelectCondition.class);
-        try (Page<Object> page = PageHelper.startPage(pageNum, pageSize)) {
-            PageInfo<EngineExecutionEntityExt> pageInfo = page.doSelectPageInfo(() -> engineExecutionMapper.select(condition));
-            List<EngineExecutionListItemResponse> list = ObjectUtils.copy(pageInfo.getList(), EngineExecutionListItemResponse.class);
+        EngineExecutionFilterCondition condition = ObjectUtils.copy(queryReq, EngineExecutionFilterCondition.class);
+        ISelect select = () -> engineExecutionMapper.select(condition, null, queryReq.getSort());
+        try(Page<EngineExecutionEntityExt> page = PageHelper.startPage(pageNum, pageSize)) {
+            PageInfo<EngineExecutionEntityExt> pageInfo = page.doSelectPageInfo(select);
+            List<EngineExecutionItemResp> list = ObjectUtils.copy(pageInfo.getList(), EngineExecutionItemResp.class);
             return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);
         }
+    }
+
+    private EngineExecutionPkCondition getPkCondition(Integer id) {
+        EngineExecutionPkCondition condition = new EngineExecutionPkCondition();
+        condition.setId(id);
+        return condition;
     }
 }

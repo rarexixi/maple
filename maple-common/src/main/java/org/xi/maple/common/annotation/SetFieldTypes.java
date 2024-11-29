@@ -1,5 +1,7 @@
 package org.xi.maple.common.annotation;
 
+import org.xi.maple.common.constant.SetFieldType;
+
 import java.lang.annotation.*;
 
 /**
@@ -9,5 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface SetFieldTypes {
-    String[] types() default {};
+    SetFieldType[] types() default {};
 }
