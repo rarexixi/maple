@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 
-const {value, separator} = defineProps<{
+const {value, separator = ','} = defineProps<{
   value: string[],
-  separator: string
+  separator?: string
 }>()
 
-const arr = ref((value.value || []).join(','))
-watch(() => value, () => arr.value = ((value.value || []).join(',')))
+const arr = ref((value || []).join(','))
+watch(() => value, () => arr.value = ((value || []).join(',')))
 
 const emit = defineEmits<{
   (e: 'update:value', arr: string[]): void
@@ -20,6 +20,7 @@ const onValueBlur = (e: InputEvent) => {
 </script>
 
 <template>
-  <a-textarea v-model:value="arr" placeholder="value1,value2,value3,..." @blur="onValueBlur"
-    :auto-size="{ minRows: 1, maxRows: 20 }" />
+  <a-textarea v-model:value="arr" @blur="onValueBlur"
+              :placeholder="`value1${separator}value2${separator}value3,...`"
+              :auto-size="{ minRows: 1, maxRows: 20 }" />
 </template>

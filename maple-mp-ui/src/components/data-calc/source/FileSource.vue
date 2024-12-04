@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputStringArray from "@/components/data-calc/InputStringArray.vue"
-import InputStringMap from "@/components/data-calc/InputStringMap.vue"
+import AInputStringArray from "@/components/ant-ext/AInputStringArray.vue"
+import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface FileSourceValue {
@@ -64,10 +64,10 @@ const layout = SampleData.Layout
       </a-col>
     </a-row>
     <a-form-item name="columnNames" label="字段名" :label-col="layout.labelCols.large">
-      <input-string-array v-model:value="value!.columnNames" />
+      <a-input-string-array v-model:value="value!.columnNames" />
     </a-form-item>
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value!.options" />
+      <a-input-string-map v-model:value="value!.options" />
     </a-form-item>
   </a-form>
 </template>

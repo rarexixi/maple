@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputStringMap from "@/components/data-calc/InputStringMap.vue"
+import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface JdbcSourceValue {
@@ -73,7 +73,7 @@ const layout = SampleData.Layout
       <a-textarea v-model:value="value!.query" :auto-size="{ minRows: 2, maxRows: 20 }" />
     </a-form-item>
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value!.options" />
+      <a-input-string-map v-model:value="value!.options" />
     </a-form-item>
   </a-form>
 </template>

@@ -1,3 +1,13 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ # 指定 Eureka Server 的地址
+    register-with-eureka: true # 是否注册自己到 Eureka Server，默认为 true
+    fetch-registry: true # 是否从 Eureka Server 获取注册表信息，默认为 true
+  instance:
+    prefer-ip-address: true # 使用 IP 地址而不是主机名进行注册，默认为 false
+    instance-id: ${spring.application.name}:${server.port} # 设置实例 ID，默认是主机名和端口
+
 server:
   port: 8082
   servlet:

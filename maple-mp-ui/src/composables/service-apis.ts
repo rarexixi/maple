@@ -50,15 +50,26 @@ function getReqUrl(urlTpl: string, method: string) {
 }
 
 
-export const DatasourceApis = {
-  list: getReqUrl('/api/datasources/all', 'GET'),
-  pageList: getReqUrl('/api/datasources', 'GET'),
-  detail: getReqUrl('/api/datasources/{id}', 'GET'),
-  add: getReqUrl('/api/datasources', 'POST'),
-  update: getReqUrl('/api/datasources/{id}', 'PUT'),
-  enable: getReqUrl('/api/datasources/enable/{id|idList}', 'PATCH'),
-  disable: getReqUrl('/api/datasources/disable/{id|idList}', 'PATCH'),
-  delete: getReqUrl('/api/datasources/{id|idList}', 'DELETE'),
+export const ClusterApis = {
+  list: getReqUrl('/api/clusters/all', 'GET'),
+  pageList: getReqUrl('/api/clusters', 'GET'),
+  detail: getReqUrl('/api/clusters/{name}', 'GET'),
+  add: getReqUrl('/api/clusters', 'POST'),
+  update: getReqUrl('/api/clusters/{name}', 'PUT'),
+  enable: getReqUrl('/api/clusters/enable/{name|nameList}', 'PATCH'),
+  disable: getReqUrl('/api/clusters/disable/{name|nameList}', 'PATCH'),
+  delete: getReqUrl('/api/clusters/{name|nameList}', 'DELETE'),
+}
+
+export const ClusterEngineApis = {
+  list: getReqUrl('/api/cluster-engines/all', 'GET'),
+  pageList: getReqUrl('/api/cluster-engines', 'GET'),
+  detail: getReqUrl('/api/cluster-engines/{id}', 'GET'),
+  add: getReqUrl('/api/cluster-engines', 'POST'),
+  update: getReqUrl('/api/cluster-engines/{id}', 'PUT'),
+  enable: getReqUrl('/api/cluster-engines/enable/{id|idList}', 'PATCH'),
+  disable: getReqUrl('/api/cluster-engines/disable/{id|idList}', 'PATCH'),
+  delete: getReqUrl('/api/cluster-engines/{id|idList}', 'DELETE'),
 }
 
 
@@ -71,5 +82,17 @@ export const DatasourceTypeApis = {
   enable: getReqUrl('/api/datasource-types/enable/{typeCode|typeCodeList}', 'PATCH'),
   disable: getReqUrl('/api/datasource-types/disable/{typeCode|typeCodeList}', 'PATCH'),
   delete: getReqUrl('/api/datasource-types/{typeCode|typeCodeList}', 'DELETE'),
+}
+
+
+export const DatasourceApis = {
+  list: getReqUrl('/api/datasources/all', 'GET'),
+  pageList: getReqUrl('/api/datasources', 'GET'),
+  detail: getReqUrl('/api/datasources/{id}', 'GET'),
+  add: getReqUrl('/api/datasources', 'POST'),
+  update: getReqUrl('/api/datasources/{id}', 'PUT'),
+  enable: getReqUrl('/api/datasources/enable/{id|idList}', 'PATCH'),
+  disable: getReqUrl('/api/datasources/disable/{id|idList}', 'PATCH'),
+  delete: getReqUrl('/api/datasources/{id|idList}', 'DELETE'),
 }
 

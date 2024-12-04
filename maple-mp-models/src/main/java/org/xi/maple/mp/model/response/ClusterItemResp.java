@@ -1,7 +1,6 @@
 package org.xi.maple.mp.model.response;
 
 import lombok.Data;
-
 import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
@@ -10,37 +9,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-public class DatasourceItemResp implements Serializable {
+public class ClusterItemResp implements Serializable {
 
     /**
-     * Id
-     */
-    private Integer id;
-
-    /**
-     * 数据源名称
+     * 集群名称
      */
     private String name;
 
     /**
-     * 数据源描述
+     * 集群类型
      */
-    private String description;
+    private String category;
 
     /**
-     * 数据源类型
+     * 集群地址
      */
-    private String datasourceType;
+    private String address;
 
     /**
-     * 数据源版本
+     * 集群说明
      */
-    private String version;
+    private String desc;
 
     /**
-     * 数据源配置
+     * 集群配置
      */
-    private String datasourceConf;
+    private String configuration;
 
     /**
      * 是否禁用
@@ -67,7 +61,7 @@ public class DatasourceItemResp implements Serializable {
      */
     private LocalDateTime updatedAt;
 
-    public Map<String, Object> getDatasourceConf() {
-        return (Map<String, Object>) JsonUtils.parseObject(datasourceConf, Map.class, Map.of());
+    public Map<String, Object> getConfiguration() {
+        return (Map<String, Object>) JsonUtils.parseObject(configuration, Map.class, Map.of());
     }
 }

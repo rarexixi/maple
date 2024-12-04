@@ -103,9 +103,6 @@ const addConfOption = () => {
         添加配置项
       </a-button>
     </h3>
-    <template v-for="(confOption, index) in detail.configurations">
-      {{ confOption }}<br>
-    </template>
     <div style="width: 100%; overflow-x: auto;">
       <table class="config-keys-table" style="text-align: left;">
         <thead>

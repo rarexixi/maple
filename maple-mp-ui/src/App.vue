@@ -12,28 +12,45 @@ const selectedKeys = ref<string[]>(['1'])
 const selectedKeys2 = ref<string[]>(['1'])
 const navMenuItems = ref<MenuProps['items']>([
   {
-    key: 'datasource',
-    icon: () => h(AntdIcons['AppstoreOutlined']),
-    label: h(RouterLink, {to: '/datasource'}, `数据源`),
-    title: 'datasource',
+    key: 'cluster',
+    icon: () => h(AntdIcons['ClusterOutlined']),
+    label: h(RouterLink, {to: '/cluster'}, `集群`),
+    title: 'cluster',
+  },
+  {
+    key: 'clusterEngine',
+    icon: () => h(AntdIcons['DatabaseOutlined']),
+    label: h(RouterLink, {to: '/cluster-engine'}, `计算引擎`),
+    title: 'clusterEngine',
   },
   {
     key: 'datasourceType',
-    icon: () => h(AntdIcons['DatabaseOutlined']),
+    icon: () => h(AntdIcons['AppstoreOutlined']),
     label: h(RouterLink, {to: '/datasource-type'}, `数据源类型`),
     title: 'datasourceType',
   },
   {
-    key: 'dataCalcArray',
-    icon: () => h(AntdIcons['CalculatorOutlined']),
-    label: h(RouterLink, {to: '/data-calc-array'}, `数据计算-数组`),
-    title: 'dataCalcArray',
+    key: 'datasource',
+    icon: () => h(AntdIcons['DatabaseOutlined']),
+    label: h(RouterLink, {to: '/datasource'}, `数据源`),
+    title: 'datasource',
   },
   {
-    key: 'dataCalcGroup',
+    key: 'dataCalc',
     icon: () => h(AntdIcons['CalculatorOutlined']),
-    label: h(RouterLink, {to: '/data-calc-group'}, `数据计算-分组`),
-    title: 'dataCalcGroup',
+    label: '数据计算-数组',
+    children: [
+      {
+        key: 'dataCalcArray',
+        label: h(RouterLink, {to: '/data-calc-array'}, `数组方式`),
+        title: 'dataCalcArray',
+      },
+      {
+        key: 'dataCalcGroup',
+        label: h(RouterLink, {to: '/data-calc-group'}, `分组方式`),
+        title: 'dataCalcGroup',
+      },
+    ]
   },
 ])
 

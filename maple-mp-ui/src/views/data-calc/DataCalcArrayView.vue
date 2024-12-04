@@ -86,8 +86,8 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
       <a-divider />
       <template v-for="(item, index) in mapleConfig.plugins" :key="`${item.type}_${index}`">
         <AddPlugin @add="(type: string, name: string) => addPlugin(type, name, index)" />
-        <a-card>
-          <a-flex :justify="'space-between'" :align="'center'">
+        <a-card :class="pageConfig[index].expand ? 'card-open' : 'card-close'">
+          <a-flex :justify="'space-between'" :align="'center'" class="card-header">
             <span>
             <template v-if="item.type == 'sink'">
               <PluginOperations v-model:value="pageConfig[index]" :index="index"
@@ -105,7 +105,12 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
               注册表名：{{ item.config.resultTable }}
             </template>
             </span>
-            <span>{{ item.name }} - <a-typography-text strong>{{ item.type }}</a-typography-text></span>
+            <span>
+              {{ item.name }} -
+              <a-tag color="green" v-if="item.type == 'source'">{{ item.type }}</a-tag>
+              <a-tag color="orange" v-else-if="item.type == 'transformation'">{{ item.type }}</a-tag>
+              <a-tag  color="blue" v-else-if="item.type == 'sink'">{{ item.type }}</a-tag>
+            </span>
           </a-flex>
           <!--<component :is="`${item.name.replace('_', '-')}-${item.type}`" v-model:value="item.config" :name="`${item.type}_${index}`"
             v-show="pageConfig[index].expand" />-->

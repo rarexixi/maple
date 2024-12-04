@@ -1,12 +1,13 @@
 <script setup lang="ts">
 const {
+  disabled = 0,
   canEnable = true,
   canDisable = true,
   canEdit = true,
   canCopy = true,
   canDel = true,
 } = defineProps<{
-  disabled: number
+  disabled?: number
   canEnable?: boolean
   canDisable?: boolean
   canEdit?: boolean

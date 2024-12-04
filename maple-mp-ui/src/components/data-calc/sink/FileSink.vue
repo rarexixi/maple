@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputStringMap from "@/components/data-calc/InputStringMap.vue"
-import InputStringArray from "@/components/data-calc/InputStringArray.vue";
+import AInputStringArray from "@/components/ant-ext/AInputStringArray.vue"
+import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 
 interface FileSinkValue {
@@ -68,10 +68,10 @@ const layout = SampleData.Layout
       <a-textarea v-model:value="value!.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }" />
     </a-form-item>
     <a-form-item name="partitionBy" label="分区字段" :label-col="layout.labelCols.large">
-      <input-string-array v-model:value="value!.partitionBy" />
+      <a-input-string-array v-model:value="value!.partitionBy" />
     </a-form-item>
     <a-form-item name="options" label="参数" :label-col="layout.labelCols.large">
-      <input-string-map v-model:value="value!.options" />
+      <a-input-string-map v-model:value="value!.options" />
     </a-form-item>
   </a-form>
 </template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
-const {value, separator} = defineProps<{
+const {value, separator = '\n'} = defineProps<{
   value: string[],
-  separator: string
+  separator?: string
 }>()
 
 const emit = defineEmits<{
@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const getMapValue = (): string => {
   const arr: string[] = [] as string[]
-  let val = value.value || {};
+  let val = value || {};
   for (let key of Object.keys(val)) {
     arr.push(key + "=" + val[key])
   }
@@ -35,9 +35,11 @@ const onValueBlur = (e: InputEvent) => {
   const newValue = (e.target as any).value || ''
   emit('update:value', toJson(newValue));
 }
+
 </script>
 
 <template>
-  <a-textarea v-model:value="map" :placeholder="'key1=value1\nkey2=value2\n...'" @blur="onValueBlur"
-    :auto-size="{ minRows: 3, maxRows: 20 }" />
+  <a-textarea v-model:value="map" @blur="onValueBlur"
+              :placeholder="`key1=value1${separator}key2=value2${separator}...`"
+              :auto-size="{ minRows: 3, maxRows: 20 }" />
 </template>

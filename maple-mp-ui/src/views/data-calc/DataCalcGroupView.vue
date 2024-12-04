@@ -124,14 +124,17 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
       <a-typography-title :level="4">输入</a-typography-title>
       <template v-for="(item, index) in mapleConfig.sources" :key="`source_${index}`">
         <AddPlugin plugin-type="source" @add="(name: string) => addPlugin('source', name, index)" />
-        <a-card>
-          <a-flex :justify="'space-between'" :align="'center'">
+        <a-card :class="pageConfig.sources[index].expand ? 'card-open' : 'card-close'">
+          <a-flex :justify="'space-between'" :align="'center'" class="card-header">
             <span>
               <PluginOperations v-model:expand="pageConfig.sources[index].expand" :index="index"
                                 @delete="() => delPlugin('source', index)" />
               注册表名：{{ item.config.resultTable }}
             </span>
-            <span>{{ item.name }}</span>
+            <span>
+              {{ item.name }} -
+              <a-tag color="green">source</a-tag>
+            </span>
           </a-flex>
           <!--<component :is="`${item.name.replace('_', '-')}-source`" v-model:value="item.config" :name="`source_${index}`"
             v-show="pageConfig.sources[index].expand" />-->
@@ -156,14 +159,17 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
       <template v-for="(item, index) in mapleConfig.transformations" :key="`transformation_${index}`">
         <AddPlugin plugin-type="transformation"
                    @add="(name: string) => addPlugin('transformation', name, index)" />
-        <a-card>
-          <a-flex :justify="'space-between'" :align="'center'">
+        <a-card :class="pageConfig.transformations[index].expand ? 'card-open' : 'card-close'">
+          <a-flex :justify="'space-between'" :align="'center'" class="card-header">
             <span>
               <PluginOperations v-model:expand="pageConfig.transformations[index].expand" :index="index"
                                 @delete="() => delPlugin('transformation', index)" />
               注册表名：{{ item.config.resultTable }}
             </span>
-            <span>{{ item.name }}</span>
+            <span>
+              {{ item.name }} -
+              <a-tag color="orange">transform</a-tag>
+            </span>
           </a-flex>
           <!--<component :is="`${item.name.replace('_', '-')}-transformation`" v-model:value="item.config"
             :name="`transformation_${index}`" v-show="pageConfig.transformations[index].expand" />-->
@@ -178,8 +184,8 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
       <a-typography-title :level="4">输出</a-typography-title>
       <template v-for="(item, index) in mapleConfig.sinks" :key="`sink_${index}`">
         <AddPlugin plugin-type="sink" @add="name => addPlugin('sink', name, index)" />
-        <a-card>
-          <a-flex :justify="'space-between'" :align="'center'">
+        <a-card :class="pageConfig.sinks[index].expand ? 'card-open' : 'card-close'">
+          <a-flex :justify="'space-between'" :align="'center'" class="card-header">
             <span>
               <PluginOperations v-model:expand="pageConfig.sinks[index].expand" :index="index"
                                 @delete="() => delPlugin('sink', index)" />
@@ -190,7 +196,10 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
                 输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
               </template>
             </span>
-            <span>{{ item.name }}</span>
+            <span>
+              {{ item.name }} -
+              <a-tag  color="blue">sink</a-tag>
+            </span>
           </a-flex>
           <!--<component :is="`${item.name.replace('_', '-')}-sink`" v-model:value="item.config" :name="`sink_${index}`"
             v-show="pageConfig.sinks[index].expand" />-->

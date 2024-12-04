@@ -4,14 +4,24 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/datasource',
-      name: 'datasource',
-      component: () => import('@/views/datasource/DatasourceIndexView.vue')
+      path: '/cluster',
+      name: 'cluster',
+      component: () => import('@/views/cluster/ClusterIndexView.vue')
+    },
+    {
+      path: '/cluster-engine',
+      name: 'clusterEngine',
+      component: () => import('@/views/cluster-engine/ClusterEngineIndexView.vue')
     },
     {
       path: '/datasource-type',
       name: 'datasourceType',
       component: () => import('@/views/datasource-type/DatasourceTypeIndexView.vue')
+    },
+    {
+      path: '/datasource',
+      name: 'datasource',
+      component: () => import('@/views/datasource/DatasourceIndexView.vue')
     },
     {
       path: '/data-calc-array',
