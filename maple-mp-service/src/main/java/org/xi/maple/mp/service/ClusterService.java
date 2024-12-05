@@ -39,32 +39,32 @@ public interface ClusterService {
     /**
      * 删除集群
      *
-     * @param nameList 集群名称列表
+     * @param idList 集群ID列表
      * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int deleteByName(List<String> nameList, BaseEntity entity);
+    int deleteById(List<Integer> idList, BaseEntity entity);
 
     /**
      * 禁用集群
      *
-     * @param nameList 集群名称列表
+     * @param idList 集群ID列表
      * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int disableByName(List<String> nameList, BaseEntity entity);
+    int disableById(List<Integer> idList, BaseEntity entity);
 
     /**
      * 启用集群
      *
-     * @param nameList 集群名称列表
+     * @param idList 集群ID列表
      * @param entity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int enableByName(List<String> nameList, BaseEntity entity);
+    int enableById(List<Integer> idList, BaseEntity entity);
 
     // endregion 删除/启用/禁用
 
@@ -73,22 +73,22 @@ public interface ClusterService {
     /**
      * 根据更新集群非空字段
      *
-     * @param name 集群名称
+     * @param id 集群ID
      * @param saveReq 保存集群请求实体
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResp patchByName(String name, ClusterSaveReq saveReq);
+    ClusterDetailResp patchById(Integer id, ClusterSaveReq saveReq);
 
     /**
      * 根据更新集群所有字段
      *
-     * @param name 集群名称
+     * @param id 集群ID
      * @param saveReq 保存集群请求实体
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResp updateByName(String name, ClusterSaveReq saveReq);
+    ClusterDetailResp updateById(Integer id, ClusterSaveReq saveReq);
 
     // endregion 更新
 
@@ -97,11 +97,11 @@ public interface ClusterService {
     /**
      * 根据获取集群详情
      *
-     * @param name 集群名称
+     * @param id 集群ID
      * @return 集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResp getByName(String name);
+    ClusterDetailResp getById(Integer id);
 
     // endregion 详情
 

@@ -14,10 +14,11 @@ import DataOperations from "@/components/DataOperations.vue"
 import TableOperations from "@/components/TableOperations.vue"
 import ClusterUpsertForm from "@/components/cluster/ClusterUpsertForm.vue"
 
-const pkFields = ['name']
+const pkFields = ['id']
 
 const searchParams = reactive<any>({
-  name: undefined,
+  id: undefined,
+  addressContains: undefined,
 })
 
 const {
@@ -30,6 +31,11 @@ const {
 const selection = getSelection()
 const {selected, rowSelection} = selection
 
+const categoryOptions = [
+  {value: 'K8s', label: 'K8s'},
+  {value: 'YARN', label: 'YARN'}
+]
+
 onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
@@ -41,15 +47,14 @@ onMounted(() => {
 })
 
 const columns = [
-  { title: '集群名称', dataIndex: 'name', key: 'name' },
-  { title: '集群类型', dataIndex: 'category', key: 'category' },
-  { title: '集群地址', dataIndex: 'address', key: 'address' },
-  { title: '集群说明', dataIndex: 'desc', key: 'desc' },
-  { title: '集群配置', dataIndex: 'configuration', key: 'configuration' },
-  { title: '创建人', dataIndex: 'createdBy', key: 'createdBy' },
-  { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
-  { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
-  { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+  {title: '集群ID', dataIndex: 'id', key: 'id'},
+  {title: '集群名称', dataIndex: 'name', key: 'name'},
+  {title: '集群种类', dataIndex: 'category', key: 'category'},
+  {title: '集群地址', dataIndex: 'address', key: 'address'},
+  {title: '创建人', dataIndex: 'createdBy', key: 'createdBy'},
+  {title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy'},
+  {title: '创建时间', dataIndex: 'createdAt', key: 'createdAt'},
+  {title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt'},
   {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
 ]
 
@@ -64,15 +69,21 @@ const callback: OperateCallback = {
     detail.category = response.category
     detail.address = response.address
     detail.desc = response.desc
-    detail.configuration = response.configuration
+    detail.clusterConf = response.clusterConf
+    if (response.category == 'K8s') {
+      detail.clusterConf = {config: {clientCertData: '', ...response.clusterConf.config}}
+    } else {
+      detail.clusterConf = {...response.clusterConf}
+    }
   },
   research: search,
   resetDetail: (detail: any) => {
+    detail.id = undefined
     detail.name = ''
     detail.category = ''
     detail.address = ''
     detail.desc = ''
-    detail.configuration = ''
+    detail.clusterConf = ''
   },
   setItem: (detail: any, editIndex: number) => {
     dataPageList.list[editIndex] = detail
@@ -110,8 +121,11 @@ const {
 <template>
   <div class="search-form">
     <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
-      <a-form-item label="集群名称">
-        <a-input v-model:value.trim="searchParams.name" allow-clear />
+      <a-form-item label="集群ID">
+        <a-input-number v-model:value="searchParams.id" allow-clear />
+      </a-form-item>
+      <a-form-item label="集群地址">
+        <a-input v-model:value.trim="searchParams.addressContains" allow-clear />
       </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit">
@@ -149,7 +163,8 @@ const {
       {{ drawerTitle }}
     </template>
     <ClusterUpsertForm ref="detailFormRef" v-model="detail"
-                            @save="upsert">
+                       :category-options="categoryOptions"
+                       @save="upsert">
       <template #buttons>
         <a-button style="margin-left: 10px" @click="() => closeUpsertDrawer()">取消</a-button>
       </template>

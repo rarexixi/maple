@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.mp.persistence.mapper.SysConfMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.mp.persistence.entity.SysConfEntity">
+        <result property="confKey" column="conf_key"/>
+        <result property="confValue" column="conf_value"/>
+        <result property="desc" column="desc"/>
+        <result property="disabled" column="disabled"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.mp.persistence.entity.SysConfEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_sys_conf`</sql>
+
+    <!--插入系统配置-->
+    <insert id="insert">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.confKey != null">`conf_key`,</if>
+            <if test="entity.confValue != null">`conf_value`,</if>
+            <if test="entity.desc != null">`desc`,</if>
+            <if test="entity.disabled != null">`disabled`,</if>
+            <if test="entity.createdBy != null">`created_by`,</if>
+            <if test="entity.updatedBy != null">`updated_by`,</if>
+            <if test="entity.createdAt != null">`created_at`,</if>
+            <if test="entity.updatedAt != null">`updated_at`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.confKey != null">#{entity.confKey},</if>
+            <if test="entity.confValue != null">#{entity.confValue},</if>
+            <if test="entity.desc != null">#{entity.desc},</if>
+            <if test="entity.disabled != null">#{entity.disabled},</if>
+            <if test="entity.createdBy != null">#{entity.createdBy},</if>
+            <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
+            <if test="entity.createdAt != null">#{entity.createdAt},</if>
+            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入系统配置-->
+    <insert id="batchInsert">
+        insert into <include refid="tableName"/>
+        (
+            `conf_key`,
+            `conf_value`,
+            `desc`,
+            `disabled`,
+            `created_by`,
+            `updated_by`,
+            `created_at`,
+            `updated_at`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.confKey},
+            #{item.confValue},
+            #{item.desc},
+            #{item.disabled},
+            #{item.createdBy},
+            #{item.updatedBy},
+            #{item.createdAt},
+            #{item.updatedAt}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据条件删除系统配置-->
+    <delete id="deleteByCondition">
+        DELETE FROM <include refid="tableName"/>
+        <include refid="updateByPkWhere"/>
+    </delete>
+
+    <!--根据条件更新系统配置实体不为空的字段-->
+    <update id="patchByCondition">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.confValue != null">
+                `conf_value` = #{entity.confValue},
+            </if>
+            <if test="entity.desc != null">
+                `desc` = #{entity.desc},
+            </if>
+            <if test="entity.disabled != null">
+                `disabled` = #{entity.disabled},
+            </if>
+            <if test="entity.updatedBy != null">
+                `updated_by` = #{entity.updatedBy},
+            </if>
+            <if test="entity.updatedAt != null">
+                `updated_at` = #{entity.updatedAt}
+            </if>
+        </set>
+        <include refid="updateByPkWhere"/>
+    </update>
+
+    <!--根据条件更新系统配置所有字段-->
+    <update id="updateByConfKey">
+        UPDATE <include refid="tableName"/>
+        <set>
+            `conf_value` = #{entity.confValue},
+            `desc` = #{entity.desc},
+            `updated_by` = #{entity.updatedBy},
+            `updated_at` = #{entity.updatedAt}
+        </set>
+        <where>
+            `conf_key` = #{confKey}
+        </where>
+    </update>
+
+    <!--根据主键获取系统配置详情-->
+    <select id="getByConfKey" resultMap="ExtResultMap">
+        SELECT
+            MT.`conf_key`,
+            MT.`conf_value`,
+            MT.`desc`,
+            MT.`disabled`,
+            MT.`created_by`,
+            MT.`updated_by`,
+            MT.`created_at`,
+            MT.`updated_at`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            MT.`conf_key` = #{confKey}
+        </where>
+    </select>
+
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
+            </when>
+            <otherwise>
+                MT.`conf_key`,
+                MT.`conf_value`,
+                MT.`desc`,
+                MT.`disabled`,
+                MT.`created_by`,
+                MT.`updated_by`,
+                MT.`created_at`,
+                MT.`updated_at`
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <choose>
+                    <when test="condition.confKey != null">
+                        `conf_key` = #{condition.confKey}
+                    </when>
+                    <otherwise>
+                        `conf_key` IN
+                        <foreach collection="condition.confKeyIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.confKey != null and condition.confKey != ''">
+                        AND MT.`conf_key` = #{condition.confKey}
+                    </if>
+                    <if test="condition.confKeyIn != null and condition.confKeyIn.size() > 0">
+                        AND MT.`conf_key` IN
+                        <foreach collection="condition.confKeyIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.confKeyNotIn != null and condition.confKeyNotIn.size() > 0">
+                        AND MT.`conf_key` NOT IN
+                        <foreach collection="condition.confKeyNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.confKeyIsNotEmpty != null and condition.confKeyIsNotEmpty == true">
+                        AND MT.`conf_key` IS NOT NULL AND `conf_key` != ''
+                    </if>
+                    <if test="condition.confKeyIsEmpty != null and condition.confKeyIsEmpty == true">
+                        AND (MT.`conf_key` IS NULL OR MT.`conf_key` = '')
+                    </if>
+                    <if test="condition.confKeyStartWith != null and condition.confKeyStartWith != ''">
+                        AND MT.`conf_key` LIKE concat(#{condition.confKeyStartWith}, '%')
+                    </if>
+                    <if test="condition.confKeyEndWith != null and condition.confKeyEndWith != ''">
+                        AND MT.`conf_key` LIKE concat('%', #{condition.confKeyEndWith})
+                    </if>
+                    <if test="condition.confKeyContains != null and condition.confKeyContains != ''">
+                        AND MT.`conf_key` LIKE concat('%', #{condition.confKeyContains}, '%')
+                    </if>
+                    <if test="condition.disabled != null">
+                        AND MT.`disabled` = #{condition.disabled}
+                    </if>
+                    <if test="condition.createdBy != null">
+                        AND MT.`created_by` = #{condition.createdBy}
+                    </if>
+                    <if test="condition.createdByIn != null and condition.createdByIn.size() > 0">
+                        AND MT.`created_by` IN
+                        <foreach collection="condition.createdByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createdByNotIn != null and condition.createdByNotIn.size() > 0">
+                        AND MT.`created_by` NOT IN
+                        <foreach collection="condition.createdByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createdByMin != null">
+                        <![CDATA[
+                        AND MT.`created_by` >= #{condition.createdByMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createdByMax != null">
+                        <![CDATA[
+                        AND MT.`created_by` <= #{condition.createdByMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedBy != null">
+                        AND MT.`updated_by` = #{condition.updatedBy}
+                    </if>
+                    <if test="condition.updatedByIn != null and condition.updatedByIn.size() > 0">
+                        AND MT.`updated_by` IN
+                        <foreach collection="condition.updatedByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updatedByNotIn != null and condition.updatedByNotIn.size() > 0">
+                        AND MT.`updated_by` NOT IN
+                        <foreach collection="condition.updatedByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updatedByMin != null">
+                        <![CDATA[
+                        AND MT.`updated_by` >= #{condition.updatedByMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedByMax != null">
+                        <![CDATA[
+                        AND MT.`updated_by` <= #{condition.updatedByMax}
+                        ]]>
+                    </if>
+                    <if test="condition.createdAtMin != null">
+                        <![CDATA[
+                        AND MT.`created_at` >= #{condition.createdAtMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createdAtMax != null">
+                        <![CDATA[
+                        AND MT.`created_at` <= #{condition.createdAtMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedAtMin != null">
+                        <![CDATA[
+                        AND MT.`updated_at` >= #{condition.updatedAtMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedAtMax != null">
+                        <![CDATA[
+                        AND MT.`updated_at` <= #{condition.updatedAtMax}
+                        ]]>
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+</mapper>

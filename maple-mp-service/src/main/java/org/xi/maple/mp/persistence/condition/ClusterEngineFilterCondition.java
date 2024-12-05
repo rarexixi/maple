@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 /**
- * 集群引擎查询条件
+ * 计算引擎查询条件
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */
@@ -45,122 +45,122 @@ public class ClusterEngineFilterCondition implements FilterCondition {
     private Integer idMax;
 
     /**
-     * 集群名称
+     * 所属集群
      */
     private String cluster;
 
     /**
-     * 集群名称列表
+     * 所属集群列表
      */
     private Collection<String> clusterIn;
 
     /**
-     * 排除的集群名称列表
+     * 排除的所属集群列表
      */
     private Collection<String> clusterNotIn;
 
     /**
-     * 集群名称不为空
+     * 所属集群不为空
      */
     private Boolean clusterIsNotEmpty;
 
     /**
-     * 集群名称为空
+     * 所属集群为空
      */
     private Boolean clusterIsEmpty;
 
     /**
-     * 集群名称开始
+     * 所属集群开始
      */
     private String clusterStartWith;
 
     /**
-     * 集群名称结束
+     * 所属集群结束
      */
     private String clusterEndWith;
 
     /**
-     * 集群名称包含
+     * 所属集群包含
      */
     private String clusterContains;
 
     /**
-     * 类型名称
+     * 引擎名称
      */
     private String name;
 
     /**
-     * 类型名称列表
+     * 引擎名称列表
      */
     private Collection<String> nameIn;
 
     /**
-     * 排除的类型名称列表
+     * 排除的引擎名称列表
      */
     private Collection<String> nameNotIn;
 
     /**
-     * 类型名称不为空
+     * 引擎名称不为空
      */
     private Boolean nameIsNotEmpty;
 
     /**
-     * 类型名称为空
+     * 引擎名称为空
      */
     private Boolean nameIsEmpty;
 
     /**
-     * 类型名称开始
+     * 引擎名称开始
      */
     private String nameStartWith;
 
     /**
-     * 类型名称结束
+     * 引擎名称结束
      */
     private String nameEndWith;
 
     /**
-     * 类型名称包含
+     * 引擎名称包含
      */
     private String nameContains;
 
     /**
-     * 类型版本
+     * 引擎版本
      */
     private String version;
 
     /**
-     * 类型版本列表
+     * 引擎版本列表
      */
     private Collection<String> versionIn;
 
     /**
-     * 排除的类型版本列表
+     * 排除的引擎版本列表
      */
     private Collection<String> versionNotIn;
 
     /**
-     * 类型版本不为空
+     * 引擎版本不为空
      */
     private Boolean versionIsNotEmpty;
 
     /**
-     * 类型版本为空
+     * 引擎版本为空
      */
     private Boolean versionIsEmpty;
 
     /**
-     * 类型版本开始
+     * 引擎版本开始
      */
     private String versionStartWith;
 
     /**
-     * 类型版本结束
+     * 引擎版本结束
      */
     private String versionEndWith;
 
     /**
-     * 类型版本包含
+     * 引擎版本包含
      */
     private String versionContains;
 
@@ -203,6 +203,61 @@ public class ClusterEngineFilterCondition implements FilterCondition {
      * 引擎目录包含
      */
     private String engineHomeContains;
+
+    /**
+     * 是否禁用
+     */
+    private Integer disabled;
+
+    /**
+     * 创建人
+     */
+    private Integer createdBy;
+
+    /**
+     * 创建人列表
+     */
+    private Collection<Integer> createdByIn;
+
+    /**
+     * 排除的创建人列表
+     */
+    private Collection<Integer> createdByNotIn;
+
+    /**
+     * 最小创建人
+     */
+    private Integer createdByMin;
+
+    /**
+     * 最大创建人
+     */
+    private Integer createdByMax;
+
+    /**
+     * 修改人
+     */
+    private Integer updatedBy;
+
+    /**
+     * 修改人列表
+     */
+    private Collection<Integer> updatedByIn;
+
+    /**
+     * 排除的修改人列表
+     */
+    private Collection<Integer> updatedByNotIn;
+
+    /**
+     * 最小修改人
+     */
+    private Integer updatedByMin;
+
+    /**
+     * 最大修改人
+     */
+    private Integer updatedByMax;
 
     /**
      * 最小创建时间

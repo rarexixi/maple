@@ -12,15 +12,21 @@ import java.util.Map;
 public class ClusterSaveReq extends BaseEntity {
 
     /**
+     * 集群ID
+     */
+    @NotNull(message = "id(集群ID)不能为空", groups = {Jsr303ValidGroup.Put.class, Jsr303ValidGroup.Patch.class})
+    private Integer id;
+
+    /**
      * 集群名称
      */
-    @NotBlank(message = "name(集群名称)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class, Jsr303ValidGroup.Patch.class})
+    @NotBlank(message = "name(集群名称)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
     private String name;
 
     /**
-     * 集群类型
+     * 集群种类
      */
-    @NotBlank(message = "category(集群类型)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    @NotBlank(message = "category(集群种类)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
     private String category;
 
     /**
@@ -37,10 +43,10 @@ public class ClusterSaveReq extends BaseEntity {
     /**
      * 集群配置
      */
-    @NotBlank(message = "configuration(集群配置)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private String configuration;
+    @NotBlank(message = "clusterConf(集群配置)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private String clusterConf;
 
-    public void setConfiguration(Map<String, ?> configuration) {
-        this.configuration = JsonUtils.toJsonString(configuration, "{}");
+    public void setClusterConf(Map<String, ?> clusterConf) {
+        this.clusterConf = JsonUtils.toJsonString(clusterConf, "{}");
     }
 }

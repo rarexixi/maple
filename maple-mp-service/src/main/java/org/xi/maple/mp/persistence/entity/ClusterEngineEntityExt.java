@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 集群引擎扩展实体
+ * 计算引擎扩展实体
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */
@@ -16,4 +16,17 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ClusterEngineEntityExt extends ClusterEngineEntity {
+
+    /**
+     * 所属集群
+     */
+    private String clusterText;
+
+    private void setClusterText (String clusterText) {
+        this.clusterText = clusterText;
+    }
+
+    private String getClusterText() {
+        return clusterText;
+    }
 }

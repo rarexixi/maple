@@ -10,19 +10,43 @@ import java.util.Collection;
 @Data
 public class ClusterQueryReq extends QueryReq {
 
-    private String name;
+    private Integer id;
 
-    private Collection<String> nameIn;
+    private Collection<Integer> idIn;
 
-    private String nameContains;
+    private Integer idMin;
+
+    private Integer idMax;
+
+    private String address;
+
+    private Collection<String> addressIn;
+
+    private String addressContains;
 
     private Integer disabled;
 
-    public void setNameSort(SortConstants sortConstants)  {
-        super.orderBy("name", sortConstants);
+    public void setIdRange(Integer[] idRange)  {
+        if (idRange == null || idRange.length != 2) {
+            return;
+        }
+        this.idMin = idRange[0];
+        this.idMax = idRange[1];
     }
 
-    public void getNameSort()  {
-        super.getOrderBy().getOrDefault("name", null);
+    public void setIdSort(SortConstants sortConstants)  {
+        super.orderBy("id", sortConstants);
+    }
+
+    public void getIdSort()  {
+        super.getOrderBy().getOrDefault("id", null);
+    }
+
+    public void setAddressSort(SortConstants sortConstants)  {
+        super.orderBy("address", sortConstants);
+    }
+
+    public void getAddressSort()  {
+        super.getOrderBy().getOrDefault("address", null);
     }
 }

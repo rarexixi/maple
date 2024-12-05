@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 集群引擎业务逻辑
+ * 计算引擎业务逻辑
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */
@@ -40,9 +40,9 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
     }
 
     /**
-     * 添加集群引擎
+     * 添加计算引擎
      *
-     * @param createReq 集群引擎
+     * @param createReq 计算引擎
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
@@ -55,9 +55,9 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
     }
 
     /**
-     * 批量添加集群引擎
+     * 批量添加计算引擎
      *
-     * @param list 集群引擎列表
+     * @param list 计算引擎列表
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
@@ -68,10 +68,10 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
         return clusterEngineMapper.batchInsert(entityList);
     }
 
-    // region 删除
+    // region 删除/启用/禁用
 
     /**
-     * 删除集群引擎
+     * 删除计算引擎
      *
      * @param idList 引擎ID列表
      * @param baseEntity
@@ -85,16 +85,50 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
         return clusterEngineMapper.deleteByCondition(condition);
     }
 
-    // endregion 删除
+    /**
+     * 禁用计算引擎
+     *
+     * @param idList 引擎ID列表
+     * @param baseEntity
+     * @return 受影响的行数
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    @Override
+    @Transactional
+    public int disableById(List<Integer> idList, BaseEntity baseEntity) {
+        ClusterEnginePkCondition condition = getPkCondition(idList);
+        ClusterEngineEntity entity = ObjectUtils.copy(baseEntity, ClusterEngineEntity.class);
+        entity.setDisabled(ValidConstant.INVALID);
+        return clusterEngineMapper.patchByCondition(condition, entity);
+    }
+
+    /**
+     * 启用计算引擎
+     *
+     * @param idList 引擎ID列表
+     * @param baseEntity
+     * @return 受影响的行数
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    @Override
+    @Transactional
+    public int enableById(List<Integer> idList, BaseEntity baseEntity) {
+        ClusterEnginePkCondition condition = getPkCondition(idList);
+        ClusterEngineEntity entity = ObjectUtils.copy(baseEntity, ClusterEngineEntity.class);
+        entity.setDisabled(ValidConstant.VALID);
+        return clusterEngineMapper.patchByCondition(condition, entity);
+    }
+
+    // endregion 删除/启用/禁用
 
     // region 更新
 
     /**
-     * 根据更新集群引擎非空字段
+     * 根据更新计算引擎非空字段
      *
      * @param id 引擎ID
-     * @param saveReq 保存集群引擎请求实体
-     * @return 更新后的集群引擎详情
+     * @param saveReq 保存计算引擎请求实体
+     * @return 更新后的计算引擎详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
@@ -107,11 +141,11 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
     }
 
     /**
-     * 根据更新集群引擎所有字段
+     * 根据更新计算引擎所有字段
      *
      * @param id 引擎ID
-     * @param saveReq 保存集群引擎请求实体
-     * @return 更新后的集群引擎详情
+     * @param saveReq 保存计算引擎请求实体
+     * @return 更新后的计算引擎详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
@@ -127,17 +161,17 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
     // region 详情
 
     /**
-     * 根据获取集群引擎详情
+     * 根据获取计算引擎详情
      *
      * @param id 引擎ID
-     * @return 集群引擎详情
+     * @return 计算引擎详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     public ClusterEngineDetailResp getById(Integer id) {
         ClusterEngineEntityExt entity = clusterEngineMapper.getById(id);
         if (entity == null) {
-            throw new MapleDataNotFoundException("集群引擎不存在");
+            throw new MapleDataNotFoundException("计算引擎不存在");
         }
         return ObjectUtils.copy(entity, ClusterEngineDetailResp.class);
     }
@@ -145,10 +179,10 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
     // endregion 详情
 
     /**
-     * 获取集群引擎列表
+     * 获取计算引擎列表
      *
      * @param queryReq 搜索条件
-     * @return 符合条件的集群引擎列表
+     * @return 符合条件的计算引擎列表
      */
     @Override
     public List<ClusterEngineItemResp> getList(ClusterEngineQueryReq queryReq) {
@@ -158,12 +192,12 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
     }
 
     /**
-     * 分页获取集群引擎列表
+     * 分页获取计算引擎列表
      *
      * @param queryReq 搜索条件
      * @param pageNum      页码
      * @param pageSize     分页大小
-     * @return 符合条件的集群引擎分页列表
+     * @return 符合条件的计算引擎分页列表
      */
     @Override
     public PageList<ClusterEngineItemResp> getPageList(ClusterEngineQueryReq queryReq, Integer pageNum, Integer pageSize) {

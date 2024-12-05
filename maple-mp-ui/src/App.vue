@@ -12,6 +12,12 @@ const selectedKeys = ref<string[]>(['1'])
 const selectedKeys2 = ref<string[]>(['1'])
 const navMenuItems = ref<MenuProps['items']>([
   {
+    key: 'sysConf',
+    icon: () => h(AntdIcons['ClusterOutlined']),
+    label: h(RouterLink, {to: '/sys-conf'}, `系统配置`),
+    title: 'sysConf',
+  },
+  {
     key: 'cluster',
     icon: () => h(AntdIcons['ClusterOutlined']),
     label: h(RouterLink, {to: '/cluster'}, `集群`),
@@ -34,6 +40,12 @@ const navMenuItems = ref<MenuProps['items']>([
     icon: () => h(AntdIcons['DatabaseOutlined']),
     label: h(RouterLink, {to: '/datasource'}, `数据源`),
     title: 'datasource',
+  },
+  {
+    key: 'job',
+    icon: () => h(AntdIcons['DatabaseOutlined']),
+    label: h(RouterLink, {to: '/job'}, `作业`),
+    title: 'job',
   },
   {
     key: 'dataCalc',

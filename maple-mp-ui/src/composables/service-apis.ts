@@ -49,16 +49,24 @@ function getReqUrl(urlTpl: string, method: string) {
   }
 }
 
+export const SysConfApis = {
+  list: getReqUrl('/api/sys-conf/all', 'GET'),
+  pageList: getReqUrl('/api/sys-conf', 'GET'),
+  detail: getReqUrl('/api/sys-conf/{confKey}', 'GET'),
+  add: getReqUrl('/api/sys-conf', 'POST'),
+  update: getReqUrl('/api/sys-conf/{confKey}', 'PUT'),
+  delete: getReqUrl('/api/sys-conf/{confKey|confKeyList}', 'DELETE'),
+}
 
 export const ClusterApis = {
   list: getReqUrl('/api/clusters/all', 'GET'),
   pageList: getReqUrl('/api/clusters', 'GET'),
-  detail: getReqUrl('/api/clusters/{name}', 'GET'),
+  detail: getReqUrl('/api/clusters/{id}', 'GET'),
   add: getReqUrl('/api/clusters', 'POST'),
-  update: getReqUrl('/api/clusters/{name}', 'PUT'),
-  enable: getReqUrl('/api/clusters/enable/{name|nameList}', 'PATCH'),
-  disable: getReqUrl('/api/clusters/disable/{name|nameList}', 'PATCH'),
-  delete: getReqUrl('/api/clusters/{name|nameList}', 'DELETE'),
+  update: getReqUrl('/api/clusters/{id}', 'PUT'),
+  enable: getReqUrl('/api/clusters/enable/{id|idList}', 'PATCH'),
+  disable: getReqUrl('/api/clusters/disable/{id|idList}', 'PATCH'),
+  delete: getReqUrl('/api/clusters/{id|idList}', 'DELETE'),
 }
 
 export const ClusterEngineApis = {
@@ -94,5 +102,17 @@ export const DatasourceApis = {
   enable: getReqUrl('/api/datasources/enable/{id|idList}', 'PATCH'),
   disable: getReqUrl('/api/datasources/disable/{id|idList}', 'PATCH'),
   delete: getReqUrl('/api/datasources/{id|idList}', 'DELETE'),
+}
+
+
+export const JobApis = {
+  list: getReqUrl('/api/jobs/all', 'GET'),
+  pageList: getReqUrl('/api/jobs', 'GET'),
+  detail: getReqUrl('/api/jobs/{id}', 'GET'),
+  add: getReqUrl('/api/jobs', 'POST'),
+  update: getReqUrl('/api/jobs/{id}', 'PUT'),
+  enable: getReqUrl('/api/jobs/enable/{id|idList}', 'PATCH'),
+  disable: getReqUrl('/api/jobs/disable/{id|idList}', 'PATCH'),
+  delete: getReqUrl('/api/jobs/{id|idList}', 'DELETE'),
 }
 

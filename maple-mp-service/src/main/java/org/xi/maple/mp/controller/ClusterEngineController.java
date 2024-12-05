@@ -47,7 +47,7 @@ public class ClusterEngineController {
 
     // endregion 创建
 
-    // region 删除
+    // region 删除/启用/禁用
 
     @DeleteMapping("/{idList}")
     public ResponseEntity<Integer> deleteById(
@@ -58,7 +58,25 @@ public class ClusterEngineController {
         return ResponseEntity.ok(count);
     }
 
-    // endregion 删除
+    @PatchMapping("/disable/{idList}")
+    public ResponseEntity<Integer> disableById(
+            @PathVariable("idList") @Validated List<@NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer> idList,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = clusterEngineService.disableById(idList, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    @PatchMapping("/enable/{idList}")
+    public ResponseEntity<Integer> enableById(
+            @PathVariable("idList") @Validated List<@NotNull(message = "id(引擎ID)不能为空") @Min(value = 1, message = "id(引擎ID)必须大于0") Integer> idList,
+            @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
+    ) {
+        Integer count = clusterEngineService.enableById(idList, baseEntity);
+        return ResponseEntity.ok(count);
+    }
+
+    // endregion 删除/启用/禁用
 
     // region 更新
 

@@ -9,16 +9,20 @@
         <result property="name" column="name"/>
         <result property="version" column="version"/>
         <result property="engineHome" column="engine_home"/>
-        <result property="extInfo" column="ext_info"/>
+        <result property="engineConf" column="engine_conf"/>
+        <result property="disabled" column="disabled"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.mp.persistence.entity.ClusterEngineEntityExt">
+        <result property="clusterText" column="cluster_text"/>
     </resultMap>
 
     <sql id="tableName">`maple_cluster_engine`</sql>
 
-    <!--插入集群引擎-->
+    <!--插入计算引擎-->
     <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
         insert into <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -27,7 +31,10 @@
             <if test="entity.name != null">`name`,</if>
             <if test="entity.version != null">`version`,</if>
             <if test="entity.engineHome != null">`engine_home`,</if>
-            <if test="entity.extInfo != null">`ext_info`,</if>
+            <if test="entity.engineConf != null">`engine_conf`,</if>
+            <if test="entity.disabled != null">`disabled`,</if>
+            <if test="entity.createdBy != null">`created_by`,</if>
+            <if test="entity.updatedBy != null">`updated_by`,</if>
             <if test="entity.createdAt != null">`created_at`,</if>
             <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
@@ -37,14 +44,17 @@
             <if test="entity.name != null">#{entity.name},</if>
             <if test="entity.version != null">#{entity.version},</if>
             <if test="entity.engineHome != null">#{entity.engineHome},</if>
-            <if test="entity.extInfo != null">#{entity.extInfo},</if>
+            <if test="entity.engineConf != null">#{entity.engineConf},</if>
+            <if test="entity.disabled != null">#{entity.disabled},</if>
+            <if test="entity.createdBy != null">#{entity.createdBy},</if>
+            <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
             <if test="entity.createdAt != null">#{entity.createdAt},</if>
             <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
         </trim>
     </insert>
 
     <!--todo 插入具体的列-->
-    <!--批量插入集群引擎-->
+    <!--批量插入计算引擎-->
     <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
         insert into <include refid="tableName"/>
         (
@@ -53,7 +63,10 @@
             `name`,
             `version`,
             `engine_home`,
-            `ext_info`,
+            `engine_conf`,
+            `disabled`,
+            `created_by`,
+            `updated_by`,
             `created_at`,
             `updated_at`
         )
@@ -65,20 +78,23 @@
             #{item.name},
             #{item.version},
             #{item.engineHome},
-            #{item.extInfo},
+            #{item.engineConf},
+            #{item.disabled},
+            #{item.createdBy},
+            #{item.updatedBy},
             #{item.createdAt},
             #{item.updatedAt}
         )
         </foreach>
     </insert>
 
-    <!--根据条件删除集群引擎-->
+    <!--根据条件删除计算引擎-->
     <delete id="deleteByCondition">
         DELETE FROM <include refid="tableName"/>
         <include refid="updateByPkWhere"/>
     </delete>
 
-    <!--根据条件更新集群引擎实体不为空的字段-->
+    <!--根据条件更新计算引擎实体不为空的字段-->
     <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
@@ -94,8 +110,14 @@
             <if test="entity.engineHome != null">
                 `engine_home` = #{entity.engineHome},
             </if>
-            <if test="entity.extInfo != null">
-                `ext_info` = #{entity.extInfo},
+            <if test="entity.engineConf != null">
+                `engine_conf` = #{entity.engineConf},
+            </if>
+            <if test="entity.disabled != null">
+                `disabled` = #{entity.disabled},
+            </if>
+            <if test="entity.updatedBy != null">
+                `updated_by` = #{entity.updatedBy},
             </if>
             <if test="entity.updatedAt != null">
                 `updated_at` = #{entity.updatedAt}
@@ -104,7 +126,7 @@
         <include refid="updateByPkWhere"/>
     </update>
 
-    <!--根据条件更新集群引擎所有字段-->
+    <!--根据条件更新计算引擎所有字段-->
     <update id="updateById">
         UPDATE <include refid="tableName"/>
         <set>
@@ -112,7 +134,8 @@
             `name` = #{entity.name},
             `version` = #{entity.version},
             `engine_home` = #{entity.engineHome},
-            `ext_info` = #{entity.extInfo},
+            `engine_conf` = #{entity.engineConf},
+            `updated_by` = #{entity.updatedBy},
             `updated_at` = #{entity.updatedAt}
         </set>
         <where>
@@ -120,19 +143,24 @@
         </where>
     </update>
 
-    <!--根据主键获取集群引擎详情-->
+    <!--根据主键获取计算引擎详情-->
     <select id="getById" resultMap="ExtResultMap">
         SELECT
             MT.`id`,
             MT.`cluster`,
+            `T0`.`name` `cluster_text`,
             MT.`name`,
             MT.`version`,
             MT.`engine_home`,
-            MT.`ext_info`,
+            MT.`engine_conf`,
+            MT.`disabled`,
+            MT.`created_by`,
+            MT.`updated_by`,
             MT.`created_at`,
             MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
+            LEFT JOIN (SELECT `id`, `name` FROM `maple_cluster`) T0 ON MT.cluster = T0.`id`
         <where>
             MT.`id` = #{id}
         </where>
@@ -151,7 +179,10 @@
                 MT.`name`,
                 MT.`version`,
                 MT.`engine_home`,
-                MT.`ext_info`,
+                MT.`engine_conf`,
+                MT.`disabled`,
+                MT.`created_by`,
+                MT.`updated_by`,
                 MT.`created_at`,
                 MT.`updated_at`
             </otherwise>
@@ -318,6 +349,51 @@
                     </if>
                     <if test="condition.engineHomeContains != null and condition.engineHomeContains != ''">
                         AND MT.`engine_home` LIKE concat('%', #{condition.engineHomeContains}, '%')
+                    </if>
+                    <if test="condition.disabled != null">
+                        AND MT.`disabled` = #{condition.disabled}
+                    </if>
+                    <if test="condition.createdBy != null">
+                        AND MT.`created_by` = #{condition.createdBy}
+                    </if>
+                    <if test="condition.createdByIn != null and condition.createdByIn.size() > 0">
+                        AND MT.`created_by` IN
+                        <foreach collection="condition.createdByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createdByNotIn != null and condition.createdByNotIn.size() > 0">
+                        AND MT.`created_by` NOT IN
+                        <foreach collection="condition.createdByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createdByMin != null">
+                        <![CDATA[
+                        AND MT.`created_by` >= #{condition.createdByMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createdByMax != null">
+                        <![CDATA[
+                        AND MT.`created_by` <= #{condition.createdByMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedBy != null">
+                        AND MT.`updated_by` = #{condition.updatedBy}
+                    </if>
+                    <if test="condition.updatedByIn != null and condition.updatedByIn.size() > 0">
+                        AND MT.`updated_by` IN
+                        <foreach collection="condition.updatedByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updatedByNotIn != null and condition.updatedByNotIn.size() > 0">
+                        AND MT.`updated_by` NOT IN
+                        <foreach collection="condition.updatedByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updatedByMin != null">
+                        <![CDATA[
+                        AND MT.`updated_by` >= #{condition.updatedByMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedByMax != null">
+                        <![CDATA[
+                        AND MT.`updated_by` <= #{condition.updatedByMax}
+                        ]]>
                     </if>
                     <if test="condition.createdAtMin != null">
                         <![CDATA[

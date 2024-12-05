@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * 集群引擎数据访问
+ * 计算引擎数据访问
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */

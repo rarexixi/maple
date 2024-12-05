@@ -41,7 +41,7 @@ public class ClusterController {
     @PostMapping
     public ResponseEntity<ClusterDetailResp> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) ClusterSaveReq cluster) {
         ClusterDetailResp detail = clusterService.create(cluster);
-        String detailPath = String.format("%s/%s", BASE_URL, detail.getName());
+        String detailPath = String.format("%s/%s", BASE_URL, detail.getId());
         return ResponseEntity.created(URI.create(detailPath)).body(detail);
     }
 
@@ -49,30 +49,30 @@ public class ClusterController {
 
     // region 删除/启用/禁用
 
-    @DeleteMapping("/{nameList}")
-    public ResponseEntity<Integer> deleteByName(
-            @PathVariable("nameList") @Validated List<@NotBlank(message = "name(集群名称)不能为空") String> nameList,
+    @DeleteMapping("/{idList}")
+    public ResponseEntity<Integer> deleteById(
+            @PathVariable("idList") @Validated List<@NotNull(message = "id(集群ID)不能为空") @Min(value = 1, message = "id(集群ID)必须大于0") Integer> idList,
             @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
     ) {
-        Integer count = clusterService.deleteByName(nameList, baseEntity);
+        Integer count = clusterService.deleteById(idList, baseEntity);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/disable/{nameList}")
-    public ResponseEntity<Integer> disableByName(
-            @PathVariable("nameList") @Validated List<@NotBlank(message = "name(集群名称)不能为空") String> nameList,
+    @PatchMapping("/disable/{idList}")
+    public ResponseEntity<Integer> disableById(
+            @PathVariable("idList") @Validated List<@NotNull(message = "id(集群ID)不能为空") @Min(value = 1, message = "id(集群ID)必须大于0") Integer> idList,
             @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
     ) {
-        Integer count = clusterService.disableByName(nameList, baseEntity);
+        Integer count = clusterService.disableById(idList, baseEntity);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/enable/{nameList}")
-    public ResponseEntity<Integer> enableByName(
-            @PathVariable("nameList") @Validated List<@NotBlank(message = "name(集群名称)不能为空") String> nameList,
+    @PatchMapping("/enable/{idList}")
+    public ResponseEntity<Integer> enableById(
+            @PathVariable("idList") @Validated List<@NotNull(message = "id(集群ID)不能为空") @Min(value = 1, message = "id(集群ID)必须大于0") Integer> idList,
             @SetFieldTypes(types = {UPDATE}) BaseEntity baseEntity
     ) {
-        Integer count = clusterService.enableByName(nameList, baseEntity);
+        Integer count = clusterService.enableById(idList, baseEntity);
         return ResponseEntity.ok(count);
     }
 
@@ -80,21 +80,21 @@ public class ClusterController {
 
     // region 更新
 
-    @PatchMapping("/{name}")
-    public ResponseEntity<ClusterDetailResp> patchByName(
-            @PathVariable("name") @NotBlank(message = "name(集群名称)不能为空") String name,
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClusterDetailResp> patchById(
+            @PathVariable("id") @NotNull(message = "id(集群ID)不能为空") @Min(value = 1, message = "id(集群ID)必须大于0") Integer id,
             @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterSaveReq cluster
     ) {
-        ClusterDetailResp detail = clusterService.patchByName(name, cluster);
+        ClusterDetailResp detail = clusterService.patchById(id, cluster);
         return ResponseEntity.ok(detail);
     }
 
-    @PutMapping("/{name}")
-    public ResponseEntity<ClusterDetailResp> updateByName(
-            @PathVariable("name") @NotBlank(message = "name(集群名称)不能为空") String name,
+    @PutMapping("/{id}")
+    public ResponseEntity<ClusterDetailResp> updateById(
+            @PathVariable("id") @NotNull(message = "id(集群ID)不能为空") @Min(value = 1, message = "id(集群ID)必须大于0") Integer id,
             @Validated({Jsr303ValidGroup.Put.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) ClusterSaveReq cluster
     ) {
-        ClusterDetailResp detail = clusterService.updateByName(name, cluster);
+        ClusterDetailResp detail = clusterService.updateById(id, cluster);
         return ResponseEntity.ok(detail);
     }
 
@@ -102,11 +102,11 @@ public class ClusterController {
 
     // region 详情
 
-    @GetMapping("/{name}")
-    public ResponseEntity<ClusterDetailResp> getByName(
-            @PathVariable("name") @NotBlank(message = "name(集群名称)不能为空") String name
+    @GetMapping("/{id}")
+    public ResponseEntity<ClusterDetailResp> getById(
+            @PathVariable("id") @NotNull(message = "id(集群ID)不能为空") @Min(value = 1, message = "id(集群ID)必须大于0") Integer id
     ) {
-        ClusterDetailResp detail = clusterService.getByName(name);
+        ClusterDetailResp detail = clusterService.getById(id);
         return ResponseEntity.ok(detail);
     }
 

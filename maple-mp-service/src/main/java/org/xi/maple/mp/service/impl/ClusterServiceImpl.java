@@ -51,7 +51,7 @@ public class ClusterServiceImpl implements ClusterService {
     public ClusterDetailResp create(ClusterSaveReq createReq) {
         ClusterEntity entity = ObjectUtils.copy(createReq, ClusterEntity.class);
         clusterMapper.insert(entity);
-        return getByName(entity.getName());
+        return getById(entity.getId());
     }
 
     /**
@@ -73,30 +73,30 @@ public class ClusterServiceImpl implements ClusterService {
     /**
      * 删除集群
      *
-     * @param nameList 集群名称列表
+     * @param idList 集群ID列表
      * @param baseEntity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public int deleteByName(List<String> nameList, BaseEntity baseEntity) {
-        ClusterPkCondition condition = getPkCondition(nameList);
+    public int deleteById(List<Integer> idList, BaseEntity baseEntity) {
+        ClusterPkCondition condition = getPkCondition(idList);
         return clusterMapper.deleteByCondition(condition);
     }
 
     /**
      * 禁用集群
      *
-     * @param nameList 集群名称列表
+     * @param idList 集群ID列表
      * @param baseEntity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public int disableByName(List<String> nameList, BaseEntity baseEntity) {
-        ClusterPkCondition condition = getPkCondition(nameList);
+    public int disableById(List<Integer> idList, BaseEntity baseEntity) {
+        ClusterPkCondition condition = getPkCondition(idList);
         ClusterEntity entity = ObjectUtils.copy(baseEntity, ClusterEntity.class);
         entity.setDisabled(ValidConstant.INVALID);
         return clusterMapper.patchByCondition(condition, entity);
@@ -105,15 +105,15 @@ public class ClusterServiceImpl implements ClusterService {
     /**
      * 启用集群
      *
-     * @param nameList 集群名称列表
+     * @param idList 集群ID列表
      * @param baseEntity
      * @return 受影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public int enableByName(List<String> nameList, BaseEntity baseEntity) {
-        ClusterPkCondition condition = getPkCondition(nameList);
+    public int enableById(List<Integer> idList, BaseEntity baseEntity) {
+        ClusterPkCondition condition = getPkCondition(idList);
         ClusterEntity entity = ObjectUtils.copy(baseEntity, ClusterEntity.class);
         entity.setDisabled(ValidConstant.VALID);
         return clusterMapper.patchByCondition(condition, entity);
@@ -126,34 +126,34 @@ public class ClusterServiceImpl implements ClusterService {
     /**
      * 根据更新集群非空字段
      *
-     * @param name 集群名称
+     * @param id 集群ID
      * @param saveReq 保存集群请求实体
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public ClusterDetailResp patchByName(String name, ClusterSaveReq saveReq) {
-        ClusterPkCondition condition = getPkCondition(name);
+    public ClusterDetailResp patchById(Integer id, ClusterSaveReq saveReq) {
+        ClusterPkCondition condition = getPkCondition(id);
         ClusterEntity entity = ObjectUtils.copy(saveReq, ClusterEntity.class);
         clusterMapper.patchByCondition(condition, entity);
-        return getByName(name);
+        return getById(id);
     }
 
     /**
      * 根据更新集群所有字段
      *
-     * @param name 集群名称
+     * @param id 集群ID
      * @param saveReq 保存集群请求实体
      * @return 更新后的集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
     @Transactional
-    public ClusterDetailResp updateByName(String name, ClusterSaveReq saveReq) {
+    public ClusterDetailResp updateById(Integer id, ClusterSaveReq saveReq) {
         ClusterEntity entity = ObjectUtils.copy(saveReq, ClusterEntity.class);
-        clusterMapper.updateByName(name, entity);
-        return getByName(name);
+        clusterMapper.updateById(id, entity);
+        return getById(id);
     }
 
     // endregion 更新
@@ -163,13 +163,13 @@ public class ClusterServiceImpl implements ClusterService {
     /**
      * 根据获取集群详情
      *
-     * @param name 集群名称
+     * @param id 集群ID
      * @return 集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
     @Override
-    public ClusterDetailResp getByName(String name) {
-        ClusterEntityExt entity = clusterMapper.getByName(name);
+    public ClusterDetailResp getById(Integer id) {
+        ClusterEntityExt entity = clusterMapper.getById(id);
         if (entity == null) {
             throw new MapleDataNotFoundException("集群不存在");
         }
@@ -210,20 +210,20 @@ public class ClusterServiceImpl implements ClusterService {
         return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);
     }
 
-    private ClusterPkCondition getPkCondition(String name) {
+    private ClusterPkCondition getPkCondition(Integer id) {
         ClusterPkCondition condition = new ClusterPkCondition();
-        condition.setName(name);
+        condition.setId(id);
         return condition;
     }
 
-    private ClusterPkCondition getPkCondition(List<String> nameList) {
+    private ClusterPkCondition getPkCondition(List<Integer> idList) {
         ClusterPkCondition condition = new ClusterPkCondition();
-        if (nameList.isEmpty()) {
+        if (idList.isEmpty()) {
             return null;
-        } else if (nameList.size() == 1) {
-            condition.setName(nameList.get(0));
+        } else if (idList.size() == 1) {
+            condition.setId(idList.get(0));
         } else {
-            condition.setNameIn(nameList);
+            condition.setIdIn(idList);
         }
         return condition;
     }

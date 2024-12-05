@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 集群引擎更新条件
+ * 计算引擎更新条件
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */

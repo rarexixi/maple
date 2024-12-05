@@ -22,7 +22,7 @@ public interface ClusterMapper extends
         SelectByConditionMapper<ClusterEntity, ClusterFilterCondition>,
         CountByConditionMapper<ClusterFilterCondition> {
 
-    int updateByName(@Param("name") String name, @Param("entity") ClusterEntity entity);
+    int updateById(@Param("id") Integer id, @Param("entity") ClusterEntity entity);
 
-    ClusterEntityExt getByName(@Param("name") String name);
+    ClusterEntityExt getById(@Param("id") Integer id);
 }

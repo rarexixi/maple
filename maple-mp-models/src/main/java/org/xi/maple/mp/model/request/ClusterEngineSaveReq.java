@@ -18,17 +18,17 @@ public class ClusterEngineSaveReq extends BaseEntity {
     private Integer id;
 
     /**
-     * 集群名称
+     * 所属集群
      */
     private String cluster;
 
     /**
-     * 类型名称
+     * 引擎名称
      */
     private String name;
 
     /**
-     * 类型版本
+     * 引擎版本
      */
     private String version;
 
@@ -38,12 +38,12 @@ public class ClusterEngineSaveReq extends BaseEntity {
     private String engineHome;
 
     /**
-     * 扩展信息
+     * 引擎配置
      */
-    @NotBlank(message = "extInfo(扩展信息)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private String extInfo;
+    @NotBlank(message = "engineConf(引擎配置)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private String engineConf;
 
-    public void setExtInfo(Map<String, ?> extInfo) {
-        this.extInfo = JsonUtils.toJsonString(extInfo, "{}");
+    public void setEngineConf(Map<String, ?> engineConf) {
+        this.engineConf = JsonUtils.toJsonString(engineConf, "{}");
     }
 }

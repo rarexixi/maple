@@ -5,7 +5,6 @@ import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -17,17 +16,17 @@ public class ClusterEngineItemResp implements Serializable {
     private Integer id;
 
     /**
-     * 集群名称
+     * 所属集群
      */
     private String cluster;
 
     /**
-     * 类型名称
+     * 引擎名称
      */
     private String name;
 
     /**
-     * 类型版本
+     * 引擎版本
      */
     private String version;
 
@@ -37,9 +36,24 @@ public class ClusterEngineItemResp implements Serializable {
     private String engineHome;
 
     /**
-     * 扩展信息
+     * 引擎配置
      */
-    private String extInfo;
+    private String engineConf;
+
+    /**
+     * 是否禁用
+     */
+    private Integer disabled;
+
+    /**
+     * 创建人
+     */
+    private Integer createdBy;
+
+    /**
+     * 修改人
+     */
+    private Integer updatedBy;
 
     /**
      * 创建时间
@@ -51,7 +65,7 @@ public class ClusterEngineItemResp implements Serializable {
      */
     private LocalDateTime updatedAt;
 
-    public Map<String, Object> getExtInfo() {
-        return (Map<String, Object>) JsonUtils.parseObject(extInfo, Map.class, Map.of());
+    public Map<String, Object> getEngineConf() {
+        return (Map<String, Object>) JsonUtils.parseObject(engineConf, Map.class, Map.of());
     }
 }

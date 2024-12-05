@@ -19,12 +19,12 @@ import lombok.ToString;
 public class ClusterPkCondition implements FilterCondition {
 
     /**
-     * 集群名称
+     * 集群ID
      */
-    private String name;
+    private Integer id;
 
     /**
-     * 集群名称集合
+     * 集群ID集合
      */
-    private Collection<String> nameIn;
+    private Collection<Integer> idIn;
 }

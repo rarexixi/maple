@@ -18,12 +18,17 @@ import org.xi.maple.common.model.BaseEntity;
 public class ClusterEntity extends BaseEntity {
 
     /**
+     * 集群ID
+     */
+    private Integer id;
+
+    /**
      * 集群名称
      */
     private String name;
 
     /**
-     * 集群类型
+     * 集群种类
      */
     private String category;
 
@@ -40,5 +45,5 @@ public class ClusterEntity extends BaseEntity {
     /**
      * 集群配置
      */
-    private String configuration;
+    private String clusterConf;
 }

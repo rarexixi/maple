@@ -10,7 +10,7 @@ import FlinkConfig from "@/components/cluster-engine/FlinkConfig.vue";
 const detail = defineModel<any>()
 
 const {
-  clusterOptions
+  clusterOptions,
 } = defineProps<{
   clusterOptions: any[],
 }>()
@@ -19,9 +19,6 @@ const {
 const rules = {
   id: [
     { type: 'integer', required: true, message: '引擎ID不能为空', trigger: 'blur' }
-  ],
-  extInfo: [
-    { required: true, message: '扩展信息不能为空', trigger: 'blur' }
   ],
 }
 
@@ -49,27 +46,21 @@ const labelWidth = 3
 <template>
   <a-form ref="formRef" :model="detail" @finish="save" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
-    <a-form-item ref="cluster" label="集群名称" name="cluster">
+    <a-form-item ref="cluster" label="所属集群" name="cluster">
       <a-select v-model:value="detail.cluster" :options="clusterOptions" allow-clear placeholder="请选择" />
     </a-form-item>
-    <a-form-item ref="name" label="类型名称" name="name">
-      <a-radio-group v-model:value="detail.name" type="text">
-        <a-radio-button value="spark">Spark</a-radio-button>
-        <a-radio-button value="flink">Flink</a-radio-button>
-      </a-radio-group>
-    </a-form-item>
-    <a-form-item ref="version" label="类型版本" name="version">
+    <a-form-item ref="version" label="引擎版本" name="version">
       <a-input v-model:value.trim="detail.version" type="text" />
     </a-form-item>
     <a-form-item ref="engineHome" label="引擎目录" name="engineHome">
       <a-input v-model:value.trim="detail.engineHome" type="text" />
     </a-form-item>
-      <template v-if="detail.name == 'spark'">
-        <SparkConfig v-model="detail.extInfo"/>
-      </template>
-      <template v-else-if="detail.name == 'flink'">
-        <FlinkConfig v-model="detail.extInfo"/>
-      </template>
+    <template v-if="detail.name == 'spark'">
+      <SparkConfig v-model="detail.engineConf"/>
+    </template>
+    <template v-else-if="detail.name == 'flink'">
+      <FlinkConfig v-model="detail.engineConf"/>
+    </template>
     <a-form-item :wrapper-col="{ offset: labelWidth }">
       <a-button type="primary" html-type="submit">保存</a-button>
       <slot name="buttons"></slot>

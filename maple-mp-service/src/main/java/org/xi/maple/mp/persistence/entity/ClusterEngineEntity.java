@@ -8,7 +8,7 @@ import org.xi.maple.common.model.BaseEntity;
 
 
 /**
- * 集群引擎实体
+ * 计算引擎实体
  *
  * @author 郗世豪（rarexixi@gmail.com）
  */
@@ -23,17 +23,17 @@ public class ClusterEngineEntity extends BaseEntity {
     private Integer id;
 
     /**
-     * 集群名称
+     * 所属集群
      */
     private String cluster;
 
     /**
-     * 类型名称
+     * 引擎名称
      */
     private String name;
 
     /**
-     * 类型版本
+     * 引擎版本
      */
     private String version;
 
@@ -43,7 +43,7 @@ public class ClusterEngineEntity extends BaseEntity {
     private String engineHome;
 
     /**
-     * 扩展信息
+     * 引擎配置
      */
-    private String extInfo;
+    private String engineConf;
 }

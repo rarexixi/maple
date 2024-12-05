@@ -4,11 +4,12 @@
 <mapper namespace="org.xi.maple.mp.persistence.mapper.ClusterMapper">
 
     <resultMap id="BaseResultMap" type="org.xi.maple.mp.persistence.entity.ClusterEntity">
+        <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="category" column="category"/>
         <result property="address" column="address"/>
         <result property="desc" column="desc"/>
-        <result property="configuration" column="configuration"/>
+        <result property="clusterConf" column="cluster_conf"/>
         <result property="disabled" column="disabled"/>
         <result property="createdBy" column="created_by"/>
         <result property="updatedBy" column="updated_by"/>
@@ -21,14 +22,15 @@
     <sql id="tableName">`maple_cluster`</sql>
 
     <!--插入集群-->
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
         insert into <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">`id`,</if>
             <if test="entity.name != null">`name`,</if>
             <if test="entity.category != null">`category`,</if>
             <if test="entity.address != null">`address`,</if>
             <if test="entity.desc != null">`desc`,</if>
-            <if test="entity.configuration != null">`configuration`,</if>
+            <if test="entity.clusterConf != null">`cluster_conf`,</if>
             <if test="entity.disabled != null">`disabled`,</if>
             <if test="entity.createdBy != null">`created_by`,</if>
             <if test="entity.updatedBy != null">`updated_by`,</if>
@@ -36,11 +38,12 @@
             <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.id != null">#{entity.id},</if>
             <if test="entity.name != null">#{entity.name},</if>
             <if test="entity.category != null">#{entity.category},</if>
             <if test="entity.address != null">#{entity.address},</if>
             <if test="entity.desc != null">#{entity.desc},</if>
-            <if test="entity.configuration != null">#{entity.configuration},</if>
+            <if test="entity.clusterConf != null">#{entity.clusterConf},</if>
             <if test="entity.disabled != null">#{entity.disabled},</if>
             <if test="entity.createdBy != null">#{entity.createdBy},</if>
             <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
@@ -51,14 +54,15 @@
 
     <!--todo 插入具体的列-->
     <!--批量插入集群-->
-    <insert id="batchInsert">
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
         insert into <include refid="tableName"/>
         (
+            `id`,
             `name`,
             `category`,
             `address`,
             `desc`,
-            `configuration`,
+            `cluster_conf`,
             `disabled`,
             `created_by`,
             `updated_by`,
@@ -68,11 +72,12 @@
         values
         <foreach collection="list" item="item" separator=",">
         (
+            #{item.id},
             #{item.name},
             #{item.category},
             #{item.address},
             #{item.desc},
-            #{item.configuration},
+            #{item.clusterConf},
             #{item.disabled},
             #{item.createdBy},
             #{item.updatedBy},
@@ -92,6 +97,9 @@
     <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
+            <if test="entity.name != null">
+                `name` = #{entity.name},
+            </if>
             <if test="entity.category != null">
                 `category` = #{entity.category},
             </if>
@@ -101,8 +109,8 @@
             <if test="entity.desc != null">
                 `desc` = #{entity.desc},
             </if>
-            <if test="entity.configuration != null">
-                `configuration` = #{entity.configuration},
+            <if test="entity.clusterConf != null">
+                `cluster_conf` = #{entity.clusterConf},
             </if>
             <if test="entity.disabled != null">
                 `disabled` = #{entity.disabled},
@@ -118,29 +126,31 @@
     </update>
 
     <!--根据条件更新集群所有字段-->
-    <update id="updateByName">
+    <update id="updateById">
         UPDATE <include refid="tableName"/>
         <set>
+            `name` = #{entity.name},
             `category` = #{entity.category},
             `address` = #{entity.address},
             `desc` = #{entity.desc},
-            `configuration` = #{entity.configuration},
+            `cluster_conf` = #{entity.clusterConf},
             `updated_by` = #{entity.updatedBy},
             `updated_at` = #{entity.updatedAt}
         </set>
         <where>
-            `name` = #{name}
+            `id` = #{id}
         </where>
     </update>
 
     <!--根据主键获取集群详情-->
-    <select id="getByName" resultMap="ExtResultMap">
+    <select id="getById" resultMap="ExtResultMap">
         SELECT
+            MT.`id`,
             MT.`name`,
             MT.`category`,
             MT.`address`,
             MT.`desc`,
-            MT.`configuration`,
+            MT.`cluster_conf`,
             MT.`disabled`,
             MT.`created_by`,
             MT.`updated_by`,
@@ -149,7 +159,7 @@
         FROM
         <include refid="tableName"/> MT
         <where>
-            MT.`name` = #{name}
+            MT.`id` = #{id}
         </where>
     </select>
 
@@ -161,11 +171,12 @@
                 <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
             </when>
             <otherwise>
+                MT.`id`,
                 MT.`name`,
                 MT.`category`,
                 MT.`address`,
                 MT.`desc`,
-                MT.`configuration`,
+                MT.`cluster_conf`,
                 MT.`disabled`,
                 MT.`created_by`,
                 MT.`updated_by`,
@@ -193,12 +204,12 @@
             <if test="condition == null">1!=1</if>
             <if test="condition != null">
                 <choose>
-                    <when test="condition.name != null">
-                        `name` = #{condition.name}
+                    <when test="condition.id != null">
+                        `id` = #{condition.id}
                     </when>
                     <otherwise>
-                        `name` IN
-                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                        `id` IN
+                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </otherwise>
                 </choose>
             </if>
@@ -211,6 +222,27 @@
             <if test="condition == null">1!=1</if>
             <if test="condition != null">
                 <trim prefixOverrides="AND|OR">
+                    <if test="condition.id != null">
+                        AND MT.`id` = #{condition.id}
+                    </if>
+                    <if test="condition.idIn != null and condition.idIn.size() > 0">
+                        AND MT.`id` IN
+                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.idNotIn != null and condition.idNotIn.size() > 0">
+                        AND MT.`id` NOT IN
+                        <foreach collection="condition.idNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.idMin != null">
+                        <![CDATA[
+                        AND MT.`id` >= #{condition.idMin}
+                        ]]>
+                    </if>
+                    <if test="condition.idMax != null">
+                        <![CDATA[
+                        AND MT.`id` <= #{condition.idMax}
+                        ]]>
+                    </if>
                     <if test="condition.name != null and condition.name != ''">
                         AND MT.`name` = #{condition.name}
                     </if>
@@ -288,47 +320,6 @@
                     </if>
                     <if test="condition.addressContains != null and condition.addressContains != ''">
                         AND MT.`address` LIKE concat('%', #{condition.addressContains}, '%')
-                    </if>
-                    <if test="condition.desc != null and condition.desc != ''">
-                        AND MT.`desc` = #{condition.desc}
-                    </if>
-                    <if test="condition.descIn != null and condition.descIn.size() > 0">
-                        AND MT.`desc` IN
-                        <foreach collection="condition.descIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.descNotIn != null and condition.descNotIn.size() > 0">
-                        AND MT.`desc` NOT IN
-                        <foreach collection="condition.descNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.descIsNotEmpty != null and condition.descIsNotEmpty == true">
-                        AND MT.`desc` IS NOT NULL AND `desc` != ''
-                    </if>
-                    <if test="condition.descIsEmpty != null and condition.descIsEmpty == true">
-                        AND (MT.`desc` IS NULL OR MT.`desc` = '')
-                    </if>
-                    <if test="condition.descStartWith != null and condition.descStartWith != ''">
-                        AND MT.`desc` LIKE concat(#{condition.descStartWith}, '%')
-                    </if>
-                    <if test="condition.descEndWith != null and condition.descEndWith != ''">
-                        AND MT.`desc` LIKE concat('%', #{condition.descEndWith})
-                    </if>
-                    <if test="condition.descContains != null and condition.descContains != ''">
-                        AND MT.`desc` LIKE concat('%', #{condition.descContains}, '%')
-                    </if>
-                    <if test="condition.configurationIsNotEmpty != null and condition.configurationIsNotEmpty == true">
-                        AND MT.`configuration` IS NOT NULL AND `configuration` != ''
-                    </if>
-                    <if test="condition.configurationIsEmpty != null and condition.configurationIsEmpty == true">
-                        AND (MT.`configuration` IS NULL OR MT.`configuration` = '')
-                    </if>
-                    <if test="condition.configurationStartWith != null and condition.configurationStartWith != ''">
-                        AND MT.`configuration` LIKE concat(#{condition.configurationStartWith}, '%')
-                    </if>
-                    <if test="condition.configurationEndWith != null and condition.configurationEndWith != ''">
-                        AND MT.`configuration` LIKE concat('%', #{condition.configurationEndWith})
-                    </if>
-                    <if test="condition.configurationContains != null and condition.configurationContains != ''">
-                        AND MT.`configuration` LIKE concat('%', #{condition.configurationContains}, '%')
                     </if>
                     <if test="condition.disabled != null">
                         AND MT.`disabled` = #{condition.disabled}

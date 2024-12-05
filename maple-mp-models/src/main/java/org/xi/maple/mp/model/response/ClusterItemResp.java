@@ -5,11 +5,15 @@ import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
 public class ClusterItemResp implements Serializable {
+
+    /**
+     * 集群ID
+     */
+    private Integer id;
 
     /**
      * 集群名称
@@ -17,7 +21,7 @@ public class ClusterItemResp implements Serializable {
     private String name;
 
     /**
-     * 集群类型
+     * 集群种类
      */
     private String category;
 
@@ -34,7 +38,7 @@ public class ClusterItemResp implements Serializable {
     /**
      * 集群配置
      */
-    private String configuration;
+    private String clusterConf;
 
     /**
      * 是否禁用
@@ -61,7 +65,7 @@ public class ClusterItemResp implements Serializable {
      */
     private LocalDateTime updatedAt;
 
-    public Map<String, Object> getConfiguration() {
-        return (Map<String, Object>) JsonUtils.parseObject(configuration, Map.class, Map.of());
+    public Map<String, Object> getClusterConf() {
+        return (Map<String, Object>) JsonUtils.parseObject(clusterConf, Map.class, Map.of());
     }
 }

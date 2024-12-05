@@ -4,6 +4,11 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/sys-conf',
+      name: 'sysConf',
+      component: () => import('@/views/sys-conf/SysConfIndexView.vue')
+    },
+    {
       path: '/cluster',
       name: 'cluster',
       component: () => import('@/views/cluster/ClusterIndexView.vue')
@@ -22,6 +27,11 @@ const router = createRouter({
       path: '/datasource',
       name: 'datasource',
       component: () => import('@/views/datasource/DatasourceIndexView.vue')
+    },
+    {
+      path: '/job',
+      name: 'job',
+      component: () => import('@/views/job/JobIndexView.vue')
     },
     {
       path: '/data-calc-array',

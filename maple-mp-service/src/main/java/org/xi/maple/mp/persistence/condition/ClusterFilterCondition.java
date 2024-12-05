@@ -20,6 +20,31 @@ import java.util.Collection;
 public class ClusterFilterCondition implements FilterCondition {
 
     /**
+     * 集群ID
+     */
+    private Integer id;
+
+    /**
+     * 集群ID列表
+     */
+    private Collection<Integer> idIn;
+
+    /**
+     * 排除的集群ID列表
+     */
+    private Collection<Integer> idNotIn;
+
+    /**
+     * 最小集群ID
+     */
+    private Integer idMin;
+
+    /**
+     * 最大集群ID
+     */
+    private Integer idMax;
+
+    /**
      * 集群名称
      */
     private String name;
@@ -60,42 +85,42 @@ public class ClusterFilterCondition implements FilterCondition {
     private String nameContains;
 
     /**
-     * 集群类型
+     * 集群种类
      */
     private String category;
 
     /**
-     * 集群类型列表
+     * 集群种类列表
      */
     private Collection<String> categoryIn;
 
     /**
-     * 排除的集群类型列表
+     * 排除的集群种类列表
      */
     private Collection<String> categoryNotIn;
 
     /**
-     * 集群类型不为空
+     * 集群种类不为空
      */
     private Boolean categoryIsNotEmpty;
 
     /**
-     * 集群类型为空
+     * 集群种类为空
      */
     private Boolean categoryIsEmpty;
 
     /**
-     * 集群类型开始
+     * 集群种类开始
      */
     private String categoryStartWith;
 
     /**
-     * 集群类型结束
+     * 集群种类结束
      */
     private String categoryEndWith;
 
     /**
-     * 集群类型包含
+     * 集群种类包含
      */
     private String categoryContains;
 
@@ -138,71 +163,6 @@ public class ClusterFilterCondition implements FilterCondition {
      * 集群地址包含
      */
     private String addressContains;
-
-    /**
-     * 集群说明
-     */
-    private String desc;
-
-    /**
-     * 集群说明列表
-     */
-    private Collection<String> descIn;
-
-    /**
-     * 排除的集群说明列表
-     */
-    private Collection<String> descNotIn;
-
-    /**
-     * 集群说明不为空
-     */
-    private Boolean descIsNotEmpty;
-
-    /**
-     * 集群说明为空
-     */
-    private Boolean descIsEmpty;
-
-    /**
-     * 集群说明开始
-     */
-    private String descStartWith;
-
-    /**
-     * 集群说明结束
-     */
-    private String descEndWith;
-
-    /**
-     * 集群说明包含
-     */
-    private String descContains;
-
-    /**
-     * 集群配置不为空
-     */
-    private Boolean configurationIsNotEmpty;
-
-    /**
-     * 集群配置为空
-     */
-    private Boolean configurationIsEmpty;
-
-    /**
-     * 集群配置开始
-     */
-    private String configurationStartWith;
-
-    /**
-     * 集群配置结束
-     */
-    private String configurationEndWith;
-
-    /**
-     * 集群配置包含
-     */
-    private String configurationContains;
 
     /**
      * 是否禁用

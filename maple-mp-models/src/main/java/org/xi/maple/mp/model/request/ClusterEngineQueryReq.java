@@ -36,6 +36,8 @@ public class ClusterEngineQueryReq extends QueryReq {
 
     private String versionContains;
 
+    private Integer disabled;
+
     public void setIdRange(Integer[] idRange)  {
         if (idRange == null || idRange.length != 2) {
             return;

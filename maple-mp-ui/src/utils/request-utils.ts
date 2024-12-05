@@ -44,6 +44,7 @@ export function request<T = any, R = any>(config: AxiosRequestConfig, direct = f
     axiosRequest.request(config).then((res: AxiosResponse) => {
       resolve(res.data)
     }).catch(error => {
+      // 请求不存在的路径时，因为后台没有设置对应的路径允许跨域，所以不会返回404，而是返回跨域错误
       reject(error);
     })
   })
