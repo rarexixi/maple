@@ -18,11 +18,11 @@ public class ClusterEngineQueryReq extends QueryReq {
 
     private Integer idMax;
 
-    private String cluster;
+    private String clusterId;
 
-    private Collection<String> clusterIn;
+    private Collection<String> clusterIdIn;
 
-    private String clusterContains;
+    private String clusterIdContains;
 
     private String name;
 
@@ -54,12 +54,12 @@ public class ClusterEngineQueryReq extends QueryReq {
         super.getOrderBy().getOrDefault("id", null);
     }
 
-    public void setClusterSort(SortConstants sortConstants)  {
-        super.orderBy("cluster", sortConstants);
+    public void setClusterIdSort(SortConstants sortConstants)  {
+        super.orderBy("cluster_id", sortConstants);
     }
 
-    public void getClusterSort()  {
-        super.getOrderBy().getOrDefault("cluster", null);
+    public void getClusterIdSort()  {
+        super.getOrderBy().getOrDefault("cluster_id", null);
     }
 
     public void setNameSort(SortConstants sortConstants)  {

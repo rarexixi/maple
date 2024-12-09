@@ -47,42 +47,42 @@ public class ClusterEngineFilterCondition implements FilterCondition {
     /**
      * 所属集群
      */
-    private String cluster;
+    private String clusterId;
 
     /**
      * 所属集群列表
      */
-    private Collection<String> clusterIn;
+    private Collection<String> clusterIdIn;
 
     /**
      * 排除的所属集群列表
      */
-    private Collection<String> clusterNotIn;
+    private Collection<String> clusterIdNotIn;
 
     /**
      * 所属集群不为空
      */
-    private Boolean clusterIsNotEmpty;
+    private Boolean clusterIdIsNotEmpty;
 
     /**
      * 所属集群为空
      */
-    private Boolean clusterIsEmpty;
+    private Boolean clusterIdIsEmpty;
 
     /**
      * 所属集群开始
      */
-    private String clusterStartWith;
+    private String clusterIdStartWith;
 
     /**
      * 所属集群结束
      */
-    private String clusterEndWith;
+    private String clusterIdEndWith;
 
     /**
      * 所属集群包含
      */
-    private String clusterContains;
+    private String clusterIdContains;
 
     /**
      * 引擎名称

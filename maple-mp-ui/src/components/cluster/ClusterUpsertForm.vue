@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { notification } from "ant-design-vue"
 import type { ValidateErrorEntity } from "ant-design-vue/es/form/interface"
 import { useTemplateRef } from "vue"
 
-import K8sClusterConfig from "@/components/cluster/K8sClusterConfig.vue";
-import YarnClusterConfig from "@/components/cluster/YarnClusterConfig.vue";
+import common from "@/composables/common"
 
 const detail = defineModel<any>()
 
@@ -40,10 +38,7 @@ const save = () => {
   formRef.value?.validate().then(() => {
     emit("save")
   }).catch((error: ValidateErrorEntity<any>) => {
-    console.log(error)
-    notification.error({
-      message: "参数验证失败"
-    })
+    common.notifyValidateError()
   })
 }
 
@@ -52,7 +47,7 @@ const labelWidth = 4
 </script>
 
 <template>
-  <a-form ref="formRef" :model="detail" @finish="save" :rules="rules"
+  <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
     <a-form-item ref="name" label="集群名称" name="name">
       <a-input v-model:value.trim="detail.name" type="text" />
@@ -64,7 +59,7 @@ const labelWidth = 4
       <a-input v-model:value.trim="detail.address" type="text" />
     </a-form-item>
     <a-form-item ref="desc" label="集群说明" name="desc">
-      <a-textarea v-model:value="detail.desc" type="textarea" :autosize="{ minRows: 5, maxRows: 100}" />
+      <a-textarea v-model:value="detail.desc" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
     <template v-if="detail.category == 'K8s'">
       <a-form-item ref="clientCertData" label="客户端证书" :name="['clusterConf', 'config', 'clientCertData']"
@@ -74,7 +69,7 @@ const labelWidth = 4
       </a-form-item>
     </template>
     <a-form-item :wrapper-col="{ offset: labelWidth }">
-      <a-button type="primary" html-type="submit">保存</a-button>
+      <a-button type="primary" @click="save">保存</a-button>
       <slot name="buttons"></slot>
     </a-form-item>
   </a-form>

@@ -5,7 +5,7 @@
 
     <resultMap id="BaseResultMap" type="org.xi.maple.mp.persistence.entity.ClusterEngineEntity">
         <result property="id" column="id"/>
-        <result property="cluster" column="cluster"/>
+        <result property="clusterId" column="cluster_id"/>
         <result property="name" column="name"/>
         <result property="version" column="version"/>
         <result property="engineHome" column="engine_home"/>
@@ -27,7 +27,7 @@
         insert into <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">`id`,</if>
-            <if test="entity.cluster != null">`cluster`,</if>
+            <if test="entity.clusterId != null">`cluster_id`,</if>
             <if test="entity.name != null">`name`,</if>
             <if test="entity.version != null">`version`,</if>
             <if test="entity.engineHome != null">`engine_home`,</if>
@@ -40,7 +40,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
-            <if test="entity.cluster != null">#{entity.cluster},</if>
+            <if test="entity.clusterId != null">#{entity.clusterId},</if>
             <if test="entity.name != null">#{entity.name},</if>
             <if test="entity.version != null">#{entity.version},</if>
             <if test="entity.engineHome != null">#{entity.engineHome},</if>
@@ -59,7 +59,7 @@
         insert into <include refid="tableName"/>
         (
             `id`,
-            `cluster`,
+            `cluster_id`,
             `name`,
             `version`,
             `engine_home`,
@@ -74,7 +74,7 @@
         <foreach collection="list" item="item" separator=",">
         (
             #{item.id},
-            #{item.cluster},
+            #{item.clusterId},
             #{item.name},
             #{item.version},
             #{item.engineHome},
@@ -98,8 +98,8 @@
     <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
-            <if test="entity.cluster != null">
-                `cluster` = #{entity.cluster},
+            <if test="entity.clusterId != null">
+                `cluster_id` = #{entity.clusterId},
             </if>
             <if test="entity.name != null">
                 `name` = #{entity.name},
@@ -130,7 +130,7 @@
     <update id="updateById">
         UPDATE <include refid="tableName"/>
         <set>
-            `cluster` = #{entity.cluster},
+            `cluster_id` = #{entity.clusterId},
             `name` = #{entity.name},
             `version` = #{entity.version},
             `engine_home` = #{entity.engineHome},
@@ -147,7 +147,7 @@
     <select id="getById" resultMap="ExtResultMap">
         SELECT
             MT.`id`,
-            MT.`cluster`,
+            MT.`cluster_id`,
             `T0`.`name` `cluster_text`,
             MT.`name`,
             MT.`version`,
@@ -160,7 +160,7 @@
             MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
-            LEFT JOIN (SELECT `id`, `name` FROM `maple_cluster`) T0 ON MT.cluster = T0.`id`
+            LEFT JOIN (SELECT `id`, `name` FROM `maple_cluster`) T0 ON MT.cluster_id = T0.`id`
         <where>
             MT.`id` = #{id}
         </where>
@@ -175,7 +175,7 @@
             </when>
             <otherwise>
                 MT.`id`,
-                MT.`cluster`,
+                MT.`cluster_id`,
                 MT.`name`,
                 MT.`version`,
                 MT.`engine_home`,
@@ -246,31 +246,31 @@
                         AND MT.`id` <= #{condition.idMax}
                         ]]>
                     </if>
-                    <if test="condition.cluster != null and condition.cluster != ''">
-                        AND MT.`cluster` = #{condition.cluster}
+                    <if test="condition.clusterId != null and condition.clusterId != ''">
+                        AND MT.`cluster_id` = #{condition.clusterId}
                     </if>
-                    <if test="condition.clusterIn != null and condition.clusterIn.size() > 0">
-                        AND MT.`cluster` IN
-                        <foreach collection="condition.clusterIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.clusterIdIn != null and condition.clusterIdIn.size() > 0">
+                        AND MT.`cluster_id` IN
+                        <foreach collection="condition.clusterIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.clusterNotIn != null and condition.clusterNotIn.size() > 0">
-                        AND MT.`cluster` NOT IN
-                        <foreach collection="condition.clusterNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.clusterIdNotIn != null and condition.clusterIdNotIn.size() > 0">
+                        AND MT.`cluster_id` NOT IN
+                        <foreach collection="condition.clusterIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.clusterIsNotEmpty != null and condition.clusterIsNotEmpty == true">
-                        AND MT.`cluster` IS NOT NULL AND `cluster` != ''
+                    <if test="condition.clusterIdIsNotEmpty != null and condition.clusterIdIsNotEmpty == true">
+                        AND MT.`cluster_id` IS NOT NULL AND `cluster_id` != ''
                     </if>
-                    <if test="condition.clusterIsEmpty != null and condition.clusterIsEmpty == true">
-                        AND (MT.`cluster` IS NULL OR MT.`cluster` = '')
+                    <if test="condition.clusterIdIsEmpty != null and condition.clusterIdIsEmpty == true">
+                        AND (MT.`cluster_id` IS NULL OR MT.`cluster_id` = '')
                     </if>
-                    <if test="condition.clusterStartWith != null and condition.clusterStartWith != ''">
-                        AND MT.`cluster` LIKE concat(#{condition.clusterStartWith}, '%')
+                    <if test="condition.clusterIdStartWith != null and condition.clusterIdStartWith != ''">
+                        AND MT.`cluster_id` LIKE concat(#{condition.clusterIdStartWith}, '%')
                     </if>
-                    <if test="condition.clusterEndWith != null and condition.clusterEndWith != ''">
-                        AND MT.`cluster` LIKE concat('%', #{condition.clusterEndWith})
+                    <if test="condition.clusterIdEndWith != null and condition.clusterIdEndWith != ''">
+                        AND MT.`cluster_id` LIKE concat('%', #{condition.clusterIdEndWith})
                     </if>
-                    <if test="condition.clusterContains != null and condition.clusterContains != ''">
-                        AND MT.`cluster` LIKE concat('%', #{condition.clusterContains}, '%')
+                    <if test="condition.clusterIdContains != null and condition.clusterIdContains != ''">
+                        AND MT.`cluster_id` LIKE concat('%', #{condition.clusterIdContains}, '%')
                     </if>
                     <if test="condition.name != null and condition.name != ''">
                         AND MT.`name` = #{condition.name}

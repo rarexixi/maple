@@ -38,19 +38,9 @@ public class JobEntity extends BaseEntity {
     private String jobType;
 
     /**
-     * 集群种类
+     * 引擎ID
      */
-    private String clusterCategory;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
+    private Integer engineId;
 
     /**
      * 作业负责人
@@ -58,9 +48,9 @@ public class JobEntity extends BaseEntity {
     private String owner;
 
     /**
-     * 执行内容
+     * 执行配置
      */
-    private String runContent;
+    private String runConf;
 
     /**
      * 作业配置

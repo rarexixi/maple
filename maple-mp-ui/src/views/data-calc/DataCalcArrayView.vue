@@ -17,14 +17,14 @@ import HiveSink from "@/components/data-calc/sink/HiveSink.vue"
 
 import AddPlugin from "@/components/data-calc/AddTypedPlugin.vue"
 import PluginOperations from "@/components/data-calc/PluginOperations.vue"
-import InputStringMap from "@/components/data-calc/InputStringMap.vue"
+import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
 const {setBreadcrumb} = useBreadcrumbStore()
 setBreadcrumb([{text: '数据计算配置-数组方式'}])
 
-const mapleConfig = reactive({
+const jobConf = reactive({
   ...SampleData.SampleArrayConfig
 })
 
@@ -32,13 +32,13 @@ const code = ref("")
 const codeView = ref(false)
 const pageConfig = reactive(Array<any>())
 
-for (let i = 0; i < mapleConfig.plugins.length; i++) {
+for (let i = 0; i < jobConf.plugins.length; i++) {
   pageConfig.push({expand: true})
 }
 
 const addPlugin = (type: string, name: string, index: number = -1) => {
   let plugin = SampleData.PluginModels[type][name]()
-  let plugins = mapleConfig.plugins
+  let plugins = jobConf.plugins
   if (index < 0 || index >= plugins.length) {
     pageConfig.push({expand: true});
     plugins.push(plugin);
@@ -49,21 +49,19 @@ const addPlugin = (type: string, name: string, index: number = -1) => {
 }
 
 const delPlugin = (index: number = -1) => {
-  console.log(index)
-  let plugins = mapleConfig.plugins
+  let plugins = jobConf.plugins
   if (index >= 0 && index < plugins.length) {
     plugins.splice(index, 1)
     pageConfig.splice(index, 1)
   }
 }
 
-const variables = reactive({})
 const getCode = (showCode: boolean) => {
   if (showCode) {
     const requestConfig = {
       url: "/ftl/get-array-code",
       method: 'POST',
-      data: toRaw(mapleConfig)
+      data: toRaw(jobConf)
     }
     request(requestConfig).then(response => {
       code.value = response
@@ -72,9 +70,10 @@ const getCode = (showCode: boolean) => {
     code.value = ''
   }
 }
+
 watch(codeView, () => getCode(codeView.value))
 
-const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(mapleConfig, null, 4))
+const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(jobConf, null, 2))
 
 </script>
 
@@ -82,34 +81,32 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
   <a-row style="height: 100%; padding: 10px">
     <a-col :span="12" style="height: 100%; overflow: auto;">
       <a-typography-title :level="4">全局变量</a-typography-title>
-      <InputStringMap v-model:value="mapleConfig.variables" />
+      <a-input-string-map v-model:value="jobConf.variables" />
       <a-divider />
-      <template v-for="(item, index) in mapleConfig.plugins" :key="`${item.type}_${index}`">
+      <template v-for="(item, index) in jobConf.plugins" :key="`${item.type}_${index}`">
         <AddPlugin @add="(type: string, name: string) => addPlugin(type, name, index)" />
         <a-card :class="pageConfig[index].expand ? 'card-open' : 'card-close'">
           <a-flex :justify="'space-between'" :align="'center'" class="card-header">
             <span>
-            <template v-if="item.type == 'sink'">
               <PluginOperations v-model:value="pageConfig[index]" :index="index"
                                 @delete="() => delPlugin(index)" />
-              <template v-if="item.name === 'file'">
-                写入路径: {{ item.config.path }}
+              <template v-if="item.type == 'sink'">
+                <template v-if="item.name === 'file'">
+                  写入路径: {{ item.config.path }}
+                </template>
+                <template v-else>
+                  输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
+                </template>
               </template>
               <template v-else>
-                输出表名: {{ item.config.targetDatabase }}.{{ item.config.targetTable }}
+                注册表名：{{ item.config.resultTable }}
               </template>
-            </template>
-            <template v-else>
-              <PluginOperations v-model:expand="pageConfig[index].expand" :index="index"
-                                @delete="() => delPlugin(index)" />
-              注册表名：{{ item.config.resultTable }}
-            </template>
             </span>
             <span>
               {{ item.name }} -
               <a-tag color="green" v-if="item.type == 'source'">{{ item.type }}</a-tag>
               <a-tag color="orange" v-else-if="item.type == 'transformation'">{{ item.type }}</a-tag>
-              <a-tag  color="blue" v-else-if="item.type == 'sink'">{{ item.type }}</a-tag>
+              <a-tag color="blue" v-else-if="item.type == 'sink'">{{ item.type }}</a-tag>
             </span>
           </a-flex>
           <!--<component :is="`${item.name.replace('_', '-')}-${item.type}`" v-model:value="item.config" :name="`${item.type}_${index}`"

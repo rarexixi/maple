@@ -81,8 +81,8 @@ const PluginModels: any = {
         }),
     },
     'transformation': {
-        type: 'transformation',
         'sql': () => ({
+            type: 'transformation',
             name: 'sql',
             config: {
                 ...getBaseTransformation(),
@@ -176,24 +176,17 @@ const PluginModels: any = {
 const FileSerializers: Array<string> = ["parquet", "orc", "csv", "text", "json"]
 
 const Layout = {
-    cols: {
-        small: { xs: 24, sm: 24, md: 12, lg: 12, xl: 8 },
-    },
     labelCols: {
-        small: { xs: 24, sm: 8, md: 10, lg: 10, xl: 9 },
-        medium: {},
-        large: { xs: 24, sm: 8, md: 5, lg: 5, xl: 3 },
+        w160: { span: 16 },
+        w320: { span: 8 },
+        w640: { span: 4 },
+        w1280: { span: 2 },
     },
-    wrapperColsWithLabel: {
-        small: { xs: 24, sm: 8, md: 10, lg: 10, xl: 9 },
-        medium: {},
-        large: {
-            xs: { span: 24, offset: 0 },
-            sm: { span: 16, offset: 8 },
-            md: { span: 19, offset: 5 },
-            lg: { span: 19, offset: 5 },
-            xl: { span: 21, offset: 3 }
-        },
+    wrapCols: {
+        w160: { offset: 16 },
+        w320: { offset: 8 },
+        w640: { offset: 4 },
+        w1280: { offset: 2 },
     },
 }
 

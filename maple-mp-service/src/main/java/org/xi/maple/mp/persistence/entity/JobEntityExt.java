@@ -16,4 +16,17 @@ import lombok.ToString;
 @Setter
 @ToString
 public class JobEntityExt extends JobEntity {
+
+    /**
+     * 引擎ID
+     */
+    private String engineText;
+
+    private void setEngineText (String engineText) {
+        this.engineText = engineText;
+    }
+
+    private String getEngineText() {
+        return engineText;
+    }
 }

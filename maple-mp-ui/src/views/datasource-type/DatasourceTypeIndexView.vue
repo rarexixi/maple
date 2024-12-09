@@ -34,10 +34,6 @@ onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
   setBreadcrumb([{text: '数据源类型'}])
-
-  // 获取列表数据
-  search()
-
 })
 
 const columns = [
@@ -111,12 +107,12 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
+    <a-form ref="searchForm" :model="searchParams" layout="inline">
       <a-form-item label="类型编码">
         <a-input v-model:value.trim="searchParams.typeCode" allow-clear />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">
+        <a-button type="primary" @click="search">
           <search-outlined />
           搜索
         </a-button>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue";
+import { useTemplateRef } from "vue";
+import type { FormInstance } from "ant-design-vue";
+import common from "@/composables/common";
 
 const conf = defineModel<any>()
 
@@ -19,10 +22,14 @@ const subFormLabelCol = {
     width: 'auto'
   }
 }
+
+defineExpose({
+  validate: common.getFormValidateFun(useTemplateRef<FormInstance>("formRef")),
+})
 </script>
 
 <template>
-  <a-form :model="conf" :label-col="{ span: 3 }">
+  <a-form ref="formRef" :model="conf" :label-col="{ span: 3 }">
     <a-form-item ref="envs" label="环境变量" name="envs">
       <a-input-string-map v-model:value="conf.envs" type="text" />
     </a-form-item>
@@ -38,9 +45,9 @@ const subFormLabelCol = {
         <thead>
         <tr>
           <th style="position: sticky; left: 0; z-index: 2"></th>
-          <th style="position: sticky; left: 32px; z-index: 2">配置名称</th>
-          <th>替换参数</th>
-          <th>描述</th>
+          <th class="forbidden-conf-name" style="position: sticky; left: 32px; z-index: 2">配置名称</th>
+          <th class="forbidden-conf-replace-parameter">替换参数</th>
+          <th class="forbidden-conf-desc">描述</th>
         </tr>
         </thead>
         <tbody>
@@ -57,17 +64,17 @@ const subFormLabelCol = {
           <td style="position: sticky; left: 32px; z-index: 2;">
             <a-form-item label="" :name="['forbiddenConfs', index, 'name']" :label-col="subFormLabelCol"
                          :rules="[{ required: true, message: '配置不能为空', trigger: 'blur' }]">
-              <a-input v-model:value="confOption.name" style="width: 170px" />
+              <a-input v-model:value="confOption.name" class="forbidden-conf-name" />
             </a-form-item>
           </td>
           <td>
             <a-form-item label="" :name="['forbiddenConfs', index, 'replaceParameter']" :label-col="subFormLabelCol">
-              <a-input v-model:value="confOption.replaceParameter" style="width: 120px" />
+              <a-input v-model:value="confOption.replaceParameter" class="forbidden-conf-replace-parameter" />
             </a-form-item>
           </td>
           <td>
             <a-form-item label="" :name="['forbiddenConfs', index, 'desc']" :label-col="subFormLabelCol">
-              <a-input v-model:value="confOption.desc" style="width: 170px" />
+              <a-input v-model:value="confOption.desc" class="forbidden-conf-desc" />
             </a-form-item>
           </td>
         </tr>
@@ -78,5 +85,15 @@ const subFormLabelCol = {
 </template>
 
 <style scoped>
+.forbidden-conf-name {
+  width: 170px
+}
 
+.forbidden-conf-replace-parameter {
+  width: 120px
+}
+
+.forbidden-conf-desc {
+  width: 170px
+}
 </style>

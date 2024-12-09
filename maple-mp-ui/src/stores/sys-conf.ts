@@ -1,0 +1,22 @@
+import { defineStore } from "pinia"
+import { getArrayConf } from "@/composables/requests"
+import { computed } from "vue"
+
+function getStore(storeId: string, configKey: string, valueField: string = "value", labelField: string = "label") {
+  return defineStore(storeId, () => {
+    const conf = getArrayConf(configKey, valueField, labelField)
+    const confArray = computed(() => conf.confArray)
+    const confMap = computed(() => conf.confMap)
+    const confOptions = computed(() => conf.confOptions)
+    const confOptionMap = computed(() => conf.confOptionMap)
+    return {confArray, confMap, confOptions, confOptionMap}
+  })
+}
+
+export const useDatabaseTypesStore = getStore('database-types', 'database_types', 'value', 'name')
+
+export const useClusterCategoriesStore = getStore('cluster-categories', 'cluster_categories')
+
+export const useEngineCategoriesStore = getStore('engine-categories', 'engine_categories')
+
+export const useJobTypesStore = getStore('job-types', 'job_run_types', 'typeCode', 'typeName')

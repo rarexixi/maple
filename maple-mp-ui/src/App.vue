@@ -14,37 +14,37 @@ const navMenuItems = ref<MenuProps['items']>([
   {
     key: 'sysConf',
     icon: () => h(AntdIcons['ClusterOutlined']),
-    label: h(RouterLink, {to: '/sys-conf'}, `系统配置`),
+    label: h(RouterLink, {to: {path:'/sys-conf'}}, () => '系统配置'),
     title: 'sysConf',
   },
   {
     key: 'cluster',
     icon: () => h(AntdIcons['ClusterOutlined']),
-    label: h(RouterLink, {to: '/cluster'}, `集群`),
+    label: h(RouterLink, {to: {path:'/cluster'}}, () => '集群'),
     title: 'cluster',
   },
   {
     key: 'clusterEngine',
     icon: () => h(AntdIcons['DatabaseOutlined']),
-    label: h(RouterLink, {to: '/cluster-engine'}, `计算引擎`),
+    label: h(RouterLink, {to: {path:'/cluster-engine'}}, () => '计算引擎'),
     title: 'clusterEngine',
   },
   {
     key: 'datasourceType',
     icon: () => h(AntdIcons['AppstoreOutlined']),
-    label: h(RouterLink, {to: '/datasource-type'}, `数据源类型`),
+    label: h(RouterLink, {to: {path:'/datasource-type'}}, () => '数据源类型'),
     title: 'datasourceType',
   },
   {
     key: 'datasource',
     icon: () => h(AntdIcons['DatabaseOutlined']),
-    label: h(RouterLink, {to: '/datasource'}, `数据源`),
+    label: h(RouterLink, {to: {path:'/datasource'}}, () => '数据源'),
     title: 'datasource',
   },
   {
     key: 'job',
     icon: () => h(AntdIcons['DatabaseOutlined']),
-    label: h(RouterLink, {to: '/job'}, `作业`),
+    label: h(RouterLink, {to: {path:'/job'}}, () => '作业'),
     title: 'job',
   },
   {
@@ -54,12 +54,12 @@ const navMenuItems = ref<MenuProps['items']>([
     children: [
       {
         key: 'dataCalcArray',
-        label: h(RouterLink, {to: '/data-calc-array'}, `数组方式`),
+        label: h(RouterLink, {to: {path:'/data-calc-array'}}, () => '数组方式'),
         title: 'dataCalcArray',
       },
       {
         key: 'dataCalcGroup',
-        label: h(RouterLink, {to: '/data-calc-group'}, `分组方式`),
+        label: h(RouterLink, {to: {path:'/data-calc-group'}}, () => '分组方式'),
         title: 'dataCalcGroup',
       },
     ]

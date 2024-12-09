@@ -15,7 +15,6 @@ const plugins = reactive({
 const plugin = ref<string>()
 
 const add = (pluginType: any) => {
-  console.log(pluginType.keyPath[0], pluginType.keyPath[1])
   emit('add', pluginType.keyPath[0], pluginType.keyPath[1])
 }
 </script>

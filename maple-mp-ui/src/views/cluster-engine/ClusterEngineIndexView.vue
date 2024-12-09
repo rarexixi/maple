@@ -13,12 +13,13 @@ import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 import DataOperations from "@/components/DataOperations.vue"
 import TableOperations from "@/components/TableOperations.vue"
 import ClusterEngineUpsertForm from "@/components/cluster-engine/ClusterEngineUpsertForm.vue"
+import { useEngineCategoriesStore } from "@/stores/sys-conf";
 
 const pkFields = ['id']
 
 const searchParams = reactive<any>({
   id: undefined,
-  cluster: undefined,
+  clusterId: undefined,
   name: undefined,
   versionContains: undefined,
 })
@@ -37,29 +38,21 @@ const clusterSearchParams = reactive<any>({
   deleted: 0
 })
 const {
-  search: clusterSearch,
-  dataList: clusterOptions
-} = listSearch(ClusterApis.list(), clusterSearchParams, undefined, common.convertToOptions('id', 'name'))
+  dataList: clusterOptions,
+  dataMap: clusterOptionMap
+} = listSearch(ClusterApis.list(), clusterSearchParams, undefined, common.convertToOptions('id', 'name'), common.setOptionMap('id', 'name'))
 
-const nameOptions = [
-  {value: 'spark', label: 'Spark'},
-  {value: 'flink', label: 'Flink'}
-]
+const {confOptions: nameOptions} = useEngineCategoriesStore()
 
 onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
   setBreadcrumb([{text: '计算引擎'}])
-
-  // 获取列表数据
-  search()
-
-  clusterSearch()
 })
 
 const columns = [
   {title: '引擎ID', dataIndex: 'id', key: 'id'},
-  {title: '所属集群', dataIndex: 'cluster', key: 'cluster'},
+  {title: '所属集群', dataIndex: 'clusterId', key: 'clusterId', customRender: (row: any) => clusterOptionMap[row.text]},
   {title: '引擎名称', dataIndex: 'name', key: 'name'},
   {title: '引擎版本', dataIndex: 'version', key: 'version'},
   {title: '引擎目录', dataIndex: 'engineHome', key: 'engineHome'},
@@ -77,7 +70,7 @@ const callback: OperateCallback = {
         detail[field] = response[field]
       }
     }
-    detail.cluster = response.cluster + ''
+    detail.clusterId = response.clusterId + ''
     detail.name = response.name
     detail.version = response.version
     detail.engineHome = response.engineHome
@@ -86,7 +79,7 @@ const callback: OperateCallback = {
   research: search,
   resetDetail: (detail: any) => {
     detail.id = undefined
-    detail.cluster = ''
+    detail.clusterId = ''
     detail.name = ''
     detail.version = ''
     detail.engineHome = ''
@@ -132,21 +125,21 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
+    <a-form ref="searchForm" :model="searchParams" layout="inline">
       <a-form-item label="引擎ID">
         <a-input-number v-model:value="searchParams.id" allow-clear />
       </a-form-item>
       <a-form-item label="所属集群">
-        <a-select v-model:value="searchParams.cluster" :options="clusterOptions" allow-clear placeholder="全部" style="min-width: 150px" />
+        <a-select v-model:value="searchParams.clusterId" :options="clusterOptions" allow-clear placeholder="全部" />
       </a-form-item>
       <a-form-item label="引擎名称">
-        <a-select v-model:value="searchParams.name" :options="nameOptions" allow-clear placeholder="全部" style="min-width: 120px" />
+        <a-select v-model:value="searchParams.name" :options="nameOptions" allow-clear placeholder="全部" />
       </a-form-item>
       <a-form-item label="引擎版本">
         <a-input v-model:value.trim="searchParams.versionContains" allow-clear />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">
+        <a-button type="primary" @click="search">
           <search-outlined />
           搜索
         </a-button>
@@ -156,7 +149,7 @@ const {
   </div>
   <div class="list-table">
     <DataOperations :selected="selected"
-                    :can-add="false" @add="add('添加计算引擎')"
+                    :can-add="false"
                     :can-enable="true" @enable="() => enableSelected((item: any) => item.disabled = 0)"
                     :can-disable="true" @disable="() => disableSelected((item: any) => item.disabled = 1)"
                     :can-del="true" @del="delSelected">
@@ -196,7 +189,6 @@ const {
       {{ drawerTitle }} {{ detail.name }}
     </template>
     <ClusterEngineUpsertForm ref="detailFormRef" v-model="detail"
-                             :name-options="nameOptions"
                              :cluster-options="clusterOptions"
                              @save="upsert">
       <template #buttons>

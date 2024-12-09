@@ -20,7 +20,7 @@ public class ClusterEngineSaveReq extends BaseEntity {
     /**
      * 所属集群
      */
-    private String cluster;
+    private String clusterId;
 
     /**
      * 引擎名称

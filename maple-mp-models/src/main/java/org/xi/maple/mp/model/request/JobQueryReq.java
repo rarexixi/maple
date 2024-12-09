@@ -30,23 +30,13 @@ public class JobQueryReq extends QueryReq {
 
     private String jobTypeContains;
 
-    private String clusterCategory;
+    private Integer engineId;
 
-    private Collection<String> clusterCategoryIn;
+    private Collection<Integer> engineIdIn;
 
-    private String clusterCategoryContains;
+    private Integer engineIdMin;
 
-    private String engineCategory;
-
-    private Collection<String> engineCategoryIn;
-
-    private String engineCategoryContains;
-
-    private String engineVersion;
-
-    private Collection<String> engineVersionIn;
-
-    private String engineVersionContains;
+    private Integer engineIdMax;
 
     private String owner;
 
@@ -88,28 +78,20 @@ public class JobQueryReq extends QueryReq {
         super.getOrderBy().getOrDefault("job_type", null);
     }
 
-    public void setClusterCategorySort(SortConstants sortConstants)  {
-        super.orderBy("cluster_category", sortConstants);
+    public void setEngineIdRange(Integer[] engineIdRange)  {
+        if (engineIdRange == null || engineIdRange.length != 2) {
+            return;
+        }
+        this.engineIdMin = engineIdRange[0];
+        this.engineIdMax = engineIdRange[1];
     }
 
-    public void getClusterCategorySort()  {
-        super.getOrderBy().getOrDefault("cluster_category", null);
+    public void setEngineIdSort(SortConstants sortConstants)  {
+        super.orderBy("engine_id", sortConstants);
     }
 
-    public void setEngineCategorySort(SortConstants sortConstants)  {
-        super.orderBy("engine_category", sortConstants);
-    }
-
-    public void getEngineCategorySort()  {
-        super.getOrderBy().getOrDefault("engine_category", null);
-    }
-
-    public void setEngineVersionSort(SortConstants sortConstants)  {
-        super.orderBy("engine_version", sortConstants);
-    }
-
-    public void getEngineVersionSort()  {
-        super.getOrderBy().getOrDefault("engine_version", null);
+    public void getEngineIdSort()  {
+        super.getOrderBy().getOrDefault("engine_id", null);
     }
 
     public void setOwnerSort(SortConstants sortConstants)  {

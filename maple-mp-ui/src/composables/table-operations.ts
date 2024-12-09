@@ -4,6 +4,7 @@ import type { AxiosRequestConfig } from "axios"
 import { createVNode, reactive, ref, toRaw } from "vue"
 
 import { request } from "@/utils/request-utils"
+import {DataOperationType} from "@/composables/common"
 
 export function getDialogOperations() {
   const opened = ref(false)
@@ -26,6 +27,7 @@ export function getDialogOperations() {
 export interface OperateCallback {
   detail?: (detail: any, copyPk: boolean) => void
   research?: () => void
+  afterSave?: () => void
   resetDetail?: (detail: any) => void
   setItem?: (detail: any, editIndex: number) => void
 }
@@ -111,6 +113,38 @@ export function getSingleDataOperations(operationUrls: any, operateCallback: Ope
   }
 
   return {dialogOperations, detail, get, add, copy, edit, upsert, enable, disable, del}
+}
+
+export function getSingleDataOperations2(operationUrls: any, operateCallback: OperateCallback) {
+
+  function getData() {
+    const data: any = {};
+    operateCallback.resetDetail?.(data)
+    return data;
+  }
+
+  const detail = reactive(getData())
+
+  function upsert(opType: DataOperationType, callbackable: boolean = true) {
+    const requestConfig: AxiosRequestConfig = opType === DataOperationType.update
+      ? {...operationUrls.update(toRaw(detail)), data: toRaw(detail)}
+      : {...operationUrls.add(), data: toRaw(detail)}
+    request(requestConfig).then(response => {
+      notification.success({message: '保存成功'})
+      if (callbackable) {
+        operateCallback.afterSave?.()
+      }
+    })
+  }
+
+  function get(item: any, copyPk: boolean) {
+    const requestConfig: AxiosRequestConfig = {...operationUrls.detail(item)}
+    request(requestConfig).then(response => {
+      operateCallback.detail?.(response, copyPk)
+    })
+  }
+
+  return {detail, get, upsert}
 }
 
 export function getMultiDataOperations(selection: any, operationUrls: any, operateCallback: OperateCallback) {

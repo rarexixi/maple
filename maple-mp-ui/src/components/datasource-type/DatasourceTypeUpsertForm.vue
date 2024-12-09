@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { notification } from "ant-design-vue"
 import type { ValidateErrorEntity } from "ant-design-vue/es/form/interface"
 import { useTemplateRef } from "vue"
+
+import common from "@/composables/common"
 
 const detail = defineModel<any>()
 
@@ -31,10 +32,7 @@ const save = () => {
   formRef.value?.validate().then(() => {
     emit("save")
   }).catch((error: ValidateErrorEntity<any>) => {
-    console.log(error)
-    notification.error({
-      message: "参数验证失败"
-    })
+    common.notifyValidateError()
   })
 }
 
@@ -79,7 +77,7 @@ const addConfOption = () => {
 </script>
 
 <template>
-  <a-form ref="formRef" :model="detail" @finish="save" :rules="rules"
+  <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
     <a-form-item ref="typeCode" label="类型编码" name="typeCode">
       <a-input v-model:value.trim="detail.typeCode" type="text" />
@@ -180,7 +178,7 @@ const addConfOption = () => {
       </table>
     </div>
     <a-form-item :wrapper-col="{ offset: labelWidth }">
-      <a-button type="primary" html-type="submit">保存</a-button>
+      <a-button type="primary" @click="save">保存</a-button>
       <slot name="buttons"></slot>
     </a-form-item>
   </a-form>

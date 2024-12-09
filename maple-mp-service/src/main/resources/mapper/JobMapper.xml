@@ -8,11 +8,9 @@
         <result property="jobName" column="job_name"/>
         <result property="desc" column="desc"/>
         <result property="jobType" column="job_type"/>
-        <result property="clusterCategory" column="cluster_category"/>
-        <result property="engineCategory" column="engine_category"/>
-        <result property="engineVersion" column="engine_version"/>
+        <result property="engineId" column="engine_id"/>
         <result property="owner" column="owner"/>
-        <result property="runContent" column="run_content"/>
+        <result property="runConf" column="run_conf"/>
         <result property="jobConf" column="job_conf"/>
         <result property="disabled" column="disabled"/>
         <result property="createdBy" column="created_by"/>
@@ -21,6 +19,7 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.mp.persistence.entity.JobEntityExt">
+        <result property="engineText" column="engine_text"/>
     </resultMap>
 
     <sql id="tableName">`maple_job`</sql>
@@ -33,11 +32,9 @@
             <if test="entity.jobName != null">`job_name`,</if>
             <if test="entity.desc != null">`desc`,</if>
             <if test="entity.jobType != null">`job_type`,</if>
-            <if test="entity.clusterCategory != null">`cluster_category`,</if>
-            <if test="entity.engineCategory != null">`engine_category`,</if>
-            <if test="entity.engineVersion != null">`engine_version`,</if>
+            <if test="entity.engineId != null">`engine_id`,</if>
             <if test="entity.owner != null">`owner`,</if>
-            <if test="entity.runContent != null">`run_content`,</if>
+            <if test="entity.runConf != null">`run_conf`,</if>
             <if test="entity.jobConf != null">`job_conf`,</if>
             <if test="entity.disabled != null">`disabled`,</if>
             <if test="entity.createdBy != null">`created_by`,</if>
@@ -50,11 +47,9 @@
             <if test="entity.jobName != null">#{entity.jobName},</if>
             <if test="entity.desc != null">#{entity.desc},</if>
             <if test="entity.jobType != null">#{entity.jobType},</if>
-            <if test="entity.clusterCategory != null">#{entity.clusterCategory},</if>
-            <if test="entity.engineCategory != null">#{entity.engineCategory},</if>
-            <if test="entity.engineVersion != null">#{entity.engineVersion},</if>
+            <if test="entity.engineId != null">#{entity.engineId},</if>
             <if test="entity.owner != null">#{entity.owner},</if>
-            <if test="entity.runContent != null">#{entity.runContent},</if>
+            <if test="entity.runConf != null">#{entity.runConf},</if>
             <if test="entity.jobConf != null">#{entity.jobConf},</if>
             <if test="entity.disabled != null">#{entity.disabled},</if>
             <if test="entity.createdBy != null">#{entity.createdBy},</if>
@@ -73,11 +68,9 @@
             `job_name`,
             `desc`,
             `job_type`,
-            `cluster_category`,
-            `engine_category`,
-            `engine_version`,
+            `engine_id`,
             `owner`,
-            `run_content`,
+            `run_conf`,
             `job_conf`,
             `disabled`,
             `created_by`,
@@ -92,11 +85,9 @@
             #{item.jobName},
             #{item.desc},
             #{item.jobType},
-            #{item.clusterCategory},
-            #{item.engineCategory},
-            #{item.engineVersion},
+            #{item.engineId},
             #{item.owner},
-            #{item.runContent},
+            #{item.runConf},
             #{item.jobConf},
             #{item.disabled},
             #{item.createdBy},
@@ -126,20 +117,14 @@
             <if test="entity.jobType != null">
                 `job_type` = #{entity.jobType},
             </if>
-            <if test="entity.clusterCategory != null">
-                `cluster_category` = #{entity.clusterCategory},
-            </if>
-            <if test="entity.engineCategory != null">
-                `engine_category` = #{entity.engineCategory},
-            </if>
-            <if test="entity.engineVersion != null">
-                `engine_version` = #{entity.engineVersion},
+            <if test="entity.engineId != null">
+                `engine_id` = #{entity.engineId},
             </if>
             <if test="entity.owner != null">
                 `owner` = #{entity.owner},
             </if>
-            <if test="entity.runContent != null">
-                `run_content` = #{entity.runContent},
+            <if test="entity.runConf != null">
+                `run_conf` = #{entity.runConf},
             </if>
             <if test="entity.jobConf != null">
                 `job_conf` = #{entity.jobConf},
@@ -164,11 +149,9 @@
             `job_name` = #{entity.jobName},
             `desc` = #{entity.desc},
             `job_type` = #{entity.jobType},
-            `cluster_category` = #{entity.clusterCategory},
-            `engine_category` = #{entity.engineCategory},
-            `engine_version` = #{entity.engineVersion},
+            `engine_id` = #{entity.engineId},
             `owner` = #{entity.owner},
-            `run_content` = #{entity.runContent},
+            `run_conf` = #{entity.runConf},
             `job_conf` = #{entity.jobConf},
             `updated_by` = #{entity.updatedBy},
             `updated_at` = #{entity.updatedAt}
@@ -185,11 +168,10 @@
             MT.`job_name`,
             MT.`desc`,
             MT.`job_type`,
-            MT.`cluster_category`,
-            MT.`engine_category`,
-            MT.`engine_version`,
+            MT.`engine_id`,
+            `T0`.`name` `engine_text`,
             MT.`owner`,
-            MT.`run_content`,
+            MT.`run_conf`,
             MT.`job_conf`,
             MT.`disabled`,
             MT.`created_by`,
@@ -198,6 +180,7 @@
             MT.`updated_at`
         FROM
         <include refid="tableName"/> MT
+            LEFT JOIN (SELECT `id`, `name` FROM `maple_cluster_engine`) T0 ON MT.engine_id = T0.`id`
         <where>
             MT.`id` = #{id}
         </where>
@@ -215,11 +198,9 @@
                 MT.`job_name`,
                 MT.`desc`,
                 MT.`job_type`,
-                MT.`cluster_category`,
-                MT.`engine_category`,
-                MT.`engine_version`,
+                MT.`engine_id`,
                 MT.`owner`,
-                MT.`run_content`,
+                MT.`run_conf`,
                 MT.`job_conf`,
                 MT.`disabled`,
                 MT.`created_by`,
@@ -339,83 +320,26 @@
                     <if test="condition.jobTypeContains != null and condition.jobTypeContains != ''">
                         AND MT.`job_type` LIKE concat('%', #{condition.jobTypeContains}, '%')
                     </if>
-                    <if test="condition.clusterCategory != null and condition.clusterCategory != ''">
-                        AND MT.`cluster_category` = #{condition.clusterCategory}
+                    <if test="condition.engineId != null">
+                        AND MT.`engine_id` = #{condition.engineId}
                     </if>
-                    <if test="condition.clusterCategoryIn != null and condition.clusterCategoryIn.size() > 0">
-                        AND MT.`cluster_category` IN
-                        <foreach collection="condition.clusterCategoryIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.engineIdIn != null and condition.engineIdIn.size() > 0">
+                        AND MT.`engine_id` IN
+                        <foreach collection="condition.engineIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.clusterCategoryNotIn != null and condition.clusterCategoryNotIn.size() > 0">
-                        AND MT.`cluster_category` NOT IN
-                        <foreach collection="condition.clusterCategoryNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.engineIdNotIn != null and condition.engineIdNotIn.size() > 0">
+                        AND MT.`engine_id` NOT IN
+                        <foreach collection="condition.engineIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.clusterCategoryIsNotEmpty != null and condition.clusterCategoryIsNotEmpty == true">
-                        AND MT.`cluster_category` IS NOT NULL AND `cluster_category` != ''
+                    <if test="condition.engineIdMin != null">
+                        <![CDATA[
+                        AND MT.`engine_id` >= #{condition.engineIdMin}
+                        ]]>
                     </if>
-                    <if test="condition.clusterCategoryIsEmpty != null and condition.clusterCategoryIsEmpty == true">
-                        AND (MT.`cluster_category` IS NULL OR MT.`cluster_category` = '')
-                    </if>
-                    <if test="condition.clusterCategoryStartWith != null and condition.clusterCategoryStartWith != ''">
-                        AND MT.`cluster_category` LIKE concat(#{condition.clusterCategoryStartWith}, '%')
-                    </if>
-                    <if test="condition.clusterCategoryEndWith != null and condition.clusterCategoryEndWith != ''">
-                        AND MT.`cluster_category` LIKE concat('%', #{condition.clusterCategoryEndWith})
-                    </if>
-                    <if test="condition.clusterCategoryContains != null and condition.clusterCategoryContains != ''">
-                        AND MT.`cluster_category` LIKE concat('%', #{condition.clusterCategoryContains}, '%')
-                    </if>
-                    <if test="condition.engineCategory != null and condition.engineCategory != ''">
-                        AND MT.`engine_category` = #{condition.engineCategory}
-                    </if>
-                    <if test="condition.engineCategoryIn != null and condition.engineCategoryIn.size() > 0">
-                        AND MT.`engine_category` IN
-                        <foreach collection="condition.engineCategoryIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineCategoryNotIn != null and condition.engineCategoryNotIn.size() > 0">
-                        AND MT.`engine_category` NOT IN
-                        <foreach collection="condition.engineCategoryNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineCategoryIsNotEmpty != null and condition.engineCategoryIsNotEmpty == true">
-                        AND MT.`engine_category` IS NOT NULL AND `engine_category` != ''
-                    </if>
-                    <if test="condition.engineCategoryIsEmpty != null and condition.engineCategoryIsEmpty == true">
-                        AND (MT.`engine_category` IS NULL OR MT.`engine_category` = '')
-                    </if>
-                    <if test="condition.engineCategoryStartWith != null and condition.engineCategoryStartWith != ''">
-                        AND MT.`engine_category` LIKE concat(#{condition.engineCategoryStartWith}, '%')
-                    </if>
-                    <if test="condition.engineCategoryEndWith != null and condition.engineCategoryEndWith != ''">
-                        AND MT.`engine_category` LIKE concat('%', #{condition.engineCategoryEndWith})
-                    </if>
-                    <if test="condition.engineCategoryContains != null and condition.engineCategoryContains != ''">
-                        AND MT.`engine_category` LIKE concat('%', #{condition.engineCategoryContains}, '%')
-                    </if>
-                    <if test="condition.engineVersion != null and condition.engineVersion != ''">
-                        AND MT.`engine_version` = #{condition.engineVersion}
-                    </if>
-                    <if test="condition.engineVersionIn != null and condition.engineVersionIn.size() > 0">
-                        AND MT.`engine_version` IN
-                        <foreach collection="condition.engineVersionIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineVersionNotIn != null and condition.engineVersionNotIn.size() > 0">
-                        AND MT.`engine_version` NOT IN
-                        <foreach collection="condition.engineVersionNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineVersionIsNotEmpty != null and condition.engineVersionIsNotEmpty == true">
-                        AND MT.`engine_version` IS NOT NULL AND `engine_version` != ''
-                    </if>
-                    <if test="condition.engineVersionIsEmpty != null and condition.engineVersionIsEmpty == true">
-                        AND (MT.`engine_version` IS NULL OR MT.`engine_version` = '')
-                    </if>
-                    <if test="condition.engineVersionStartWith != null and condition.engineVersionStartWith != ''">
-                        AND MT.`engine_version` LIKE concat(#{condition.engineVersionStartWith}, '%')
-                    </if>
-                    <if test="condition.engineVersionEndWith != null and condition.engineVersionEndWith != ''">
-                        AND MT.`engine_version` LIKE concat('%', #{condition.engineVersionEndWith})
-                    </if>
-                    <if test="condition.engineVersionContains != null and condition.engineVersionContains != ''">
-                        AND MT.`engine_version` LIKE concat('%', #{condition.engineVersionContains}, '%')
+                    <if test="condition.engineIdMax != null">
+                        <![CDATA[
+                        AND MT.`engine_id` <= #{condition.engineIdMax}
+                        ]]>
                     </if>
                     <if test="condition.owner != null and condition.owner != ''">
                         AND MT.`owner` = #{condition.owner}

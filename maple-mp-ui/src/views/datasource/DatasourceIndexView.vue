@@ -45,7 +45,6 @@ const convertList = (list: any[]) => list.map(item => {
   }
 })
 const {
-  search: datasourceTypeSearch,
   dataList: datasourceTypeOptions
 } = listSearch(DatasourceTypeApis.list(), datasourceTypeSearchParams, undefined, convertList)
 
@@ -53,11 +52,6 @@ onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
   setBreadcrumb([{text: '数据源'}])
-
-  // 获取列表数据
-  search()
-
-  datasourceTypeSearch()
 })
 
 const columns = [
@@ -154,7 +148,7 @@ const getDatasourceTypeDetail = (datasourceConf: any) => {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
+    <a-form ref="searchForm" :model="searchParams" layout="inline">
       <a-form-item label="Id">
         <a-input-number v-model:value="searchParams.id" allow-clear />
       </a-form-item>
@@ -165,7 +159,7 @@ const getDatasourceTypeDetail = (datasourceConf: any) => {
         <a-select v-model:value="searchParams.datasourceType" :options="datasourceTypeOptions" allow-clear placeholder="全部" style="width: 120px" />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">
+        <a-button type="primary" @click="search">
           <search-outlined />
           搜索
         </a-button>

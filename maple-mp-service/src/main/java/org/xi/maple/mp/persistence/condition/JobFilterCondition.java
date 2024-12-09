@@ -125,124 +125,29 @@ public class JobFilterCondition implements FilterCondition {
     private String jobTypeContains;
 
     /**
-     * 集群种类
+     * 引擎ID
      */
-    private String clusterCategory;
+    private Integer engineId;
 
     /**
-     * 集群种类列表
+     * 引擎ID列表
      */
-    private Collection<String> clusterCategoryIn;
+    private Collection<Integer> engineIdIn;
 
     /**
-     * 排除的集群种类列表
+     * 排除的引擎ID列表
      */
-    private Collection<String> clusterCategoryNotIn;
+    private Collection<Integer> engineIdNotIn;
 
     /**
-     * 集群种类不为空
+     * 最小引擎ID
      */
-    private Boolean clusterCategoryIsNotEmpty;
+    private Integer engineIdMin;
 
     /**
-     * 集群种类为空
+     * 最大引擎ID
      */
-    private Boolean clusterCategoryIsEmpty;
-
-    /**
-     * 集群种类开始
-     */
-    private String clusterCategoryStartWith;
-
-    /**
-     * 集群种类结束
-     */
-    private String clusterCategoryEndWith;
-
-    /**
-     * 集群种类包含
-     */
-    private String clusterCategoryContains;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎种类列表
-     */
-    private Collection<String> engineCategoryIn;
-
-    /**
-     * 排除的引擎种类列表
-     */
-    private Collection<String> engineCategoryNotIn;
-
-    /**
-     * 引擎种类不为空
-     */
-    private Boolean engineCategoryIsNotEmpty;
-
-    /**
-     * 引擎种类为空
-     */
-    private Boolean engineCategoryIsEmpty;
-
-    /**
-     * 引擎种类开始
-     */
-    private String engineCategoryStartWith;
-
-    /**
-     * 引擎种类结束
-     */
-    private String engineCategoryEndWith;
-
-    /**
-     * 引擎种类包含
-     */
-    private String engineCategoryContains;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
-
-    /**
-     * 引擎版本列表
-     */
-    private Collection<String> engineVersionIn;
-
-    /**
-     * 排除的引擎版本列表
-     */
-    private Collection<String> engineVersionNotIn;
-
-    /**
-     * 引擎版本不为空
-     */
-    private Boolean engineVersionIsNotEmpty;
-
-    /**
-     * 引擎版本为空
-     */
-    private Boolean engineVersionIsEmpty;
-
-    /**
-     * 引擎版本开始
-     */
-    private String engineVersionStartWith;
-
-    /**
-     * 引擎版本结束
-     */
-    private String engineVersionEndWith;
-
-    /**
-     * 引擎版本包含
-     */
-    private String engineVersionContains;
+    private Integer engineIdMax;
 
     /**
      * 作业负责人

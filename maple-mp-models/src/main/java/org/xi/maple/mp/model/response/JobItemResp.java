@@ -1,9 +1,11 @@
 package org.xi.maple.mp.model.response;
 
 import lombok.Data;
+import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 public class JobItemResp implements Serializable {
@@ -29,19 +31,9 @@ public class JobItemResp implements Serializable {
     private String jobType;
 
     /**
-     * 集群种类
+     * 引擎ID
      */
-    private String clusterCategory;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
+    private Integer engineId;
 
     /**
      * 作业负责人
@@ -49,9 +41,9 @@ public class JobItemResp implements Serializable {
     private String owner;
 
     /**
-     * 执行内容
+     * 执行配置
      */
-    private String runContent;
+    private String runConf;
 
     /**
      * 作业配置
@@ -82,4 +74,12 @@ public class JobItemResp implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
+
+    public Map<String, Object> getRunConf() {
+        return (Map<String, Object>) JsonUtils.parseObject(runConf, Map.class, Map.of());
+    }
+
+    public Map<String, Object> getJobConf() {
+        return (Map<String, Object>) JsonUtils.parseObject(jobConf, Map.class, Map.of());
+    }
 }

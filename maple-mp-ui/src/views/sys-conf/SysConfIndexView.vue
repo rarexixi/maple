@@ -34,10 +34,6 @@ onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
   setBreadcrumb([{text: '系统配置'}])
-
-  // 获取列表数据
-  search()
-
 })
 
 const columns = [
@@ -57,7 +53,11 @@ const callback: OperateCallback = {
       }
     }
     detail.confKey = response.confKey
-    detail.confValue = response.confValue
+    try {
+      detail.confValue = JSON.stringify(JSON.parse(response.confValue), null, 4)
+    } catch (err) {
+      detail.confValue = response.confValue
+    }
     detail.desc = response.desc
   },
   research: search,
@@ -101,12 +101,12 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
+    <a-form ref="searchForm" :model="searchParams" layout="inline">
       <a-form-item label="配置键">
         <a-input v-model:value.trim="searchParams.confKey" allow-clear />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">
+        <a-button type="primary" @click="search">
           <search-outlined />
           搜索
         </a-button>

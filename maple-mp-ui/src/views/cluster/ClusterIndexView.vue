@@ -3,7 +3,7 @@ import type { FormInstance } from "ant-design-vue"
 import { reactive, onMounted, ref, useTemplateRef } from "vue"
 
 import common from '@/composables/common'
-import { listSearch, pageListSearch } from '@/composables/requests'
+import { pageListSearch } from '@/composables/requests'
 import { ClusterApis } from "@/composables/service-apis"
 import type { OperateCallback } from "@/composables/table-operations"
 import { getMultiDataOperations, getSingleDataOperations } from "@/composables/table-operations"
@@ -13,6 +13,7 @@ import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 import DataOperations from "@/components/DataOperations.vue"
 import TableOperations from "@/components/TableOperations.vue"
 import ClusterUpsertForm from "@/components/cluster/ClusterUpsertForm.vue"
+import { useClusterCategoriesStore } from "@/stores/sys-conf"
 
 const pkFields = ['id']
 
@@ -31,19 +32,12 @@ const {
 const selection = getSelection()
 const {selected, rowSelection} = selection
 
-const categoryOptions = [
-  {value: 'K8s', label: 'K8s'},
-  {value: 'YARN', label: 'YARN'}
-]
+const {confOptions: categoryOptions} = useClusterCategoriesStore()
 
 onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
   setBreadcrumb([{text: '集群'}])
-
-  // 获取列表数据
-  search()
-
 })
 
 const columns = [
@@ -120,7 +114,7 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" @finish="search" layout="inline">
+    <a-form ref="searchForm" :model="searchParams" layout="inline">
       <a-form-item label="集群ID">
         <a-input-number v-model:value="searchParams.id" allow-clear />
       </a-form-item>
@@ -128,7 +122,7 @@ const {
         <a-input v-model:value.trim="searchParams.addressContains" allow-clear />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">
+        <a-button type="primary" @click="search">
           <search-outlined />
           搜索
         </a-button>

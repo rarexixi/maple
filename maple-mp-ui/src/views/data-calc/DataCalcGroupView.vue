@@ -14,16 +14,17 @@ import DorisSink from "@/components/data-calc/sink/DorisSink.vue"
 import StarRocksSink from "@/components/data-calc/sink/StarRocksSink.vue"
 import ManagedJdbcSink from "@/components/data-calc/sink/ManagedJdbcSink.vue"
 import HiveSink from "@/components/data-calc/sink/HiveSink.vue"
+
 import AddPlugin from "@/components/data-calc/AddPlugin.vue"
 import PluginOperations from "@/components/data-calc/PluginOperations.vue"
-import InputStringMap from "@/components/data-calc/InputStringMap.vue"
+import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 import SampleData from "@/assets/sample-data"
 import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
 const {setBreadcrumb} = useBreadcrumbStore()
 setBreadcrumb([{text: '数据计算配置-分组方式'}])
 
-const mapleConfig = reactive({
+const jobConf = reactive({
   ...SampleData.SampleConfig
 })
 
@@ -45,11 +46,11 @@ for (let config in SampleData.SampleConfig) {
 const getTargetPlugins = (type: string): any[] => {
   switch (type) {
     case 'source':
-      return mapleConfig.sources
+      return jobConf.sources
     case 'transformation':
-      return mapleConfig.transformations
+      return jobConf.transformations
     case 'sink':
-      return mapleConfig.sinks
+      return jobConf.sinks
     default:
       return []
   }
@@ -69,7 +70,6 @@ const getTargetPluginPageConfig = (type: string): any[] => {
 }
 
 const addPlugin = (type: string, name: string, index: number = -1) => {
-  console.log(type, name)
   let plugin = SampleData.PluginModels[type][name]()
   let plugins = getTargetPlugins(type)
   let pluginPageConfig = getTargetPluginPageConfig(type)
@@ -97,7 +97,7 @@ const getCode = (showCode: boolean) => {
     const requestConfig = {
       url: "/ftl/get-group-code",
       method: 'POST',
-      data: toRaw(mapleConfig)
+      data: toRaw(jobConf)
     }
     request(requestConfig).then(response => {
       code.value = response
@@ -109,7 +109,7 @@ const getCode = (showCode: boolean) => {
 
 watch(codeView, () => getCode(codeView.value))
 
-const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(mapleConfig, null, 4))
+const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(jobConf, null, 2))
 
 </script>
 
@@ -117,12 +117,12 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
   <a-row style="height: 100%; padding: 10px">
     <a-col :span="12" style="height: 100%; overflow: auto;">
       <a-typography-title :level="4">全局变量</a-typography-title>
-      <InputStringMap v-model:value="mapleConfig.variables" />
+      <a-input-string-map v-model:value="jobConf.variables" />
 
       <a-divider />
 
       <a-typography-title :level="4">输入</a-typography-title>
-      <template v-for="(item, index) in mapleConfig.sources" :key="`source_${index}`">
+      <template v-for="(item, index) in jobConf.sources" :key="`source_${index}`">
         <AddPlugin plugin-type="source" @add="(name: string) => addPlugin('source', name, index)" />
         <a-card :class="pageConfig.sources[index].expand ? 'card-open' : 'card-close'">
           <a-flex :justify="'space-between'" :align="'center'" class="card-header">
@@ -156,7 +156,7 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
       <a-divider />
 
       <a-typography-title :level="4">转换</a-typography-title>
-      <template v-for="(item, index) in mapleConfig.transformations" :key="`transformation_${index}`">
+      <template v-for="(item, index) in jobConf.transformations" :key="`transformation_${index}`">
         <AddPlugin plugin-type="transformation"
                    @add="(name: string) => addPlugin('transformation', name, index)" />
         <a-card :class="pageConfig.transformations[index].expand ? 'card-open' : 'card-close'">
@@ -182,7 +182,7 @@ const previewCode = computed(() => codeView.value ? code.value : JSON.stringify(
       <a-divider />
 
       <a-typography-title :level="4">输出</a-typography-title>
-      <template v-for="(item, index) in mapleConfig.sinks" :key="`sink_${index}`">
+      <template v-for="(item, index) in jobConf.sinks" :key="`sink_${index}`">
         <AddPlugin plugin-type="sink" @add="name => addPlugin('sink', name, index)" />
         <a-card :class="pageConfig.sinks[index].expand ? 'card-open' : 'card-close'">
           <a-flex :justify="'space-between'" :align="'center'" class="card-header">
