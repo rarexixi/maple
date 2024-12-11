@@ -22,7 +22,7 @@ import static org.xi.maple.common.constant.SetFieldType.*;
 @Validated
 public class ClusterEngineDefaultConfController {
 
-    public static final String BASE_URL = "/api/cluster-engine-default-conves";
+    public static final String BASE_URL = "/api/cluster-engine-default-conf";
 
     private final ClusterEngineDefaultConfService clusterEngineDefaultConfService;
 

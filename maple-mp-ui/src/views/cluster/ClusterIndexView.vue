@@ -62,7 +62,7 @@ const callback: OperateCallback = {
     detail.name = response.name
     detail.category = response.category
     detail.address = response.address
-    detail.desc = response.desc
+    detail.description = response.description
     detail.clusterConf = response.clusterConf
     if (response.category == 'K8s') {
       detail.clusterConf = {config: {clientCertData: '', ...response.clusterConf.config}}
@@ -76,7 +76,7 @@ const callback: OperateCallback = {
     detail.name = ''
     detail.category = ''
     detail.address = ''
-    detail.desc = ''
+    detail.description = ''
     detail.clusterConf = ''
   },
   setItem: (detail: any, editIndex: number) => {

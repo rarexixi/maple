@@ -75,7 +75,7 @@ public class TableUtils {
         try {
             SqlNode sqlNode = parser.parseStmt();
             if (sqlNode.getKind() != SqlKind.CREATE_TABLE) {
-                throw new RuntimeException("createSql is invalid");
+                throw new RuntimeException("create sql is invalid");
             }
             return (SqlCreateTable) sqlNode;
         } catch (SqlParseException e) {
@@ -84,13 +84,12 @@ public class TableUtils {
     }
 
     private static SqlParser.Config getSqlParserConfig() {
-        return SqlParser.configBuilder()
-                .setParserFactory(FlinkSqlParserImpl.FACTORY)
-                .setQuoting(BACK_TICK)
-                .setUnquotedCasing(Casing.TO_LOWER)
-                .setQuotedCasing(Casing.UNCHANGED)
-                .setConformance(FlinkSqlConformance.DEFAULT)
-                .build();
+        return SqlParser.config()
+                .withParserFactory(FlinkSqlParserImpl.FACTORY)
+                .withQuoting(BACK_TICK)
+                .withUnquotedCasing(Casing.TO_LOWER)
+                .withQuotedCasing(Casing.UNCHANGED)
+                .withConformance(FlinkSqlConformance.DEFAULT);
     }
 
     public static TableDescriptor getTableDescriptor(StructTableConfig structTableConfig) {

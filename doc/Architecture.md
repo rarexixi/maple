@@ -103,47 +103,47 @@
         {
             "name": "spark.yarn.queue",
             "replaceParameter": "--queue",
-            "desc": "YARN 队列"
+            "description": "YARN 队列"
         },
         {
             "name": "spark.driver.cores",
             "replaceParameter": "--driver-cores",
-            "desc": "Spark driver vcores"
+            "description": "Spark driver vcores"
         },
         {
             "name": "spark.driver.memory",
             "replaceParameter": "--driver-memory",
-            "desc": "Spark driver 内存"
+            "description": "Spark driver 内存"
         },
         {
             "name": "spark.executor.instances",
             "replaceParameter": "--num-executors",
-            "desc": "Spark executor 内存"
+            "description": "Spark executor 内存"
         },
         {
             "name": "spark.executor.cores",
             "replaceParameter": "--executor-cores",
-            "desc": "Spark executor vcores"
+            "description": "Spark executor vcores"
         },
         {
             "name": "spark.executor.memory",
             "replaceParameter": "--executor-memory",
-            "desc": "Spark executor 内存"
+            "description": "Spark executor 内存"
         },
         {
             "name": "spark.driver.extraJavaOptions",
             "replaceParameter": "--driver-java-options",
-            "desc": "Spark driver java 启动参数"
+            "description": "Spark driver java 启动参数"
         },
         {
             "name": "spark.driver.extraLibraryPath",
             "replaceParameter": "--driver-library-path",
-            "desc": "Spark driver java 启动参数"
+            "description": "Spark driver java 启动参数"
         },
         {
             "name": "spark.jars",
             "replaceParameter": "--jars",
-            "desc": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
+            "description": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
         }
     ]
 }

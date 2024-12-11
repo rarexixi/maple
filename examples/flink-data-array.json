@@ -1,0 +1,103 @@
+{
+  "variables": {
+  },
+  "plugins": [
+    {
+      "type": "source",
+      "name": "jdbc",
+      "config": {
+        "tableName": "source_001",
+        "comment": "source_001",
+        "columns": [
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "",
+              "comment": "",
+              "dataType": ""
+            }
+          },
+          {
+            "columnType": "metadata",
+            "definition": {
+              "name": "",
+              "comment": "",
+              "dataType": "",
+              "dataType": "",
+              "metadataKey": "",
+              "virtual": false
+            }
+          },
+          {
+            "columnType": "computed",
+            "definition": {
+              "expression": ""
+            }
+          }],
+        "primaryKey": {
+          "name": "",
+          "columns": ["id"]
+        },
+        "watermark" : {
+
+        },
+        "partitionColumns": [],
+        "url": "jdbc:mysql://localhost:3306/",
+        "table": "",
+        "driver": "com.mysql.cj.jdbc.Driver",
+        "user": "xi_root",
+        "password": "123456",
+        "options": {
+        }
+      }
+    },
+    {
+      "type": "sink",
+      "name": "jdbc",
+      "config": {
+        "tableName": "sink_001",
+        "comment": "sink_001",
+        "columns": [
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "",
+              "comment": "",
+              "dataType": ""
+            }
+          },
+          {
+            "columnType": "metadata",
+            "definition": {
+              "name": "",
+              "comment": "",
+              "dataType": "",
+              "metadataKey": "",
+              "virtual": false
+            }
+          },
+          {
+            "columnType": "computed",
+            "definition": {
+              "expression": ""
+            }
+          }],
+        "primaryKey": {
+          "name": "",
+          "columns": ["id"]
+        },
+        "watermark" : {
+
+        },
+        "partitionColumns": [],
+        "url": "jdbc:mysql://localhost:3306/",
+        "table": "",
+        "driver": "com.mysql.cj.jdbc.Driver",
+        "user": "xi_root",
+        "password": "123456",
+        "options": {
+        }
+      }
+    }
+  ]
+}

@@ -17,7 +17,7 @@ export function listSearch(listRequestConfig: AxiosRequestConfig,
   const dataList = ref<any[]>([])
   const dataMap = reactive<any>({})
   const search = () => {
-    request({...listRequestConfig, params: {...searchParams}}).then(response => {
+    request({ ...listRequestConfig, params: { ...searchParams } }).then(response => {
       dataList.value = convertToList(response)
       setMap(response, dataMap)
     })
@@ -27,7 +27,7 @@ export function listSearch(listRequestConfig: AxiosRequestConfig,
   }
 
   search()
-  return {dataList, dataMap, search, resetSearch}
+  return { dataList, dataMap, search, resetSearch }
 }
 
 export function pageListSearch(pageListRequestConfig: AxiosRequestConfig,
@@ -40,7 +40,7 @@ export function pageListSearch(pageListRequestConfig: AxiosRequestConfig,
   const search = () => {
     request({
       ...pageListRequestConfig,
-      params: {...searchParams, pageNum: pageNum.value, pageSize: pageSize.value}
+      params: { ...searchParams, pageNum: pageNum.value, pageSize: pageSize.value }
     }).then(response => {
       dataPageList.list = convertList(response.list)
       dataPageList.total = response.total
@@ -58,7 +58,7 @@ export function pageListSearch(pageListRequestConfig: AxiosRequestConfig,
   watch(pageNum, search)
 
   search()
-  return {pageNum, pageSize, dataPageList, search, resetSearch}
+  return { pageNum, pageSize, dataPageList, search, resetSearch }
 }
 
 export function getArrayConf(configKey: string, valueField: string = "value", labelField: string = "label") {
@@ -71,11 +71,18 @@ export function getArrayConf(configKey: string, valueField: string = "value", la
   request(SysConfApis.detail(configKey)).then(response => {
     confArray.value = JSON.parse(response.confValue);
     confOptions.value = confArray.value.map((item: any) => {
-      confMap[item[valueField]] = item
-      confOptionMap[item[valueField]] = item[labelField]
-      return {value: item[valueField], label: item[labelField]}
+      if (typeof item === 'string') {
+        confMap[item] = item
+        confOptionMap[item] = item
+        return { value: item, label: item }
+      } else {
+
+        confMap[item[valueField]] = item
+        confOptionMap[item[valueField]] = item[labelField]
+        return { value: item[valueField], label: item[labelField] }
+      }
     })
   })
 
-  return {confArray, confMap, confOptions, confOptionMap}
+  return { confArray, confMap, confOptions, confOptionMap }
 }

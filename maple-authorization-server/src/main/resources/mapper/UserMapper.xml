@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.authserver.persistence.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.authserver.persistence.entity.UserEntity">
+        <result property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="picture" column="picture"/>
+        <result property="gender" column="gender"/>
+        <result property="disabled" column="disabled"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    <sql id="tableName">`maple_user`</sql>
+
+    <!--根据用户名获取用户详情-->
+    <select id="getByUsername" resultMap="BaseResultMap">
+        SELECT
+            MT.`id`,
+            MT.`username`,
+            MT.`name`,
+            MT.`password`,
+            MT.`email`,
+            MT.`phone_number`,
+            MT.`picture`,
+            MT.`gender`,
+            MT.`disabled`,
+            MT.`created_by`,
+            MT.`updated_by`,
+            MT.`created_at`,
+            MT.`updated_at`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            MT.`username` = #{username}
+        </where>
+    </select>
+
+    <!--根据用户ID获取用户详情-->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+            MT.`id`,
+            MT.`username`,
+            MT.`name`,
+            MT.`password`,
+            MT.`email`,
+            MT.`phone_number`,
+            MT.`picture`,
+            MT.`gender`,
+            MT.`disabled`,
+            MT.`created_by`,
+            MT.`updated_by`,
+            MT.`created_at`,
+            MT.`updated_at`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            MT.`id` = #{id}
+        </where>
+    </select>
+
+    <!--根据用户ID获取用户权限-->
+    <select id="getUserPermissionsByUserId" resultType="java.lang.String">
+        SELECT MP.`code`
+        FROM `maple_permission` MP
+                JOIN `maple_user_permission` MUP ON MP.`id` = MUP.`perm_id`
+        <where>
+            MUP.`user_id` = #{userId}
+        </where>
+    </select>
+</mapper>

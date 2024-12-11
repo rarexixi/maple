@@ -36,8 +36,8 @@ public abstract class MapleSink<T extends MapleSink.SinkConfig> extends MaplePlu
 
     @Data
     public static abstract class SinkConfig extends StructTableConfig implements TableInsert {
-        protected String sourceCatalogName;
-        protected String sourceDatabaseName;
+        // protected String sourceCatalogName;
+        // protected String sourceDatabaseName;
         protected String sourceTableName;
 
         protected String sourceSql;
@@ -51,8 +51,9 @@ public abstract class MapleSink<T extends MapleSink.SinkConfig> extends MaplePlu
             if (StringUtils.isNotBlank(sourceSql)) {
                 return sourceSql;
             }
-            String sourceTable = TableUtils.getResultTable(sourceCatalogName, sourceDatabaseName, sourceTableName);
-            return String.format("SELECT * FROM %s", sourceTable);
+            // String sourceTable = TableUtils.getResultTable(sourceCatalogName, sourceDatabaseName, sourceTableName);
+            // return String.format("SELECT * FROM %s", sourceTable);
+            return String.format("SELECT * FROM %s", sourceTableName);
         }
 
         @Override

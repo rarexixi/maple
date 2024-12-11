@@ -21,7 +21,7 @@ public class SysConfItemResp implements Serializable {
     /**
      * 配置说明
      */
-    private String desc;
+    private String description;
 
     /**
      * 是否禁用

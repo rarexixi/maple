@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.api.TableEnvironment;
 import org.xi.maple.datacalc.flink.api.MapleSource;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class KafkaSource extends MapleSource<KafkaSource.Config> {
@@ -21,19 +21,13 @@ public class KafkaSource extends MapleSource<KafkaSource.Config> {
         @NotBlank
         String bootstrapServers;
 
-        String topic;
-        String topicPattern;
-
         @NotBlank
+        String topic;
+
         String groupId;
 
         @NotBlank
         String format;
-
-        @AssertTrue(message = "[topic, topicPattern] cannot be blank at the same time.")
-        public boolean isSourceOK() {
-            return StringUtils.isNotBlank(topic) || StringUtils.isNotBlank(topicPattern);
-        }
 
         @Override
         public String getConnector() {
@@ -42,12 +36,14 @@ public class KafkaSource extends MapleSource<KafkaSource.Config> {
 
         @Override
         public Map<String, String> getDefineOptions() {
-            return null;
-        }
-
-        @Override
-        public String getResultTable() {
-            return null;
+            Map<String, String> defineOptions = new LinkedHashMap<>();
+            defineOptions.put("topic", topic);
+            defineOptions.put("properties.bootstrap.servers", bootstrapServers);
+            if (StringUtils.isNoneBlank(groupId)) {
+                defineOptions.put("properties.group.id", groupId);
+            }
+            defineOptions.put("format", format);
+            return defineOptions;
         }
     }
 }

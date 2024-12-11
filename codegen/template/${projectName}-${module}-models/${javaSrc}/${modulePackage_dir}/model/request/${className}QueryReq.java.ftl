@@ -1,16 +1,13 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.model.request;
 
+import lombok.Data;
 import ${commonPackage}.constant.SortConstants;
 import ${commonPackage}.model.QueryReq;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
 
-import lombok.Data;
+import java.io.Serializable;
+<#include "/include/table/table_field_type_imports.ftl">
+<@import_fields_type table.indexes true />
 
 @Data
 public class ${className}QueryReq extends QueryReq {

@@ -52,9 +52,9 @@ const ${fieldNameExceptKey}SearchParams = reactive<any>({
   </#list>
 })
 const {
-  search: ${fieldNameExceptKey}Search,
   dataList: ${fieldNameExceptKey}Options
-} = listSearch(${column.fkSelectColumn.foreignClassName}Apis.list(), ${fieldNameExceptKey}SearchParams, undefined, common.convertToOptions('${column.fkSelectColumn.valueName?uncap_first}', '${column.fkSelectColumn.textName?uncap_first}'))
+  dataMap: ${fieldNameExceptKey}OptionMap
+} = listSearch(${column.fkSelectColumn.foreignClassName}Apis.list(), ${fieldNameExceptKey}SearchParams, undefined, common.convertToOptions('${column.fkSelectColumn.valueName?uncap_first}', '${column.fkSelectColumn.textName?uncap_first}'), common.setOptionMap('${column.fkSelectColumn.valueName?uncap_first}', '${column.fkSelectColumn.textName?uncap_first}'))
 </#list>
 <#list table.selectColumns as column>
 <#include "/include/column/properties.ftl">
@@ -70,20 +70,14 @@ onMounted(() => {
   // 设置面包屑
   const {setBreadcrumb} = useBreadcrumbStore()
   setBreadcrumb([{text: '${tableComment}'}])
-
-  // 获取列表数据
-  search()
-
-  <#list table.fkSelectColumns as column>
-  <#include "/include/column/properties.ftl">
-  ${fieldNameExceptKey}Search()
-  </#list>
 })
 
 const columns = [
   <#list table.columns as column>
   <#include "/include/column/properties.ftl">
   <#if (isContent || column.validStatus)>
+  <#elseif (column.fkSelect)>
+  { title: '${columnComment}', dataIndex: '${fieldName}', key: '${fieldName}', customRender: (row: any) => ${fieldNameExceptKey}OptionMap[row.text] },
   <#else>
   { title: '${columnComment}', dataIndex: '${fieldName}', key: '${fieldName}' },
   </#if>
@@ -244,11 +238,11 @@ const {
     <${className}UpsertForm ref="detailFormRef" v-model="detail"
                             <#list table.selectColumns as column>
                             <#include "/include/column/properties.ftl">
-                            :${fieldNameExceptKey}Options="${fieldNameExceptKey}Options"
+                            :${fieldNameExceptKey}-options="${fieldNameExceptKey}Options"
                             </#list>
                             <#list table.fkSelectColumns as column>
                             <#include "/include/column/properties.ftl">
-                            :${fieldNameExceptKey}Options="${fieldNameExceptKey}Options"
+                            :${fieldNameExceptKey}-options="${fieldNameExceptKey}Options"
                             </#list>
                             @save="upsert">
       <template #buttons>

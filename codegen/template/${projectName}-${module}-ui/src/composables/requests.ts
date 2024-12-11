@@ -10,17 +10,23 @@ import { request } from '@/utils/request-utils'
 export function listSearch(listRequestConfig: AxiosRequestConfig,
                            searchParams: UnwrapRef<any>,
                            formRef?: Readonly<ShallowRef<FormInstance | null>>,
-                           convertList: (list: any[]) => any[] = (list: any[]) => list) {
+                           convertToList: (list: any[]) => any[] = (list: any[]) => list,
+                           setMap: (list: any[], dataMap: any) => void = (list: any[]) => {
+                           }) {
   const dataList = ref<any[]>([])
+  const dataMap = reactive<any>({})
   const search = () => {
     request({...listRequestConfig, params: {...searchParams}}).then(response => {
-      dataList.value = convertList(response)
+      dataList.value = convertToList(response)
+      setMap(response, dataMap)
     })
   }
   const resetSearch = () => {
     formRef?.value?.resetFields()
   }
-  return {dataList, search, resetSearch}
+
+  search()
+  return {dataList, dataMap, search, resetSearch}
 }
 
 export function pageListSearch(pageListRequestConfig: AxiosRequestConfig,
@@ -49,5 +55,7 @@ export function pageListSearch(pageListRequestConfig: AxiosRequestConfig,
     search()
   })
   watch(pageNum, search)
+
+  search()
   return {pageNum, pageSize, dataPageList, search, resetSearch}
 }

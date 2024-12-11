@@ -1,9 +1,10 @@
 <#include "/include/table/properties.ftl">
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { notification } from "ant-design-vue"
 import type { ValidateErrorEntity } from "ant-design-vue/es/form/interface"
 import { useTemplateRef } from "vue"
+
+import common from "@/composables/common"
 
 const detail = defineModel<any>()
 
@@ -49,10 +50,7 @@ const save = () => {
   formRef.value?.validate().then(() => {
     emit("save")
   }).catch((error: ValidateErrorEntity<any>) => {
-    console.log(error)
-    notification.error({
-      message: "参数验证失败"
-    })
+    common.notifyValidateError()
   })
 }
 
@@ -61,7 +59,7 @@ const labelWidth = 4
 </script>
 
 <template>
-  <a-form ref="formRef" :model="detail" @finish="save" :rules="rules"
+  <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
     <#list table.columnsExceptBase as column>
     <#include "/include/column/properties.ftl">
@@ -90,7 +88,7 @@ const labelWidth = 4
     </a-form-item>
     <#elseif (isContent)>
     <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
-      <a-textarea v-model:value="detail.${fieldName}" type="textarea" :autosize="{ minRows: 5, maxRows: 100}" />
+      <a-textarea v-model:value="detail.${fieldName}" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
     <#elseif (isString)>
     <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
@@ -100,7 +98,7 @@ const labelWidth = 4
     </#if>
     </#list>
     <a-form-item :wrapper-col="{ offset: labelWidth }">
-      <a-button type="primary" html-type="submit">保存</a-button>
+      <a-button type="primary" @click="save">保存</a-button>
       <slot name="buttons"></slot>
     </a-form-item>
   </a-form>

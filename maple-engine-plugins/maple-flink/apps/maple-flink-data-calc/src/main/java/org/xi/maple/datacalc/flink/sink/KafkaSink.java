@@ -5,6 +5,7 @@ import org.apache.flink.table.api.TableEnvironment;
 import org.xi.maple.datacalc.flink.api.MapleSink;
 
 import javax.validation.constraints.NotBlank;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class KafkaSink extends MapleSink<KafkaSink.Config> {
@@ -23,9 +24,6 @@ public class KafkaSink extends MapleSink<KafkaSink.Config> {
         String topic;
 
         @NotBlank
-        String groupId;
-
-        @NotBlank
         String format;
 
         @Override
@@ -35,12 +33,11 @@ public class KafkaSink extends MapleSink<KafkaSink.Config> {
 
         @Override
         public Map<String, String> getDefineOptions() {
-            return null;
-        }
-
-        @Override
-        public String getResultTable() {
-            return null;
+            Map<String, String> defineOptions = new LinkedHashMap<>();
+            defineOptions.put("topic", topic);
+            defineOptions.put("properties.bootstrap.servers", bootstrapServers);
+            defineOptions.put("format", format);
+            return defineOptions;
         }
     }
 }

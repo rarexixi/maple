@@ -7,6 +7,7 @@ import common from "@/composables/common"
 import type { ValidatableComponent } from "@/composables/models"
 
 import SparkRunForm from "@/components/job/spark/SparkRunForm.vue"
+import FlinkRunForm from "@/components/job/flink/FlinkRunForm.vue"
 import SparkDataCalcArrayForm from "@/components/job/spark/data-calc/SparkDataCalcArrayForm.vue"
 import SparkDataCalcGroupForm from "@/components/job/spark/data-calc/SparkDataCalcGroupForm.vue"
 
@@ -14,8 +15,10 @@ const detail = defineModel<any>()
 
 const {
   engineOptions,
+  jobType
 } = defineProps<{
   engineOptions: any[],
+  jobType: any
 }>()
 
 
@@ -73,15 +76,19 @@ const labelWidth = 8
       <a-form-item ref="owner" label="作业负责人" name="owner" class="form-item-320">
         <a-input v-model:value.trim="detail.owner" type="text" />
       </a-form-item>
-      <a-form-item ref="desc" label="作业说明" name="desc" class="form-item-640" :label-col="{ span: 4 }"
+      <a-form-item ref="description" label="作业说明" name="description" class="form-item-640" :label-col="{ span: 4 }"
                    :wrapper-col="{ span: 20 }">
         <a-input v-model:value="detail.desc" />
       </a-form-item>
     </a-flex>
     <a-divider />
-    <SparkRunForm ref="runFormRef" :run-conf="detail.runConf" />
+    <template v-if="jobType?.engineType == 'spark'">
+      <SparkRunForm ref="runFormRef" :run-conf="detail.runConf" />
+    </template>
+    <template v-else-if="jobType?.engineType == 'flink'">
+      <FlinkRunForm ref="runFormRef" :run-conf="detail.runConf" />
+    </template>
     <a-divider />
-    <!--<SparkDataCalcGroupForm ref="jobConfFormRef" :job-conf="detail.jobConf" />-->
     <SparkDataCalcGroupForm ref="jobConfFormRef" :job-conf="detail.jobConf"
                             v-if="detail.jobType === 'spark-data-calc-group'" />
     <SparkDataCalcArrayForm ref="jobConfFormRef" :job-conf="detail.jobConf"

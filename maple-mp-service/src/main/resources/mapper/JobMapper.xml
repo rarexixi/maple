@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="org.xi.maple.mp.persistence.entity.JobEntity">
         <result property="id" column="id"/>
         <result property="jobName" column="job_name"/>
-        <result property="desc" column="desc"/>
+        <result property="description" column="description"/>
         <result property="jobType" column="job_type"/>
         <result property="engineId" column="engine_id"/>
         <result property="owner" column="owner"/>
@@ -30,7 +30,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">`id`,</if>
             <if test="entity.jobName != null">`job_name`,</if>
-            <if test="entity.desc != null">`desc`,</if>
+            <if test="entity.description != null">`description`,</if>
             <if test="entity.jobType != null">`job_type`,</if>
             <if test="entity.engineId != null">`engine_id`,</if>
             <if test="entity.owner != null">`owner`,</if>

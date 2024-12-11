@@ -1,5 +1,5 @@
-replace into maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
-values ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
         '[
           {
             "keyCode": "address",
@@ -524,8 +524,8 @@ values ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
           }
         ]');
 
-replace into maple.maple_datasource (id, name, description, datasource_type, version, datasource_conf)
-values (1, 'test_mysql', '测试mysql', 'mysql', '5.7',
+REPLACE INTO maple.maple_datasource (id, name, description, datasource_type, version, datasource_conf)
+VALUES (1, 'test_mysql', '测试mysql', 'mysql', '5.7',
         '{
           "driverClassName": "com.mysql.jdbc.Driver",
           "address": "localhost:3306",
@@ -559,13 +559,137 @@ values (1, 'test_mysql', '测试mysql', 'mysql', '5.7',
           "databaseName": "test_sqlserver_db"
         }');
 
+INSERT INTO maple.maple_sys_conf (conf_key, conf_value, `description`, disabled, created_by, updated_by, created_at,
+                                  updated_at)
+VALUES ('cluster_categories', '[
+  {
+    "label": "K8s",
+    "value": "K8s"
+  },
+  {
+    "label": "YARN",
+    "value": "YARN"
+  }
+]', '集群种类类型(例如：K8s, YARN等)', 0, 0, 0, '2024-12-05 18:27:41', '2024-12-05 18:27:41');
+INSERT INTO maple.maple_sys_conf (conf_key, conf_value, `description`, disabled, created_by, updated_by, created_at,
+                                  updated_at)
+VALUES ('database_types', '[
+  {
+    "name": "MySQL",
+    "value": "mysql",
+    "useFor": "mysql",
+    "hasSchema": false,
+    "selectCrossDatabase": true
+  },
+  {
+    "name": "PostgreSQL",
+    "value": "postgresql",
+    "useFor": "postgresql",
+    "hasSchema": true,
+    "selectCrossDatabase": false
+  },
+  {
+    "name": "SQLServer",
+    "value": "sqlserver",
+    "useFor": "sqlserver",
+    "hasSchema": true,
+    "selectCrossDatabase": true
+  },
+  {
+    "name": "Oracle",
+    "value": "oracle",
+    "useFor": "oracle",
+    "hasSchema": true,
+    "selectCrossDatabase": false
+  },
+  {
+    "name": "DB2",
+    "value": "db2",
+    "useFor": "db2",
+    "hasSchema": true,
+    "selectCrossDatabase": false
+  },
+  {
+    "name": "HIVE",
+    "value": "hive",
+    "useFor": "hive",
+    "hasSchema": false,
+    "selectCrossDatabase": false
+  },
+  {
+    "name": "MariaDB",
+    "value": "mariadb",
+    "useFor": "mysql",
+    "hasSchema": false,
+    "selectCrossDatabase": true
+  },
+  {
+    "name": "TiDB",
+    "value": "tidb",
+    "useFor": "mysql",
+    "hasSchema": false,
+    "selectCrossDatabase": true
+  }
+]', '数据库配置说明
+name: 数据库展示名称
+value: 数据库使用名称
+useFor: 使用方式
+hasSchema: 是否支持 schema
+selectCrossDatabase: 是否支持跨库查询', 0, 1, 1, '2024-12-09 10:35:04', '2024-12-09 10:35:04');
+INSERT INTO maple.maple_sys_conf (conf_key, conf_value, `description`, disabled, created_by, updated_by, created_at,
+                                  updated_at)
+VALUES ('engine_categories', '[
+  {
+    "label": "spark",
+    "value": "Spark"
+  },
+  {
+    "label": "flink",
+    "value": "Flink"
+  }
+]', '引擎种类类型(例如：spark, flink, hive等)', 0, 0, 1, '2024-12-05 18:27:41', '2024-12-06 09:13:51');
+INSERT INTO maple.maple_sys_conf (conf_key, conf_value, `description`, disabled, created_by, updated_by, created_at,
+                                  updated_at)
+VALUES ('job_run_types', '[
+  {
+    "icon": "spark-data-calc",
+    "color": "#1890ff",
+    "typeCode": "spark-data-calc-group",
+    "typeName": "Spark Data Calc Group",
+    "engineType": "spark",
+    "engineVersions": [
+      "3.*"
+    ]
+  },
+  {
+    "icon": "spark-data-calc-array",
+    "color": "#1890ff",
+    "typeCode": "spark-data-calc-array",
+    "typeName": "Spark Data Calc Array",
+    "engineType": "spark",
+    "engineVersions": [
+      "3.*"
+    ]
+  },
+  {
+    "icon": "flink-data-calc-array",
+    "color": "#1890ff",
+    "typeCode": "flink-data-calc-array",
+    "typeName": "Flink Data Calc Array",
+    "engineType": "flink",
+    "engineVersions": [
+      "1.17.*"
+    ]
+  }
+]', '作业运行类型(例如：spark-sql, spark-data-calc)', 0, 0, 1, '2024-12-04 21:50:46', '2024-12-08 22:40:04');
 
-insert into maple.maple_cluster (name, category, address, `desc`, configuration)
-values ('hadoop-default', 'YARN', 'localhost:8080', '测试集群', '{}'),
-       ('k8s-default', 'K8s', 'localhost:6443', '测试集群2', '{}');
 
-insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
-values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark/current', '{
+INSERT INTO maple.maple_cluster (id, name, category, address, `description`, cluster_conf)
+VALUES (1, 'hadoop-default', 'YARN', 'localhost:8080', '测试集群', '{}'),
+       (2, 'k8s-default', 'K8s', 'localhost:6443', '测试集群2', '{}');
+
+REPLACE INTO maple.maple_cluster_engine (id, cluster_id, name, version, engine_home, engine_conf)
+VALUES (1, 1, 'spark', '3.3.2', '/opt/spark/current', '{
   "envs": {
     "HADOOP_HOME": "/opt/hadoop/current",
     "HADOOP_CONF_DIR": "/opt/hadoop/current/etc/hadoop/",
@@ -575,17 +699,17 @@ values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark/current', '{
     {
       "name": "spark.yarn.queue",
       "replaceParameter": "--queue",
-      "desc": "YARN 队列"
+      "description": "YARN 队列"
     },
     {
       "name": "spark.driver.cores",
       "replaceParameter": "--driver-cores",
-      "desc": "Spark driver vcores"
+      "description": "Spark driver vcores"
     },
     {
       "name": "spark.driver.memory",
       "replaceParameter": "--driver-memory",
-      "desc": "Spark driver 内存"
+      "description": "Spark driver 内存"
     },
     {
       "name": "spark.executor.instances",
@@ -621,14 +745,17 @@ values (1, 'hadoop-default', 'spark', '3.3.2', '/opt/spark/current', '{
 }');
 
 
-insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
-values (2, 'k8s-default', 'spark', '3.3.2', '/opt/spark/current', '{
-
+REPLACE INTO maple.maple_cluster_engine (id, cluster_id, name, version, engine_home, engine_conf)
+VALUES (2, 2, 'spark', '3.3.2', '/opt/spark/current', '{
+  "envs": {
+  },
+  "forbiddenConfs": [
+  ]
 }');
 
 
-insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
-values (3, 'hadoop-default', 'flink', '1.16', '/opt/flink/current', '{
+REPLACE INTO maple.maple_cluster_engine (id, cluster_id, name, version, engine_home, engine_conf)
+VALUES (3, 1, 'flink', '1.16', '/opt/flink/current', '{
   "envs": {
     "HADOOP_CLASSPATH": "/opt/hadoop/current/etc/hadoop:/opt/hadoop/current/share/hadoop/common/lib/*:/opt/hadoop/current/share/hadoop/common/*:/opt/hadoop/current/share/hadoop/hdfs:/opt/hadoop/current/share/hadoop/hdfs/lib/*:/opt/hadoop/current/share/hadoop/hdfs/*:/opt/hadoop/current/share/hadoop/mapreduce/*:/opt/hadoop/current/share/hadoop/yarn:/opt/hadoop/current/share/hadoop/yarn/lib/*:/opt/hadoop/current/share/hadoop/yarn/*"
   },
@@ -637,8 +764,8 @@ values (3, 'hadoop-default', 'flink', '1.16', '/opt/flink/current', '{
 }');
 
 
-insert into maple.maple_cluster_engine (id, cluster, name, version, engine_home, ext_info)
-values (4, 'k8s-default', 'flink', '1.16', '/opt/flink/current', '{
+REPLACE INTO maple.maple_cluster_engine (id, cluster_id, name, version, engine_home, engine_conf)
+VALUES (4, 2, 'flink', '1.16', '/opt/flink/current', '{
   "envs": {
   },
   "forbiddenConfs": [

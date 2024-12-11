@@ -12,15 +12,15 @@ public enum EngineExecutionStatus {
     CANCELED("作业停止/取消", false, false, false, true),
     UNKNOWN("未知", false, false, false, true);
 
-    EngineExecutionStatus(String desc, boolean canAccept, boolean canStart, boolean canStartFailed, boolean isFinalStatus) {
-        this.desc = desc;
+    EngineExecutionStatus(String description, boolean canAccept, boolean canStart, boolean canStartFailed, boolean isFinalStatus) {
+        this.description = description;
         this.canAccept = canAccept;
         this.canStart = canStart;
         this.canStartFailed = canStartFailed;
         this.isFinalStatus = isFinalStatus;
     }
 
-    final String desc;
+    final String description;
     final boolean canAccept;
     final boolean canStart;
     final boolean canStartFailed;

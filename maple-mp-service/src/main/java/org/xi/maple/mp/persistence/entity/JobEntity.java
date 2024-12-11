@@ -30,7 +30,7 @@ public class JobEntity extends BaseEntity {
     /**
      * 作业说明
      */
-    private String desc;
+    private String description;
 
     /**
      * 作业类型

@@ -2,24 +2,26 @@
 import { computed, reactive, ref, toRaw, watch } from "vue"
 import { request } from "@/utils/request-utils"
 
-import FileSource from "@/components/data-calc/source/FileSource.vue"
-import JdbcSource from "@/components/data-calc/source/JdbcSource.vue"
-import DorisSource from "@/components/data-calc/source/DorisSource.vue"
-import StarRocksSource from "@/components/data-calc/source/StarRocksSource.vue"
-import ManagedJdbcSource from "@/components/data-calc/source/ManagedJdbcSource.vue"
-import SqlTransformation from "@/components/data-calc/transformation/SqlTransformation.vue"
-import FileSink from "@/components/data-calc/sink/FileSink.vue"
-import JdbcSink from "@/components/data-calc/sink/JdbcSink.vue"
-import DorisSink from "@/components/data-calc/sink/DorisSink.vue"
-import StarRocksSink from "@/components/data-calc/sink/StarRocksSink.vue"
-import ManagedJdbcSink from "@/components/data-calc/sink/ManagedJdbcSink.vue"
-import HiveSink from "@/components/data-calc/sink/HiveSink.vue"
+import jobs from "@/composables/jobs"
+import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
-import AddPlugin from "@/components/data-calc/AddPlugin.vue"
-import PluginOperations from "@/components/data-calc/PluginOperations.vue"
+import FileSource from "@/components/job/spark/data-calc/source/FileSource.vue"
+import JdbcSource from "@/components/job/spark/data-calc/source/JdbcSource.vue"
+import DorisSource from "@/components/job/spark/data-calc/source/DorisSource.vue"
+import StarRocksSource from "@/components/job/spark/data-calc/source/StarRocksSource.vue"
+import ManagedJdbcSource from "@/components/job/spark/data-calc/source/ManagedJdbcSource.vue"
+import SqlTransformation from "@/components/job/spark/data-calc/transformation/SqlTransformation.vue"
+import FileSink from "@/components/job/spark/data-calc/sink/FileSink.vue"
+import JdbcSink from "@/components/job/spark/data-calc/sink/JdbcSink.vue"
+import DorisSink from "@/components/job/spark/data-calc/sink/DorisSink.vue"
+import StarRocksSink from "@/components/job/spark/data-calc/sink/StarRocksSink.vue"
+import ManagedJdbcSink from "@/components/job/spark/data-calc/sink/ManagedJdbcSink.vue"
+import HiveSink from "@/components/job/spark/data-calc/sink/HiveSink.vue"
+
+import AddPlugin from "@/components/job/spark/data-calc/AddPlugin.vue"
+import PluginOperations from "@/components/job/spark/data-calc/PluginOperations.vue"
 import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 import SampleData from "@/assets/sample-data"
-import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
 const {setBreadcrumb} = useBreadcrumbStore()
 setBreadcrumb([{text: '数据计算配置-分组方式'}])
@@ -70,7 +72,7 @@ const getTargetPluginPageConfig = (type: string): any[] => {
 }
 
 const addPlugin = (type: string, name: string, index: number = -1) => {
-  let plugin = SampleData.PluginModels[type][name]()
+  let plugin = jobs.SparkDataCalcModels[type][name]()
   let plugins = getTargetPlugins(type)
   let pluginPageConfig = getTargetPluginPageConfig(type)
   if (index < 0 || index >= plugins.length) {

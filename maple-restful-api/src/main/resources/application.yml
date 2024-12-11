@@ -19,7 +19,34 @@ spring:
         max-idle: 8
         min-idle: 0
 
+resilience4j:
+  circuitbreaker:
+    instances:
+        default:
+            register-health-indicator: true
+            sliding-window-type: COUNT_BASED
+            sliding-window-size: 10
+            minimum-number-of-calls: 5
+            permitted-number-of-calls-in-half-open-state: 3
+            automatic-transition-from-open-to-half-open-enabled: true
+            wait-duration-in-open-state: 10000
+            failure-rate-threshold: 50
+            event-consumer-buffer-size: 10
+            ignore-exceptions:
+            - java.lang.IllegalArgumentException
+            - java.lang.IllegalStateException
+            record-exceptions:
+            - java.io.IOException
+            - java.util.concurrent.TimeoutException
+            writable-stack-trace-enabled: true
+
 maple:
+  aspect:
+    controller-method-pattern: execution(public * org.xi.maple.rest.controller.*.*(..))
+  json-format:
+    date-time-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd
+    time-format: HH:mm:ss
   security:
     auth: false
     auth-expire-seconds: 10

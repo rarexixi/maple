@@ -4,11 +4,11 @@ import lombok.Data;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.datacalc.flink.api.ResultTableConfig;
 import org.xi.maple.datacalc.flink.model.definition.*;
-import org.xi.maple.datacalc.flink.util.TableUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +16,14 @@ import java.util.Map;
 @Data
 public abstract class StructTableConfig extends MaplePluginConfig implements ResultTableConfig {
 
-    protected String catalogName;
-    protected String databaseName;
+    // protected String catalogName;
+    // protected String databaseName;
     @NotBlank
-    protected String tableName;
+    protected String resultTable;
     protected String comment;
     @NotEmpty
     @Valid
-    protected List<BaseColumn> columns;
+    protected List<BaseColumn> columns = new ArrayList<>();
     protected PrimaryKeyDefinition primaryKey;
 
     protected WatermarkDefinition watermark;
@@ -32,7 +32,15 @@ public abstract class StructTableConfig extends MaplePluginConfig implements Res
     protected Map<String, String> options = new LinkedHashMap<>();
 
     public Map<String, String> getOptions() {
-        return options;
+        final Map<String, String> result = new LinkedHashMap<>();
+        result.put("connector", getConnector());
+        result.putAll(getDefineOptions());
+        options.forEach((key, value) -> {
+            if (!"connector".equals(key) && !result.containsKey(key)) {
+                result.put(key, value);
+            }
+        });
+        return result;
     }
 
     public void setOptions(Map<String, String> options) {
@@ -40,7 +48,6 @@ public abstract class StructTableConfig extends MaplePluginConfig implements Res
             return;
         }
         this.options.putAll(options);
-        this.options.remove("connector");
     }
 
     public abstract String getConnector();
@@ -68,6 +75,7 @@ public abstract class StructTableConfig extends MaplePluginConfig implements Res
     }
 
     public String getResultTable() {
-        return TableUtils.getResultTable(catalogName, databaseName, tableName);
+        // return TableUtils.getResultTable(catalogName, databaseName, tableName);
+        return resultTable;
     }
 }

@@ -1,17 +1,14 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.persistence.condition;
 
-import ${commonPackage}.model.db.condition.FilterCondition;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import ${commonPackage}.model.db.condition.FilterCondition;
+
+<#include "/include/table/table_field_type_imports.ftl">
+<@import_fields_type table.columns true />
 
 /**
  * ${table.comment}查询条件

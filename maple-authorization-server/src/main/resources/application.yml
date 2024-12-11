@@ -1,0 +1,62 @@
+server:
+  port: 8085
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  
+spring:
+  main:
+    allow-bean-definition-overriding: true # 是否允许覆盖已定义的 Bean
+  application:
+    name: maple-mp-service
+  jackson:
+    date-format: java.text.SimpleDateFormat
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 256MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/maple?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&rewriteBatchedStatements=true&useServerPrepStmts=true&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
+    username: xi_root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cache:
+    type: redis
+  redis:
+    # cluster:
+    #   nodes:
+    #   max-redirects:
+    host: localhost
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+mybatis:
+  type-aliases-package: org.xi.maple.authserver.mapper
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    cache-enabled: false
+    lazy-loading-enabled: false
+    multiple-result-sets-enabled: true
+    use-column-label: true
+    use-generated-keys: false
+    default-executor-type: simple
+    default-statement-timeout: 25000
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+
+
+info:
+  app:
+    name: ${spring.application.name}
+
+maple:
+  security:
+    private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrwNJ4KTjk6e2acrEFSmGhdKEfBmt64bJ/xt3cpI+QbHCg9xY0FSxVArVGUT6nwMjpfML6Ppg5mA2y+5F8Er2HyFqo0Z7aTIgPTqc6jKQZTQ0/pFPoDR4O0PmxcEJTj9Sd+bImQ96fGS/TW/BJ4CVeFeaRBwM8s85/kixK9mhi1qbxwVBZ6W/JrmF8HiVN0GWB+mTXe6rP+LDe26ULU9FOUwCx4SkkknBz5Xa5BqaX3ov9c+n9MntqBKfgxRBe6LwngKRM7yHbP5pE2Xn1XvEYPsoU+/2DGM/LfNPgbBdptN7sxm0iBIxPIO7eKmyb47GjZ2kRhLGRfc1NIuhbvBOzAgMBAAECggEBAJCjrttgo7grxFwYEDnLXRLSHEn7ZxIx9dejiv2gXAKdP/BehQVRe2cQA8b27pPpR4lR9wU1J48BHTBIqUlaouAxex/GgEeIweBaNXyaKivgdrLM2ZiHS3PgyxaB2mlyq/Rp7nxJFbbYSC1vtJkSOYXVXblutWwuZE2MtN5gSqJIjqURn3OT4C2X0sftn6WrUuqLBxRDqGjtcrHZjb9b2q9C0XM0ZMVocRCINmoJu6OkG2NR46+qj5KNSHz7pFwbbf6tVrWLah1naPHpYhdk5KSuJJAKxpxdzUHg3AiCu40kwvZSmUACmfu9ki8144q+aZ9nljrrI0ydlhiEcwuVliECgYEA33ToP4xpFrjjUJ4Lqr9jPUBxwym74eD63Q8oMbehvY2ylnOq079qPv/She70FHZ4JTUFwfp7J107t5k6LJFgM+skDUOS3bgqDe0hrOChTfIZWOIM3GMqMbxp/YQZvLErrqGtqyECAv6TIYW/x+gHdM+pdHEY8UNQ6w/NGMcaynECgYEAxMRDwt3lj0vI7QN0w7nxwOhXajOezW9M9fxns7kHXSjqN/GWAr+WRTfJdD3S9fY6AvKnF9REAtIzvjmPyoUYiDBcSWTw7y4mKCah6+xLLdXru/g/PKAYSBdw1x/PSlfVEX+VKabSITLetyM2nqtv5oszVTqiIZfVkQZTUBHdamMCgYAuQiZeGXQb1xR/uOgTZeFmabPjQf16CjgEkUGx4SDje7Tvvmwrv6F//zeWsFvo7Il8slhJys+522wkWt0XItU2ikQBVu7NZXWXQnLJNgtOdoLWypz89q5ic23BpJorXMX9Nc0c8w1Wj1roAqcr/BWnEeIzj8IpF9Vlg/TiXz1lkQKBgAsy6HBk1LXtKEhlE/Y31QyXrLH8siMbHJQ7g2N1OngQ5hO9Cj6pzNGvtSWKh0E8fFzClsQCbsSCVjOTbx2lqZnGttnuhs/2HnHWkQyubDD1pe8S1/aJXhhsTR3RT6j5isTuL/0o43jEPmzJ8kfhlgLXFVradXPYAm24oHFEMwflAoGAKl7G71eOpo/b46dpP/RXkg912I6ECcGNhaL1l1mwXWaQ9FSSmhPxIuTen+j7HrlgXwtIVojbfI1FDqhK6/lneTXe1RJtwe+T9pbs80Uj6rgcsHb0z/v7hB/LuhM1J2GMmRjIphXUEHISkC+Tt97RMhNHPZu3Ebgkwfci7QUd5ks=
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq8DSeCk45OntmnKxBUphoXShHwZreuGyf8bd3KSPkGxwoPcWNBUsVQK1RlE+p8DI6XzC+j6YOZgNsvuRfBK9h8haqNGe2kyID06nOoykGU0NP6RT6A0eDtD5sXBCU4/UnfmyJkPenxkv01vwSeAlXhXmkQcDPLPOf5IsSvZoYtam8cFQWelvya5hfB4lTdBlgfpk13uqz/iw3tulC1PRTlMAseEpJJJwc+V2uQaml96L/XPp/TJ7agSn4MUQXui8J4CkTO8h2z+aRNl59V7xGD7KFPv9gxjPy3zT4GwXabTe7MZtIgSMTyDu3ipsm+Oxo2dpEYSxkX3NTSLoW7wTswIDAQAB

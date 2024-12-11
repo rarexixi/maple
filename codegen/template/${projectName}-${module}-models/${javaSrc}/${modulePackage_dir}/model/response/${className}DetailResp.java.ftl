@@ -1,9 +1,6 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.model.response;
 
-import java.math.BigDecimal;
-import java.util.Collection;
-
 import lombok.Data;
 
 @Data

@@ -20,3 +20,6 @@ export const useClusterCategoriesStore = getStore('cluster-categories', 'cluster
 export const useEngineCategoriesStore = getStore('engine-categories', 'engine_categories')
 
 export const useJobTypesStore = getStore('job-types', 'job_run_types', 'typeCode', 'typeName')
+
+export const useSparkStorageLevelsStore = getStore('spark-storage-levels', 'spark_storage_levels')
+export const useSparkFileSerializersStore = getStore('spark-file-serializers', 'spark_file_serializers')

@@ -4,6 +4,7 @@ import type { AxiosRequestConfig } from "axios"
 import { createVNode, reactive, ref, toRaw } from "vue"
 
 import { request } from "@/utils/request-utils"
+import {DataOperationType} from "@/composables/common"
 
 export function getDialogOperations() {
   const opened = ref(false)
@@ -26,6 +27,7 @@ export function getDialogOperations() {
 export interface OperateCallback {
   detail?: (detail: any, copyPk: boolean) => void
   research?: () => void
+  afterSave?: () => void
   resetDetail?: (detail: any) => void
   setItem?: (detail: any, editIndex: number) => void
 }

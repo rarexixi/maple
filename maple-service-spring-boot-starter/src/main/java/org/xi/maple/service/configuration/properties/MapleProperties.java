@@ -15,6 +15,4 @@ public class MapleProperties {
 
     @NestedConfigurationProperty
     private MapleAspectProperties aspect;
-
-
 }

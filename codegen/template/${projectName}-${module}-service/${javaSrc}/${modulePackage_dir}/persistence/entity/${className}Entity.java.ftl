@@ -1,17 +1,14 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.persistence.entity;
 
-import ${commonPackage}.model.BaseEntity;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import ${commonPackage}.model.BaseEntity;
+
+<#include "/include/table/table_field_type_imports.ftl">
+<@import_fields_type table.columnsExceptBase />
 
 /**
  * ${table.comment}实体

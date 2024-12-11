@@ -31,7 +31,7 @@ public class ClusterSaveReq extends BaseEntity {
     /**
      * 集群说明
      */
-    private String desc;
+    private String description;
 
     /**
      * 集群配置

@@ -1,12 +1,26 @@
 import type { PageInfo, ValidatableComponent } from "@/composables/models"
 import { type FormInstance, notification } from 'ant-design-vue'
-import { ref, type ShallowRef } from "vue";
+import { ref, type ShallowRef } from "vue"
 
 const SortEnum = {ASC: 'ASC', DESC: 'DESC'}
 const PageSizeOptions = ['10', '20', '50', '100']
 const DefaultSearchParams = {defaultPageNum: 1, defaultPageSize: 50}
 
-export declare type OperationType = | 0 | 1 | 2 | 3
+const Layout = {
+  labelCols: {
+    w160: { span: 16 },
+    w320: { span: 8 },
+    w640: { span: 4 },
+    w1280: { span: 2 },
+  },
+  wrapCols: {
+    w160: { offset: 16 },
+    w320: { offset: 8 },
+    w640: { offset: 4 },
+    w1280: { offset: 2 },
+  },
+}
+
 export enum DataOperationType {create = 1, copy = 2, update = 3}
 
 const validateMessages = {
@@ -72,6 +86,7 @@ async function getFormValidated(...formRefs: Readonly<ShallowRef<ValidatableComp
 export default {
   SortEnum,
   DefaultSearchParams,
+  Layout,
   PageSizeOptions,
   validateMessages,
   getDefaultPageInfo,

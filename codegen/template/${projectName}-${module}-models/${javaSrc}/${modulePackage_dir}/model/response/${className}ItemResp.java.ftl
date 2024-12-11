@@ -1,13 +1,11 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.model.response;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.math.BigDecimal;
-
 import lombok.Data;
+
+import java.io.Serializable;
+<#include "/include/table/table_field_type_imports.ftl">
+<@import_fields_type table.columns />
 
 @Data
 public class ${className}ItemResp implements Serializable {

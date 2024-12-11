@@ -3,7 +3,11 @@ package ${modulePackage}.persistence.condition;
 
 import ${commonPackage}.model.db.condition.FilterCondition;
 
+<#include "/include/table/table_field_type_imports.ftl">
+<@import_fields_type pks />
+<#if (table.hasUniPk)>
 import java.util.Collection;
+</#if>
 
 import lombok.Getter;
 import lombok.Setter;

@@ -68,8 +68,8 @@ public class DataSourceContext {
     }
 
     public NamedDatasource getDataSource() {
-        Map<String, Object> connectParams = JsonUtils.parseObject(configJson, Map.class, new HashMap<String, String>());
-        Map<String, String> params = new HashMap<>(0);
+        Map<String, Object> connectParams = JsonUtils.parseObject(configJson, Map.class, Map.of());
+        Map<String, String> params = Map.of();
         if (connectParams != null) {
             params = connectParams.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().toString()));
         }

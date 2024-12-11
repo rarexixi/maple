@@ -58,8 +58,8 @@ const labelWidth = 4
     <a-form-item ref="address" label="集群地址" name="address">
       <a-input v-model:value.trim="detail.address" type="text" />
     </a-form-item>
-    <a-form-item ref="desc" label="集群说明" name="desc">
-      <a-textarea v-model:value="detail.desc" :autoSize="{ minRows: 5, maxRows: 100}" />
+    <a-form-item ref="description" label="集群说明" name="description">
+      <a-textarea v-model:value="detail.description" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
     <template v-if="detail.category == 'K8s'">
       <a-form-item ref="clientCertData" label="客户端证书" :name="['clusterConf', 'config', 'clientCertData']"

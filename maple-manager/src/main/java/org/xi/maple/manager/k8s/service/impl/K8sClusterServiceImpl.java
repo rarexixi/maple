@@ -272,7 +272,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
         if (kubeConfig == null) {
             throw new MapleClusterConfigException("K8s 集群配置错误, name: " + name);
         }
-        if ("file".equals(kubeConfig.getType())) {
+        /*if ("file".equals(kubeConfig.getType())) {
             if (StringUtils.isBlank(kubeConfig.getKubeConfigContent())) {
                 String kubeConfigFile = kubeConfig.getKubeConfigFile();
                 if (StringUtils.isBlank(kubeConfigFile)) {
@@ -289,7 +289,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
                 }
             }
             return Config.fromKubeconfig(kubeConfig.getKubeConfigContent());
-        }
+        }*/
         Config config = kubeConfig.getConfig();
         config.setMasterUrl(master);
         return config;

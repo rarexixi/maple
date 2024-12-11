@@ -13,7 +13,7 @@ const addConfOption = () => {
   conf.value.forbiddenConfs.push({
     name: '',
     replaceParameter: '',
-    desc: '',
+    description: '',
   });
 };
 
@@ -47,7 +47,7 @@ defineExpose({
           <th style="position: sticky; left: 0; z-index: 2"></th>
           <th class="forbidden-conf-name" style="position: sticky; left: 32px; z-index: 2">配置名称</th>
           <th class="forbidden-conf-replace-parameter">替换参数</th>
-          <th class="forbidden-conf-desc">描述</th>
+          <th class="forbidden-conf-description">描述</th>
         </tr>
         </thead>
         <tbody>
@@ -73,7 +73,7 @@ defineExpose({
             </a-form-item>
           </td>
           <td>
-            <a-form-item label="" :name="['forbiddenConfs', index, 'desc']" :label-col="subFormLabelCol">
+            <a-form-item label="" :name="['forbiddenConfs', index, 'description']" :label-col="subFormLabelCol">
               <a-input v-model:value="confOption.desc" class="forbidden-conf-desc" />
             </a-form-item>
           </td>

@@ -11,10 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JdbcSink extends MapleSink<JdbcSink.Config> {
 
@@ -59,7 +56,11 @@ public class JdbcSink extends MapleSink<JdbcSink.Config> {
 
         @Override
         public Map<String, String> getDefineOptions() {
-            Map<String, String> options = new HashMap<>();
+            Map<String, String> defineOptions = new LinkedHashMap<>();
+            defineOptions.put("url", url);
+            defineOptions.put("table-name", table);
+            defineOptions.put("username", username);
+            defineOptions.put("password", password);
             return options;
         }
 

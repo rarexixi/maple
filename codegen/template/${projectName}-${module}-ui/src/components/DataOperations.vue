@@ -29,11 +29,9 @@ const emit = defineEmits<{
   <div class="operation-btns">
     <slot name="before" />
     <a-button v-if="canAdd" @click="() => emit('add')" :icon="h(PlusOutlined)" class="btn-primary">添加</a-button>
-    <template v-if="selected">
-      <a-button v-if="canEnable" @click="() => emit('enable')" :icon="h(CheckOutlined)" class="btn-success">启用</a-button>
-      <a-button v-if="canDisable" @click="() => emit('disable')" :icon="h(StopOutlined)" class="btn-warning">禁用</a-button>
-      <a-button v-if="canDel" @click="() => emit('del')" :icon="h(DeleteOutlined)" class="btn-danger">删除</a-button>
-    </template>
+    <a-button v-if="canEnable" :disabled="!selected" @click="() => emit('enable')" :icon="h(CheckOutlined)" class="btn-success">启用</a-button>
+    <a-button v-if="canDisable" :disabled="!selected" @click="() => emit('disable')" :icon="h(StopOutlined)" class="btn-warning">禁用</a-button>
+    <a-button v-if="canDel" :disabled="!selected" @click="() => emit('del')" :icon="h(DeleteOutlined)" class="btn-danger">删除</a-button>
     <slot name="after" />
   </div>
 </template>

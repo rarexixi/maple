@@ -1,4 +1,28 @@
 ###
+GET http://localhost:8085/list
+
+###
+GET http://localhost:8085/list
+token: eyJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXJuYW1lIiwic3ViIjoiMSIsImlhdCI6MTczMzE0MDkyOSwiZXhwIjoxNzMzMTQ0NTI5fQ.jlfFmtNJ90iTawdUwnOfT9qXbzkbe90DzbiOx_vU9xF4GsrbeQ_V0zFDSHk8hMIzCMo5kbuEpIrxfkZSgDzfjB2fouYjKLYPQaDoO-Dastkwdk4GyuLhp3ZIgnRqg3a6YJm2IOUBJrQfS2oh7X5ZAa9IpFaPzEmWEzrUEZJ8-M6AMay55cXfIquxmVmKHznWM68SYK-Rc96oHvR4n7lBWmG28h09TVK5x0hcUWMCDsr51fhgolO0NI1NhCs7rPqqsne-wZuJVH3kWMCdBclJNd5NZ_IkMKz1urxszi-ttQv7fclCMVOYcs6OBVD5a0qllrduIdiFr5CMEgxqOzbxsQ
+
+###
+GET http://localhost:8085/user/1/permissions
+
+###
+GET http://localhost:8085/user/1/permissions
+token: eyJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXJuYW1lIiwic3ViIjoiMSIsImlhdCI6MTczMzE0MDkyOSwiZXhwIjoxNzMzMTQ0NTI5fQ.jlfFmtNJ90iTawdUwnOfT9qXbzkbe90DzbiOx_vU9xF4GsrbeQ_V0zFDSHk8hMIzCMo5kbuEpIrxfkZSgDzfjB2fouYjKLYPQaDoO-Dastkwdk4GyuLhp3ZIgnRqg3a6YJm2IOUBJrQfS2oh7X5ZAa9IpFaPzEmWEzrUEZJ8-M6AMay55cXfIquxmVmKHznWM68SYK-Rc96oHvR4n7lBWmG28h09TVK5x0hcUWMCDsr51fhgolO0NI1NhCs7rPqqsne-wZuJVH3kWMCdBclJNd5NZ_IkMKz1urxszi-ttQv7fclCMVOYcs6OBVD5a0qllrduIdiFr5CMEgxqOzbxsQ
+
+###
+POST http://localhost:8085/user/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "admin",
+    "password": "admin"
+}
+
+###
 
 GET http://localhost:8080/execution/detail?id=1
 Content-Type: application/json

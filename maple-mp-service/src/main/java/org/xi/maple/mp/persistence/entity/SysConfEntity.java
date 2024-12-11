@@ -30,5 +30,5 @@ public class SysConfEntity extends BaseEntity {
     /**
      * 配置说明
      */
-    private String desc;
+    private String description;
 }

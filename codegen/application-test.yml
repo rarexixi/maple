@@ -10,7 +10,7 @@ generator:
   table-name-match-regex: '(?<=maple_).*'
   paths:
     template: ./template/                       # 模版路径
-    out: ./gen                                      # 输出路径
+    out: ./gen                                    # 输出路径
   files:
     ignore:
       - include/
@@ -39,8 +39,9 @@ generator:
       - src/mixin/
       - src/store/
       - src/utils/
-      - src/base_config.js
-      - src/main.js
+      - src/App.vue,
+      - src/base_config.js,
+      - src/main.js,
       - .gitignore
       - env.d.ts
       - index.html
@@ -51,33 +52,32 @@ generator:
       - tsconfig.json
       - tsconfig.node.json
       - vite.config.ts
-
+  tables:
+    - table-name: maple_cluster_engine_default_conf
+      target-table-name: maple_cluster_engine_default_conf
+      plural-table-name: maple_cluster_engine_default_conf
   columns:
     base:
       column-name-set: disabled,created_by,created_at,updated_by,updated_at
-      table-name: maple_test_main
+      table-name: maple_datasource_type
     not-required:
       - column-name-set: created_at
     cannot-update:
       - column-name-set: created_by,created_at
-#    img-url:
-#    video-url:
-#    doc-url:
-#    page-url:
-#    other-url:
+    #    img-url:
+    #    video-url:
+    #    doc-url:
+    #    page-url:
+    #    other-url:
     fk-select:
-      - column-name-set: main_type
-        table-name: maple_test_main
-        fk:
-          foreign-table-name: maple_test_main_type
-          value-column-name: type_code
-          text-column-name: type_name
-    content:
-      - column-name-set: datasource_config
+      - column-name-set: datasource_type
         table-name: maple_datasource
-      - column-name-set: configuration, exec_info
-        table-name: maple_engine_execution_ext_info
-      - column-name-set: ext_info
+        fk:
+          foreign-table-name: maple_datasource_type
+          value-column-name: type_name
+          text-column-name: type_code
+    content:
+      - column-name-set: configurations, datasource_conf, material_conf, cluster_conf, ext_info, default_conf, exec_conf, exec_info, job_conf
 
     valid-status:
       - column-name-set: disabled
@@ -88,10 +88,10 @@ generator:
   # 公共自定义属性
   common-properties:
     projectName: maple
-    module: test
-    serviceApplicationName: MapleTestApplication
-    servicePort: 8088
-    modulePackage: org.xi.maple.test
+    module: mp
+    serviceApplicationName: MapleManagementPlatformApplication
+    servicePort: 8082
+    modulePackage: org.xi.maple.mp
     commonPackage: org.xi.maple.common
     commonStarterPackage: org.xi.maple.service
 
@@ -119,6 +119,7 @@ generator:
     tinytext: String
     mediumtext: String
     longtext: String
+    json: String
     blob: byte[]
     tinyblob: byte[]
     mediumblob: byte[]

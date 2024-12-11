@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import { minimatch } from "minimatch"
 import { computed, onMounted, reactive } from "vue"
 import { useRouter } from "vue-router"
 
 import common, { DataOperationType } from '@/composables/common'
+import jobs from '@/composables/jobs'
 import { listSearch } from "@/composables/requests"
 import { JobApis, ClusterEngineApis, ClusterApis } from "@/composables/service-apis"
 import { useJobTypesStore } from "@/stores/sys-conf"
@@ -12,7 +14,6 @@ import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
 import UpsertCard from "@/components/UpsertCard.vue"
 import JobUpsertForm from "@/components/job/JobUpsertForm.vue"
-import { minimatch } from "minimatch";
 
 interface Props {
   id?: any;
@@ -62,7 +63,7 @@ const callback: OperateCallback = {
       detail.id = response.id
     }
     detail.jobName = response.jobName
-    detail.desc = response.desc
+    detail.description = response.desc
     setJobConf(response.runConf, response.jobConf, response.jobType)
     detail.jobType = response.jobType
     detail.engineId = response.engineId
@@ -90,38 +91,18 @@ const {
 } = getSingleDataOperations2(JobApis, callback)
 
 function setJobConf(runConf: any, jobConf: any, jobType?: string) {
-  if (jobType === 'spark-data-calc-group') {
-    let defaultJobConf = {
-      variables: {},
-      sources: [],
-      transformations: [],
-      sinks: []
-    }
-    let defaultRunConf = {
-      driverCores: undefined,
-      driverMemory: undefined,
-      executorCores: undefined,
-      executorMemory: undefined,
-      numExecutors: undefined,
-    }
-    detail.jobConf = {...defaultJobConf, ...jobConf}
-    detail.runConf = {...defaultRunConf, ...runConf}
-  }
-  if (jobType === 'spark-data-calc-array') {
-    let defaultJobConf = {
-      variables: {},
-      plugins: [],
-    }
-    let defaultRunConf = {
-      driverCores: undefined,
-      driverMemory: undefined,
-      executorCores: undefined,
-      executorMemory: undefined,
-      numExecutors: undefined,
-    }
-    detail.jobConf = {...defaultJobConf, ...jobConf}
-    detail.runConf = {...defaultRunConf, ...runConf}
-  }
+  if (!jobType) return
+  let jobTypeDetail = jobTypeMap[jobType]
+  if (!jobTypeDetail) return
+
+  let getDefaultRunConf = jobs.JobRunTypes[jobTypeDetail.engineType]
+  let getDefaultJobConf = jobs.JobConf[jobType]
+
+  let defaultRunConf = getDefaultRunConf ? getDefaultRunConf() : {}
+  let defaultJobConf = getDefaultJobConf ? getDefaultJobConf() : {}
+
+  detail.runConf = { ...defaultRunConf, ...runConf }
+  detail.jobConf = { ...defaultJobConf, ...jobConf }
 }
 
 function versionMatch(patterns: string[], version: string) {
@@ -146,24 +127,24 @@ const engineOptions = computed(() => {
       continue
     }
     if (result.has(engine.clusterId)) {
-      result.get(engine.clusterId).push({label: `${engine.name} ${engine.version}`, value: engine.id})
+      result.get(engine.clusterId).push({ label: `${engine.name} ${engine.version}`, value: engine.id })
     } else {
-      result.set(engine.clusterId, [{label: `${engine.name} ${engine.version}`, value: engine.id}])
+      result.set(engine.clusterId, [{ label: `${engine.name} ${engine.version}`, value: engine.id }])
     }
   }
-  return Array.from(result).map(([clusterId, engines]) => ({label: clusterOptionMap[clusterId], options: engines}))
+  return Array.from(result).map(([clusterId, engines]) => ({ label: clusterOptionMap[clusterId], options: engines }))
 })
 
 onMounted(() => {
   // 设置面包屑
-  const {setBreadcrumb} = useBreadcrumbStore()
-  setBreadcrumb([{text: '作业'}, {text: getTitle()}])
+  const { setBreadcrumb } = useBreadcrumbStore()
+  setBreadcrumb([{ text: '作业' }, { text: getTitle() }])
 
   if (operateType === DataOperationType.create) {
     detail.jobType = jobType
     setJobConf({}, {}, jobType)
   } else {
-    getDetail({id: id}, operateType === DataOperationType.update)
+    getDetail({ id: id }, operateType === DataOperationType.update)
   }
 })
 
@@ -182,6 +163,7 @@ onMounted(() => {
     </template>
     <JobUpsertForm ref="detailFormRef" v-model="detail"
                    :engine-options="engineOptions"
+                   :job-type="jobTypeDetail"
                    @save="upsert(operateType, false)">
       <template #buttons>
         <a-button type="primary" @click="upsert(operateType)">保存并返回</a-button>

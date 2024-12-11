@@ -17,7 +17,7 @@ public abstract class DataSourceStrategy {
     protected String getConnectParams(String paramsStr) {
         if (StringUtils.isBlank(paramsStr)) return "";
 
-        Map<String, String> paramsMap = JsonUtils.parseObject(paramsStr, Map.class, new HashMap<String, String>());
+        Map<String, String> paramsMap = JsonUtils.parseObject(paramsStr, Map.class, Map.of());
         if (paramsMap.isEmpty()) return "";
 
         String paramsSplitCharacter = getParamsSplitCharacter();

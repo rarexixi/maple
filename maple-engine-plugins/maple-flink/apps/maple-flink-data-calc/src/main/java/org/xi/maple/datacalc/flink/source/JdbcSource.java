@@ -5,6 +5,7 @@ import org.apache.flink.table.api.TableEnvironment;
 import org.xi.maple.datacalc.flink.api.MapleSource;
 
 import javax.validation.constraints.NotBlank;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class JdbcSource extends MapleSource<JdbcSource.Config> {
@@ -30,12 +31,12 @@ public class JdbcSource extends MapleSource<JdbcSource.Config> {
 
         @Override
         public Map<String, String> getDefineOptions() {
-            return null;
-        }
-
-        @Override
-        public String getResultTable() {
-            return null;
+            Map<String, String> defineOptions = new LinkedHashMap<>();
+            defineOptions.put("url", url);
+            defineOptions.put("table-name", table);
+            defineOptions.put("username", username);
+            defineOptions.put("password", password);
+            return defineOptions;
         }
     }
 }

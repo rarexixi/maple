@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="org.xi.maple.mp.persistence.entity.SysConfEntity">
         <result property="confKey" column="conf_key"/>
         <result property="confValue" column="conf_value"/>
-        <result property="desc" column="desc"/>
+        <result property="description" column="description"/>
         <result property="disabled" column="disabled"/>
         <result property="createdBy" column="created_by"/>
         <result property="updatedBy" column="updated_by"/>
@@ -24,7 +24,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.confKey != null">`conf_key`,</if>
             <if test="entity.confValue != null">`conf_value`,</if>
-            <if test="entity.desc != null">`desc`,</if>
+            <if test="entity.description != null">`description`,</if>
             <if test="entity.disabled != null">`disabled`,</if>
             <if test="entity.createdBy != null">`created_by`,</if>
             <if test="entity.updatedBy != null">`updated_by`,</if>
@@ -34,7 +34,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.confKey != null">#{entity.confKey},</if>
             <if test="entity.confValue != null">#{entity.confValue},</if>
-            <if test="entity.desc != null">#{entity.desc},</if>
+            <if test="entity.description != null">#{entity.description},</if>
             <if test="entity.disabled != null">#{entity.disabled},</if>
             <if test="entity.createdBy != null">#{entity.createdBy},</if>
             <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
@@ -50,7 +50,7 @@
         (
             `conf_key`,
             `conf_value`,
-            `desc`,
+            `description`,
             `disabled`,
             `created_by`,
             `updated_by`,
@@ -62,7 +62,7 @@
         (
             #{item.confKey},
             #{item.confValue},
-            #{item.desc},
+            #{item.description},
             #{item.disabled},
             #{item.createdBy},
             #{item.updatedBy},
@@ -85,7 +85,7 @@
             <if test="entity.confValue != null">
                 `conf_value` = #{entity.confValue},
             </if>
-            <if test="entity.desc != null">
+            <if test="entity.description != null">
                 `desc` = #{entity.desc},
             </if>
             <if test="entity.disabled != null">

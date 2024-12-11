@@ -46,8 +46,8 @@ const labelWidth = 4
     <a-form-item ref="confValue" label="配置值" name="confValue">
       <a-textarea v-model:value="detail.confValue" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
-    <a-form-item ref="desc" label="配置说明" name="desc">
-      <a-textarea v-model:value="detail.desc" :autoSize="{ minRows: 5, maxRows: 100}" />
+    <a-form-item ref="description" label="配置说明" name="description">
+      <a-textarea v-model:value="detail.description" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
     <a-form-item :wrapper-col="{ offset: labelWidth }">
       <a-button type="primary" @click="save">保存</a-button>

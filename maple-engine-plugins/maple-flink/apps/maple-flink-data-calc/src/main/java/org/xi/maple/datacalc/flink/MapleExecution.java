@@ -1,6 +1,5 @@
 package org.xi.maple.datacalc.flink;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.api.StatementSet;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
@@ -122,13 +121,13 @@ public class MapleExecution<T extends MapleData> {
         if (config instanceof StructTableConfig) {
             StructTableConfig c = (StructTableConfig) config;
             StringBuilder tableName = new StringBuilder();
-            if (StringUtils.isNotBlank(c.getCatalogName())) {
-                tableName.append(c.getCatalogName()).append(".");
-            }
-            if (StringUtils.isNotBlank(c.getDatabaseName())) {
-                tableName.append(c.getDatabaseName()).append(".");
-            }
-            tableName.append(c.getTableName());
+            // if (StringUtils.isNotBlank(c.getCatalogName())) {
+            //     tableName.append(c.getCatalogName()).append(".");
+            // }
+            // if (StringUtils.isNotBlank(c.getDatabaseName())) {
+            //     tableName.append(c.getDatabaseName()).append(".");
+            // }
+            tableName.append(c.getResultTable());
             if (registerTableSet.contains(tableName.toString())) {
                 logger.error("Result table [{}] cannot be duplicate", tableName);
                 success = false;

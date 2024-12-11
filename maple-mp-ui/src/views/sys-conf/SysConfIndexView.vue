@@ -58,13 +58,13 @@ const callback: OperateCallback = {
     } catch (err) {
       detail.confValue = response.confValue
     }
-    detail.desc = response.desc
+    detail.description = response.description
   },
   research: search,
   resetDetail: (detail: any) => {
     detail.confKey = ''
     detail.confValue = ''
-    detail.desc = ''
+    detail.description = ''
   },
   setItem: (detail: any, editIndex: number) => {
     dataPageList.list[editIndex] = detail

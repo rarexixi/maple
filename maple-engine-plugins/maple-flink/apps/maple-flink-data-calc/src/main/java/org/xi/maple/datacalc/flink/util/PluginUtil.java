@@ -76,14 +76,7 @@ public class PluginUtil {
         }
     }
 
-    public static void main(String[] args) {
-        Class<?> pluginClass = JdbcSink.class;
-        ParameterizedType genericSuperclass = (ParameterizedType) pluginClass.getAnnotatedSuperclass().getType();
-        Class<?> configType = (Class<?>) genericSuperclass.getActualTypeArguments()[0];
-        System.out.println(configType);
-    }
-
     public enum ExecutionType {
-        SOURCE, TRANSFORM, SINK;
+        SOURCE, TRANSFORM, SINK
     }
 }

@@ -1,15 +1,13 @@
 <#include "/include/table/properties.ftl">
 package ${modulePackage}.model.request;
 
+import lombok.Data;
 import ${commonPackage}.annotation.Jsr303ValidGroup;
 import ${commonPackage}.model.BaseEntity;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import javax.validation.constraints.*;
 
-import lombok.Data;
+<#include "/include/table/table_field_type_imports.ftl">
+<@import_fields_type table.columnsExceptBase />
+import javax.validation.constraints.*;
 
 @Data
 public class ${className}SaveReq extends BaseEntity {

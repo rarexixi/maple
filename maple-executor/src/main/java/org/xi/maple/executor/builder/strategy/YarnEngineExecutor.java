@@ -60,8 +60,8 @@ public class YarnEngineExecutor extends EngineExecutor {
             Process process = null;
             try {
                 process = processBuilder.start();
-                int exitcode = process.waitFor();
-                if (exitcode != 0) {
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
                     updateExecutionStatus(execution.getId(), EngineExecutionStatus.FAILED);
                 }
             } catch (Throwable t) {
