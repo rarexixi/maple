@@ -2,24 +2,14 @@
 import type { FormInstance } from "ant-design-vue"
 import { onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
+import type { validateFunction } from "@/composables/models"
+import type { FileSinkConfig } from "@/composables/spark-jobs"
+
+import { useSparkFileSerializersStore } from "@/stores/sys-conf"
 
 import AInputStringArray from "@/components/ant-ext/AInputStringArray.vue"
-import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
-
-import { useSparkFileSerializersStore } from "@/stores/sys-conf";
-
-interface FileSinkValue {
-  sourceTable: string,
-  sourceQuery: string,
-  options: any,
-  path: string,
-  serializer: string,
-  saveMode: string,
-  partitionBy: Array<string>,
-  numPartitions: number,
-}
+import ParamsMap from "@/components/ParamsMap.vue"
 
 const rules = {
   path: [{required: true}],
@@ -31,7 +21,7 @@ const rules = {
 }
 
 const {value, name} = defineProps<{
-  value: FileSinkValue,
+  value: FileSinkConfig,
   name: String,
 }>()
 
@@ -42,8 +32,9 @@ const validateMessages = {
   },
 }
 
-const { confOptions: fileSerializers } = useSparkFileSerializersStore()
 const labelCols = common.Layout.labelCols
+
+const { confOptions: fileSerializers } = useSparkFileSerializersStore()
 
 const formRef = useTemplateRef<FormInstance>("formRef");
 const emit = defineEmits<{
@@ -84,7 +75,7 @@ onMounted(() => {
         <a-input-string-array v-model:value="value.partitionBy" />
       </a-form-item>
       <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-input-string-map v-model:value="value.options" />
+        <params-map v-model:value="value.options" />
       </a-form-item>
     </a-flex>
   </a-form>

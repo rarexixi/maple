@@ -192,7 +192,7 @@ const {
       </#list>
       <a-form-item>
         <a-button type="primary" html-type="submit">
-          <search-outlined />
+          <SearchOutlined />
           搜索
         </a-button>
         <a-button @click="resetSearch">重置</a-button>

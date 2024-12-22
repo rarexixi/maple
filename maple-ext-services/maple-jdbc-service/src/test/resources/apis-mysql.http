@@ -1,0 +1,65 @@
+###
+
+POST http://localhost:10002/api/jdbc/dbs
+Content-Type: application/json
+Accept: application/json
+
+{
+  "url": "jdbc:mysql://localhost:3306/maple",
+  "username": "xi_root",
+  "password": "123456",
+  "driverClassName": "com.mysql.cj.jdbc.Driver"
+}
+
+###
+
+POST http://localhost:10002/api/jdbc/schemas
+Content-Type: application/json
+Accept: application/json
+
+{
+  "url": "jdbc:mysql://localhost:3306/maple",
+  "username": "xi_root",
+  "password": "123456",
+  "driverClassName": "com.mysql.cj.jdbc.Driver",
+  "databaseName": "maple"
+}
+
+###
+
+POST http://localhost:10002/api/jdbc/tables
+Content-Type: application/json
+Accept: application/json
+
+{
+  "url": "jdbc:mysql://localhost:3306/maple",
+  "username": "xi_root",
+  "password": "123456",
+  "driverClassName": "com.mysql.cj.jdbc.Driver",
+  "databaseName": "maple",
+  "schemaName": ""
+}
+
+###
+
+POST http://localhost:10002/api/jdbc/table
+Content-Type: application/json
+Accept: application/json
+
+{
+  "url": "jdbc:mysql://localhost:3306/maple",
+  "username": "xi_root",
+  "password": "123456",
+  "driverClassName": "com.mysql.cj.jdbc.Driver",
+  "databaseName": "maple",
+  "schemaName": "public",
+  "tableName": "maple_user"
+}
+
+
+###
+
+GET http://localhost:8082/api/jdbc/1/tables?databaseName=maple
+Content-Type: application/json
+Accept: application/json
+maple-tag: maple-db-service:mysql

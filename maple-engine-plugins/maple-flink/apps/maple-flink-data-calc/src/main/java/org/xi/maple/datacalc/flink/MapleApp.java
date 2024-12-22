@@ -2,7 +2,6 @@ package org.xi.maple.datacalc.flink;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.PipelineOptionsInternal;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
@@ -23,9 +22,8 @@ public class MapleApp {
         cmd.getOptionValue("file");
         String execType = cmd.getOptionValue("exec-type", "array");
 
-        String jobId = "maple-flink-data-calc";
         Configuration configuration = new Configuration();
-        configuration.setString(PipelineOptionsInternal.PIPELINE_FIXED_JOB_ID, jobId);
+        // configuration.setString(PipelineOptionsInternal.PIPELINE_FIXED_JOB_ID, jobId);
 
         try (StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(configuration)) {
             TableEnvironment tableEnv = "stream".equals(cmd.getOptionValue("mode"))

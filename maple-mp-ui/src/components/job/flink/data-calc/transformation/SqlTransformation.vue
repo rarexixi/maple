@@ -2,15 +2,11 @@
 import type { FormInstance } from "ant-design-vue"
 import { onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
-
-import { useSparkStorageLevelsStore } from "@/stores/sys-conf"
+import type { validateFunction } from "@/composables/models"
 
 interface SqlTransformationValue {
   resultTable: string,
-  persist: boolean,
-  storageLevel: string,
   sql: string,
 }
 
@@ -31,7 +27,6 @@ const validateMessages = {
   },
 }
 
-const { confOptions: storageLevels } = useSparkStorageLevelsStore()
 const labelCols = common.Layout.labelCols
 
 const formRef = useTemplateRef<FormInstance>("formRef");
@@ -50,12 +45,6 @@ onMounted(() => {
     <a-flex wrap="wrap">
       <a-form-item name="resultTable" label="注册表名" class="form-item-320">
         <a-input v-model:value="value.resultTable" />
-      </a-form-item>
-      <a-form-item name="persist" label="开启缓存" class="form-item-320">
-        <a-switch v-model:checked="value.persist" />
-      </a-form-item>
-      <a-form-item name="storageLevel" label="缓存级别" class="form-item-320">
-        <a-select v-model:value="value.storageLevel" :options="storageLevels" :disabled="!value.persist" />
       </a-form-item>
       <a-form-item name="sql" label="SQL" :label-col="labelCols.w1280" class="form-item-1280">
         <a-textarea v-model:value="value.sql" :auto-size="{ minRows: 2, maxRows: 20 }" />

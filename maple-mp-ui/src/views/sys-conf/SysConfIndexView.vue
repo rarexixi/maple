@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type { FormInstance } from "ant-design-vue"
-import { reactive, onMounted, ref, useTemplateRef } from "vue"
+import { reactive, onMounted, useTemplateRef } from "vue"
 
 import common from '@/composables/common'
-import { listSearch, pageListSearch } from '@/composables/requests'
+import { pageListSearch } from '@/composables/requests'
 import { SysConfApis } from "@/composables/service-apis"
 import type { OperateCallback } from "@/composables/table-operations"
 import { getMultiDataOperations, getSingleDataOperations } from "@/composables/table-operations"
@@ -38,10 +38,7 @@ onMounted(() => {
 
 const columns = [
   { title: '配置键', dataIndex: 'confKey', key: 'confKey' },
-  { title: '创建人', dataIndex: 'createdBy', key: 'createdBy' },
-  { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
-  { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
-  { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+  { title: '配置说明', dataIndex: 'description', key: 'description' },
   {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
 ]
 
@@ -107,7 +104,7 @@ const {
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="search">
-          <search-outlined />
+          <SearchOutlined />
           搜索
         </a-button>
         <a-button @click="resetSearch">重置</a-button>

@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { h, reactive, ref } from "vue"
-import { PlusOutlined } from "@ant-design/icons-vue";
+import { h, reactive } from "vue"
+import { PlusOutlined } from "@ant-design/icons-vue"
 
 const emit = defineEmits<{
   (e: 'add', pluginType: string, pluginName: string): void
 }>()
 
 const plugins = reactive({
-  source: ['jdbc', 'managed_jdbc', 'doris', 'star_rocks', 'file'],
+  source: ['jdbc', 'doris', 'starrocks', 'file'],
   transformation: ['sql'],
-  sink: ['hive', 'jdbc', 'doris', 'star_rocks', 'managed_jdbc', 'file'],
+  sink: ['hive', 'jdbc', 'doris', 'starrocks', 'file'],
 })
-
-const plugin = ref<string>()
 
 const add = (pluginType: any) => {
   emit('add', pluginType.keyPath[0], pluginType.keyPath[1])

@@ -3,6 +3,7 @@ package org.xi.maple.datacalc.spark.sink
 import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSink
+import org.xi.maple.datacalc.spark.model.sink.FileSinkConfig
 
 import scala.collection.JavaConverters._
 
@@ -10,11 +11,8 @@ class FileSink extends MapleSink[FileSinkConfig] {
 
   val defaultUriSchema = "hdfs://"
 
-  override protected def prepare(): Unit = {
-    config.setPath(VariableUtils.replaceVariables(config.getPath, variables))
-  }
-
-  override def output(ds: Dataset[Row]): Unit = {
+  override protected def exec(variables: java.util.Map[String, String]): Unit = {
+    val ds: Dataset[Row] = getData(variables)
 
     val writer = ds.write.mode(config.getSaveMode)
 
@@ -27,9 +25,9 @@ class FileSink extends MapleSink[FileSinkConfig] {
       writer.options(config.getOptions)
     }
     val path = if (config.getPath.startsWith("/")) {
-      defaultUriSchema + config.getPath
+      defaultUriSchema + VariableUtils.replaceVariables(config.getPath, variables)
     } else {
-      config.getPath
+      VariableUtils.replaceVariables(config.getPath, variables)
     }
     logger.info(s"Save data to file, path: $path")
 

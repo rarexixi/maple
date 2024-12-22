@@ -1,30 +1,27 @@
 package org.xi.maple.datacalc.flink.sink;
 
-import lombok.Data;
 import org.apache.flink.table.api.TableEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.datacalc.flink.api.MapleSink;
 import org.xi.maple.datacalc.flink.exception.ConfigRuntimeException;
+import org.xi.maple.datacalc.flink.model.sink.JdbcSinkConfig;
 
-import javax.validation.constraints.NotBlank;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.util.*;
 
-public class JdbcSink extends MapleSink<JdbcSink.Config> {
+public class JdbcSink extends MapleSink<JdbcSinkConfig> {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcSink.class);
 
-    public JdbcSink(TableEnvironment tableEnv, Map<String, String> gv) {
-        super(tableEnv, gv);
+    public JdbcSink(TableEnvironment tableEnv) {
+        super(tableEnv);
     }
 
     public void prepare() {
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(config.getJdbcUrl(), config.getUsername(), config.getPassword())) {
             for (String query : config.getPreQueries()) {
-                logger.info("Execute query: {}", query);
                 try (PreparedStatement statement = conn.prepareStatement(query)) {
                     // statement.setQueryTimeout(jdbcOptions.queryTimeout)
                     int rows = statement.executeUpdate();
@@ -37,36 +34,4 @@ public class JdbcSink extends MapleSink<JdbcSink.Config> {
         }
     }
 
-    @Data
-    public static class Config extends MapleSink.SinkConfig {
-
-        @NotBlank
-        String url;
-        @NotBlank
-        String table;
-        String username;
-        String password;
-
-        List<String> preQueries = new ArrayList<>();
-
-        @Override
-        public String getConnector() {
-            return "jdbc";
-        }
-
-        @Override
-        public Map<String, String> getDefineOptions() {
-            Map<String, String> defineOptions = new LinkedHashMap<>();
-            defineOptions.put("url", url);
-            defineOptions.put("table-name", table);
-            defineOptions.put("username", username);
-            defineOptions.put("password", password);
-            return options;
-        }
-
-        @Override
-        public String getResultTable() {
-            return null;
-        }
-    }
 }

@@ -5,6 +5,7 @@ import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 @Data
@@ -76,10 +77,10 @@ public class JobItemResp implements Serializable {
     private LocalDateTime updatedAt;
 
     public Map<String, Object> getRunConf() {
-        return (Map<String, Object>) JsonUtils.parseObject(runConf, Map.class, Map.of());
+        return (Map<String, Object>) JsonUtils.parseObject(runConf, Map.class, Collections.emptyMap());
     }
 
     public Map<String, Object> getJobConf() {
-        return (Map<String, Object>) JsonUtils.parseObject(jobConf, Map.class, Map.of());
+        return (Map<String, Object>) JsonUtils.parseObject(jobConf, Map.class, Collections.emptyMap());
     }
 }

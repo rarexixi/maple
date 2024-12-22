@@ -164,7 +164,7 @@
                 MT.`name`,
                 MT.`category`,
                 MT.`address`,
-                MT.`desc`,
+                MT.`description`,
                 MT.`configuration`,
                 MT.`disabled`,
                 MT.`created_by`,
@@ -289,31 +289,8 @@
                     <if test="condition.addressContains != null and condition.addressContains != ''">
                         AND MT.`address` LIKE concat('%', #{condition.addressContains}, '%')
                     </if>
-                    <if test="condition.desc != null and condition.desc != ''">
-                        AND MT.`desc` = #{condition.desc}
-                    </if>
-                    <if test="condition.descIn != null and condition.descIn.size() > 0">
-                        AND MT.`desc` IN
-                        <foreach collection="condition.descIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.descNotIn != null and condition.descNotIn.size() > 0">
-                        AND MT.`desc` NOT IN
-                        <foreach collection="condition.descNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.descIsNotEmpty != null and condition.descIsNotEmpty == true">
-                        AND MT.`desc` IS NOT NULL AND `desc` != ''
-                    </if>
-                    <if test="condition.descIsEmpty != null and condition.descIsEmpty == true">
-                        AND (MT.`desc` IS NULL OR MT.`desc` = '')
-                    </if>
-                    <if test="condition.descStartWith != null and condition.descStartWith != ''">
-                        AND MT.`desc` LIKE concat(#{condition.descStartWith}, '%')
-                    </if>
-                    <if test="condition.descEndWith != null and condition.descEndWith != ''">
-                        AND MT.`desc` LIKE concat('%', #{condition.descEndWith})
-                    </if>
-                    <if test="condition.descContains != null and condition.descContains != ''">
-                        AND MT.`desc` LIKE concat('%', #{condition.descContains}, '%')
+                    <if test="condition.description != null and condition.description != ''">
+                        AND MT.`description` = #{condition.description}
                     </if>
                     <if test="condition.disabled != null">
                         AND MT.`disabled` = #{condition.disabled}

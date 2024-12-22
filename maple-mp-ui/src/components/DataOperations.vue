@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PlusOutlined, CheckOutlined, StopOutlined, DeleteOutlined, } from '@ant-design/icons-vue';
+import { PlusOutlined, CheckOutlined, StopOutlined, DeleteOutlined, } from '@ant-design/icons-vue'
 import { h } from "vue"
 
 const {

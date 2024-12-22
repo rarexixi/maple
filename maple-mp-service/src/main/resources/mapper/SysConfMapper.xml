@@ -86,7 +86,7 @@
                 `conf_value` = #{entity.confValue},
             </if>
             <if test="entity.description != null">
-                `desc` = #{entity.desc},
+                `description` = #{entity.description},
             </if>
             <if test="entity.disabled != null">
                 `disabled` = #{entity.disabled},
@@ -106,7 +106,7 @@
         UPDATE <include refid="tableName"/>
         <set>
             `conf_value` = #{entity.confValue},
-            `desc` = #{entity.desc},
+            `description` = #{entity.description},
             `updated_by` = #{entity.updatedBy},
             `updated_at` = #{entity.updatedAt}
         </set>
@@ -120,7 +120,7 @@
         SELECT
             MT.`conf_key`,
             MT.`conf_value`,
-            MT.`desc`,
+            MT.`description`,
             MT.`disabled`,
             MT.`created_by`,
             MT.`updated_by`,
@@ -143,7 +143,7 @@
             <otherwise>
                 MT.`conf_key`,
                 MT.`conf_value`,
-                MT.`desc`,
+                MT.`description`,
                 MT.`disabled`,
                 MT.`created_by`,
                 MT.`updated_by`,

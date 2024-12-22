@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { minimatch } from "minimatch"
-import { computed, onMounted, reactive } from "vue"
+import { computed, onBeforeMount, onBeforeUpdate, onMounted, reactive } from "vue"
 import { useRouter } from "vue-router"
 
 import common, { DataOperationType } from '@/composables/common'
@@ -10,10 +10,14 @@ import { JobApis, ClusterEngineApis, ClusterApis } from "@/composables/service-a
 import { useJobTypesStore } from "@/stores/sys-conf"
 import type { OperateCallback } from "@/composables/table-operations"
 import { getSingleDataOperations2 } from "@/composables/table-operations"
-import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
 import UpsertCard from "@/components/UpsertCard.vue"
 import JobUpsertForm from "@/components/job/JobUpsertForm.vue"
+
+import { useBreadcrumbStore } from "@/stores/breadcrumbs"
+// 设置面包屑
+const { setBreadcrumb } = useBreadcrumbStore()
+setBreadcrumb([{ text: '作业' }, { text: getTitle() }])
 
 interface Props {
   id?: any;
@@ -63,7 +67,7 @@ const callback: OperateCallback = {
       detail.id = response.id
     }
     detail.jobName = response.jobName
-    detail.description = response.desc
+    detail.description = response.description
     setJobConf(response.runConf, response.jobConf, response.jobType)
     detail.jobType = response.jobType
     detail.engineId = response.engineId
@@ -72,7 +76,7 @@ const callback: OperateCallback = {
   resetDetail: (detail: any) => {
     detail.id = undefined
     detail.jobName = ''
-    detail.desc = ''
+    detail.description = ''
     detail.jobType = ''
     detail.engineId = undefined
     detail.owner = ''
@@ -92,26 +96,26 @@ const {
 
 function setJobConf(runConf: any, jobConf: any, jobType?: string) {
   if (!jobType) return
-  let jobTypeDetail = jobTypeMap[jobType]
-  if (!jobTypeDetail) return
 
-  let getDefaultRunConf = jobs.JobRunTypes[jobTypeDetail.engineType]
   let getDefaultJobConf = jobs.JobConf[jobType]
-
-  let defaultRunConf = getDefaultRunConf ? getDefaultRunConf() : {}
   let defaultJobConf = getDefaultJobConf ? getDefaultJobConf() : {}
-
-  detail.runConf = { ...defaultRunConf, ...runConf }
   detail.jobConf = { ...defaultJobConf, ...jobConf }
+
+  let jobTypeDetail = jobTypeMap[jobType]
+  if (jobTypeDetail) {
+    let getDefaultRunConf = jobs.JobRunTypes[jobTypeDetail.engineType]
+    let defaultRunConf = getDefaultRunConf ? getDefaultRunConf() : {}
+    detail.runConf = { ...defaultRunConf, ...runConf }
+  }
 }
 
 function versionMatch(patterns: string[], version: string) {
   for (let pattern of patterns) {
-    if (!minimatch(version, pattern)) {
-      return false
+    if (minimatch(version, pattern)) {
+      return true
     }
   }
-  return true
+  return false
 }
 
 const jobTypeDetail = computed(() => jobTypeMap[detail.jobType])
@@ -135,10 +139,11 @@ const engineOptions = computed(() => {
   return Array.from(result).map(([clusterId, engines]) => ({ label: clusterOptionMap[clusterId], options: engines }))
 })
 
-onMounted(() => {
-  // 设置面包屑
-  const { setBreadcrumb } = useBreadcrumbStore()
-  setBreadcrumb([{ text: '作业' }, { text: getTitle() }])
+
+let initialized = false
+const initPageConf = () => {
+  if (initialized) return
+  initialized = true
 
   if (operateType === DataOperationType.create) {
     detail.jobType = jobType
@@ -146,7 +151,10 @@ onMounted(() => {
   } else {
     getDetail({ id: id }, operateType === DataOperationType.update)
   }
-})
+}
+onBeforeMount(() => initPageConf())
+onMounted(() => initPageConf())
+onBeforeUpdate(() => initPageConf())
 
 </script>
 

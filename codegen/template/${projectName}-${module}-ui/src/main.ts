@@ -10,7 +10,7 @@ import router from './router'
 import 'ant-design-vue/dist/reset.css';
 import '@/assets/styles/antv-override.less'
 
-import AInputNumberRanger from "@/components/ant-ext/AInputNumberRanger.vue";
+import AInputNumberRanger from "@/components/ant-ext/AInputNumberRanger.vue"
 
 const app = createApp(App)
 

@@ -2,13 +2,14 @@
 import type { FormInstance } from "ant-design-vue"
 import { onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
-
-import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
-import AInputStringArray from "@/components/ant-ext/AInputStringArray.vue"
+import type { validateFunction } from "@/composables/models"
+import type { FileSourceConfig } from "@/composables/spark-jobs"
 
 import { useSparkFileSerializersStore, useSparkStorageLevelsStore } from "@/stores/sys-conf"
+
+import ParamsMap from "@/components/ParamsMap.vue"
+import AInputStringArray from "@/components/ant-ext/AInputStringArray.vue"
 
 interface FileSourceValue {
   resultTable: string,
@@ -27,7 +28,7 @@ const rules = {
 }
 
 const {value, name} = defineProps<{
-  value: FileSourceValue,
+  value: FileSourceConfig,
   name: string,
 }>()
 
@@ -38,9 +39,10 @@ const validateMessages = {
   },
 }
 
+const labelCols = common.Layout.labelCols
+
 const { confOptions: fileSerializers } = useSparkFileSerializersStore()
 const { confOptions: storageLevels } = useSparkStorageLevelsStore()
-const labelCols = common.Layout.labelCols
 
 const formRef = useTemplateRef<FormInstance>("formRef");
 const emit = defineEmits<{
@@ -65,6 +67,7 @@ onMounted(() => {
       <a-form-item name="storageLevel" label="缓存级别" class="form-item-320">
         <a-select v-model:value="value.storageLevel" :options="storageLevels" :disabled="!value.persist" />
       </a-form-item>
+      <a-flex-br/>
       <a-form-item name="path" label="文件路径" :label-col="labelCols.w1280" class="form-item-1280">
         <a-input v-model:value="value.path" />
       </a-form-item>
@@ -75,7 +78,7 @@ onMounted(() => {
         <a-input-string-array v-model:value="value.columnNames" />
       </a-form-item>
       <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-input-string-map v-model:value="value.options" />
+        <params-map v-model:value="value.options" />
       </a-form-item>
     </a-flex>
   </a-form>

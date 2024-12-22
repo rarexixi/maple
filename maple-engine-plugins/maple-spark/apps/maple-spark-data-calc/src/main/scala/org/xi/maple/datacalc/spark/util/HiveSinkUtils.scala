@@ -66,17 +66,18 @@ object HiveSinkUtils {
   }
 
   /**
-   * 获取hive表存储位置
    *
-   * @param spark
+   * @param spark SparkSession
    * @param targetTable 表名 database.table
-   * @return 表路径
+   * @param partitionsColumns 分区字段
+   * @param variables 变量
+   * @return
    */
-  def getLocation(spark: SparkSession, targetTable: String, partitionsColumns: Array[String], variables: Map[String, String]): String = {
+  def getLocation(spark: SparkSession, targetTable: String, partitionsColumns: Array[String], variables: java.util.Map[String, String]): String = {
     val locations = spark.sql(s"desc formatted $targetTable").filter(col("col_name") === "Location").collect()
     var location: String = locations(0).getString(1)
     for (partitionColName <- partitionsColumns) {
-      if (StringUtils.isBlank(variables.getOrElse(partitionColName, ""))) {
+      if (StringUtils.isBlank(variables.getOrDefault(partitionColName, ""))) {
         throw new HiveSinkException(s"Please set [${partitionsColumns.mkString(", ")}] in variables")
       }
       location += s"/$partitionColName=${variables.get(partitionColName)}"

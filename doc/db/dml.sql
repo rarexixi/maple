@@ -1,12 +1,22 @@
 REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
-VALUES ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
+VALUES ('mysql', 'MySQL', '', 'rdbms', '5.6,5.7,8.0',
         '[
           {
-            "keyCode": "address",
-            "keyName": "地址",
+            "keyCode": "host",
+            "keyName": "主机地址",
             "dataType": "STRING",
             "versions": "*",
             "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "IP/域名"
+          },
+          {
+            "keyCode": "port",
+            "keyName": "端口",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "3306",
             "nullable": true,
             "valueRegex": "",
             "description": ""
@@ -61,207 +71,29 @@ VALUES ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
             "valueRegex": "",
             "description": "JSON格式: {\\"param\\":\\"value\\"}"
           }
-        ]'),
-       ('tidb', 'TiDB', '', '数据库', '4,5,6.1,6.5',
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('postgresql', 'PostgreSQL', '', 'rdbms', '10,11,12,13,14,15',
         '[
           {
-            "keyCode": "address",
-            "keyName": "地址",
+            "keyCode": "host",
+            "keyName": "主机地址",
             "dataType": "STRING",
             "versions": "*",
             "defaultValue": "",
             "nullable": true,
             "valueRegex": "",
-            "description": "host1:port1[,host2:port2...]"
+            "description": "IP/域名"
           },
           {
-            "keyCode": "username",
-            "keyName": "用户名",
+            "keyCode": "port",
+            "keyName": "端口",
             "dataType": "STRING",
             "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "^[0-9A-Za-z_-]+$",
-            "description": ""
-          },
-          {
-            "keyCode": "password",
-            "keyName": "密码",
-            "dataType": "PASSWORD",
-            "versions": "*",
-            "defaultValue": "",
+            "defaultValue": "5432",
             "nullable": true,
             "valueRegex": "",
             "description": ""
-          },
-          {
-            "keyCode": "databaseName",
-            "keyName": "数据库名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "driverClassName",
-            "keyName": "驱动类名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "com.mysql.jdbc.Driver",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "params",
-            "keyName": "连接参数",
-            "dataType": "JSON",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "JSON格式: {\\"param\\":\\"value\\"}"
-          }
-        ]'),
-       ('doris', 'Doris', '', '数据库', '1.1,1.2',
-        '[
-          {
-            "keyCode": "address",
-            "keyName": "地址",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "host1:port1[,host2:port2...]"
-          },
-          {
-            "keyCode": "username",
-            "keyName": "用户名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "^[0-9A-Za-z_-]+$",
-            "description": ""
-          },
-          {
-            "keyCode": "password",
-            "keyName": "密码",
-            "dataType": "PASSWORD",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "databaseName",
-            "keyName": "数据库名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "driverClassName",
-            "keyName": "驱动类名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "com.mysql.jdbc.Driver",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "params",
-            "keyName": "连接参数",
-            "dataType": "JSON",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "JSON格式: {\\"param\\":\\"value\\"}"
-          }
-        ]'),
-       ('clickhouse', 'ClickHouse', '', '数据库', '1.1,18,19,20,21,22',
-        '[
-          {
-            "keyCode": "address",
-            "keyName": "地址",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "host1:port1[,host2:port2...]"
-          },
-          {
-            "keyCode": "username",
-            "keyName": "用户名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "^[0-9A-Za-z_-]+$",
-            "description": ""
-          },
-          {
-            "keyCode": "password",
-            "keyName": "密码",
-            "dataType": "PASSWORD",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "databaseName",
-            "keyName": "数据库名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "driverClassName",
-            "keyName": "驱动类名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "ru.yandex.clickhouse.ClickHouseDriver",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "params",
-            "keyName": "连接参数",
-            "dataType": "JSON",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "JSON格式: {\\"param\\":\\"value\\"}"
-          }
-        ]'),
-       ('postgresql', 'PostgreSQL', '', '数据库', '10,11,12,13,14,15',
-        '[
-          {
-            "keyCode": "address",
-            "keyName": "地址",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "host1:port1[,host2:port2...]"
           },
           {
             "keyCode": "username",
@@ -313,81 +145,29 @@ VALUES ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
             "valueRegex": "",
             "description": "JSON格式: {\\"param\\":\\"value\\"}"
           }
-        ]'),
-       ('db2', 'DB2', '', '数据库', '9.7,10,11,12,13',
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('oracle', 'Oracle', '', 'rdbms', '9i,10g,11g,12c,18c,19c,21c',
         '[
           {
-            "keyCode": "address",
-            "keyName": "地址",
+            "keyCode": "host",
+            "keyName": "主机地址",
             "dataType": "STRING",
             "versions": "*",
             "defaultValue": "",
             "nullable": true,
             "valueRegex": "",
-            "description": "host1:port1[,host2:port2...]"
+            "description": "IP/域名"
           },
           {
-            "keyCode": "username",
-            "keyName": "用户名",
+            "keyCode": "port",
+            "keyName": "端口",
             "dataType": "STRING",
             "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "^[0-9A-Za-z_-]+$",
-            "description": ""
-          },
-          {
-            "keyCode": "password",
-            "keyName": "密码",
-            "dataType": "PASSWORD",
-            "versions": "*",
-            "defaultValue": "",
+            "defaultValue": "1521",
             "nullable": true,
             "valueRegex": "",
             "description": ""
-          },
-          {
-            "keyCode": "databaseName",
-            "keyName": "数据库名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "driverClassName",
-            "keyName": "驱动类名",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "com.ibm.db2.jcc.DB2Driver",
-            "nullable": true,
-            "valueRegex": "",
-            "description": ""
-          },
-          {
-            "keyCode": "params",
-            "keyName": "连接参数",
-            "dataType": "JSON",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "JSON格式: {\\"param\\":\\"value\\"}"
-          }
-        ]'),
-       ('oracle', 'Oracle', '', '数据库', '9i,10g,11g,12c,18c,19c,21c',
-        '[
-          {
-            "keyCode": "address",
-            "keyName": "地址",
-            "dataType": "STRING",
-            "versions": "*",
-            "defaultValue": "",
-            "nullable": true,
-            "valueRegex": "",
-            "description": "host1:port1[,host2:port2...]"
           },
           {
             "keyCode": "username",
@@ -469,18 +249,29 @@ VALUES ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
             "valueRegex": "",
             "description": "JSON格式: {\\"param\\":\\"value\\"}"
           }
-        ]'),
-       ('sqlserver', 'SqlServer', '', '数据库', '2016,2017,2019,2022',
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('sqlserver', 'SqlServer', '', 'rdbms', '2016,2017,2019,2022',
         '[
           {
-            "keyCode": "address",
-            "keyName": "地址",
+            "keyCode": "host",
+            "keyName": "主机地址",
             "dataType": "STRING",
             "versions": "*",
             "defaultValue": "",
             "nullable": true,
             "valueRegex": "",
-            "description": "host1:port1[,host2:port2...][\\\\instance]"
+            "description": "IP/域名"
+          },
+          {
+            "keyCode": "port",
+            "keyName": "端口",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "1433",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
           },
           {
             "keyCode": "username",
@@ -521,6 +312,360 @@ VALUES ('mysql', 'MySQL', '', '数据库', '5.6,5.7,8.0',
             "nullable": true,
             "valueRegex": "",
             "description": "JSON格式: {\\"param\\":\\"value\\"}"
+          }
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('db2', 'DB2', '', 'rdbms', '9.7,10,11,12,13',
+        '[
+          {
+            "keyCode": "host",
+            "keyName": "主机地址",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "IP/域名"
+          },
+          {
+            "keyCode": "port",
+            "keyName": "端口",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "50000",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "username",
+            "keyName": "用户名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "^[0-9A-Za-z_-]+$",
+            "description": ""
+          },
+          {
+            "keyCode": "password",
+            "keyName": "密码",
+            "dataType": "PASSWORD",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "databaseName",
+            "keyName": "数据库名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "driverClassName",
+            "keyName": "驱动类名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "com.ibm.db2.jcc.DB2Driver",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "params",
+            "keyName": "连接参数",
+            "dataType": "JSON",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "JSON格式: {\\"param\\":\\"value\\"}"
+          }
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('doris', 'Doris', '', 'doris', '2.0,2.1,3.0',
+        '[
+          {
+            "keyCode": "address",
+            "keyName": "地址",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...]"
+          },
+          {
+            "keyCode": "fenodes",
+            "keyName": "FE Nodes",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...]"
+          },
+          {
+            "keyCode": "username",
+            "keyName": "用户名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "^[0-9A-Za-z_-]+$",
+            "description": ""
+          },
+          {
+            "keyCode": "password",
+            "keyName": "密码",
+            "dataType": "PASSWORD",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "driverClassName",
+            "keyName": "驱动类名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "params",
+            "keyName": "连接参数",
+            "dataType": "JSON",
+            "versions": "*",
+            "defaultValue": "{\\"encrypt\\":\\"true\\",\\"trustServerCertificate\\":\\"true\\"}",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "JSON格式: {\\"param\\":\\"value\\"}"
+          }
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('starrocks', 'StarRocks', '', 'starrocks', '2.5,3.1,3.2,3.3',
+        '[
+          {
+            "keyCode": "address",
+            "keyName": "地址",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...][\\\\instance]"
+          },
+          {
+            "keyCode": "fenodes",
+            "keyName": "FE Nodes",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...]"
+          },
+          {
+            "keyCode": "benodes",
+            "keyName": "BE Nodes",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...]"
+          },
+          {
+            "keyCode": "username",
+            "keyName": "用户名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "^[0-9A-Za-z_-]+$",
+            "description": ""
+          },
+          {
+            "keyCode": "password",
+            "keyName": "密码",
+            "dataType": "PASSWORD",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "driverClassName",
+            "keyName": "驱动类名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "params",
+            "keyName": "连接参数",
+            "dataType": "JSON",
+            "versions": "*",
+            "defaultValue": "{\\"encrypt\\":\\"true\\",\\"trustServerCertificate\\":\\"true\\"}",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "JSON格式: {\\"param\\":\\"value\\"}"
+          }
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('tidb', 'TiDB', '', 'rdbms', '4,5,6.1,6.5',
+        '[
+          {
+            "keyCode": "address",
+            "keyName": "地址",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...]"
+          },
+          {
+            "keyCode": "username",
+            "keyName": "用户名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "^[0-9A-Za-z_-]+$",
+            "description": ""
+          },
+          {
+            "keyCode": "password",
+            "keyName": "密码",
+            "dataType": "PASSWORD",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "databaseName",
+            "keyName": "数据库名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "driverClassName",
+            "keyName": "驱动类名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "com.mysql.jdbc.Driver",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "params",
+            "keyName": "连接参数",
+            "dataType": "JSON",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "JSON格式: {\\"param\\":\\"value\\"}"
+          }
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('clickhouse', 'ClickHouse', '', 'clickhouse', '1.1,18,19,20,21,22',
+        '[
+          {
+            "keyCode": "address",
+            "keyName": "地址",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...]"
+          },
+          {
+            "keyCode": "username",
+            "keyName": "用户名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "^[0-9A-Za-z_-]+$",
+            "description": ""
+          },
+          {
+            "keyCode": "password",
+            "keyName": "密码",
+            "dataType": "PASSWORD",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "databaseName",
+            "keyName": "数据库名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "driverClassName",
+            "keyName": "驱动类名",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "ru.yandex.clickhouse.ClickHouseDriver",
+            "nullable": true,
+            "valueRegex": "",
+            "description": ""
+          },
+          {
+            "keyCode": "params",
+            "keyName": "连接参数",
+            "dataType": "JSON",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "JSON格式: {\\"param\\":\\"value\\"}"
+          }
+        ]');
+REPLACE INTO maple.maple_datasource_type (type_code, type_name, icon, classifier, versions, configurations)
+VALUES ('kafka', 'Kafka', '', 'kafka', '2.7,2.8,3.7,3.8,3.9',
+        '[
+          {
+            "keyCode": "bootstrapServers",
+            "keyName": "地址",
+            "dataType": "STRING",
+            "versions": "*",
+            "defaultValue": "",
+            "nullable": true,
+            "valueRegex": "",
+            "description": "host1:port1[,host2:port2...][\\\\instance]"
           }
         ]');
 
@@ -714,32 +859,32 @@ VALUES (1, 1, 'spark', '3.3.2', '/opt/spark/current', '{
     {
       "name": "spark.executor.instances",
       "replaceParameter": "--num-executors",
-      "desc": "Spark executor 内存"
+      "description": "Spark executor 内存"
     },
     {
       "name": "spark.executor.cores",
       "replaceParameter": "--executor-cores",
-      "desc": "Spark executor vcores"
+      "description": "Spark executor vcores"
     },
     {
       "name": "spark.executor.memory",
       "replaceParameter": "--executor-memory",
-      "desc": "Spark executor 内存"
+      "description": "Spark executor 内存"
     },
     {
       "name": "spark.driver.extraJavaOptions",
       "replaceParameter": "--driver-java-options",
-      "desc": "Spark driver java 启动参数"
+      "description": "Spark driver java 启动参数"
     },
     {
       "name": "spark.driver.extraLibraryPath",
       "replaceParameter": "--driver-library-path",
-      "desc": "Spark driver java 启动参数"
+      "description": "Spark driver java 启动参数"
     },
     {
       "name": "spark.jars",
       "replaceParameter": "--jars",
-      "desc": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
+      "description": "以逗号分隔的 jars 列表，包含在 driver 和 executor 的类路径中"
     }
   ]
 }');

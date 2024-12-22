@@ -6,10 +6,12 @@ import { useTemplateRef } from "vue"
 import common from "@/composables/common"
 import type { ValidatableComponent } from "@/composables/models"
 
-import SparkRunForm from "@/components/job/spark/SparkRunForm.vue"
-import FlinkRunForm from "@/components/job/flink/FlinkRunForm.vue"
-import SparkDataCalcArrayForm from "@/components/job/spark/data-calc/SparkDataCalcArrayForm.vue"
-import SparkDataCalcGroupForm from "@/components/job/spark/data-calc/SparkDataCalcGroupForm.vue"
+import SparkRun from "@/components/job/spark/SparkRunForm.vue"
+import FlinkRun from "@/components/job/flink/FlinkRunForm.vue"
+import SparkDataCalc from "@/components/job/spark/data-calc/SparkDataCalcForm.vue"
+import FlinkDataCalc from "@/components/job/flink/data-calc/FlinkDataCalcForm.vue"
+import { useDatabaseTypesStore } from "@/stores/sys-conf";
+import { useDatasourceStore } from "@/stores/sys-data";
 
 const detail = defineModel<any>()
 
@@ -24,22 +26,25 @@ const {
 
 const rules = {
   id: [
-    {type: 'integer', required: true, message: '作业ID不能为空', trigger: 'blur'}
+    { type: 'integer', required: true, message: '作业ID不能为空', trigger: 'blur' }
   ],
   jobName: [
-    {required: true, message: '作业名不能为空', trigger: 'blur'}
+    { required: true, message: '作业名不能为空', trigger: 'blur' }
   ],
   jobType: [
-    {required: true, message: '作业类型不能为空', trigger: 'blur'}
+    { required: true, message: '作业类型不能为空', trigger: 'blur' }
   ],
   engineId: [
-    {type: 'integer', required: true, message: '引擎ID不能为空', trigger: 'change'}
+    { type: 'integer', required: true, message: '引擎ID不能为空', trigger: 'change' }
   ],
 }
 
 const formRef = useTemplateRef<FormInstance>("formRef")
 const runFormRef = useTemplateRef<ValidatableComponent>("runFormRef")
 const jobConfFormRef = useTemplateRef<ValidatableComponent>("jobConfFormRef")
+
+const { dataInitialized } = useDatasourceStore()
+const { confInitialized } = useDatabaseTypesStore()
 
 const emit = defineEmits<{
   (e: 'save'): void
@@ -78,21 +83,17 @@ const labelWidth = 8
       </a-form-item>
       <a-form-item ref="description" label="作业说明" name="description" class="form-item-640" :label-col="{ span: 4 }"
                    :wrapper-col="{ span: 20 }">
-        <a-input v-model:value="detail.desc" />
+        <a-input v-model:value="detail.description" />
       </a-form-item>
     </a-flex>
     <a-divider />
-    <template v-if="jobType?.engineType == 'spark'">
-      <SparkRunForm ref="runFormRef" :run-conf="detail.runConf" />
+    <SparkRun ref="runFormRef" :run-conf="detail.runConf" v-if="jobType?.engineType == 'spark'" />
+    <FlinkRun ref="runFormRef" :run-conf="detail.runConf" v-else-if="jobType?.engineType == 'flink'" />
+    <template v-if="confInitialized && dataInitialized">
+      <a-divider />
+      <SparkDataCalc ref="jobConfFormRef" :job-conf="detail.jobConf" v-if="detail.jobType === 'spark-data-calc'" />
+      <FlinkDataCalc ref="jobConfFormRef" :job-conf="detail.jobConf" v-else-if="detail.jobType === 'flink-data-calc'" />
     </template>
-    <template v-else-if="jobType?.engineType == 'flink'">
-      <FlinkRunForm ref="runFormRef" :run-conf="detail.runConf" />
-    </template>
-    <a-divider />
-    <SparkDataCalcGroupForm ref="jobConfFormRef" :job-conf="detail.jobConf"
-                            v-if="detail.jobType === 'spark-data-calc-group'" />
-    <SparkDataCalcArrayForm ref="jobConfFormRef" :job-conf="detail.jobConf"
-                            v-else-if="detail.jobType === 'spark-data-calc-array'" />
     <a-form-item :wrapper-col="{ offset: labelWidth / 4 }" class="form-item-1280">
       <a-affix :offset-bottom="70">
         <a-button type="primary" @click="save">保存</a-button>

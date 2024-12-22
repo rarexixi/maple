@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type { FormInstance } from "ant-design-vue"
-import { reactive, onMounted, ref, useTemplateRef } from "vue"
+import { reactive, onMounted, useTemplateRef } from "vue"
 
 import common from '@/composables/common'
-import { listSearch, pageListSearch } from '@/composables/requests'
+import { pageListSearch } from '@/composables/requests'
 import { DatasourceTypeApis } from "@/composables/service-apis"
 import type { OperateCallback } from "@/composables/table-operations"
 import { getMultiDataOperations, getSingleDataOperations } from "@/composables/table-operations"
@@ -113,7 +113,7 @@ const {
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="search">
-          <search-outlined />
+          <SearchOutlined />
           搜索
         </a-button>
         <a-button @click="resetSearch">重置</a-button>

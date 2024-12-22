@@ -1,37 +1,25 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { onMounted, useTemplateRef } from "vue"
+import { computed, onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
-
-import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
+import { getDatasourceOptions } from "@/composables/datasources"
+import type { validateFunction } from "@/composables/models"
+import type { DorisSourceConfig } from "@/composables/spark-jobs"
 
 import { useSparkStorageLevelsStore } from "@/stores/sys-conf"
+import { useDatasourceStore } from "@/stores/sys-data"
 
-interface DorisSourceValue {
-  resultTable: string,
-  persist: boolean,
-  storageLevel: string,
-  options: any,
-  fenodes: string,
-  user: string,
-  password: string,
-  database: string,
-  table: string,
-}
+import ParamsMap from "@/components/ParamsMap.vue"
+import TableSelectFormItems from "@/components/datasource/TableSelectFormItems.vue"
 
 const rules = {
   resultTable: [{required: true}],
-  fenodes: [{required: true}],
-  user: [{required: true}],
-  password: [{required: true}],
-  database: [{required: true}],
-  table: [{required: true}],
+  datasource: [{required: true}],
 }
 
 const {value, name} = defineProps<{
-  value: DorisSourceValue,
+  value: DorisSourceConfig,
   name: string,
 }>()
 
@@ -42,8 +30,11 @@ const validateMessages = {
   },
 }
 
-const { confOptions: storageLevels } = useSparkStorageLevelsStore()
 const labelCols = common.Layout.labelCols
+
+const { confOptions: storageLevels } = useSparkStorageLevelsStore()
+const { dataList: datasourceList } = useDatasourceStore()
+const datasourceOptions = computed(() => getDatasourceOptions(datasourceList.value, 'doris'))
 
 const formRef = useTemplateRef<FormInstance>("formRef");
 const emit = defineEmits<{
@@ -68,23 +59,17 @@ onMounted(() => {
       <a-form-item name="storageLevel" label="缓存级别" class="form-item-320">
         <a-select v-model:value="value.storageLevel" :options="storageLevels" :disabled="!value.persist"></a-select>
       </a-form-item>
-      <a-form-item name="fenodes" label="fenodes" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-input v-model:value="value.fenodes" />
+      <a-flex-br />
+      <a-form-item name="datasource" label="数据源" class="form-item-320">
+        <a-select v-model:value="value.datasource" :options="datasourceOptions" placeholder="请选择" />
       </a-form-item>
-      <a-form-item name="user" label="用户名" class="form-item-320">
-        <a-input v-model:value="value.user" />
-      </a-form-item>
-      <a-form-item name="password" label="密码" class="form-item-320">
-        <a-input-password v-model:value="value.password" />
-      </a-form-item>
-      <a-form-item name="database" label="库名" class="form-item-320">
-        <a-input v-model:value="value.database" />
-      </a-form-item>
-      <a-form-item name="table" label="表名" class="form-item-320">
-        <a-input v-model:value="value.table" />
-      </a-form-item>
+      <TableSelectFormItems v-model:database-name="value.sourceTable.databaseName"
+                            v-model:schema-name="value.sourceTable.schemaName"
+                            v-model:table-name="value.sourceTable.tableName"
+                            :datasourceId="value.datasource" :validated-name-prefix="['sourceTable']" />
+      <a-flex-br />
       <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-input-string-map v-model:value="value.options" />
+        <params-map v-model:value="value.options" />
       </a-form-item>
     </a-flex>
   </a-form>

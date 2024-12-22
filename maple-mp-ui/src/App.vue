@@ -3,7 +3,7 @@ import { RouterView, RouterLink } from 'vue-router'
 import { h, ref } from "vue"
 import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 import zhCN from "ant-design-vue/es/locale/zh_CN"
-import type { MenuProps } from "ant-design-vue";
+import type { MenuProps } from "ant-design-vue"
 import * as AntdIcons from '@ant-design/icons-vue'
 
 const breadcrumbsStore = useBreadcrumbStore()
@@ -13,7 +13,7 @@ const selectedKeys2 = ref<string[]>(['1'])
 const navMenuItems = ref<MenuProps['items']>([
   {
     key: 'sysConf',
-    icon: () => h(AntdIcons['ClusterOutlined']),
+    icon: () => h(AntdIcons['ControlOutlined']),
     label: h(RouterLink, {to: {path:'/sys-conf'}}, () => '系统配置'),
     title: 'sysConf',
   },
@@ -25,7 +25,7 @@ const navMenuItems = ref<MenuProps['items']>([
   },
   {
     key: 'clusterEngine',
-    icon: () => h(AntdIcons['DatabaseOutlined']),
+    icon: () => h(AntdIcons['CalculatorOutlined']),
     label: h(RouterLink, {to: {path:'/cluster-engine'}}, () => '计算引擎'),
     title: 'clusterEngine',
   },
@@ -43,7 +43,7 @@ const navMenuItems = ref<MenuProps['items']>([
   },
   {
     key: 'job',
-    icon: () => h(AntdIcons['DatabaseOutlined']),
+    icon: () => h(AntdIcons['PlaySquareOutlined']),
     label: h(RouterLink, {to: {path:'/job'}}, () => '作业'),
     title: 'job',
   },
@@ -53,14 +53,14 @@ const navMenuItems = ref<MenuProps['items']>([
     label: '数据计算-数组',
     children: [
       {
-        key: 'dataCalcArray',
-        label: h(RouterLink, {to: {path:'/data-calc-array'}}, () => '数组方式'),
-        title: 'dataCalcArray',
+        key: 'sparkDataCalcArray',
+        label: h(RouterLink, {to: {path:'/spark-data-calc-array'}}, () => '数组方式'),
+        title: 'sparkDataCalcArray',
       },
       {
-        key: 'dataCalcGroup',
-        label: h(RouterLink, {to: {path:'/data-calc-group'}}, () => '分组方式'),
-        title: 'dataCalcGroup',
+        key: 'sparkDataCalcGroup',
+        label: h(RouterLink, {to: {path:'/spark-data-calc-group'}}, () => '分组方式'),
+        title: 'sparkDataCalcGroup',
       },
     ]
   },
@@ -104,8 +104,8 @@ const headerNavMenuItems = ref<MenuProps['items']>([
           <a-flex :style="{ width: '100%', height: '100%', padding: '0 12px' }" :align="'center'">
             <a-button type="text" @click="() => (collapsed = !collapsed)"
                       style="font-size: 1.5rem; display: inline-block; height: 64px; margin-right: 20px;">
-              <menu-unfold-outlined v-if="collapsed" />
-              <menu-fold-outlined v-else />
+              <MenuUnfoldOutlined v-if="collapsed" />
+              <MenuFoldOutlined v-else />
             </a-button>
             <a-breadcrumb style="line-height: 64px; width: 50%; font-size: 1rem">
               <template v-for="item in breadcrumbsStore.breadcrumbs">

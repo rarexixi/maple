@@ -3,7 +3,7 @@ import { RouterView, RouterLink } from 'vue-router'
 import { h, ref } from "vue"
 import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 import zhCN from "ant-design-vue/es/locale/zh_CN"
-import type { MenuProps } from "ant-design-vue";
+import type { MenuProps } from "ant-design-vue"
 import * as AntdIcons from '@ant-design/icons-vue'
 
 const breadcrumbsStore = useBreadcrumbStore()

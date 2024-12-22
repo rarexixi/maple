@@ -2,6 +2,7 @@ package org.xi.maple.datacalc.spark.source
 
 import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.datacalc.spark.api.MapleSource
+import org.xi.maple.datacalc.spark.model.source.StarRocksSourceConfig
 
 import scala.collection.JavaConverters._
 
@@ -10,8 +11,8 @@ import scala.collection.JavaConverters._
  */
 class StarRocksSource extends MapleSource[StarRocksSourceConfig] {
 
-  override def getData: Dataset[Row] = {
-    val sourceTable = config.getDatabase + "." + config.getTable
+  override def getData(variables: java.util.Map[String, String]): Dataset[Row] = {
+    val sourceTable = config.getSourceTable.getTableIdentifierWithDb
     logger.info(s"Load data from starrocks http url: ${config.getFeHttpUrl}, jdbc url: ${config.getFeJdbcUrl}, username: ${config.getUser}, table: $sourceTable")
 
     var options = Map(

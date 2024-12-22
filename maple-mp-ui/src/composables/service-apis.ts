@@ -116,3 +116,10 @@ export const JobApis = {
   delete: getReqUrl('/api/jobs/{id|idList}', 'DELETE'),
 }
 
+export const JdbcApis = {
+  dbs: getReqUrl('/api/jdbc/{datasourceId}/dbs', 'GET'),
+  schemas: getReqUrl('/api/jdbc/{datasourceId}/schemas', 'GET'),
+  tables: getReqUrl('/api/jdbc/{datasourceId}/tables', 'GET'),
+  table: getReqUrl('/api/jdbc/{datasourceId}/table', 'GET'),
+}
+

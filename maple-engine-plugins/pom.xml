@@ -15,7 +15,14 @@
 
     <modules>
         <module>maple-engine-common</module>
-        <module>maple-spark</module>
-        <module>maple-flink</module>
+
+        <module>maple-spark/maple-spark-builder</module>
+        <module>maple-spark/apps/maple-spark-data-calc-models</module>
+        <module>maple-spark/apps/maple-spark-data-calc</module>
+        <module>maple-spark/apps/maple-spark-executor</module>
+
+        <module>maple-flink/maple-flink-builder</module>
+        <module>maple-flink/apps/maple-flink-data-calc-models</module>
+        <module>maple-flink/apps/maple-flink-data-calc</module>
     </modules>
 </project>

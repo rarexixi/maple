@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { DataOperationType } from "@/composables/common";
+import { DataOperationType } from "@/composables/common"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,20 +62,24 @@ const router = createRouter({
       })
     },
     {
-      path: '/data-calc-array',
-      name: 'dataCalcArray',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('@/views/data-calc/DataCalcArrayView.vue')
+      path: '/spark-data-calc-array',
+      name: 'sparkDataCalcArray',
+      component: () => import('@/views/data-calc/SparkDataCalcArrayView.vue')
     },
     {
-      path: '/data-calc-group',
-      name: 'dataCalcGroup',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('@/views/data-calc/DataCalcGroupView.vue')
+      path: '/spark-data-calc-group',
+      name: 'sparkDataCalcGroup',
+      component: () => import('@/views/data-calc/SparkDataCalcGroupView.vue')
+    },
+    {
+      path: '/flink-data-calc-array',
+      name: 'flinkDataCalcArray',
+      component: () => import('@/views/data-calc/FlinkDataCalcArrayView.vue')
+    },
+    {
+      path: '/flink-data-calc-group',
+      name: 'flinkDataCalcGroup',
+      component: () => import('@/views/data-calc/FlinkDataCalcGroupView.vue')
     },
   ]
 })

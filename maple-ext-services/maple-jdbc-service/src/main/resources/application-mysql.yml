@@ -1,0 +1,48 @@
+eureka:
+  instance:
+    metadata-map:
+      maple-tag: mysql
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+
+server:
+  port: 10002
+
+spring:
+  application:
+    name: maple-jdbc-service
+
+maple:
+  jdbc:
+    get-databases-sql:
+      SELECT SCHEMA_NAME AS `databaseName`
+      FROM information_schema.SCHEMATA
+      WHERE SCHEMA_NAME NOT IN ('mysql', 'information_schema', 'performance_schema')
+      ORDER BY SCHEMA_NAME
+    get-schemas-sql:
+    get-tables-sql: |
+      SELECT TABLE_NAME    AS `tableName`,
+             TABLE_COMMENT AS `tableComment`
+      FROM information_schema.TABLES
+      WHERE TABLE_SCHEMA = :databaseName
+        AND TABLE_TYPE = 'BASE TABLE'
+      ORDER BY TABLE_NAME
+    get-table-columns-sql:
+      SELECT COLUMN_NAME      AS `columnName`,
+             DATA_TYPE        AS `dataType`,
+             COLUMN_COMMENT   AS `columnComment`,
+             ORDINAL_POSITION AS `columnPosition`
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = :databaseName
+        AND TABLE_NAME = :tableName
+        AND DATA_TYPE<>'unspecified'
+      ORDER BY ORDINAL_POSITION
+    get-table-pk-columns-sql: |
+      SELECT COLUMN_NAME      AS `columnName`,
+             ORDINAL_POSITION AS `columnPosition`
+      FROM information_schema.KEY_COLUMN_USAGE
+      WHERE CONSTRAINT_SCHEMA = :databaseName
+        AND TABLE_NAME = :tableName
+        AND CONSTRAINT_NAME = 'PRIMARY'
+      ORDER BY ORDINAL_POSITION;

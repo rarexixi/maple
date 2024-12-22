@@ -29,7 +29,7 @@ CREATE TABLE `maple`.`maple_datasource`
     `id`              int                                    NOT NULL AUTO_INCREMENT,
     `name`            varchar(32)                            NOT NULL COMMENT '数据源名称',
     `description`     varchar(256) DEFAULT ''                NOT NULL COMMENT '数据源描述',
-    `datasource_type` varchar(32)                            NOT NULL COMMENT '数据源类型',
+    `datasource_type` varchar(32)                            NOT NULL COMMENT '数据源类型(rdbms, hdfs, hive, hbase, kafka, es, redis, ftp, http, etc)',
     `version`         varchar(32)                            NOT NULL COMMENT '数据源版本',
     `datasource_conf` json                                   NOT NULL COMMENT '数据源配置',
 
@@ -55,7 +55,7 @@ CREATE TABLE `maple`.`maple_material`
 (
     `id`             int                                   NOT NULL AUTO_INCREMENT,
     `name`           varchar(32)                           NOT NULL COMMENT '素材名称',
-    `description`           varchar(256)                          NOT NULL COMMENT '素材描述',
+    `description`    varchar(256)                          NOT NULL COMMENT '素材描述',
     `material_type`  varchar(32)                           NOT NULL COMMENT '素材类型',
     `visibility`     varchar(32)                           NOT NULL COMMENT '可见范围 (system, group, private)',
     `latest_version` int         DEFAULT 1                 NOT NULL COMMENT '最新版本',
@@ -84,7 +84,7 @@ CREATE TABLE `maple`.`maple_material_version`
     `material_id`   int                                NOT NULL COMMENT '素材ID',
     `store_path`    varchar(256)                       NOT NULL COMMENT '存储路径', -- 例如 HDFS 路径
     `file_sha256`   char(64)                           NOT NULL COMMENT '文件SHA256',
-    `description`          varchar(256)                       NOT NULL COMMENT '版本描述',
+    `description`   varchar(256)                       NOT NULL COMMENT '版本描述',
     `version`       int                                NOT NULL COMMENT '版本',
     `material_conf` json                               NOT NULL COMMENT '素材配置',
 
@@ -135,7 +135,7 @@ CREATE TABLE `maple`.`maple_cluster`
     `name`         varchar(32)                           NOT NULL COMMENT '集群名称',
     `category`     varchar(16)                           NOT NULL COMMENT '集群种类', -- YARN, K8s
     `address`      varchar(256)                          NOT NULL COMMENT '集群地址',
-    `description`         varchar(16) DEFAULT ''                NOT NULL COMMENT '集群说明',
+    `description`  varchar(16) DEFAULT ''                NOT NULL COMMENT '集群说明',
     `cluster_conf` json                                  NOT NULL COMMENT '集群配置',
 
     `disabled`     tinyint     DEFAULT 0                 NOT NULL COMMENT '是否禁用',
@@ -331,103 +331,34 @@ CREATE TABLE `maple`.`maple_job_queue`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci COMMENT = '作业队列';
 
-/**
-`id`              int                                    NOT NULL AUTO_INCREMENT COMMENT '执行ID',
-`exec_file`       varchar(256)                           NOT NULL COMMENT '执行文件',
-
-`from_app`        varchar(16)                            NOT NULL COMMENT '来源应用',           -- 用于区分哪个应用提交，例如调度系统，实时平台等
-`job_id`          varchar(32)                            NOT NULL COMMENT '作业ID',             -- 用于关联到某一个具体的作业配置
-`biz_id`          varchar(32)                            NOT NULL COMMENT '执行批次ID',         -- 某个作业同一个业务时间运行的实例的集合ID (可能包含多次执行)
-`exec_uniq_id`    varchar(32)                            NOT NULL COMMENT '应用作业执行唯一ID', -- 一个作业运行实例的ID，用于防止重复提交执行
-`exec_name`       varchar(32)  DEFAULT ''                NOT NULL COMMENT '执行名称',           -- 作业的code，用于生成集群上的名称
-
-`cluster`         varchar(32)                            NOT NULL COMMENT '提交集群',
-`resource_group`  varchar(256) DEFAULT ''                NOT NULL COMMENT '集群资源组',         -- 如 YARN、Volcano 的 Queue，K8s 的 Namespace 等
-`engine_category` varchar(16)  DEFAULT ''                NOT NULL COMMENT '引擎种类',           -- 如 Spark、Flink、Hive 等
-`engine_version`  varchar(16)  DEFAULT ''                NOT NULL COMMENT '引擎版本',
-`priority`        tinyint                                NOT NULL COMMENT '初始优先级',         -- 用于区分优先级，优先级高的先执行
-`run_pri`         tinyint                                NOT NULL COMMENT '运行优先级',
-`pri_upgradable`  bit          DEFAULT 0                 NOT NULL COMMENT '优先级可提升',       -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
-
-`group`           varchar(32)  DEFAULT ''                NOT NULL COMMENT '用户组',
-`user`            varchar(32)  DEFAULT ''                NOT NULL COMMENT '用户',
- */
-
 DROP TABLE IF EXISTS `maple`.`maple_sys_conf`;
 CREATE TABLE `maple`.`maple_sys_conf`
 (
-    `conf_key`   varchar(64)                            NOT NULL COMMENT '配置键',
-    `conf_value` json                                   NOT NULL COMMENT '配置值',
-    `description`       varchar(512) DEFAULT ''                NOT NULL COMMENT '配置说明',
+    `conf_key`    varchar(64)                            NOT NULL COMMENT '配置键',
+    `conf_value`  json                                   NOT NULL COMMENT '配置值',
+    `description` varchar(512) DEFAULT ''                NOT NULL COMMENT '配置说明',
 
-    `disabled`   tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
-    `created_by` int          DEFAULT 0                 NOT NULL COMMENT '创建人',
-    `updated_by` int          DEFAULT 0                 NOT NULL COMMENT '修改人',
-    `created_at` datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at` datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
+    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
+    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
+    `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     PRIMARY KEY (`conf_key`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci COMMENT ='系统配置';
 
-
-INSERT INTO maple_sys_conf(`conf_key`, `conf_value`, `desc`)
-VALUES ('job_run_types', '[
-  {
-    "type_code": "spark-data-calc",
-    "type_name": "Spark数据计算",
-    "icon": "spark-data-calc",
-    "color": "#1890ff",
-    "engine_versions": [
-      "3.*"
-    ]
-  },
-  {
-    "type_code": "flink-data-calc",
-    "type_name": "Flink数据计算",
-    "icon": "flink-data-calc",
-    "color": "#1890ff",
-    "engine_versions": [
-      "1.17.*"
-    ]
-  }
-]', '作业运行类型(例如：spark-sql, spark-data-calc等)');
-
-INSERT INTO maple_sys_conf(`conf_key`, `conf_value`, `desc`)
-VALUES ('engine_categories', '[
-  {
-    "value": "Spark",
-    "label": "spark"
-  },
-  {
-    "value": "Spark",
-    "label": "spark"
-  }
-]', '引擎种类类型(例如：spark, flink, hive等)');
-
-INSERT INTO maple_sys_conf(`conf_key`, `conf_value`, `desc`)
-VALUES ('cluster_categories', '[
-  {
-    "value": "K8s",
-    "label": "K8s"
-  },
-  {
-    "value": "YARN",
-    "label": "YARN"
-  }
-]', '集群种类类型(例如：K8s, YARN等)');
-
 DROP TABLE IF EXISTS `maple`.`maple_job`;
 CREATE TABLE `maple`.`maple_job`
 (
     `id`          int                                    NOT NULL AUTO_INCREMENT COMMENT '作业ID',
     `job_name`    varchar(64)                            NOT NULL COMMENT '作业名',
-    `desc`        varchar(256) DEFAULT ''                NOT NULL COMMENT '作业说明',
+    `description` varchar(256) DEFAULT ''                NOT NULL COMMENT '作业说明',
     `job_type`    varchar(8)                             NOT NULL COMMENT '作业类型', -- spark-sql, spark-data-calc, flink-data-calc
     `engine_id`   int                                    NOT NULL COMMENT '引擎ID',
     `owner`       varchar(32)  DEFAULT ''                NOT NULL COMMENT '作业负责人',
-    `run_conf` json                                   NOT NULL COMMENT '执行配置',
+    `run_conf`    json                                   NOT NULL COMMENT '执行配置',
     `job_conf`    json                                   NOT NULL COMMENT '作业配置', -- 启动参数，运行参数等，根据集群种类不同，配置不同
 
     `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
@@ -457,3 +388,28 @@ CREATE TABLE `maple`.`maple_job_ext_info`
   COLLATE = utf8_unicode_ci COMMENT = '执行作业结果';
 
 -- endregion
+
+
+CREATE TABLE test1
+(
+    id int NOT NULL AUTO_INCREMENT,
+    name varchar(32) NOT NULL,
+    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
+    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
+    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
+    PRIMARY KEY (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
+
+CREATE TABLE test2
+(
+    id int NOT NULL AUTO_INCREMENT,
+    name varchar(32) NOT NULL,
+    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
+    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
+    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
+    PRIMARY KEY (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;

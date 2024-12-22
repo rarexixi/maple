@@ -4,7 +4,7 @@ import type { ValidateErrorEntity } from "ant-design-vue/es/form/interface"
 import { useTemplateRef } from "vue"
 
 import common from "@/composables/common"
-import type { ValidatableComponent } from "@/composables/models";
+import type { ValidatableComponent } from "@/composables/models"
 
 import SparkConfig from "@/components/cluster-engine/SparkConfig.vue"
 import FlinkConfig from "@/components/cluster-engine/FlinkConfig.vue"

@@ -145,41 +145,6 @@ public class ClusterFilterCondition implements FilterCondition {
     private String description;
 
     /**
-     * 集群说明列表
-     */
-    private Collection<String> descIn;
-
-    /**
-     * 排除的集群说明列表
-     */
-    private Collection<String> descNotIn;
-
-    /**
-     * 集群说明不为空
-     */
-    private Boolean descIsNotEmpty;
-
-    /**
-     * 集群说明为空
-     */
-    private Boolean descIsEmpty;
-
-    /**
-     * 集群说明开始
-     */
-    private String descStartWith;
-
-    /**
-     * 集群说明结束
-     */
-    private String descEndWith;
-
-    /**
-     * 集群说明包含
-     */
-    private String descContains;
-
-    /**
      * 是否禁用
      */
     private Integer disabled;

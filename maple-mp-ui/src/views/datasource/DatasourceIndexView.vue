@@ -9,7 +9,7 @@ import type { OperateCallback } from "@/composables/table-operations"
 import { getMultiDataOperations, getSingleDataOperations } from "@/composables/table-operations"
 import { getSelection } from '@/composables/table-selection'
 import { useBreadcrumbStore } from "@/stores/breadcrumbs"
-import { request } from "@/utils/request-utils";
+import { request } from "@/utils/request-utils"
 
 import DataOperations from "@/components/DataOperations.vue"
 import TableOperations from "@/components/TableOperations.vue"
@@ -160,7 +160,7 @@ const getDatasourceTypeDetail = (datasourceConf: any) => {
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="search">
-          <search-outlined />
+          <SearchOutlined />
           搜索
         </a-button>
         <a-button @click="resetSearch">重置</a-button>
@@ -183,9 +183,9 @@ const getDatasourceTypeDetail = (datasourceConf: any) => {
             </a-menu>
           </template>
           <a-button type="primary">
-            <plus-outlined />
+            <PlusOutlined />
             添加
-            <down-outlined />
+            <DownOutlined />
           </a-button>
         </a-dropdown>
       </template>

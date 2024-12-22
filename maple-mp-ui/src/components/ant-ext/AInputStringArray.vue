@@ -14,7 +14,7 @@ const emit = defineEmits<{
 }>()
 
 const onValueBlur = (e: InputEvent) => {
-  const newValue: string = (e.target as any).value || '';
+  const newValue: string = (e.target as any).value || ''
   emit('update:value', newValue.split(separator).map(item => item.trim()))
 }
 </script>

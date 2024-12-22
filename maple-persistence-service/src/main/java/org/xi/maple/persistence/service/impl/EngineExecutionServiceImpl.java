@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -84,7 +85,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     @Transactional
     public List<Integer> batchCreate(List<EngineExecutionSaveReq> list) {
         if (list == null || list.isEmpty()) {
-            return List.of();
+            return Collections.emptyList();
         }
         List<EngineExecutionEntity> entityList = ObjectUtils.copy(list, EngineExecutionEntity.class);
         int count = engineExecutionMapper.batchInsert(entityList);

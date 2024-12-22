@@ -5,11 +5,10 @@ import { useTemplateRef } from "vue"
 import common from "@/composables/common"
 
 interface SparkRunConf {
-  driverMemory: string
-  driverCores: string
-  executorMemory: string
-  executorCores: string
-  numExecutors: string
+  jobmanagerMemory: string
+  taskmanagerMemory: string
+  numberOfTaskSlots: string
+  numTaskmangager: string
   jars: string
 }
 
@@ -18,20 +17,17 @@ const {runConf} = defineProps<{
 }>()
 
 const rules = {
-  driverMemory: [
+  jobmanagerMemory: [
     {required: true, message: 'driver-memory 不能为空', trigger: 'blur'}
   ],
-  driverCores: [
+  taskmanagerMemory: [
     {required: true, message: 'driver-cores 不能为空', trigger: 'blur'}
   ],
-  executorMemory: [
+  numberOfTaskSlots: [
     {required: true, message: 'executor-memory 不能为空', trigger: 'blur'}
   ],
-  executorCores: [
+  numTaskmangager: [
     {required: true, message: 'executor-cores 不能为空', trigger: 'blur'}
-  ],
-  numExecutors: [
-    {required: true, message: 'num-executors 不能为空', trigger: 'blur'}
   ],
 }
 
@@ -50,20 +46,17 @@ const labelWidth = 12
   <a-form ref="formRef" :model="runConf" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
     <a-flex wrap="wrap">
-        <a-form-item ref="driverMemory" label="driver-memory" name="driverMemory" class="form-item-320">
-          <a-input v-model:value.trim="runConf.driverMemory" type="text" />
+        <a-form-item ref="jobmanagerMemory" label="JM内存" name="jobmanagerMemory" class="form-item-320">
+          <a-input v-model:value.number="runConf.jobmanagerMemory" type="text" />
         </a-form-item>
-        <a-form-item ref="driverCores" label="driver-cores" name="driverCores" class="form-item-320">
-          <a-input v-model:value.number="runConf.driverCores" type="text" />
+        <a-form-item ref="taskmanagerMemory" label="TM内存" name="taskmanagerMemory" class="form-item-320">
+          <a-input v-model:value.trim="runConf.taskmanagerMemory" type="text" />
         </a-form-item>
-        <a-form-item ref="executorMemory" label="executor-memory" name="executorMemory" class="form-item-320">
-          <a-input v-model:value.trim="runConf.executorMemory" type="text" />
+        <a-form-item ref="numberOfTaskSlots" label="TM任务槽数" name="numberOfTaskSlots" class="form-item-320">
+          <a-input v-model:value.number="runConf.numberOfTaskSlots" type="text" />
         </a-form-item>
-        <a-form-item ref="executorCores" label="executor-cores" name="executorCores" class="form-item-320">
-          <a-input v-model:value.number="runConf.executorCores" type="text" />
-        </a-form-item>
-        <a-form-item ref="numExecutors" label="num-executors" name="numExecutors" class="form-item-320">
-          <a-input v-model:value.number="runConf.numExecutors" type="text" />
+        <a-form-item ref="numTaskmangager" label="TM个数" name="numTaskmangager" class="form-item-320">
+          <a-input v-model:value.number="runConf.numTaskmangager" type="text" />
         </a-form-item>
         <a-form-item ref="jars" label="jars" name="jars" class="form-item-320">
           <a-input v-model:value.number="runConf.jars" type="text" />

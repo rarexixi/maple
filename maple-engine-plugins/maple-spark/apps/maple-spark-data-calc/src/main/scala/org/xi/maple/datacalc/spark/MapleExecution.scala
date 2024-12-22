@@ -52,14 +52,14 @@ class MapleExecution[SR <: SourceConfig, TR <: TransformConfig, SK <: SinkConfig
   private def getExecution(dcType: String, dc: MapleDataConfig): (MaplePluginConfig, () => Unit, () => Unit) = {
     dcType match {
       case "source" =>
-        val plugin = PluginUtil.createSource[SR](dc.getName, dc.getConfig, spark, gv)
-        (plugin.getConfig, () => plugin.execute(), () => plugin.clean())
+        val plugin = PluginUtil.createSource[SR](dc.getName, dc.getConfig, spark)
+        (plugin.getConfig, () => plugin.execute(gv), () => plugin.clean())
       case "transformation" =>
-        val plugin = PluginUtil.createTransform[TR](dc.getName, dc.getConfig, spark, gv)
-        (plugin.getConfig, () => plugin.execute(), () => plugin.clean())
+        val plugin = PluginUtil.createTransform[TR](dc.getName, dc.getConfig, spark)
+        (plugin.getConfig, () => plugin.execute(gv), () => plugin.clean())
       case "sink" =>
-        val plugin = PluginUtil.createSink[SK](dc.getName, dc.getConfig, spark, gv)
-        (plugin.getConfig, () => plugin.execute(), () => plugin.clean())
+        val plugin = PluginUtil.createSink[SK](dc.getName, dc.getConfig, spark)
+        (plugin.getConfig, () => plugin.execute(gv), () => plugin.clean())
       case t: String =>
         throw new ConfigRuntimeException(s"[$t] is not a valid type")
     }

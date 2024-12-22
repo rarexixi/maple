@@ -95,6 +95,11 @@ Content-Type: application/json
 PUT http://localhost:8761/eureka/apps/maple-persistence-service/192.168.1.8:maple-persistence-service:8100/metadata?maple-tag=test-xi
 Accept: application/json
 Content-Type: application/json
+### 变更元数据
+
+GET http://localhost:8761/eureka/apps/maple-db-service/192.168.1.12:maple-db-service:10001
+Accept: application/json
+Content-Type: application/json
 
 ###
 

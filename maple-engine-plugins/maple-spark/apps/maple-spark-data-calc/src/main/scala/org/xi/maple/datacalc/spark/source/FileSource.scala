@@ -3,25 +3,22 @@ package org.xi.maple.datacalc.spark.source
 import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSource
+import org.xi.maple.datacalc.spark.model.source.FileSourceConfig
 
 class FileSource extends MapleSource[FileSourceConfig] {
 
   val defaultUriSchema = "hdfs://"
 
-  override protected def prepare(): Unit = {
-    config.setPath(VariableUtils.replaceVariables(config.getPath, variables))
-  }
-
-  override def getData: Dataset[Row] = {
+  override def getData(variables: java.util.Map[String, String]): Dataset[Row] = {
     val reader = spark.read
 
     if (config.getOptions != null && !config.getOptions.isEmpty) {
       reader.options(config.getOptions)
     }
     val path = if (config.getPath.startsWith("/")) {
-      defaultUriSchema + config.getPath
+      defaultUriSchema + VariableUtils.replaceVariables(config.getPath, variables)
     } else {
-      config.getPath
+      VariableUtils.replaceVariables(config.getPath, variables)
     }
 
     logger.info(s"Load data from file <$path>")

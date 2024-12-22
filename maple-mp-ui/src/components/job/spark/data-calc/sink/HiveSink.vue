@@ -1,39 +1,30 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { onMounted, useTemplateRef } from "vue"
+import { computed, onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
+import { getDatasourceOptions } from "@/composables/datasources"
+import type { validateFunction } from "@/composables/models"
+import type { HiveSinkConfig } from "@/composables/spark-jobs"
 
-import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
+import { useDatasourceStore } from "@/stores/sys-data"
+
+import ParamsMap from "@/components/ParamsMap.vue"
 
 import SampleData from "@/assets/sample-data"
-
-interface HiveSinkValue {
-  sourceTable: string,
-  sourceQuery: string,
-  options: any,
-  targetDatabase: string,
-  targetTable: string,
-  saveMode: string,
-  strongCheck: boolean,
-  writeAsFile: boolean,
-  numPartitions: number,
-}
+import TableSelectFormItems from "@/components/datasource/TableSelectFormItems.vue"
 
 const rules = {
-  targetDatabase: [{required: true}],
-  targetTable: [{required: true}],
   saveMode: [{required: true}],
   writeAsFile: [{required: true}],
   strongCheck: [{required: true}],
-  numPartitions: [{type: 'number', min: 0, max: 99}],
+  numPartitions: [{type: 'number', min: 0}],
   sourceTable: [{required: true}],
   sourceQuery: [{required: true}],
 }
 
 const {value, name} = defineProps<{
-  value: HiveSinkValue,
+  value: HiveSinkConfig,
   name: string,
 }>()
 
@@ -43,8 +34,12 @@ const validateMessages = {
     range: '${label}必须在${min}和${max}之间',
   },
 }
+
 const databases = SampleData.Databases
 const labelCols = common.Layout.labelCols
+
+const { dataList: datasourceList } = useDatasourceStore()
+const datasourceOptions = computed(() => getDatasourceOptions(datasourceList.value, 'hive'))
 
 const formRef = useTemplateRef<FormInstance>("formRef");
 const emit = defineEmits<{
@@ -60,16 +55,11 @@ onMounted(() => {
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
           :label-col="labelCols.w320">
     <a-flex wrap="wrap">
-      <a-form-item name="targetDatabase" label="目标库" class="form-item-320">
-        <a-select v-model:value="value.targetDatabase" placeholder="请选择">
-          <template v-for="db in databases" :key="db.databaseName">
-            <a-select-option :value="db.databaseName">{{ db.databaseName }}</a-select-option>
-          </template>
-        </a-select>
-      </a-form-item>
-      <a-form-item name="targetTable" label="目标表" class="form-item-320">
-        <a-input v-model:value="value.targetTable" />
-      </a-form-item>
+      <TableSelectFormItems v-model:database-name="value.targetTable.databaseName"
+                            v-model:schema-name="value.targetTable.schemaName"
+                            v-model:table-name="value.targetTable.tableName"
+                            :datasourceId="value.targetDatasource" :validated-name-prefix="['targetTable']" />
+      <a-flex-br />
       <a-form-item name="saveMode" label="写入模式" class="form-item-320">
         <a-radio-group v-model:value="value.saveMode">
           <a-radio-button value="append">追加</a-radio-button>
@@ -92,7 +82,7 @@ onMounted(() => {
         <a-textarea v-model:value="value.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }" />
       </a-form-item>
       <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-input-string-map v-model:value="value.options" />
+        <params-map v-model:value="value.options" />
       </a-form-item>
     </a-flex>
   </a-form>

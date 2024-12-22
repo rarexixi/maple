@@ -10,6 +10,12 @@ export interface SearchPageParams {
   pageSize: number
 }
 
+export interface RdbmsTable {
+  databaseName: string
+  schemaName: string
+  tableName: string
+}
+
 export type validateFunction = (setValidated: (success: boolean) => void) => Promise<void>
 
 export interface ValidatableComponent {

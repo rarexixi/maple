@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { FormInstance } from "ant-design-vue"
-import { reactive, onMounted, ref, useTemplateRef } from "vue"
+import { reactive, onMounted, useTemplateRef } from "vue"
 
 import common from '@/composables/common'
 import { listSearch, pageListSearch } from '@/composables/requests'
@@ -13,7 +13,7 @@ import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 import DataOperations from "@/components/DataOperations.vue"
 import TableOperations from "@/components/TableOperations.vue"
 import ClusterEngineUpsertForm from "@/components/cluster-engine/ClusterEngineUpsertForm.vue"
-import { useEngineCategoriesStore } from "@/stores/sys-conf";
+import { useEngineCategoriesStore } from "@/stores/sys-conf"
 
 const pkFields = ['id']
 
@@ -140,7 +140,7 @@ const {
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="search">
-          <search-outlined />
+          <SearchOutlined />
           搜索
         </a-button>
         <a-button @click="resetSearch">重置</a-button>
@@ -161,9 +161,9 @@ const {
             </a-menu>
           </template>
           <a-button type="primary">
-            <plus-outlined />
+            <PlusOutlined />
             添加
-            <down-outlined />
+            <DownOutlined />
           </a-button>
         </a-dropdown>
       </template>

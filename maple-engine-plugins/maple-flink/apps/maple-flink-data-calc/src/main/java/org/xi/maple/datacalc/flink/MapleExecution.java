@@ -1,14 +1,12 @@
 package org.xi.maple.datacalc.flink;
 
-import org.apache.flink.table.api.StatementSet;
-import org.apache.flink.table.api.TableEnvironment;
-import org.apache.flink.table.api.TableResult;
+import org.apache.flink.table.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.common.util.VariableUtils;
 import org.xi.maple.datacalc.flink.api.MaplePlugin;
-import org.xi.maple.datacalc.flink.api.TableInsert;
+import org.xi.maple.datacalc.flink.api.MapleSink;
 import org.xi.maple.datacalc.flink.exception.ConfigRuntimeException;
 import org.xi.maple.datacalc.flink.model.*;
 import org.xi.maple.datacalc.flink.util.PluginUtil;
@@ -18,6 +16,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class MapleExecution<T extends MapleData> {
 
@@ -50,7 +49,7 @@ public class MapleExecution<T extends MapleData> {
     }
 
     private void executeGroup(MapleGroupData mapleData) {
-        List<MaplePlugin> executions = new ArrayList<>();
+        List<MaplePlugin<?>> executions = new ArrayList<>();
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
             final Validator validator = validatorFactory.getValidator();
             for (MapleDataConfig dc : mapleData.getSources()) {
@@ -67,7 +66,7 @@ public class MapleExecution<T extends MapleData> {
     }
 
     private MaplePlugin<MaplePluginConfig> getAndCheckExecution(final Validator validator, PluginUtil.ExecutionType dcType, MapleDataConfig dc) {
-        MaplePlugin<MaplePluginConfig> execution = PluginUtil.createExecution(dcType, dc.getName(), dc.getConfig(), tableEnv, gv);
+        MaplePlugin<MaplePluginConfig> execution = PluginUtil.createExecution(dcType, dc.getName(), dc.getConfig(), tableEnv);
         checkPluginConfig(validator, execution.getConfig());
         return execution;
     }
@@ -77,11 +76,11 @@ public class MapleExecution<T extends MapleData> {
             throw new ConfigRuntimeException("plugins is empty");
         }
 
-        List<MaplePlugin> executions = new ArrayList<>(mapleData.getPlugins().length);
+        List<MaplePlugin<?>> executions = new ArrayList<>(mapleData.getPlugins().length);
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
             Validator validator = validatorFactory.getValidator();
             for (MapleDataConfig dc : mapleData.getPlugins()) {
-                MaplePlugin<MaplePluginConfig> execution = PluginUtil.createExecution(dc.getType(), dc.getName(), dc.getConfig(), tableEnv, gv);
+                MaplePlugin<MaplePluginConfig> execution = PluginUtil.createExecution(dc.getType(), dc.getName(), dc.getConfig(), tableEnv);
                 checkPluginConfig(validator, execution.getConfig());
                 executions.add(execution);
             }
@@ -89,25 +88,30 @@ public class MapleExecution<T extends MapleData> {
         executePlugins(executions);
     }
 
-    private void executePlugins(List<MaplePlugin> executions) {
+    private void executePlugins(List<MaplePlugin<?>> executions) {
         StatementSet statementSet = tableEnv.createStatementSet();
-        for (MaplePlugin execution : executions) {
+        for (MaplePlugin<?> execution : executions) {
             execution.define();
-            if (execution.getConfig() instanceof TableInsert) {
-                TableInsert tableInsert = (TableInsert) execution.getConfig();
-                statementSet.addInsertSql(tableInsert.getInsertSql());
+            if (execution instanceof MapleSink) {
+                TablePipeline tablePipeline = ((MapleSink<?>) execution).getTablePipeline();
+                statementSet.add(tablePipeline);
             }
             if (execution.getConfig().isTerminate()) {
                 break;
             }
         }
         TableResult tableResult = statementSet.execute();
+        try {
+            tableResult.await();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void checkPluginConfig(Validator validator, MaplePluginConfig config) {
         Set<ConstraintViolation<MaplePluginConfig>> validate = validator.validate(config);
         boolean success = true;
-        if (validate.size() > 0) {
+        if (!validate.isEmpty()) {
             logger.error("Configuration check error, {}", JsonUtils.toJsonString(config, ""));
             for (ConstraintViolation<MaplePluginConfig> violation : validate) {
                 if (violation.getMessageTemplate().startsWith("{") && violation.getMessageTemplate().endsWith("}")) {

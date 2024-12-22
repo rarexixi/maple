@@ -2,17 +2,11 @@
 import type { FormInstance } from "ant-design-vue"
 import { onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
+import type { validateFunction } from "@/composables/models"
+import type { SqlTransformConfig } from "@/composables/spark-jobs"
 
 import { useSparkStorageLevelsStore } from "@/stores/sys-conf"
-
-interface SqlTransformationValue {
-  resultTable: string,
-  persist: boolean,
-  storageLevel: string,
-  sql: string,
-}
 
 const rules = {
   resultTable: [{required: true}],
@@ -20,7 +14,7 @@ const rules = {
 }
 
 const {value, name} = defineProps<{
-  value: SqlTransformationValue,
+  value: SqlTransformConfig,
   name: string,
 }>()
 

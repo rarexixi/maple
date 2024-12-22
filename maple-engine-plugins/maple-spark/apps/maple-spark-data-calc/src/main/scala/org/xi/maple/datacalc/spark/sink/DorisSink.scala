@@ -3,6 +3,7 @@ package org.xi.maple.datacalc.spark.sink
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.datacalc.spark.api.MapleSink
+import org.xi.maple.datacalc.spark.model.sink.DorisSinkConfig
 
 import scala.collection.JavaConverters._
 
@@ -10,11 +11,10 @@ import scala.collection.JavaConverters._
  * https://doris.apache.org/zh-CN/docs/ecosystem/spark-doris-connector#%E5%86%99%E5%85%A5
  */
 class DorisSink extends MapleSink[DorisSinkConfig] {
-  override protected def prepare(): Unit = {
-  }
 
-  override def output(ds: Dataset[Row]): Unit = {
-    val targetTable = config.getTargetDatabase + "." + config.getTargetTable
+  override protected def exec(variables: java.util.Map[String, String]): Unit = {
+    val ds: Dataset[Row] = getData(variables)
+    val targetTable = config.getTargetTable.getTableIdentifierWithDb
     var options = Map(
       "doris.fenodes" -> config.getFenodes,
       "user" -> config.getUser,

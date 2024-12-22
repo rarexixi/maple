@@ -1,5 +1,8 @@
 package org.xi.maple.datacalc.flink.util;
 
+import org.xi.maple.datacalc.flink.exception.ConfigRuntimeException;
+import org.xi.maple.datacalc.flink.model.StructTableConfig;
+import org.xi.maple.datacalc.flink.model.definition.*;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
@@ -11,11 +14,11 @@ import org.apache.flink.sql.parser.ddl.SqlCreateTable;
 import org.apache.flink.sql.parser.ddl.SqlTableColumn;
 import org.apache.flink.sql.parser.impl.FlinkSqlParserImpl;
 import org.apache.flink.sql.parser.validate.FlinkSqlConformance;
+import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.api.TableDescriptor;
-import org.xi.maple.datacalc.flink.exception.ConfigRuntimeException;
-import org.xi.maple.datacalc.flink.model.StructTableConfig;
-import org.xi.maple.datacalc.flink.model.definition.*;
+import org.apache.flink.table.expressions.SqlCallExpression;
+import org.apache.flink.table.types.UnresolvedDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +61,7 @@ public class TableUtils {
                 ComputedColumn computedColumn = new ComputedColumn();
                 computedColumn.setName(cc.getName().toString());
             } else if (column instanceof SqlTableColumn.SqlRegularColumn) {
-                SqlTableColumn.SqlRegularColumn re =  (SqlTableColumn.SqlRegularColumn) column;
+                SqlTableColumn.SqlRegularColumn re = (SqlTableColumn.SqlRegularColumn) column;
             }
         }
         return columns;
@@ -94,31 +97,32 @@ public class TableUtils {
 
     public static TableDescriptor getTableDescriptor(StructTableConfig structTableConfig) {
         Schema.Builder schemaBuilder = Schema.newBuilder();
+
+        List<Schema.UnresolvedColumn> columns = new ArrayList<>(structTableConfig.getColumns().size());
         for (BaseColumn column : structTableConfig.getColumns()) {
             if (column instanceof PhysicalColumn) {
                 PhysicalColumn pc = (PhysicalColumn) column;
-                // new Schema.UnresolvedPhysicalColumn(pc.getName(), DataTypes.of(pc.getDataType()), pc.getComment());
-                schemaBuilder.column(pc.getName(), pc.getDataType()).withComment(pc.getComment());
+                UnresolvedDataType dataType = pc.isNullable() ? DataTypes.of(pc.getDataType()) : DataTypes.of(pc.getDataType()).notNull();
+                columns.add(new Schema.UnresolvedPhysicalColumn(pc.getName(), dataType, pc.getComment()));
             } else if (column instanceof MetadataColumn) {
                 MetadataColumn mc = (MetadataColumn) column;
-                // new Schema.UnresolvedMetadataColumn(mc.getName(), DataTypes.of(mc.getDataType()), mc.getMetadataKey(), mc.isVirtual(), mc.getComment());
-                schemaBuilder.columnByMetadata(mc.getName(), mc.getDataType(), mc.getMetadataKey(), mc.isVirtual()).withComment(mc.getComment());
+                columns.add(new Schema.UnresolvedMetadataColumn(mc.getName(), DataTypes.of(mc.getDataType()), mc.getMetadataKey(), mc.isVirtual(), mc.getComment()));
             } else if (column instanceof ComputedColumn) {
                 ComputedColumn cc = (ComputedColumn) column;
-                // new Schema.UnresolvedComputedColumn(cc.getName(), new SqlCallExpression(cc.getExpression()), cc.getComment());
-                schemaBuilder.columnByExpression(cc.getName(), cc.getExpression()).withComment(cc.getComment());
+                columns.add(new Schema.UnresolvedComputedColumn(cc.getName(), new SqlCallExpression(cc.getExpression()), cc.getComment()));
             }
         }
+        schemaBuilder.fromColumns(columns);
+
         if (structTableConfig.getPrimaryKey() != null) {
             PrimaryKeyDefinition pk = structTableConfig.getPrimaryKey();
             if (StringUtils.isBlank(pk.getName())) {
-                schemaBuilder.primaryKey(pk.getColumns());
                 schemaBuilder.primaryKey(pk.getColumns());
             } else {
                 schemaBuilder.primaryKeyNamed(pk.getName(), pk.getColumns());
             }
         }
-        if (structTableConfig.getWatermark() != null) {
+        if (structTableConfig.getWatermark() != null && StringUtils.isNotBlank(structTableConfig.getWatermark().getColumnName())) {
             WatermarkDefinition watermark = structTableConfig.getWatermark();
             schemaBuilder.watermark(watermark.getColumnName(), watermark.getExpression());
         }

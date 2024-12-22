@@ -26,9 +26,10 @@ public class PluginUtil {
 
     private static Map<String, Class<?>> getSourcePlugins() {
         Map<String, Class<?>> classMap = new HashMap<>();
-        classMap.put("managed_jdbc", ManagedJdbcSource.class);
         classMap.put("jdbc", JdbcSource.class);
         classMap.put("file", FileSource.class);
+        classMap.put("doris", DorisSource.class);
+        classMap.put("starrocks", StarRocksSource.class);
         return classMap;
     }
 
@@ -40,26 +41,27 @@ public class PluginUtil {
 
     private static Map<String, Class<?>> getSinkPlugins() {
         Map<String, Class<?>> classMap = new HashMap<>();
-        classMap.put("managed_jdbc", ManagedJdbcSink.class);
         classMap.put("jdbc", JdbcSink.class);
         classMap.put("hive", HiveSink.class);
         classMap.put("file", FileSink.class);
+        classMap.put("doris", DorisSink.class);
+        classMap.put("starrocks", StarRocksSink.class);
         return classMap;
     }
     
-    public static <T extends SourceConfig> MapleSource<T> createSource(String name, Map<String, Object> config, SparkSession spark, Map<String, String> variables) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        return createPlugin(SOURCE_PLUGINS, name, config, spark, variables);
+    public static <T extends SourceConfig> MapleSource<T> createSource(String name, Map<String, Object> config, SparkSession spark) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return createPlugin(SOURCE_PLUGINS, name, config, spark);
     }
 
-    public static <T extends TransformConfig> MapleTransform<T> createTransform(String name, Map<String, Object> config, SparkSession spark, Map<String, String> variables) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        return createPlugin(TRANSFORM_PLUGINS, name, config, spark, variables);
+    public static <T extends TransformConfig> MapleTransform<T> createTransform(String name, Map<String, Object> config, SparkSession spark) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return createPlugin(TRANSFORM_PLUGINS, name, config, spark);
     }
 
-    public static <T extends SinkConfig> MapleSink<T> createSink(String name, Map<String, Object> config, SparkSession spark, Map<String, String> variables) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        return createPlugin(SINK_PLUGINS, name, config, spark, variables);
+    public static <T extends SinkConfig> MapleSink<T> createSink(String name, Map<String, Object> config, SparkSession spark) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return createPlugin(SINK_PLUGINS, name, config, spark);
     }
 
-    public static <T extends MaplePlugin> T createPlugin(Map<String, Class<?>> pluginMap, String name, Map<String, Object> config, SparkSession spark, Map<String, String> variables) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static <T extends MaplePlugin> T createPlugin(Map<String, Class<?>> pluginMap, String name, Map<String, Object> config, SparkSession spark) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         Class<?> pluginClass = pluginMap.get(name);
         if (pluginClass == null) {
             throw new IllegalArgumentException("Plugin name not found in the map: " + name);
@@ -69,7 +71,6 @@ public class PluginUtil {
         T plugin = (T) pluginClass.getDeclaredConstructor().newInstance();
         plugin.setConfig(JsonUtils.convertValue(config, configType));
         plugin.setSpark(spark);
-        plugin.setVariables(variables);
         return plugin;
     }
 }

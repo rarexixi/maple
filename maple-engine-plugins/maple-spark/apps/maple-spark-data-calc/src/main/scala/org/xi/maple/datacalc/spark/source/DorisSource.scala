@@ -2,6 +2,7 @@ package org.xi.maple.datacalc.spark.source
 
 import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.datacalc.spark.api.MapleSource
+import org.xi.maple.datacalc.spark.model.source.DorisSourceConfig
 
 import scala.collection.JavaConverters._
 
@@ -10,9 +11,9 @@ import scala.collection.JavaConverters._
  */
 class DorisSource extends MapleSource[DorisSourceConfig] {
 
-  override def getData: Dataset[Row] = {
+  override def getData(variables: java.util.Map[String, String]): Dataset[Row] = {
 
-    val sourceTable = config.getDatabase + "." + config.getTable
+    val sourceTable = config.getSourceTable.getTableIdentifierWithDb
     logger.info(s"Load data from doris fenodes: ${config.getFenodes}, table: $sourceTable, username: ${config.getUser}")
 
     var options = Map(

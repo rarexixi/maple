@@ -8,8 +8,8 @@ trait MapleResultTablePlugin[T <: ResultTableConfig] extends MaplePlugin[T] with
 
   private var ds: Dataset[Row] = _
 
-  override protected def exec(): Unit = {
-    ds = getData
+  override protected def exec(variables: java.util.Map[String, String]): Unit = {
+    ds = getData(variables)
     if (ds == null) return
     ds.createOrReplaceTempView(config.getResultTable)
     if (config.getPersist) {
@@ -24,7 +24,5 @@ trait MapleResultTablePlugin[T <: ResultTableConfig] extends MaplePlugin[T] with
       ds.unpersist()
     }
   }
-
-  protected def getData: Dataset[Row]
 }
 

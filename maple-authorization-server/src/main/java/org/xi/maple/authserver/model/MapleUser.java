@@ -5,10 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -27,7 +24,7 @@ public class MapleUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (permissions == null) {
-            return List.of();
+            return Collections.emptyList();
         }
         return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }

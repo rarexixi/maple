@@ -1,37 +1,25 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { onMounted, useTemplateRef } from "vue"
+import { computed, onMounted, useTemplateRef } from "vue"
 
-import type { validateFunction } from "@/composables/models"
 import common from "@/composables/common"
+import { getDatasourceOptions } from "@/composables/datasources"
+import type { JdbcSourceConfig } from "@/composables/flink-jobs"
+import type { validateFunction } from "@/composables/models"
 
-import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
+import { useDatasourceStore } from "@/stores/sys-data"
+import { useDatabaseTypesOfFlinkJdbcSupportedStore } from "@/stores/sys-conf"
 
-import { useSparkStorageLevelsStore } from "@/stores/sys-conf"
-
-interface JdbcSourceValue {
-  resultTable: string,
-  persist: boolean,
-  storageLevel: string,
-  options: any,
-  url: string,
-  driver: string,
-  user: string,
-  password: string,
-  query: string,
-  table: string,
-}
+import ParamsMap from "@/components/ParamsMap.vue"
+import TableSelectFormItems from "@/components/datasource/TableSelectFormItems.vue"
 
 const rules = {
   resultTable: [{required: true}],
-  driver: [{required: true}],
-  user: [{required: true}],
-  password: [{required: true}],
-  url: [{required: true}],
+  datasourceId: [{ required: true }],
 }
 
-const {value, name} = defineProps<{
-  value: JdbcSourceValue,
+const { value, name } = defineProps<{
+  value: JdbcSourceConfig,
   name: string,
 }>()
 
@@ -42,8 +30,11 @@ const validateMessages = {
   },
 }
 
-const { confOptions: storageLevels } = useSparkStorageLevelsStore()
 const labelCols = common.Layout.labelCols
+
+const { dataList: datasourceList } = useDatasourceStore()
+const { confArray: jdbcTypes } = useDatabaseTypesOfFlinkJdbcSupportedStore()
+const datasourceOptions = computed(() => getDatasourceOptions(datasourceList.value, ...jdbcTypes.value))
 
 const formRef = useTemplateRef<FormInstance>("formRef");
 const emit = defineEmits<{
@@ -53,46 +44,40 @@ const emit = defineEmits<{
 onMounted(() => {
   emit('push-validated', common.getFormValidateFun(formRef))
 })
+
+function getTable(tableDetail: any) {
+}
 </script>
 
 <template>
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
           :label-col="labelCols.w320">
     <a-flex wrap="wrap">
-      <a-form-item name="resultTable" label="注册表名" :label-col="labelCols.w320"
-                   class="form-item-320">
+      <a-form-item name="resultTable" label="注册表名" class="form-item-320">
         <a-input v-model:value="value.resultTable" />
       </a-form-item>
-      <a-form-item name="persist" label="开启缓存" class="form-item-320">
-        <a-switch v-model:checked="value.persist" />
+      <a-form-item name="comment" label="说明" class="form-item-320">
+        <a-input v-model:value="value.comment" />
       </a-form-item>
-      <a-form-item name="storageLevel" label="缓存级别" class="form-item-320">
-        <a-select v-model:value="value.storageLevel" :options="storageLevels" :disabled="!value.persist" />
+      <a-flex-br />
+      <a-form-item name="datasourceId" label="数据源" class="form-item-320">
+        <a-select v-model:value="value.datasourceId" :options="datasourceOptions" placeholder="请选择" />
       </a-form-item>
-      <a-form-item name="driver" label="驱动类名" :label-col="labelCols.w320"
-                   class="form-item-320">
-        <a-input v-model:value="value.driver" />
+      <TableSelectFormItems v-model:database-name="value.rdbmsTable.databaseName"
+                            v-model:schema-name="value.rdbmsTable.schemaName"
+                            v-model:table-name="value.rdbmsTable.tableName"
+                            :datasourceId="value.datasourceId" :validated-name-prefix="['rdbmsTable']"
+                            :require-table="true" @change-table="getTable" />
+      <a-flex-br />
+      <a-form-item :name="['watermark', 'columnName']" label="watermark" class="form-item-320">
+        <a-select v-model:value="value.watermark.columnName" />
       </a-form-item>
-      <a-form-item name="user" label="用户名" :label-col="labelCols.w320"
-                   class="form-item-320">
-        <a-input v-model:value="value.user" />
-      </a-form-item>
-      <a-form-item name="password" label="密码" :label-col="labelCols.w320"
-                   class="form-item-320">
-        <a-input-password v-model:value="value.password" />
-      </a-form-item>
-      <a-form-item name="url" label="jdbc url" :label-col="labelCols.w1280"
-                   class="form-item-1280">
-        <a-input v-model:value="value.url" />
-      </a-form-item>
-      <a-form-item name="table" label="来源表" :label-col="labelCols.w320" class="form-item-320">
-        <a-input v-model:value="value.table" />
-      </a-form-item>
-      <a-form-item name="query" label="查询语句" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-textarea v-model:value="value.query" :auto-size="{ minRows: 2, maxRows: 20 }" />
+      <a-form-item :name="['watermark', 'delaySeconds']" class="form-item-320">
+        <a-input-number v-model:value="value.watermark.delaySeconds" style="width: 50%" addon-before="延迟"
+                        addon-after="秒" />
       </a-form-item>
       <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-input-string-map v-model:value="value.options" />
+        <params-map v-model:value="value.options" />
       </a-form-item>
     </a-flex>
   </a-form>

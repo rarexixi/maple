@@ -45,7 +45,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
             <if test="entity.jobName != null">#{entity.jobName},</if>
-            <if test="entity.desc != null">#{entity.desc},</if>
+            <if test="entity.description != null">#{entity.description},</if>
             <if test="entity.jobType != null">#{entity.jobType},</if>
             <if test="entity.engineId != null">#{entity.engineId},</if>
             <if test="entity.owner != null">#{entity.owner},</if>
@@ -66,7 +66,7 @@
         (
             `id`,
             `job_name`,
-            `desc`,
+            `description`,
             `job_type`,
             `engine_id`,
             `owner`,
@@ -83,7 +83,7 @@
         (
             #{item.id},
             #{item.jobName},
-            #{item.desc},
+            #{item.description},
             #{item.jobType},
             #{item.engineId},
             #{item.owner},
@@ -111,8 +111,8 @@
             <if test="entity.jobName != null">
                 `job_name` = #{entity.jobName},
             </if>
-            <if test="entity.desc != null">
-                `desc` = #{entity.desc},
+            <if test="entity.description != null">
+                `description` = #{entity.description},
             </if>
             <if test="entity.jobType != null">
                 `job_type` = #{entity.jobType},
@@ -147,7 +147,7 @@
         UPDATE <include refid="tableName"/>
         <set>
             `job_name` = #{entity.jobName},
-            `desc` = #{entity.desc},
+            `description` = #{entity.description},
             `job_type` = #{entity.jobType},
             `engine_id` = #{entity.engineId},
             `owner` = #{entity.owner},
@@ -166,7 +166,7 @@
         SELECT
             MT.`id`,
             MT.`job_name`,
-            MT.`desc`,
+            MT.`description`,
             MT.`job_type`,
             MT.`engine_id`,
             `T0`.`name` `engine_text`,
@@ -196,7 +196,7 @@
             <otherwise>
                 MT.`id`,
                 MT.`job_name`,
-                MT.`desc`,
+                MT.`description`,
                 MT.`job_type`,
                 MT.`engine_id`,
                 MT.`owner`,

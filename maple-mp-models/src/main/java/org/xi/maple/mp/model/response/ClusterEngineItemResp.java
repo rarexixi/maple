@@ -5,6 +5,7 @@ import org.xi.maple.common.util.JsonUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 @Data
@@ -66,6 +67,6 @@ public class ClusterEngineItemResp implements Serializable {
     private LocalDateTime updatedAt;
 
     public Map<String, Object> getEngineConf() {
-        return (Map<String, Object>) JsonUtils.parseObject(engineConf, Map.class, Map.of());
+        return (Map<String, Object>) JsonUtils.parseObject(engineConf, Map.class, Collections.emptyMap());
     }
 }

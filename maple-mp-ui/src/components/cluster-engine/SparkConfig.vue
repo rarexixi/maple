@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue";
-import { useTemplateRef } from "vue";
-import type { FormInstance } from "ant-design-vue";
-import common from "@/composables/common";
+import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
+import { useTemplateRef } from "vue"
+import type { FormInstance } from "ant-design-vue"
+import common from "@/composables/common"
 
 const conf = defineModel<any>()
 
 const removeConfOption = (index: number) => {
-  conf.value.forbiddenConfs.splice(index, 1);
-};
+  conf.value.forbiddenConfs.splice(index, 1)
+}
+
 const addConfOption = () => {
   conf.value.forbiddenConfs.push({
     name: '',
@@ -74,7 +75,7 @@ defineExpose({
           </td>
           <td>
             <a-form-item label="" :name="['forbiddenConfs', index, 'description']" :label-col="subFormLabelCol">
-              <a-input v-model:value="confOption.desc" class="forbidden-conf-desc" />
+              <a-input v-model:value="confOption.description" class="forbidden-conf-desc" />
             </a-form-item>
           </td>
         </tr>

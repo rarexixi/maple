@@ -5,17 +5,16 @@ import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
 import org.apache.spark.sql.{Dataset, Row}
 import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSink
+import org.xi.maple.datacalc.spark.model.sink.JdbcSinkConfig
 
 import java.sql.{Connection, DriverManager, PreparedStatement}
 import scala.collection.JavaConverters._
 
 class JdbcSink extends MapleSink[JdbcSinkConfig] {
-  override protected def prepare(): Unit = {
-    config.setPreQueries(config.getPreQueries.asScala.map(query => VariableUtils.replaceVariables(query, variables)).asJava)
-  }
 
-  override def output(ds: Dataset[Row]): Unit = {
-    val targetTable = config.getTargetDatabase + "." + config.getTargetTable
+  override protected def exec(variables: java.util.Map[String, String]): Unit = {
+    val ds: Dataset[Row] = getData(variables)
+    val targetTable = config.getTargetTable.getTableIdentifierWithDb
     var options = Map(
       "url" -> config.getUrl,
       "driver" -> config.getDriver,
@@ -40,7 +39,8 @@ class JdbcSink extends MapleSink[JdbcSinkConfig] {
         var conn: Connection = null
         try {
           conn = DriverManager.getConnection(config.getUrl, config.getUser, config.getPassword)
-          config.getPreQueries.asScala.foreach(query => {
+          config.getPreQueries.asScala.foreach(preQuery => {
+            val query = VariableUtils.replaceVariables(preQuery, variables)
             logger.info(s"Execute pre query: $query")
             execute(conn, jdbcOptions, query)
           })

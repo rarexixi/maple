@@ -3,31 +3,15 @@ package org.xi.maple.datacalc.spark.sink
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{Dataset, Row}
-import org.xi.maple.common.util.VariableUtils
 import org.xi.maple.datacalc.spark.api.MapleSink
+import org.xi.maple.datacalc.spark.model.sink.HiveSinkConfig
 import org.xi.maple.datacalc.spark.util.HiveSinkUtils
-
-import scala.collection.JavaConverters.mapAsScalaMapConverter
 
 class HiveSink extends MapleSink[HiveSinkConfig] {
 
-  private val currentVariables: java.util.Map[String, String] = new java.util.HashMap[String, String]()
-
-  override protected def prepare(): Unit = {
-    if (variables != null) {
-      variables.asScala.foreach { case (key, value) =>
-        this.currentVariables.put(key, value)
-      }
-    }
-    if (config.getVariables != null) {
-      config.getVariables.asScala.foreach { case (key, value) =>
-        this.currentVariables.put(key, VariableUtils.replaceVariables(value, variables))
-      }
-    }
-  }
-
-  override def output(ds: Dataset[Row]): Unit = {
-    val targetTable = config.getTargetDatabase + "." + config.getTargetTable
+  override protected def exec(variables: java.util.Map[String, String]): Unit = {
+    val ds: Dataset[Row] = getData(variables)
+    val targetTable = config.getTargetTable.getTableIdentifierWithDb
     val targetFields = spark.table(targetTable).schema.fields
     if (config.getWriteAsFile != null && config.getWriteAsFile) {
       val partitionsColumns = spark.catalog.listColumns(targetTable)
@@ -35,7 +19,7 @@ class HiveSink extends MapleSink[HiveSinkConfig] {
         .select("name")
         .collect()
         .map(_.getAs[String]("name"))
-      val location = HiveSinkUtils.getLocation(spark, targetTable, partitionsColumns, currentVariables.asScala.toMap)
+      val location = HiveSinkUtils.getLocation(spark, targetTable, partitionsColumns, variables)
       val fileFormat = HiveSinkUtils.getTableFileFormat(spark, targetTable)
 
       logger.info(s"Write $fileFormat into target table: $targetTable, location: $location, file format: $fileFormat")
@@ -48,7 +32,7 @@ class HiveSink extends MapleSink[HiveSinkConfig] {
         case _ =>
       }
 
-      val partition = partitionsColumns.map(colName => s"$colName='${currentVariables.get(colName)}'").mkString(",")
+      val partition = partitionsColumns.map(colName => s"$colName='${variables.get(colName)}'").mkString(",")
       if (StringUtils.isNotBlank(partition)) {
         logger.info(s"Refresh table partition: $partition")
         HiveSinkUtils.refreshPartition(spark, targetTable, partition)

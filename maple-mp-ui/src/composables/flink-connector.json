@@ -1,0 +1,31 @@
+{
+  "source": {
+    "jdbc": [
+      {
+        "option": "",
+        "required": "",
+        "default": "",
+        "type": "",
+        "description": ""
+      }
+    ],
+    "kafka": [],
+    "upsert-kafka": [],
+    "doris": [],
+    "starrocks": [],
+    "mysql-cdc": [],
+    "postgres-cdc": [],
+    "oracle-cdc": [],
+    "sqlserver-cdc": [],
+    "db2-cdc": [],
+    "tidb-cdc": [],
+    "oceanbase-cdc": []
+  },
+  "sink": {
+    "jdbc": [],
+    "kafka": [],
+    "upsert-kafka": [],
+    "doris": [],
+    "starrocks": []
+  }
+}

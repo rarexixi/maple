@@ -275,29 +275,6 @@
                     <if test="condition.description != null and condition.description != ''">
                         AND MT.`description` = #{condition.description}
                     </if>
-                    <if test="condition.descriptionIn != null and condition.descriptionIn.size() > 0">
-                        AND MT.`description` IN
-                        <foreach collection="condition.descriptionIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.descriptionNotIn != null and condition.descriptionNotIn.size() > 0">
-                        AND MT.`description` NOT IN
-                        <foreach collection="condition.descriptionNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.descriptionIsNotEmpty != null and condition.descriptionIsNotEmpty == true">
-                        AND MT.`description` IS NOT NULL AND `description` != ''
-                    </if>
-                    <if test="condition.descriptionIsEmpty != null and condition.descriptionIsEmpty == true">
-                        AND (MT.`description` IS NULL OR MT.`description` = '')
-                    </if>
-                    <if test="condition.descriptionStartWith != null and condition.descriptionStartWith != ''">
-                        AND MT.`description` LIKE concat(#{condition.descriptionStartWith}, '%')
-                    </if>
-                    <if test="condition.descriptionEndWith != null and condition.descriptionEndWith != ''">
-                        AND MT.`description` LIKE concat('%', #{condition.descriptionEndWith})
-                    </if>
-                    <if test="condition.descriptionContains != null and condition.descriptionContains != ''">
-                        AND MT.`description` LIKE concat('%', #{condition.descriptionContains}, '%')
-                    </if>
                     <if test="condition.datasourceType != null and condition.datasourceType != ''">
                         AND MT.`datasource_type` = #{condition.datasourceType}
                     </if>

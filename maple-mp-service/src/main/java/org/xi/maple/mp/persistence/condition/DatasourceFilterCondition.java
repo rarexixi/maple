@@ -92,40 +92,6 @@ public class DatasourceFilterCondition implements FilterCondition {
      */
     private String description;
 
-    /**
-     * 数据源描述列表
-     */
-    private Collection<String> descriptionIn;
-
-    /**
-     * 排除的数据源描述列表
-     */
-    private Collection<String> descriptionNotIn;
-
-    /**
-     * 数据源描述不为空
-     */
-    private Boolean descriptionIsNotEmpty;
-
-    /**
-     * 数据源描述为空
-     */
-    private Boolean descriptionIsEmpty;
-
-    /**
-     * 数据源描述开始
-     */
-    private String descriptionStartWith;
-
-    /**
-     * 数据源描述结束
-     */
-    private String descriptionEndWith;
-
-    /**
-     * 数据源描述包含
-     */
-    private String descriptionContains;
 
     /**
      * 数据源类型

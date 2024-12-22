@@ -1,0 +1,63 @@
+eureka:
+  instance:
+    metadata-map:
+      maple-tag: postgresql
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+
+server:
+  port: 10001
+
+spring:
+  application:
+    name: maple-jdbc-service
+
+maple:
+  jdbc:
+    get-databases-sql:
+    get-schemas-sql: |
+      SELECT schema_name AS "schemaName"
+      FROM information_schema.schemata
+      WHERE schema_name <> 'information_schema' AND schema_name !~ '^pg_';
+    get-tables-sql: |
+      SELECT t.table_name  AS "tableName",
+             d.description AS "tableComment"
+      FROM information_schema.tables t
+               LEFT JOIN 
+               (
+                   SELECT n.nspname AS table_schema, c.relname AS table_name, d.description
+                   FROM pg_class c
+                            JOIN pg_namespace n ON n.oid = c.relnamespace
+                            LEFT JOIN pg_description d ON d.objsubid = 0 AND d.objoid = c.oid
+               ) d ON d.table_schema = t.table_schema AND d.table_name = t.table_name
+      WHERE t.table_schema = :schemaName
+        AND t.table_type = 'BASE TABLE'
+    get-table-columns-sql: |
+      SELECT c.column_name      AS "columnName",
+             c.udt_name         AS "dataType",
+             d.description      AS "columnComment",
+             c.ordinal_position AS "columnPosition"
+      FROM information_schema.columns c
+               LEFT JOIN 
+               (
+                   SELECT d.objoid, d.objsubid, d.description, n.nspname AS table_schema, c.relname AS table_name
+                   FROM pg_description d
+                            JOIN pg_class c ON d.objoid = c.oid
+                            JOIN pg_namespace n ON c.relnamespace = n.oid
+               ) d ON d.table_schema = c.table_schema AND d.table_name = c.table_name AND d.objsubid = c.ordinal_position
+      WHERE c.table_schema = :schemaName
+        AND c.table_name = :tableName
+      ORDER BY c.ordinal_position
+    get-table-pk-columns-sql: |
+      SELECT a.attname AS "columnName",
+             idx.idx   AS "columnPosition"
+      FROM pg_index i
+               JOIN pg_class c ON c.oid = i.indrelid
+               JOIN pg_namespace n ON n.oid = c.relnamespace
+               JOIN pg_attribute a ON a.attnum = ANY (i.indkey) AND a.attrelid = c.oid
+               JOIN UNNEST(i.indkey) WITH ORDINALITY AS idx(key, idx) ON a.attnum = key
+      WHERE i.indisprimary
+        AND n.nspname = :schemaName
+        AND c.relname = :tableName
+      ORDER BY idx.idx

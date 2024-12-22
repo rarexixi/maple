@@ -6,7 +6,7 @@ import { ref, reactive, watch } from "vue"
 import common from '@/composables/common'
 import type { PageInfo } from '@/composables/models'
 import { request } from '@/utils/request-utils'
-import { SysConfApis } from "@/composables/service-apis";
+import { SysConfApis } from "@/composables/service-apis"
 
 export function listSearch(listRequestConfig: AxiosRequestConfig,
                            searchParams: UnwrapRef<any>,
@@ -16,10 +16,12 @@ export function listSearch(listRequestConfig: AxiosRequestConfig,
                            }) {
   const dataList = ref<any[]>([])
   const dataMap = reactive<any>({})
+  const dataInitialized = ref(false)
   const search = () => {
     request({ ...listRequestConfig, params: { ...searchParams } }).then(response => {
       dataList.value = convertToList(response)
       setMap(response, dataMap)
+      dataInitialized.value = true
     })
   }
   const resetSearch = () => {
@@ -27,7 +29,7 @@ export function listSearch(listRequestConfig: AxiosRequestConfig,
   }
 
   search()
-  return { dataList, dataMap, search, resetSearch }
+  return { dataList, dataMap, search, resetSearch, dataInitialized }
 }
 
 export function pageListSearch(pageListRequestConfig: AxiosRequestConfig,
@@ -67,6 +69,7 @@ export function getArrayConf(configKey: string, valueField: string = "value", la
   const confMap = reactive<any>({})
   const confOptions = ref<any[]>([])
   const confOptionMap = reactive<any>({})
+  const confInitialized = ref(false)
 
   request(SysConfApis.detail(configKey)).then(response => {
     confArray.value = JSON.parse(response.confValue);
@@ -76,13 +79,13 @@ export function getArrayConf(configKey: string, valueField: string = "value", la
         confOptionMap[item] = item
         return { value: item, label: item }
       } else {
-
         confMap[item[valueField]] = item
         confOptionMap[item[valueField]] = item[labelField]
         return { value: item[valueField], label: item[labelField] }
       }
     })
+    confInitialized.value = true
   })
 
-  return { confArray, confMap, confOptions, confOptionMap }
+  return { confArray, confMap, confOptions, confOptionMap, confInitialized }
 }

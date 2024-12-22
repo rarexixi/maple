@@ -12,40 +12,102 @@
           {
             "columnType": "physical",
             "definition": {
-              "name": "",
+              "name": "type_code",
               "comment": "",
-              "dataType": ""
+              "dataType": "String",
+              "nullable": false
             }
           },
           {
-            "columnType": "metadata",
+            "columnType": "physical",
             "definition": {
-              "name": "",
+              "name": "type_name",
               "comment": "",
-              "dataType": "",
-              "dataType": "",
-              "metadataKey": "",
-              "virtual": false
+              "dataType": "String"
             }
           },
           {
-            "columnType": "computed",
+            "columnType": "physical",
             "definition": {
-              "expression": ""
+              "name": "icon",
+              "comment": "",
+              "dataType": "String"
             }
-          }],
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "classifier",
+              "comment": "",
+              "dataType": "String"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "versions",
+              "comment": "",
+              "dataType": "String"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "configurations",
+              "comment": "",
+              "dataType": "String"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "disabled",
+              "comment": "",
+              "dataType": "TINYINT"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "created_by",
+              "comment": "",
+              "dataType": "INTEGER"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "updated_by",
+              "comment": "",
+              "dataType": "INTEGER"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "created_at",
+              "comment": "",
+              "dataType": "TIMESTAMP"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "updated_at",
+              "comment": "",
+              "dataType": "TIMESTAMP"
+            }
+          }
+        ],
         "primaryKey": {
           "name": "",
-          "columns": ["id"]
-        },
-        "watermark" : {
-
+          "columns": ["type_code"]
         },
         "partitionColumns": [],
-        "url": "jdbc:mysql://localhost:3306/",
-        "table": "",
+        "url": "jdbc:mysql://localhost:3306/test",
+        "table": "maple_datasource_type",
         "driver": "com.mysql.cj.jdbc.Driver",
-        "user": "xi_root",
+        "username": "xi_root",
         "password": "123456",
         "options": {
         }
@@ -57,43 +119,107 @@
       "config": {
         "tableName": "sink_001",
         "comment": "sink_001",
+        "sourceTableName": "source_001",
         "columns": [
           {
             "columnType": "physical",
             "definition": {
-              "name": "",
+              "name": "type_code",
               "comment": "",
-              "dataType": ""
+              "dataType": "String",
+              "nullable": false
             }
           },
           {
-            "columnType": "metadata",
+            "columnType": "physical",
             "definition": {
-              "name": "",
+              "name": "type_name",
               "comment": "",
-              "dataType": "",
-              "metadataKey": "",
-              "virtual": false
+              "dataType": "String"
             }
           },
           {
-            "columnType": "computed",
+            "columnType": "physical",
             "definition": {
-              "expression": ""
+              "name": "icon",
+              "comment": "",
+              "dataType": "String"
             }
-          }],
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "classifier",
+              "comment": "",
+              "dataType": "String"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "versions",
+              "comment": "",
+              "dataType": "String"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "configurations",
+              "comment": "",
+              "dataType": "String"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "disabled",
+              "comment": "",
+              "dataType": "TINYINT"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "created_by",
+              "comment": "",
+              "dataType": "INTEGER"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "updated_by",
+              "comment": "",
+              "dataType": "INTEGER"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "created_at",
+              "comment": "",
+              "dataType": "TIMESTAMP"
+            }
+          },
+          {
+            "columnType": "physical",
+            "definition": {
+              "name": "updated_at",
+              "comment": "",
+              "dataType": "TIMESTAMP"
+            }
+          }
+        ],
         "primaryKey": {
           "name": "",
-          "columns": ["id"]
-        },
-        "watermark" : {
-
+          "columns": ["type_code"]
         },
         "partitionColumns": [],
-        "url": "jdbc:mysql://localhost:3306/",
-        "table": "",
+        "url": "jdbc:mysql://localhost:3306/test",
+        "table": "maple_datasource_type2",
         "driver": "com.mysql.cj.jdbc.Driver",
-        "user": "xi_root",
+        "username": "xi_root",
         "password": "123456",
         "options": {
         }
