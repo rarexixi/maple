@@ -2,22 +2,16 @@ import type { PageInfo, ValidatableComponent } from "@/composables/models"
 import { type FormInstance, notification } from 'ant-design-vue'
 import { ref, type ShallowRef } from "vue"
 
-const SortEnum = {ASC: 'ASC', DESC: 'DESC'}
+const SortEnum = { ASC: 'ASC', DESC: 'DESC' }
 const PageSizeOptions = ['10', '20', '50', '100']
-const DefaultSearchParams = {defaultPageNum: 1, defaultPageSize: 50}
+const DefaultSearchParams = { defaultPageNum: 1, defaultPageSize: 50 }
 
 const Layout = {
   labelCols: {
-    w160: { span: 16 },
-    w320: { span: 8 },
-    w640: { span: 4 },
-    w1280: { span: 2 },
+    l125: { style: { width: '125px' } },
   },
   wrapCols: {
-    w160: { offset: 16 },
-    w320: { offset: 8 },
-    w640: { offset: 4 },
-    w1280: { offset: 2 },
+    l125: { style: { marginLeft: '125px' } },
   },
 }
 
@@ -42,7 +36,7 @@ function getDefaultPageInfo(): PageInfo {
 function convertToOptions(valueField: string, labelField: string) {
   return (list: any[]) => {
     return list.map(item => {
-      return {value: item[valueField], label: item[labelField]}
+      return { value: item[valueField], label: item[labelField] }
     })
   }
 }
@@ -56,7 +50,7 @@ function setOptionMap(keyField: string, valueField: string) {
 }
 
 function notifyValidateError() {
-  notification.error({message: "参数验证失败"})
+  notification.error({ message: "参数验证失败" })
 }
 
 // (setValidated: (success: boolean) => void) => Promise<void>

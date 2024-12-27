@@ -13,4 +13,7 @@ public abstract class MaplePlugin<T extends MaplePluginConfig> implements TableD
     public MaplePlugin(TableEnvironment tableEnv) {
         this.tableEnv = tableEnv;
     }
+
+    public void prepare() {
+    }
 }

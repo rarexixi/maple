@@ -107,8 +107,9 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" layout="inline">
-      <a-form-item label="类型编码">
+    <a-form ref="searchForm" :model="searchParams" labelAlign="left" :label-col="{style:{width:'70px'}}">
+      <a-flex wrap="wrap">
+      <a-form-item label="类型编码" class="form-item-240">
         <a-input v-model:value.trim="searchParams.typeCode" allow-clear />
       </a-form-item>
       <a-form-item>
@@ -118,6 +119,7 @@ const {
         </a-button>
         <a-button @click="resetSearch">重置</a-button>
       </a-form-item>
+      </a-flex>
     </a-form>
   </div>
   <div class="list-table">

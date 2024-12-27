@@ -30,26 +30,26 @@ const {
   resetSearch
 } = pageListSearch(ClusterApis.pageList(), searchParams, useTemplateRef<FormInstance>("searchForm"))
 const selection = getSelection()
-const {selected, rowSelection} = selection
+const { selected, rowSelection } = selection
 
-const {confOptions: categoryOptions} = useClusterCategoriesStore()
+const { confOptions: categoryOptions } = useClusterCategoriesStore()
 
 onMounted(() => {
   // 设置面包屑
-  const {setBreadcrumb} = useBreadcrumbStore()
-  setBreadcrumb([{text: '集群'}])
+  const { setBreadcrumb } = useBreadcrumbStore()
+  setBreadcrumb([{ text: '集群' }])
 })
 
 const columns = [
-  {title: '集群ID', dataIndex: 'id', key: 'id'},
-  {title: '集群名称', dataIndex: 'name', key: 'name'},
-  {title: '集群种类', dataIndex: 'category', key: 'category'},
-  {title: '集群地址', dataIndex: 'address', key: 'address'},
-  {title: '创建人', dataIndex: 'createdBy', key: 'createdBy'},
-  {title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy'},
-  {title: '创建时间', dataIndex: 'createdAt', key: 'createdAt'},
-  {title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt'},
-  {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
+  { title: '集群ID', dataIndex: 'id', key: 'id' },
+  { title: '集群名称', dataIndex: 'name', key: 'name' },
+  { title: '集群种类', dataIndex: 'category', key: 'category' },
+  { title: '集群地址', dataIndex: 'address', key: 'address' },
+  { title: '创建人', dataIndex: 'createdBy', key: 'createdBy' },
+  { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
+  { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
+  { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+  { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120 },
 ]
 
 const callback: OperateCallback = {
@@ -65,9 +65,9 @@ const callback: OperateCallback = {
     detail.description = response.description
     detail.clusterConf = response.clusterConf
     if (response.category == 'K8s') {
-      detail.clusterConf = {config: {clientCertData: '', ...response.clusterConf.config}}
+      detail.clusterConf = { config: { clientCertData: '', ...response.clusterConf.config } }
     } else {
-      detail.clusterConf = {...response.clusterConf}
+      detail.clusterConf = { ...response.clusterConf }
     }
   },
   research: search,
@@ -114,20 +114,22 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" layout="inline">
-      <a-form-item label="集群ID">
-        <a-input-number v-model:value="searchParams.id" allow-clear />
-      </a-form-item>
-      <a-form-item label="集群地址">
-        <a-input v-model:value.trim="searchParams.addressContains" allow-clear />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="search">
-          <SearchOutlined />
-          搜索
-        </a-button>
-        <a-button @click="resetSearch">重置</a-button>
-      </a-form-item>
+    <a-form ref="searchForm" :model="searchParams" labelAlign="left" :label-col="{style:{width:'70px'}}">
+      <a-flex>
+        <a-form-item label="集群ID" class="form-item-240">
+          <a-input v-model:value.number="searchParams.id" allow-clear />
+        </a-form-item>
+        <a-form-item label="集群地址" class="form-item-240">
+          <a-input v-model:value.trim="searchParams.addressContains" allow-clear />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="search">
+            <SearchOutlined />
+            搜索
+          </a-button>
+          <a-button @click="resetSearch">重置</a-button>
+        </a-form-item>
+      </a-flex>
     </a-form>
   </div>
   <div class="list-table">

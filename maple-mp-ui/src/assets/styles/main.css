@@ -20,18 +20,22 @@
     margin-bottom: 0;
 }
 
-.form-item-160 {
-    width: 160px;
+.form-item-240 {
+    width: 240px;
 }
 
-.form-item-320 {
-    width: 320px;
+.form-item-360 {
+    width: 360px;
 }
 
-.form-item-640 {
-    width: 640px;
+.form-item-480 {
+    width: 480px;
 }
 
-.form-item-1280 {
-    width: 1280px;
+.form-item-720 {
+    width: 720px;
+}
+
+.form-item-960 {
+    width: 960px;
 }

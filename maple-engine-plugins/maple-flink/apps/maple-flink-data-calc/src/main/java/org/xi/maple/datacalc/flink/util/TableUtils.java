@@ -98,33 +98,28 @@ public class TableUtils {
     public static TableDescriptor getTableDescriptor(StructTableConfig structTableConfig) {
         Schema.Builder schemaBuilder = Schema.newBuilder();
 
-        List<Schema.UnresolvedColumn> columns = new ArrayList<>(structTableConfig.getColumns().size());
-        for (BaseColumn column : structTableConfig.getColumns()) {
-            if (column instanceof PhysicalColumn) {
-                PhysicalColumn pc = (PhysicalColumn) column;
-                UnresolvedDataType dataType = pc.isNullable() ? DataTypes.of(pc.getDataType()) : DataTypes.of(pc.getDataType()).notNull();
-                columns.add(new Schema.UnresolvedPhysicalColumn(pc.getName(), dataType, pc.getComment()));
-            } else if (column instanceof MetadataColumn) {
-                MetadataColumn mc = (MetadataColumn) column;
-                columns.add(new Schema.UnresolvedMetadataColumn(mc.getName(), DataTypes.of(mc.getDataType()), mc.getMetadataKey(), mc.isVirtual(), mc.getComment()));
-            } else if (column instanceof ComputedColumn) {
-                ComputedColumn cc = (ComputedColumn) column;
-                columns.add(new Schema.UnresolvedComputedColumn(cc.getName(), new SqlCallExpression(cc.getExpression()), cc.getComment()));
-            }
+        List<Schema.UnresolvedColumn> columns = new ArrayList<>();
+        for (PhysicalColumn pc : structTableConfig.getPhysicalColumns()) {
+            UnresolvedDataType dataType = pc.isNullable() ? DataTypes.of(pc.getDataType()) : DataTypes.of(pc.getDataType()).notNull();
+            columns.add(new Schema.UnresolvedPhysicalColumn(pc.getName(), dataType, pc.getComment()));
+        }
+        for (MetadataColumn mc : structTableConfig.getMetadataColumns()) {
+            columns.add(new Schema.UnresolvedMetadataColumn(mc.getName(), DataTypes.of(mc.getDataType()), mc.getMetadataKey(), mc.isVirtual(), mc.getComment()));
+        }
+        for (ComputedColumn cc : structTableConfig.getComputedColumns()) {
+            columns.add(new Schema.UnresolvedComputedColumn(cc.getName(), new SqlCallExpression(cc.getExpression()), cc.getComment()));
         }
         schemaBuilder.fromColumns(columns);
 
-        if (structTableConfig.getPrimaryKey() != null) {
-            PrimaryKeyDefinition pk = structTableConfig.getPrimaryKey();
-            if (StringUtils.isBlank(pk.getName())) {
-                schemaBuilder.primaryKey(pk.getColumns());
+        if (structTableConfig.getPkColumns() != null && structTableConfig.getPkColumns().length > 0) {
+            if (StringUtils.isBlank(structTableConfig.getPkName())) {
+                schemaBuilder.primaryKey(structTableConfig.getPkColumns());
             } else {
-                schemaBuilder.primaryKeyNamed(pk.getName(), pk.getColumns());
+                schemaBuilder.primaryKeyNamed(structTableConfig.getPkName(), structTableConfig.getPkColumns());
             }
         }
-        if (structTableConfig.getWatermark() != null && StringUtils.isNotBlank(structTableConfig.getWatermark().getColumnName())) {
-            WatermarkDefinition watermark = structTableConfig.getWatermark();
-            schemaBuilder.watermark(watermark.getColumnName(), watermark.getExpression());
+        if (StringUtils.isNotBlank(structTableConfig.getWmColumn())) {
+            schemaBuilder.watermark(structTableConfig.getWmColumn(), structTableConfig.getWatermarkExpression());
         }
 
         TableDescriptor.Builder tableBuilder = TableDescriptor.forConnector(structTableConfig.getConnector()).schema(schemaBuilder.build());

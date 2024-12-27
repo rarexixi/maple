@@ -28,18 +28,18 @@ const {
   resetSearch
 } = pageListSearch(SysConfApis.pageList(), searchParams, useTemplateRef<FormInstance>("searchForm"))
 const selection = getSelection()
-const {selected, rowSelection} = selection
+const { selected, rowSelection } = selection
 
 onMounted(() => {
   // 设置面包屑
-  const {setBreadcrumb} = useBreadcrumbStore()
-  setBreadcrumb([{text: '系统配置'}])
+  const { setBreadcrumb } = useBreadcrumbStore()
+  setBreadcrumb([{ text: '系统配置' }])
 })
 
 const columns = [
   { title: '配置键', dataIndex: 'confKey', key: 'confKey' },
   { title: '配置说明', dataIndex: 'description', key: 'description' },
-  {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
+  { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120 },
 ]
 
 const callback: OperateCallback = {
@@ -98,17 +98,19 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" layout="inline">
-      <a-form-item label="配置键">
-        <a-input v-model:value.trim="searchParams.confKey" allow-clear />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="search">
-          <SearchOutlined />
-          搜索
-        </a-button>
-        <a-button @click="resetSearch">重置</a-button>
-      </a-form-item>
+    <a-form ref="searchForm" :model="searchParams" labelAlign="left" :label-col="{style:{width:'60px'}}">
+      <a-flex wrap="wrap">
+        <a-form-item label="配置键" class="form-item-240">
+          <a-input v-model:value.trim="searchParams.confKey" allow-clear />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="search">
+            <SearchOutlined />
+            搜索
+          </a-button>
+          <a-button @click="resetSearch">重置</a-button>
+        </a-form-item>
+      </a-flex>
     </a-form>
   </div>
   <div class="list-table">
@@ -138,7 +140,7 @@ const {
       {{ drawerTitle }}
     </template>
     <SysConfUpsertForm ref="detailFormRef" v-model="detail"
-                            @save="upsert">
+                       @save="upsert">
       <template #buttons>
         <a-button style="margin-left: 10px" @click="() => closeUpsertDrawer()">取消</a-button>
       </template>

@@ -1,15 +1,36 @@
 import type { RdbmsTable } from "@/composables/models"
 
-export interface WatermarkDefinition {
-  columnName: string
-  delaySeconds: number
+export interface PhysicalColumn {
+  name: String
+  comment: String
+  dataType: String
+  nullable: boolean;
+}
+
+export interface MetadataColumn {
+  name: string
+  comment: string
+  dataType: string
+  metadataKey: string
+  virtual: boolean
+}
+
+export interface ComputedColumn {
+  name: string
+  comment: string
+  expression: string
 }
 
 export interface TableDefinition {
   datasourceId: number
-  resultTable: String
-  comment: String
-  watermark: WatermarkDefinition
+  resultTable: string
+  comment: string
+  physicalColumns: PhysicalColumn[]
+  metadataColumns: MetadataColumn[]
+  computedColumns: ComputedColumn[]
+  pkColumns: string[]
+  wmColumn: string
+  wmDelaySeconds: number
   partitionColumns: string[]
   options: any
 }
@@ -18,10 +39,12 @@ export interface BaseSource extends TableDefinition {
 }
 
 export interface BaseTransformation {
-  resultTable: String
+  resultTable: string
 }
 
 export interface BaseSink extends TableDefinition {
+  sourceTable: string
+  sourceQuery: string
 }
 
 export interface Db2CdcSourceConfig extends BaseSource {
@@ -112,7 +135,6 @@ export interface StarRocksSinkConfig extends BaseSink {
 
 export interface UpsertKafkaSinkConfig extends BaseSink {
   topic: string
-  format: string
   keyFormat: string
   valueFormat: string
   valueFieldsInclude: string
@@ -122,10 +144,12 @@ const getBaseSource = () => ({
   datasourceId: undefined,
   resultTable: undefined,
   comment: undefined,
-  watermark: {
-    columnName: undefined,
-    delaySeconds: 5,
-  },
+  physicalColumns: [],
+  metadataColumns: [],
+  computedColumns: [],
+  pkColumns: [],
+  wmColumn: undefined,
+  wmDelaySeconds: undefined,
   partitionColumns: [],
   options: {},
 })
@@ -138,10 +162,12 @@ const getBaseSink = () => ({
   datasourceId: undefined,
   resultTable: undefined,
   comment: undefined,
-  watermark: {
-    columnName: undefined,
-    delaySeconds: 5,
-  },
+  physicalColumns: [],
+  metadataColumns: [],
+  computedColumns: [],
+  pkColumns: [],
+  wmColumn: undefined,
+  wmDelaySeconds: undefined,
   partitionColumns: [],
   options: {},
 })
@@ -252,7 +278,7 @@ const FlinkDataCalcModels: any = {
         scanStartupMode: undefined,
         keyFormat: undefined,
         valueFormat: undefined,
-        valueFieldsInclude: undefined,
+        valueFieldsInclude: 'ALL',
       }
     }),
   },
@@ -311,7 +337,7 @@ const FlinkDataCalcModels: any = {
         format: undefined,
         keyFormat: undefined,
         valueFormat: undefined,
-        valueFieldsInclude: undefined,
+        valueFieldsInclude: 'ALL',
       }
     }),
   },

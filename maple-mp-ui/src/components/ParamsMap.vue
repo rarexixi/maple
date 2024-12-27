@@ -4,16 +4,16 @@ import { ref } from "vue"
 import AInputStringMap from "@/components/ant-ext/AInputStringMap.vue"
 
 const value = defineModel<any>("value")
-const showOptions = ref<boolean>(false)
+const showOptions = defineModel<boolean>("showOptions")
 
 const confirm = () => {
 };
 </script>
 
 <template>
-  <a-popconfirm placement="top" @confirm="confirm">
+  <a-popconfirm placement="top" @confirm="confirm" :show-cancel="false">
     <template #title>
-      <a-input-string-map v-model:value="value" style="width: 640px" />
+      <a-input-string-map v-model:value="value" style="width: 600px" />
     </template>
     <a-button>设置参数</a-button>
   </a-popconfirm>
@@ -24,5 +24,4 @@ const confirm = () => {
 </template>
 
 <style scoped>
-
 </style>

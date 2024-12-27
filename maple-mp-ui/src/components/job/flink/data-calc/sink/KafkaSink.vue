@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { computed, onMounted, useTemplateRef } from "vue"
+import { onMounted, useTemplateRef } from "vue"
 
 import common from "@/composables/common"
-import { getDatasourceOptions } from "@/composables/datasources"
 import type { KafkaSinkConfig } from "@/composables/flink-jobs"
 import type { validateFunction } from "@/composables/models"
 
-import { useDatasourceStore } from "@/stores/sys-data"
-
-import ParamsMap from "@/components/ParamsMap.vue"
+import SinkJobSourceForms from "@/components/job/SinkJobSourceForms.vue"
+import FlinkKafkaTableFormItems from "@/components/job/flink/data-calc/FlinkKafkaTableFormItems.vue"
 
 const rules = {
-  path: [{required: true}],
-  serializer: [{required: true}],
-  saveMode: [{required: true}],
-  numPartitions: [{required: true}],
-  sourceTable: [{required: true}],
-  sourceQuery: [{required: true}],
+  topic: [{required: true}],
+  format: [{required: true}],
 }
 
 const {value, name} = defineProps<{
@@ -34,9 +28,6 @@ const validateMessages = {
 
 const labelCols = common.Layout.labelCols
 
-const { dataList: datasourceList } = useDatasourceStore()
-const datasourceOptions = computed(() => getDatasourceOptions(datasourceList.value, 'db2'))
-
 const formRef = useTemplateRef<FormInstance>("formRef");
 const emit = defineEmits<{
   (e: 'push-validated', param: validateFunction): void
@@ -50,35 +41,30 @@ onMounted(() => {
 
 <template>
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
-          :label-col="labelCols.w320">
+          :label-col="labelCols.l125">
     <a-flex wrap="wrap">
-      <a-form-item name="resultTable" label="注册表名" class="form-item-320">
-        <a-input v-model:value="value.resultTable" />
-      </a-form-item>
-      <a-form-item name="comment" label="说明" class="form-item-320">
-        <a-input v-model:value="value.comment" />
-      </a-form-item>
+      <FlinkKafkaTableFormItems
+          v-model:result-table="value.resultTable"
+          v-model:comment="value.comment"
+          v-model:datasource-id="value.datasourceId"
+          v-model:topic="value.topic"
+          v-model:physical-columns="value.physicalColumns"
+          v-model:metadata-columns="value.metadataColumns"
+          v-model:computed-columns="value.computedColumns"
+          v-model:pk-columns="value.pkColumns"
+          v-model:wm-column="value.wmColumn"
+          v-model:wm-delay-seconds="value.wmDelaySeconds"
+          v-model:partition-columns="value.partitionColumns"
+          v-model:options="value.options"
+          :datasource-types="['kafka']">
+        <template #definedOptions>
+          <a-form-item name="format" label="format" class="form-item-360">
+            <a-input v-model:value="value.format" />
+          </a-form-item>
+        </template>
+      </FlinkKafkaTableFormItems>
       <a-flex-br />
-      <a-form-item name="datasourceId" label="数据源" class="form-item-320">
-        <a-select v-model:value="value.datasourceId" :options="datasourceOptions" placeholder="请选择" />
-      </a-form-item>
-      <a-flex-br />
-      <a-form-item :name="['watermark', 'columnName']" label="watermark" class="form-item-320">
-        <a-select v-model:value="value.watermark.columnName" />
-      </a-form-item>
-      <a-form-item :name="['watermark', 'delaySeconds']" class="form-item-320">
-        <a-input-number v-model:value="value.watermark.delaySeconds" style="width: 50%" addon-before="延迟"
-                        addon-after="秒" />
-      </a-form-item>
-      <a-form-item name="topic" label="topic" class="form-item-320">
-        <a-input v-model:value="value.topic" />
-      </a-form-item>
-      <a-form-item name="format" label="format" class="form-item-320">
-        <a-input v-model:value="value.format" />
-      </a-form-item>
-      <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <params-map v-model:value="value.options" />
-      </a-form-item>
+      <SinkJobSourceForms v-model:sourceTable="value.sourceTable" v-model:sourceQuery="value.sourceQuery" />
     </a-flex>
   </a-form>
 </template>

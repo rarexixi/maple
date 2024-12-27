@@ -32,7 +32,7 @@ const {
   resetSearch
 } = pageListSearch(ClusterEngineApis.pageList(), searchParams, useTemplateRef<FormInstance>("searchForm"))
 const selection = getSelection()
-const {selected, rowSelection} = selection
+const { selected, rowSelection } = selection
 
 const clusterSearchParams = reactive<any>({
   deleted: 0
@@ -42,25 +42,30 @@ const {
   dataMap: clusterOptionMap
 } = listSearch(ClusterApis.list(), clusterSearchParams, undefined, common.convertToOptions('id', 'name'), common.setOptionMap('id', 'name'))
 
-const {confOptions: nameOptions} = useEngineCategoriesStore()
+const { confOptions: nameOptions } = useEngineCategoriesStore()
 
 onMounted(() => {
   // 设置面包屑
-  const {setBreadcrumb} = useBreadcrumbStore()
-  setBreadcrumb([{text: '计算引擎'}])
+  const { setBreadcrumb } = useBreadcrumbStore()
+  setBreadcrumb([{ text: '计算引擎' }])
 })
 
 const columns = [
-  {title: '引擎ID', dataIndex: 'id', key: 'id'},
-  {title: '所属集群', dataIndex: 'clusterId', key: 'clusterId', customRender: (row: any) => clusterOptionMap[row.text]},
-  {title: '引擎名称', dataIndex: 'name', key: 'name'},
-  {title: '引擎版本', dataIndex: 'version', key: 'version'},
-  {title: '引擎目录', dataIndex: 'engineHome', key: 'engineHome'},
-  {title: '创建人', dataIndex: 'createdBy', key: 'createdBy'},
-  {title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy'},
-  {title: '创建时间', dataIndex: 'createdAt', key: 'createdAt'},
-  {title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt'},
-  {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
+  { title: '引擎ID', dataIndex: 'id', key: 'id' },
+  {
+    title: '所属集群',
+    dataIndex: 'clusterId',
+    key: 'clusterId',
+    customRender: (row: any) => clusterOptionMap[row.text]
+  },
+  { title: '引擎名称', dataIndex: 'name', key: 'name' },
+  { title: '引擎版本', dataIndex: 'version', key: 'version' },
+  { title: '引擎目录', dataIndex: 'engineHome', key: 'engineHome' },
+  { title: '创建人', dataIndex: 'createdBy', key: 'createdBy' },
+  { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
+  { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
+  { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+  { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120 },
 ]
 
 const callback: OperateCallback = {
@@ -125,26 +130,28 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" layout="inline">
-      <a-form-item label="引擎ID">
-        <a-input-number v-model:value="searchParams.id" allow-clear />
-      </a-form-item>
-      <a-form-item label="所属集群">
-        <a-select v-model:value="searchParams.clusterId" :options="clusterOptions" allow-clear placeholder="全部" />
-      </a-form-item>
-      <a-form-item label="引擎名称">
-        <a-select v-model:value="searchParams.name" :options="nameOptions" allow-clear placeholder="全部" />
-      </a-form-item>
-      <a-form-item label="引擎版本">
-        <a-input v-model:value.trim="searchParams.versionContains" allow-clear />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="search">
-          <SearchOutlined />
-          搜索
-        </a-button>
-        <a-button @click="resetSearch">重置</a-button>
-      </a-form-item>
+    <a-form ref="searchForm" :model="searchParams" labelAlign="left" :label-col="{style:{width:'70px'}}">
+      <a-flex wrap="wrap">
+        <a-form-item label="引擎ID" class="form-item-320">
+          <a-input v-model:value.number="searchParams.id" allow-clear />
+        </a-form-item>
+        <a-form-item label="所属集群" class="form-item-320">
+          <a-select v-model:value="searchParams.clusterId" :options="clusterOptions" allow-clear placeholder="全部" />
+        </a-form-item>
+        <a-form-item label="引擎名称" class="form-item-320">
+          <a-select v-model:value="searchParams.name" :options="nameOptions" allow-clear placeholder="全部" />
+        </a-form-item>
+        <a-form-item label="引擎版本" class="form-item-320">
+          <a-input v-model:value.trim="searchParams.versionContains" allow-clear />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="search">
+            <SearchOutlined />
+            搜索
+          </a-button>
+          <a-button @click="resetSearch">重置</a-button>
+        </a-form-item>
+      </a-flex>
     </a-form>
   </div>
   <div class="list-table">
@@ -199,4 +206,9 @@ const {
 
 </template>
 
-<style scoped></style>
+<style scoped>
+.form-item-320 {
+  width: 250px;
+}
+</style>
+

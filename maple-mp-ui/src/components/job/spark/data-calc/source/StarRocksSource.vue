@@ -10,7 +10,7 @@ import type { StarRocksSourceConfig } from "@/composables/spark-jobs"
 import { useSparkStorageLevelsStore } from "@/stores/sys-conf"
 import { useDatasourceStore } from "@/stores/sys-data"
 
-import ParamsMap from "@/components/ParamsMap.vue"
+import ConfOptionsForm from "@/components/job/ConfOptionsForm.vue"
 import TableSelectFormItems from "@/components/datasource/TableSelectFormItems.vue"
 
 const rules = {
@@ -48,19 +48,19 @@ onMounted(() => {
 
 <template>
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
-          :label-col="labelCols.w320">
+          :label-col="labelCols.l125">
     <a-flex wrap="wrap">
-      <a-form-item name="resultTable" label="注册表名" class="form-item-320">
+      <a-form-item name="resultTable" label="注册表名" class="form-item-360">
         <a-input v-model:value="value.resultTable" />
       </a-form-item>
-      <a-form-item name="persist" label="开启缓存" class="form-item-320">
+      <a-form-item name="persist" label="开启缓存" class="form-item-360">
         <a-switch v-model:checked="value.persist" />
       </a-form-item>
-      <a-form-item name="storageLevel" label="缓存级别" class="form-item-320">
+      <a-form-item name="storageLevel" label="缓存级别" class="form-item-360">
         <a-select v-model:value="value.storageLevel" :options="storageLevels" :disabled="!value.persist" />
       </a-form-item>
       <a-flex-br/>
-      <a-form-item name="datasource" label="数据源" class="form-item-320">
+      <a-form-item name="datasource" label="数据源" class="form-item-360">
         <a-select v-model:value="value.datasource" :options="datasourceOptions" placeholder="请选择" />
       </a-form-item>
       <TableSelectFormItems v-model:database-name="value.sourceTable.databaseName"
@@ -68,9 +68,7 @@ onMounted(() => {
                             v-model:table-name="value.sourceTable.tableName"
                             :datasourceId="value.datasource" :validated-name-prefix="['sourceTable']" />
       <a-flex-br />
-      <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <params-map v-model:value="value.options" />
-      </a-form-item>
+      <ConfOptionsForm name="options" v-model:value="value.options" />
     </a-flex>
   </a-form>
 </template>

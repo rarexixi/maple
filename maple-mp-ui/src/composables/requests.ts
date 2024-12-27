@@ -89,3 +89,16 @@ export function getArrayConf(configKey: string, valueField: string = "value", la
 
   return { confArray, confMap, confOptions, confOptionMap, confInitialized }
 }
+
+export function getConf(configKey: string) {
+
+  const conf = ref<any>({})
+  const confInitialized = ref(false)
+
+  request(SysConfApis.detail(configKey)).then(response => {
+    conf.value = JSON.parse(response.confValue);
+    confInitialized.value = true
+  })
+
+  return { conf, confInitialized }
+}

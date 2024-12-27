@@ -37,7 +37,25 @@ maple:
       SELECT c.column_name      AS "columnName",
              c.udt_name         AS "dataType",
              d.description      AS "columnComment",
-             c.ordinal_position AS "columnPosition"
+             c.ordinal_position AS "columnPosition",
+             CASE WHEN c.udt_name = 'int2' THEN 'SMALLINT'
+                  WHEN c.udt_name = 'int4' THEN 'INT'
+                  WHEN c.udt_name = 'int8' THEN 'BIGINT'
+                  WHEN c.udt_name = 'float4' THEN 'FLOAT'
+                  WHEN c.udt_name = 'float8' THEN 'DOUBLE'
+                  WHEN c.udt_name = 'numeric' THEN CONCAT('DECIMAL(', c.numeric_precision, ', ', c.numeric_scale, ')')
+                  WHEN c.udt_name = 'bool' THEN 'BOOLEAN'
+                  WHEN c.udt_name = 'date' THEN 'DATE'
+                  WHEN c.udt_name = 'bytea' THEN 'BYTES'
+                  WHEN c.udt_name = 'timetz' THEN CONCAT('TIME(', c.datetime_precision, ') WITH TIMEZONE')
+                  WHEN c.udt_name = 'timestamptz' THEN CONCAT('TIMESTAMP(', c.datetime_precision, ') WITH TIMEZONE')
+                  WHEN c.udt_name = 'time' THEN CONCAT('TIME(', c.datetime_precision, ')')
+                  WHEN c.udt_name = 'timestamp' THEN CONCAT('TIMESTAMP(', c.datetime_precision, ')')
+                  -- 不存在于官方文档的类型
+                  WHEN c.udt_name = 'bit' AND c.character_maximum_length = 1 THEN 'BOOLEAN'
+                  WHEN c.udt_name = 'bit' AND c.character_maximum_length <> 1 THEN CONCAT('BINARY(', CEIL((c.character_maximum_length + 7) / 8), ')')
+                  WHEN c.udt_name = 'varbit' THEN CONCAT('BINARY(', CEIL((c.character_maximum_length + 7) / 8), ')')
+                  ELSE 'STRING' END AS "flinkDataType"
       FROM information_schema.columns c
                LEFT JOIN 
                (

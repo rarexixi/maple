@@ -14,8 +14,13 @@ import java.util.List;
 
 public abstract class MapleSink<T extends SinkConfig> extends MaplePlugin<T> implements TableDefine {
 
+    final Table sourceTable;
+
     public MapleSink(TableEnvironment tableEnv) {
         super(tableEnv);
+        sourceTable = StringUtils.isNotBlank(config.getSourceQuery())
+                ? tableEnv.sqlQuery(config.getSourceQuery())
+                : tableEnv.from(config.getSourceTable());
     }
 
     @Override
@@ -25,17 +30,17 @@ public abstract class MapleSink<T extends SinkConfig> extends MaplePlugin<T> imp
     }
 
     public TablePipeline getTablePipeline() {
-        if (StringUtils.isNotBlank(config.getSourceSql())) {
-            return tableEnv.sqlQuery(config.getSourceSql()).insertInto(config.getResultTable());
-        } else {
-            return tableEnv.from(config.getSourceTableName()).insertInto(config.getResultTable());
-        }
+        return sourceTable.insertInto(config.getResultTable());
     }
 
+    @Override
     public void prepare() {
-        Table sourceTable = tableEnv.sqlQuery(config.getSourceSql());
         List<Column> columns = sourceTable.getResolvedSchema().getColumns();
-        if (columns.size() != config.getColumns().size()) {
+        int columnSize = config.getPhysicalColumns().size();
+        if (!config.getMetadataColumns().isEmpty()) {
+            columnSize += (int) config.getMetadataColumns().stream().filter(item -> !item.isVirtual()).count();
+        }
+        if (columns.size() != columnSize) {
             throw new ConfigRuntimeException("The number of columns in the source table and the target table is inconsistent");
         }
     }

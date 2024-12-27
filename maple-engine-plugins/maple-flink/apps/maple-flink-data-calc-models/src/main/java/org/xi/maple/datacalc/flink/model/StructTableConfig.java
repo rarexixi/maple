@@ -17,13 +17,22 @@ public abstract class StructTableConfig extends MaplePluginConfig {
     protected String comment;
     @NotEmpty
     @Valid
-    protected List<BaseColumn> columns = new ArrayList<>();
-    protected PrimaryKeyDefinition primaryKey;
+    protected List<PhysicalColumn> physicalColumns = new ArrayList<>();
+    protected List<MetadataColumn> metadataColumns = new ArrayList<>();
+    protected List<ComputedColumn> computedColumns = new ArrayList<>();
+    protected String pkName;
+    protected String[] pkColumns;
 
-    protected WatermarkDefinition watermark;
+    protected String wmColumn;
+    protected Integer wmDelaySeconds;
+
     protected String[] partitionColumns;
 
     protected Map<String, String> options = new LinkedHashMap<>();
+
+    public String getWatermarkExpression() {
+        return String.format("%s - INTERVAL '%d' SECOND", wmColumn, wmDelaySeconds);
+    }
 
     public Map<String, String> getOptions() {
         final Map<String, String> result = new LinkedHashMap<>();
@@ -47,24 +56,4 @@ public abstract class StructTableConfig extends MaplePluginConfig {
     public abstract String getConnector();
 
     public abstract Map<String, String> getDefineOptions();
-
-    public void setColumns(List<ColumnDefinition> columns) {
-        for (ColumnDefinition cd : columns) {
-            BaseColumn column;
-            switch (cd.getColumnType()) {
-                case "physical":
-                    column = JsonUtils.convertValue(cd.getDefinition(), PhysicalColumn.class);
-                    break;
-                case "metadata":
-                    column = JsonUtils.convertValue(cd.getDefinition(), MetadataColumn.class);
-                    break;
-                case "computed":
-                    column = JsonUtils.convertValue(cd.getDefinition(), ComputedColumn.class);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown column type: " + cd.getColumnType());
-            }
-            this.columns.add(column);
-        }
-    }
 }

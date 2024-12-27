@@ -1,8 +1,8 @@
 import { defineStore } from "pinia"
-import { getArrayConf } from "@/composables/requests"
+import { getArrayConf, getConf } from "@/composables/requests"
 import { computed } from "vue"
 
-function getStore(storeId: string, configKey: string, valueField: string = "value", labelField: string = "label") {
+function getArrayStore(storeId: string, configKey: string, valueField: string = "value", labelField: string = "label") {
   return defineStore(storeId, () => {
     const conf = getArrayConf(configKey, valueField, labelField)
     const confArray = computed(() => conf.confArray)
@@ -14,18 +14,29 @@ function getStore(storeId: string, configKey: string, valueField: string = "valu
   })
 }
 
-export const useDatabaseTypesStore = getStore('database-types', 'database_types', 'value', 'name')
+function getStore(storeId: string, configKey: string) {
+  return defineStore(storeId, () => {
+    let confResult = getConf(configKey);
+    const conf = computed(() => confResult.conf)
+    const confInitialized = computed(() => confResult.confInitialized)
+    return { conf, confInitialized }
+  })
+}
 
-export const useClusterCategoriesStore = getStore('cluster-categories', 'cluster_categories')
+export const useDatabaseTypesStore = getArrayStore('database_types', 'database_types', 'value', 'name')
 
-export const useEngineCategoriesStore = getStore('engine-categories', 'engine_categories')
+export const useClusterCategoriesStore = getArrayStore('cluster_categories', 'cluster_categories')
 
-export const useJobTypesStore = getStore('job-types', 'job_run_types', 'typeCode', 'typeName')
+export const useEngineCategoriesStore = getArrayStore('engine_categories', 'engine_categories')
 
-export const useDatabaseTypesOfFlinkJdbcSupportedStore = getStore('db-types-of-flink-jdbc-supported', 'db_types_of_flink_jdbc_supported')
+export const useJobTypesStore = getArrayStore('job_run_types', 'job_run_types', 'typeCode', 'typeName')
 
-export const useDatabaseTypesOfSparkJdbcSupportedStore = getStore('db-types-of-spark-jdbc-supported', 'db_types_of_spark_jdbc_supported')
+export const useDatabaseTypesOfFlinkJdbcSupportedStore = getArrayStore('db_types_of_flink_jdbc_supported', 'db_types_of_flink_jdbc_supported')
 
-export const useSparkStorageLevelsStore = getStore('spark-storage-levels', 'spark_storage_levels')
+export const useDatabaseTypesOfSparkJdbcSupportedStore = getArrayStore('db_types_of_spark_jdbc_supported', 'db_types_of_spark_jdbc_supported')
 
-export const useSparkFileSerializersStore = getStore('spark-file-serializers', 'spark_file_serializers')
+export const useSparkStorageLevelsStore = getArrayStore('spark_storage_levels', 'spark_storage_levels')
+
+export const useSparkFileSerializersStore = getArrayStore('spark_file_serializers', 'spark_file_serializers')
+
+export const useFlinkConnectorAvailableMetadataStore = getStore('flink_connector_available_metadata', 'flink_connector_available_metadata')

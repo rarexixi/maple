@@ -41,12 +41,12 @@ onMounted(() => {
 
 <template>
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
-          :label-col="labelCols.w320">
+          :label-col="labelCols.l125">
     <a-flex wrap="wrap">
-      <a-form-item name="resultTable" label="注册表名" class="form-item-320">
+      <a-form-item name="resultTable" label="注册表名" class="form-item-360">
         <a-input v-model:value="value.resultTable" />
       </a-form-item>
-      <a-form-item name="sql" label="SQL" :label-col="labelCols.w1280" class="form-item-1280">
+      <a-form-item name="sql" label="SQL" :label-col="labelCols.l125" class="form-item-960">
         <a-textarea v-model:value="value.sql" :auto-size="{ minRows: 2, maxRows: 20 }" />
       </a-form-item>
     </a-flex>

@@ -8,107 +8,78 @@
       "config": {
         "tableName": "source_001",
         "comment": "source_001",
-        "columns": [
+        "physicalColumns": [
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "type_code",
-              "comment": "",
-              "dataType": "String",
-              "nullable": false
-            }
+            "name": "type_code",
+            "comment": "",
+            "dataType": "String",
+            "nullable": false
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "type_name",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "type_name",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "icon",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "icon",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "classifier",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "classifier",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "versions",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "versions",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "configurations",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "configurations",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "disabled",
-              "comment": "",
-              "dataType": "TINYINT"
-            }
+            "name": "disabled",
+            "comment": "",
+            "dataType": "TINYINT"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "created_by",
-              "comment": "",
-              "dataType": "INTEGER"
-            }
+            "name": "created_by",
+            "comment": "",
+            "dataType": "INTEGER"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "updated_by",
-              "comment": "",
-              "dataType": "INTEGER"
-            }
+            "name": "updated_by",
+            "comment": "",
+            "dataType": "INTEGER"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "created_at",
-              "comment": "",
-              "dataType": "TIMESTAMP"
-            }
+            "name": "created_at",
+            "comment": "",
+            "dataType": "TIMESTAMP"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "updated_at",
-              "comment": "",
-              "dataType": "TIMESTAMP"
-            }
+            "name": "updated_at",
+            "comment": "",
+            "dataType": "TIMESTAMP"
           }
         ],
-        "primaryKey": {
-          "name": "",
-          "columns": ["type_code"]
-        },
+        "metadataColumns": [],
+        "computedColumns": [],
+        "pkColumns": [
+          "type_code"
+        ],
         "partitionColumns": [],
         "url": "jdbc:mysql://localhost:3306/test",
-        "table": "maple_datasource_type",
         "driver": "com.mysql.cj.jdbc.Driver",
         "username": "xi_root",
         "password": "123456",
+        "rdbmsTable": {
+          "databaseName": "test",
+          "tableName": "maple_datasource_type"
+        },
         "options": {
         }
       }
@@ -119,108 +90,79 @@
       "config": {
         "tableName": "sink_001",
         "comment": "sink_001",
-        "sourceTableName": "source_001",
-        "columns": [
+        "sourceTable": "source_001",
+        "physicalColumns": [
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "type_code",
-              "comment": "",
-              "dataType": "String",
-              "nullable": false
-            }
+            "name": "type_code",
+            "comment": "",
+            "dataType": "String",
+            "nullable": false
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "type_name",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "type_name",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "icon",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "icon",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "classifier",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "classifier",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "versions",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "versions",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "configurations",
-              "comment": "",
-              "dataType": "String"
-            }
+            "name": "configurations",
+            "comment": "",
+            "dataType": "String"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "disabled",
-              "comment": "",
-              "dataType": "TINYINT"
-            }
+            "name": "disabled",
+            "comment": "",
+            "dataType": "TINYINT"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "created_by",
-              "comment": "",
-              "dataType": "INTEGER"
-            }
+            "name": "created_by",
+            "comment": "",
+            "dataType": "INTEGER"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "updated_by",
-              "comment": "",
-              "dataType": "INTEGER"
-            }
+            "name": "updated_by",
+            "comment": "",
+            "dataType": "INTEGER"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "created_at",
-              "comment": "",
-              "dataType": "TIMESTAMP"
-            }
+            "name": "created_at",
+            "comment": "",
+            "dataType": "TIMESTAMP"
           },
           {
-            "columnType": "physical",
-            "definition": {
-              "name": "updated_at",
-              "comment": "",
-              "dataType": "TIMESTAMP"
-            }
+            "name": "updated_at",
+            "comment": "",
+            "dataType": "TIMESTAMP"
           }
         ],
-        "primaryKey": {
-          "name": "",
-          "columns": ["type_code"]
-        },
+        "metadataColumns": [],
+        "computedColumns": [],
+        "pkColumns": [
+          "type_code"
+        ],
         "partitionColumns": [],
         "url": "jdbc:mysql://localhost:3306/test",
-        "table": "maple_datasource_type2",
         "driver": "com.mysql.cj.jdbc.Driver",
         "username": "xi_root",
         "password": "123456",
+        "rdbmsTable": {
+          "databaseName": "test",
+          "tableName": "maple_datasource_type2"
+        },
         "options": {
         }
       }

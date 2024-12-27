@@ -31,10 +31,9 @@ const {
   resetSearch
 } = pageListSearch(DatasourceApis.pageList(), searchParams, useTemplateRef<FormInstance>("searchForm"))
 const selection = getSelection()
-const {selected, rowSelection} = selection
+const { selected, rowSelection } = selection
 
-const datasourceTypeSearchParams = reactive<any>({
-})
+const datasourceTypeSearchParams = reactive<any>({})
 const typeMap = reactive<any>({})
 const convertList = (list: any[]) => list.map(item => {
   typeMap[item.typeCode] = item.typeName
@@ -50,8 +49,8 @@ const {
 
 onMounted(() => {
   // 设置面包屑
-  const {setBreadcrumb} = useBreadcrumbStore()
-  setBreadcrumb([{text: '数据源'}])
+  const { setBreadcrumb } = useBreadcrumbStore()
+  setBreadcrumb([{ text: '数据源' }])
 })
 
 const columns = [
@@ -64,7 +63,7 @@ const columns = [
   { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
   { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
   { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
-  {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
+  { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120 },
 ]
 
 const callback: OperateCallback = {
@@ -148,23 +147,26 @@ const getDatasourceTypeDetail = (datasourceConf: any) => {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" layout="inline">
-      <a-form-item label="Id">
-        <a-input-number v-model:value="searchParams.id" allow-clear />
-      </a-form-item>
-      <a-form-item label="数据源名称">
-        <a-input v-model:value.trim="searchParams.nameContains" allow-clear />
-      </a-form-item>
-      <a-form-item label="数据源类型">
-        <a-select v-model:value="searchParams.datasourceType" :options="datasourceTypeOptions" allow-clear placeholder="全部" style="width: 120px" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="search">
-          <SearchOutlined />
-          搜索
-        </a-button>
-        <a-button @click="resetSearch">重置</a-button>
-      </a-form-item>
+    <a-form ref="searchForm" :model="searchParams" labelAlign="left" :label-col="{style:{width:'80px'}}">
+      <a-flex wrap="wrap">
+        <a-form-item label="Id" class="form-item-240">
+          <a-input v-model:value.number="searchParams.id" allow-clear />
+        </a-form-item>
+        <a-form-item label="数据源名称" class="form-item-240">
+          <a-input v-model:value.trim="searchParams.nameContains" allow-clear />
+        </a-form-item>
+        <a-form-item label="数据源类型" class="form-item-240">
+          <a-select v-model:value="searchParams.datasourceType" :options="datasourceTypeOptions" allow-clear
+                    placeholder="全部" />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="search">
+            <SearchOutlined />
+            搜索
+          </a-button>
+          <a-button @click="resetSearch">重置</a-button>
+        </a-form-item>
+      </a-flex>
     </a-form>
   </div>
   <div class="list-table">
@@ -212,9 +214,9 @@ const getDatasourceTypeDetail = (datasourceConf: any) => {
       <a-typography-text type="secondary">({{ detail.datasourceType }} {{ detail.version }})</a-typography-text>
     </template>
     <DatasourceUpsertForm ref="detailFormRef" v-model="detail"
-                            :datasourceTypeOptions="datasourceTypeOptions"
-                            :confOptions="confOptions"
-                            @save="upsert">
+                          :datasourceTypeOptions="datasourceTypeOptions"
+                          :confOptions="confOptions"
+                          @save="upsert">
       <template #buttons>
         <a-button style="margin-left: 10px" @click="() => closeUpsertDrawer()">取消</a-button>
       </template>

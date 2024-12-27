@@ -50,22 +50,22 @@ const labelWidth = 12
   <a-form ref="formRef" :model="runConf" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
     <a-flex wrap="wrap">
-        <a-form-item ref="driverMemory" label="driver-memory" name="driverMemory" class="form-item-320">
+        <a-form-item ref="driverMemory" label="driver-memory" name="driverMemory" class="form-item-360">
           <a-input v-model:value.trim="runConf.driverMemory" type="text" />
         </a-form-item>
-        <a-form-item ref="driverCores" label="driver-cores" name="driverCores" class="form-item-320">
+        <a-form-item ref="driverCores" label="driver-cores" name="driverCores" class="form-item-360">
           <a-input v-model:value.number="runConf.driverCores" type="text" />
         </a-form-item>
-        <a-form-item ref="executorMemory" label="executor-memory" name="executorMemory" class="form-item-320">
+        <a-form-item ref="executorMemory" label="executor-memory" name="executorMemory" class="form-item-360">
           <a-input v-model:value.trim="runConf.executorMemory" type="text" />
         </a-form-item>
-        <a-form-item ref="executorCores" label="executor-cores" name="executorCores" class="form-item-320">
+        <a-form-item ref="executorCores" label="executor-cores" name="executorCores" class="form-item-360">
           <a-input v-model:value.number="runConf.executorCores" type="text" />
         </a-form-item>
-        <a-form-item ref="numExecutors" label="num-executors" name="numExecutors" class="form-item-320">
+        <a-form-item ref="numExecutors" label="num-executors" name="numExecutors" class="form-item-360">
           <a-input v-model:value.number="runConf.numExecutors" type="text" />
         </a-form-item>
-        <a-form-item ref="jars" label="jars" name="jars" class="form-item-320">
+        <a-form-item ref="jars" label="jars" name="jars" class="form-item-360">
           <a-input v-model:value.number="runConf.jars" type="text" />
         </a-form-item>
     </a-flex>

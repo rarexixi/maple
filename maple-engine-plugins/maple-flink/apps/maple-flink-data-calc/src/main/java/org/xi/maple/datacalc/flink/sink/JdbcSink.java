@@ -19,7 +19,9 @@ public class JdbcSink extends MapleSink<JdbcSinkConfig> {
         super(tableEnv);
     }
 
+    @Override
     public void prepare() {
+        super.prepare();
         try (Connection conn = DriverManager.getConnection(config.getJdbcUrl(), config.getUsername(), config.getPassword())) {
             for (String query : config.getPreQueries()) {
                 try (PreparedStatement statement = conn.prepareStatement(query)) {

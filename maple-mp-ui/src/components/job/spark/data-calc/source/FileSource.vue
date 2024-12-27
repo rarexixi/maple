@@ -8,7 +8,7 @@ import type { FileSourceConfig } from "@/composables/spark-jobs"
 
 import { useSparkFileSerializersStore, useSparkStorageLevelsStore } from "@/stores/sys-conf"
 
-import ParamsMap from "@/components/ParamsMap.vue"
+import ConfOptionsForm from "@/components/job/ConfOptionsForm.vue"
 import AInputStringArray from "@/components/ant-ext/AInputStringArray.vue"
 
 interface FileSourceValue {
@@ -56,30 +56,28 @@ onMounted(() => {
 
 <template>
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
-          :label-col="labelCols.w320">
+          :label-col="labelCols.l125">
     <a-flex wrap="wrap">
-      <a-form-item name="resultTable" label="注册表名" class="form-item-320">
+      <a-form-item name="resultTable" label="注册表名" class="form-item-360">
         <a-input v-model:value="value.resultTable" />
       </a-form-item>
-      <a-form-item name="persist" label="开启缓存" class="form-item-320">
+      <a-form-item name="persist" label="开启缓存" class="form-item-360">
         <a-switch v-model:checked="value.persist" />
       </a-form-item>
-      <a-form-item name="storageLevel" label="缓存级别" class="form-item-320">
+      <a-form-item name="storageLevel" label="缓存级别" class="form-item-360">
         <a-select v-model:value="value.storageLevel" :options="storageLevels" :disabled="!value.persist" />
       </a-form-item>
       <a-flex-br/>
-      <a-form-item name="path" label="文件路径" :label-col="labelCols.w1280" class="form-item-1280">
+      <a-form-item name="path" label="文件路径" :label-col="labelCols.l125" class="form-item-960">
         <a-input v-model:value="value.path" />
       </a-form-item>
-      <a-form-item name="serializer" label="文件格式" class="form-item-320">
+      <a-form-item name="serializer" label="文件格式" class="form-item-360">
         <a-select v-model:value="value.serializer" :options="fileSerializers" placeholder="请选择"/>
       </a-form-item>
-      <a-form-item name="columnNames" label="字段名" :label-col="labelCols.w1280" class="form-item-1280">
+      <a-form-item name="columnNames" label="字段名" :label-col="labelCols.l125" class="form-item-960">
         <a-input-string-array v-model:value="value.columnNames" />
       </a-form-item>
-      <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <params-map v-model:value="value.options" />
-      </a-form-item>
+      <ConfOptionsForm name="options" v-model:value="value.options" />
     </a-flex>
   </a-form>
 </template>

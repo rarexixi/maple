@@ -17,6 +17,7 @@ const props = defineProps<{
         <slot name="title" v-else></slot>
       </a-space>
     </template>
+
     <slot></slot>
   </a-card>
 </template>

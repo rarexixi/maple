@@ -20,7 +20,7 @@ interface PropModel {
   validatedNamePrefix: (string | number)[],
 }
 
-const { datasourceId = 0, requireTable = false } = defineProps<PropModel>()
+const { datasourceId, requireTable = false } = defineProps<PropModel>()
 
 const { dataMap: datasourceMap } = useDatasourceStore()
 
@@ -92,24 +92,24 @@ async function getTables(_databaseName?: string, _schemaName?: string) {
 }
 
 const emit = defineEmits<{
-  (e: 'change-table', tableDetail: any, isInit: boolean): void
+  (e: 'change-table', tableDetail: any): void
 }>()
 
-async function getTable(_tableName: string, isInit: boolean = false) {
+function getTable(_tableName: string) {
   if (!requireTable || !datasourceId || !databaseConf.value) return
   let params = {
     databaseName: databaseName.value,
     schemaName: schemaName.value,
     tableName: _tableName
   }
-  await request({ ...JdbcApis.table(datasourceId), params, headers: getHeaders() }).then(response => {
+  request({ ...JdbcApis.table(datasourceId), params, headers: getHeaders() }).then(response => {
     emit('change-table', {
       datasource: datasourceId,
       database: databaseName.value,
       schema: schemaName.value,
       table: _tableName,
       ...response
-    }, isInit)
+    })
   })
 }
 
@@ -162,9 +162,6 @@ onMounted(async () => {
     await getDatabases(datasourceId)
     await getSchemas(datasourceId, databaseName.value)
     await getTables(databaseName.value, schemaName.value)
-    if (requireTable && tableName.value) {
-      await getTable(tableName.value, true)
-    }
     dataInitialized.value = true
   }
 })

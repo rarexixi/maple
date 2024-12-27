@@ -32,7 +32,25 @@ maple:
       SELECT COLUMN_NAME      AS `columnName`,
              DATA_TYPE        AS `dataType`,
              COLUMN_COMMENT   AS `columnComment`,
-             ORDINAL_POSITION AS `columnPosition`
+             ORDINAL_POSITION AS `columnPosition`,
+             CASE WHEN COLUMN_TYPE IN ('tinyint(1)', 'bit(1)') THEN 'BOOLEAN'
+                  WHEN DATA_TYPE = 'tinyint' AND COLUMN_TYPE NOT LIKE '%unsigned%' THEN 'TINYINT'
+                  WHEN (DATA_TYPE = 'smallint' AND COLUMN_TYPE NOT LIKE '%unsigned%') OR (DATA_TYPE = 'tinyint' AND COLUMN_TYPE LIKE '%unsigned%') THEN 'SMALLINT'
+                  WHEN (DATA_TYPE IN ('int', 'mediumint') AND COLUMN_TYPE NOT LIKE '%unsigned%') OR (COLUMN_TYPE = 'smallint' AND COLUMN_TYPE LIKE '%unsigned%') THEN 'INT'
+                  WHEN (DATA_TYPE = 'bigint' AND COLUMN_TYPE NOT LIKE '%unsigned%') OR (COLUMN_TYPE IN ('int', 'mediumint') AND COLUMN_TYPE LIKE '%unsigned%') THEN 'BIGINT'
+                  WHEN (COLUMN_TYPE = 'bigint' AND COLUMN_TYPE LIKE '%unsigned%') THEN 'DECIMAL(20, 0)'
+                  WHEN DATA_TYPE = 'float' THEN 'FLOAT'
+                  WHEN DATA_TYPE = 'decimal' AND NUMERIC_PRECISION <= 38 THEN CONCAT('DECIMAL(', NUMERIC_PRECISION, ', ', NUMERIC_SCALE, ')')
+                  WHEN DATA_TYPE = 'decimal' AND NUMERIC_PRECISION > 38 THEN 'STRING'
+                  WHEN DATA_TYPE = 'date' THEN 'DATE'
+                  WHEN DATA_TYPE IN ('time', 'timestamp', 'char', 'varchar', 'binary', 'varbinary') THEN UPPER(COLUMN_TYPE)
+                  WHEN DATA_TYPE = 'datetime' THEN CONCAT('TIMESTAMP(', DATETIME_PRECISION, ')')
+                  WHEN DATA_TYPE = 'bit' THEN CONCAT('BINARY(', CEIL((NUMERIC_PRECISION + 7) / 8), ')')
+                  WHEN DATA_TYPE IN ('tinytext', 'text', 'mediumtext', 'longtext', 'enum', 'json') THEN 'STRING'
+                  WHEN DATA_TYPE IN ('tinyblob', 'blob', 'mediumblob', 'longblob') THEN 'BYTES'
+                  WHEN DATA_TYPE = 'year' THEN 'INT'
+                  WHEN DATA_TYPE = 'set' THEN 'ARRAY<STRING>'
+                  ELSE 'STRING' END AS `flinkDataType`
       FROM information_schema.COLUMNS
       WHERE TABLE_SCHEMA = :databaseName
         AND TABLE_NAME = :tableName

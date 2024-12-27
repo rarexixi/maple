@@ -7,12 +7,12 @@ import javax.validation.constraints.AssertTrue;
 
 @Data
 public abstract class SinkConfig extends StructTableConfig {
-    protected String sourceTableName;
+    protected String sourceTable;
 
-    protected String sourceSql;
+    protected String sourceQuery;
 
-    @AssertTrue(message = "[sourceSql, sourceTableName] cannot be blank at the same time.")
+    @AssertTrue(message = "[sourceQuery, sourceTable] cannot be blank at the same time.")
     public boolean isSourceOK() {
-        return StringUtils.isNotBlank(sourceSql) || StringUtils.isNotBlank(sourceTableName);
+        return StringUtils.isNotBlank(sourceQuery) || StringUtils.isNotBlank(sourceTable);
     }
 }

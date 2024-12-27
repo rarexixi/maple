@@ -46,19 +46,19 @@ const labelWidth = 12
   <a-form ref="formRef" :model="runConf" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
     <a-flex wrap="wrap">
-        <a-form-item ref="jobmanagerMemory" label="JM内存" name="jobmanagerMemory" class="form-item-320">
+        <a-form-item ref="jobmanagerMemory" label="JM内存" name="jobmanagerMemory" class="form-item-360">
           <a-input v-model:value.number="runConf.jobmanagerMemory" type="text" />
         </a-form-item>
-        <a-form-item ref="taskmanagerMemory" label="TM内存" name="taskmanagerMemory" class="form-item-320">
+        <a-form-item ref="taskmanagerMemory" label="TM内存" name="taskmanagerMemory" class="form-item-360">
           <a-input v-model:value.trim="runConf.taskmanagerMemory" type="text" />
         </a-form-item>
-        <a-form-item ref="numberOfTaskSlots" label="TM任务槽数" name="numberOfTaskSlots" class="form-item-320">
+        <a-form-item ref="numberOfTaskSlots" label="TM任务槽数" name="numberOfTaskSlots" class="form-item-360">
           <a-input v-model:value.number="runConf.numberOfTaskSlots" type="text" />
         </a-form-item>
-        <a-form-item ref="numTaskmangager" label="TM个数" name="numTaskmangager" class="form-item-320">
+        <a-form-item ref="numTaskmangager" label="TM个数" name="numTaskmangager" class="form-item-360">
           <a-input v-model:value.number="runConf.numTaskmangager" type="text" />
         </a-form-item>
-        <a-form-item ref="jars" label="jars" name="jars" class="form-item-320">
+        <a-form-item ref="jars" label="jars" name="jars" class="form-item-360">
           <a-input v-model:value.number="runConf.jars" type="text" />
         </a-form-item>
     </a-flex>

@@ -31,7 +31,7 @@ const {
   resetSearch
 } = pageListSearch(JobApis.pageList(), searchParams, useTemplateRef<FormInstance>("searchForm"))
 const selection = getSelection()
-const {selected, rowSelection} = selection
+const { selected, rowSelection } = selection
 
 const clusterSearchParams = reactive<any>({
   deleted: 0
@@ -49,12 +49,12 @@ const engineOptions = computed(() => {
   let result = new Map<string, any>()
   for (let engine of engineList.value) {
     if (result.has(engine.clusterId)) {
-      result.get(engine.clusterId).push({label: `${engine.name} ${engine.version}`, value: engine.id})
+      result.get(engine.clusterId).push({ label: `${engine.name} ${engine.version}`, value: engine.id })
     } else {
-      result.set(engine.clusterId, [{label: `${engine.name} ${engine.version}`, value: engine.id}])
+      result.set(engine.clusterId, [{ label: `${engine.name} ${engine.version}`, value: engine.id }])
     }
   }
-  return Array.from(result).map(([clusterId, engines]) => ({label: clusterOptionMap[clusterId], options: engines}))
+  return Array.from(result).map(([clusterId, engines]) => ({ label: clusterOptionMap[clusterId], options: engines }))
 })
 
 const {
@@ -64,21 +64,21 @@ const {
 
 onMounted(() => {
   // 设置面包屑
-  const {setBreadcrumb} = useBreadcrumbStore()
-  setBreadcrumb([{text: '执行作业'}])
+  const { setBreadcrumb } = useBreadcrumbStore()
+  setBreadcrumb([{ text: '执行作业' }])
 })
 
 const columns = [
-  {title: '作业ID', dataIndex: 'id', key: 'id'},
-  {title: '作业名', dataIndex: 'jobName', key: 'jobName'},
-  {title: '作业类型', dataIndex: 'jobType', key: 'jobType', customRender: (row: any) => jobTypeOptionMap[row.text]},
-  {title: '引擎ID', dataIndex: 'engineId', key: 'engineId'},
-  {title: '作业负责人', dataIndex: 'owner', key: 'owner'},
-  {title: '创建人', dataIndex: 'createdBy', key: 'createdBy'},
-  {title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy'},
-  {title: '创建时间', dataIndex: 'createdAt', key: 'createdAt'},
-  {title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt'},
-  {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
+  { title: '作业ID', dataIndex: 'id', key: 'id' },
+  { title: '作业名', dataIndex: 'jobName', key: 'jobName' },
+  { title: '作业类型', dataIndex: 'jobType', key: 'jobType', customRender: (row: any) => jobTypeOptionMap[row.text] },
+  { title: '引擎ID', dataIndex: 'engineId', key: 'engineId' },
+  { title: '作业负责人', dataIndex: 'owner', key: 'owner' },
+  { title: '创建人', dataIndex: 'createdBy', key: 'createdBy' },
+  { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
+  { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
+  { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+  { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120 },
 ]
 
 const callback: OperateCallback = {
@@ -103,29 +103,31 @@ const {
 
 <template>
   <div class="search-form">
-    <a-form ref="searchForm" :model="searchParams" layout="inline">
-      <a-form-item label="作业ID">
-        <a-input-number v-model:value="searchParams.id" allow-clear />
-      </a-form-item>
-      <a-form-item label="作业名">
-        <a-input v-model:value.trim="searchParams.jobNameContains" allow-clear />
-      </a-form-item>
-      <a-form-item label="作业类型">
-        <a-select v-model:value="searchParams.jobType" :options="jobTypeOptions" allow-clear placeholder="全部" />
-      </a-form-item>
-      <a-form-item label="引擎ID">
-        <a-select v-model:value="searchParams.engineId" :options="engineOptions" allow-clear placeholder="全部" />
-      </a-form-item>
-      <a-form-item label="作业负责人">
-        <a-input v-model:value.trim="searchParams.ownerContains" allow-clear />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="search">
-          <SearchOutlined />
-          搜索
-        </a-button>
-        <a-button @click="resetSearch">重置</a-button>
-      </a-form-item>
+    <a-form ref="searchForm" :model="searchParams" labelAlign="left" :label-col="{style:{width:'80px'}}">
+      <a-flex wrap="wrap">
+        <a-form-item label="作业ID" class="form-item-240">
+          <a-input v-model:value.number="searchParams.id" allow-clear />
+        </a-form-item>
+        <a-form-item label="作业名" class="form-item-240">
+          <a-input v-model:value.trim="searchParams.jobNameContains" allow-clear />
+        </a-form-item>
+        <a-form-item label="作业类型" class="form-item-240">
+          <a-select v-model:value="searchParams.jobType" :options="jobTypeOptions" allow-clear placeholder="全部" />
+        </a-form-item>
+        <a-form-item label="引擎ID" class="form-item-240">
+          <a-select v-model:value="searchParams.engineId" :options="engineOptions" allow-clear placeholder="全部" />
+        </a-form-item>
+        <a-form-item label="作业负责人" class="form-item-240">
+          <a-input v-model:value.trim="searchParams.ownerContains" allow-clear />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="search">
+            <SearchOutlined />
+            搜索
+          </a-button>
+          <a-button @click="resetSearch">重置</a-button>
+        </a-form-item>
+      </a-flex>
     </a-form>
   </div>
   <div class="list-table">
@@ -166,5 +168,3 @@ const {
                   :page-size-options="common.PageSizeOptions" show-size-changer show-quick-jumper />
   </div>
 </template>
-
-<style scoped></style>

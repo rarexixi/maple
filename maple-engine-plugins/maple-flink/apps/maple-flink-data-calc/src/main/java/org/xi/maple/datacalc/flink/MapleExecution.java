@@ -91,6 +91,7 @@ public class MapleExecution<T extends MapleData> {
     private void executePlugins(List<MaplePlugin<?>> executions) {
         StatementSet statementSet = tableEnv.createStatementSet();
         for (MaplePlugin<?> execution : executions) {
+            execution.prepare();
             execution.define();
             if (execution instanceof MapleSink) {
                 TablePipeline tablePipeline = ((MapleSink<?>) execution).getTablePipeline();

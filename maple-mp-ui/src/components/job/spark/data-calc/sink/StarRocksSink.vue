@@ -9,8 +9,9 @@ import type { StarRocksSinkConfig } from "@/composables/spark-jobs"
 
 import { useDatasourceStore } from "@/stores/sys-data"
 
-import ParamsMap from "@/components/ParamsMap.vue"
 import TableSelectFormItems from "@/components/datasource/TableSelectFormItems.vue"
+import ConfOptionsForm from "@/components/job/ConfOptionsForm.vue"
+import SinkJobSourceForms from "@/components/job/SinkJobSourceForms.vue"
 
 const rules = {
   targetDatasource: [{required: true}],
@@ -49,9 +50,9 @@ onMounted(() => {
 
 <template>
   <a-form ref="formRef" :name="name" :model="value" :rules="rules" :validate-messages="validateMessages"
-          :label-col="labelCols.w320">
+          :label-col="labelCols.l125">
     <a-flex wrap="wrap">
-      <a-form-item name="targetDatasource" label="目标数据源" class="form-item-320">
+      <a-form-item name="targetDatasource" label="目标数据源" class="form-item-360">
         <a-select v-model:value="value.targetDatasource" :options="datasourceOptions" placeholder="请选择" />
       </a-form-item>
       <TableSelectFormItems v-model:database-name="value.targetTable.databaseName"
@@ -59,24 +60,18 @@ onMounted(() => {
                             v-model:table-name="value.targetTable.tableName"
                             :datasourceId="value.targetDatasource" :validated-name-prefix="['targetTable']" />
       <a-flex-br />
-      <a-form-item name="saveMode" label="写入模式" class="form-item-320">
+      <a-form-item name="saveMode" label="写入模式" class="form-item-360">
         <a-radio-group v-model:value="value.saveMode">
           <a-radio-button value="append">追加</a-radio-button>
           <a-radio-button value="overwrite">覆盖</a-radio-button>
         </a-radio-group>
       </a-form-item>
-      <a-form-item name="numPartitions" label="分区数" class="form-item-320">
+      <a-form-item name="numPartitions" label="分区数" class="form-item-360">
         <a-input-number v-model:value="value.numPartitions" />
       </a-form-item>
-      <a-form-item name="sourceTable" label="来源表" class="form-item-320">
-        <a-input v-model:value="value.sourceTable" />
-      </a-form-item>
-      <a-form-item name="sourceQuery" label="来源语句" :label-col="labelCols.w1280" class="form-item-1280">
-        <a-textarea v-model:value="value.sourceQuery" :auto-size="{ minRows: 2, maxRows: 20 }" />
-      </a-form-item>
-      <a-form-item name="options" label="参数" :label-col="labelCols.w1280" class="form-item-1280">
-        <params-map v-model:value="value.options" />
-      </a-form-item>
+      <SinkJobSourceForms v-model:sourceTable="value.sourceTable" v-model:sourceQuery="value.sourceQuery" />
+      <a-flex-br />
+      <ConfOptionsForm name="options" v-model:value="value.options" />
     </a-flex>
   </a-form>
 </template>
