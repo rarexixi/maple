@@ -61,26 +61,6 @@ const router = createRouter({
         operateType: DataOperationType.update,
       })
     },
-    {
-      path: '/spark-data-calc-array',
-      name: 'sparkDataCalcArray',
-      component: () => import('@/views/data-calc/SparkDataCalcArrayView.vue')
-    },
-    {
-      path: '/spark-data-calc-group',
-      name: 'sparkDataCalcGroup',
-      component: () => import('@/views/data-calc/SparkDataCalcGroupView.vue')
-    },
-    {
-      path: '/flink-data-calc-array',
-      name: 'flinkDataCalcArray',
-      component: () => import('@/views/data-calc/FlinkDataCalcArrayView.vue')
-    },
-    {
-      path: '/flink-data-calc-group',
-      name: 'flinkDataCalcGroup',
-      component: () => import('@/views/data-calc/FlinkDataCalcGroupView.vue')
-    },
   ]
 })
 

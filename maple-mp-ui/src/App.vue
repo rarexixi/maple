@@ -47,23 +47,6 @@ const navMenuItems = ref<MenuProps['items']>([
     label: h(RouterLink, { to: { path: '/job' } }, () => '作业'),
     title: 'job',
   },
-  {
-    key: 'dataCalc',
-    icon: () => h(AntdIcons['CalculatorOutlined']),
-    label: '数据计算-数组',
-    children: [
-      {
-        key: 'sparkDataCalcArray',
-        label: h(RouterLink, { to: { path: '/spark-data-calc-array' } }, () => '数组方式'),
-        title: 'sparkDataCalcArray',
-      },
-      {
-        key: 'sparkDataCalcGroup',
-        label: h(RouterLink, { to: { path: '/spark-data-calc-group' } }, () => '分组方式'),
-        title: 'sparkDataCalcGroup',
-      },
-    ]
-  },
 ])
 
 const headerNavMenuItems = ref<MenuProps['items']>([
