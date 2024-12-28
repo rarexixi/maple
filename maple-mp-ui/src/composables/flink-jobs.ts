@@ -140,9 +140,13 @@ export interface UpsertKafkaSinkConfig extends BaseSink {
   valueFieldsInclude: string
 }
 
+function getRandomName() {
+  return Math.random().toString(36).substring(2)
+}
+
 const getBaseSource = () => ({
   datasourceId: undefined,
-  resultTable: undefined,
+  resultTable: 'so_' + getRandomName(),
   comment: undefined,
   physicalColumns: [],
   metadataColumns: [],
@@ -155,12 +159,12 @@ const getBaseSource = () => ({
 })
 
 const getBaseTransformation = () => ({
-  resultTable: undefined,
+  resultTable: 'tr_' + getRandomName(),
 })
 
 const getBaseSink = () => ({
   datasourceId: undefined,
-  resultTable: undefined,
+  resultTable: 'si_' + getRandomName(),
   comment: undefined,
   physicalColumns: [],
   metadataColumns: [],
@@ -249,6 +253,15 @@ const FlinkDataCalcModels: any = {
       }
     }),
     "tidb-cdc": () => ({
+      type: "source",
+      name: "tidb-cdc",
+      config: {
+        ...getBaseSource(),
+        rdbmsTable: getRdbmsTable(),
+        scanStartupMode: undefined,
+      }
+    }),
+    "oceanbase-cdc": () => ({
       type: "source",
       name: "tidb-cdc",
       config: {

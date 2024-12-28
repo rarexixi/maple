@@ -1,6 +1,6 @@
 import type { PageInfo, ValidatableComponent } from "@/composables/models"
 import { type FormInstance, notification } from 'ant-design-vue'
-import { ref, type ShallowRef } from "vue"
+import { type ShallowRef } from "vue"
 
 const SortEnum = { ASC: 'ASC', DESC: 'DESC' }
 const PageSizeOptions = ['10', '20', '50', '100']

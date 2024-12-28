@@ -56,6 +56,7 @@ onMounted(() => {
           v-model:wm-delay-seconds="value.wmDelaySeconds"
           v-model:partition-columns="value.partitionColumns"
           v-model:options="value.options"
+          :operation-type="'sink'"
           :datasource-types="['starrocks']">
       </FlinkRdbmsTableFormItems>
       <SinkJobSourceForms v-model:sourceTable="value.sourceTable" v-model:sourceQuery="value.sourceQuery" />

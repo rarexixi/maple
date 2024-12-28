@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 @Data
-public class ReplaceVariablesRequest implements Serializable {
+public class ReplaceVariablesReq implements Serializable {
     String content;
     Map<String, String> variables;
 }

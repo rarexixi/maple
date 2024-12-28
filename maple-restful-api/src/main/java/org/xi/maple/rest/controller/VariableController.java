@@ -6,7 +6,7 @@ import com.netflix.discovery.shared.Application;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import org.xi.maple.rest.model.request.ReplaceVariablesRequest;
+import org.xi.maple.rest.model.request.ReplaceVariablesReq;
 import org.xi.maple.common.util.VariableUtils;
 
 import java.util.List;
@@ -19,8 +19,8 @@ public class VariableController {
     EurekaClient eurekaClient;
 
     @PostMapping("/replace")
-    public String replaceVariables(@RequestBody ReplaceVariablesRequest request) {
-        return VariableUtils.replaceVariables(request.getContent(), request.getVariables());
+    public String replaceVariables(@RequestBody ReplaceVariablesReq req) {
+        return VariableUtils.replaceVariables(req.getContent(), req.getVariables());
     }
 
     @GetMapping("/applications")

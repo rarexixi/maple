@@ -32,7 +32,8 @@ const options = defineModel<any>('options', {
   default: () => ({}),
 })
 
-const { datasourceTypes = [] } = defineProps<{
+const { operationType, datasourceTypes = [] } = defineProps<{
+  operationType: string,
   datasourceTypes: string[],
 }>()
 
@@ -58,10 +59,10 @@ const labelCols = common.Layout.labelCols
 </script>
 
 <template>
-  <a-form-item name="resultTable" label="注册表名" class="form-item-360">
+  <a-form-item name="resultTable" label="注册表名" class="form-item-360" v-if="operationType === 'source'">
     <a-input v-model:value="resultTable" />
   </a-form-item>
-  <a-form-item name="comment" label="说明" class="form-item-360">
+  <a-form-item name="comment" label="说明" class="form-item-360" v-if="operationType === 'source'">
     <a-input v-model:value="comment" />
   </a-form-item>
   <a-flex-br />

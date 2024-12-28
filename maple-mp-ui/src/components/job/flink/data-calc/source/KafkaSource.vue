@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
-import { computed, onMounted, useTemplateRef } from "vue"
+import { onMounted, useTemplateRef } from "vue"
 
 import common from "@/composables/common"
-import { getDatasourceOptions } from "@/composables/datasources"
 import type { KafkaSourceConfig } from "@/composables/flink-jobs"
 import type { validateFunction } from "@/composables/models"
 
-import { useDatasourceStore } from "@/stores/sys-data"
 
 import FlinkKafkaTableFormItems from "@/components/job/flink/data-calc/FlinkKafkaTableFormItems.vue"
 
@@ -33,9 +31,6 @@ const validateMessages = {
 }
 
 const labelCols = common.Layout.labelCols
-
-const { dataList: datasourceList } = useDatasourceStore()
-const datasourceOptions = computed(() => getDatasourceOptions(datasourceList.value, 'kafka'))
 
 const formRef = useTemplateRef<FormInstance>("formRef")
 const emit = defineEmits<{
@@ -66,6 +61,7 @@ onMounted(() => {
           v-model:wm-delay-seconds="value.wmDelaySeconds"
           v-model:partition-columns="value.partitionColumns"
           v-model:options="value.options"
+          :operation-type="'source'"
           :datasource-types="['kafka']">
         <template #definedOptions>
           <a-form-item name="format" label="format" class="form-item-360">

@@ -55,6 +55,7 @@ onMounted(() => {
           v-model:wm-delay-seconds="value.wmDelaySeconds"
           v-model:partition-columns="value.partitionColumns"
           v-model:options="value.options"
+          :operation-type="'sink'"
           :datasource-types="['doris']">
       </FlinkRdbmsTableFormItems>
       <a-flex-br />

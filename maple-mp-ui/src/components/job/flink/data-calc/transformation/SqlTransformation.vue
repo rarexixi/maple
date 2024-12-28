@@ -3,12 +3,8 @@ import type { FormInstance } from "ant-design-vue"
 import { onMounted, useTemplateRef } from "vue"
 
 import common from "@/composables/common"
+import type { SqlTransformConfig } from "@/composables/flink-jobs"
 import type { validateFunction } from "@/composables/models"
-
-interface SqlTransformationValue {
-  resultTable: string,
-  sql: string,
-}
 
 const rules = {
   resultTable: [{required: true}],
@@ -16,7 +12,7 @@ const rules = {
 }
 
 const {value, name} = defineProps<{
-  value: SqlTransformationValue,
+  value: SqlTransformConfig,
   name: string,
 }>()
 

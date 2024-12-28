@@ -7,6 +7,7 @@ import type { UpsertKafkaSourceConfig } from "@/composables/flink-jobs"
 import type { validateFunction } from "@/composables/models"
 
 import FlinkKafkaTableFormItems from "@/components/job/flink/data-calc/FlinkKafkaTableFormItems.vue"
+import FlinkRdbmsTableFormItems from "@/components/job/flink/data-calc/FlinkRdbmsTableFormItems.vue";
 
 const rules = {
   resultTable: [{ required: true }],
@@ -61,6 +62,7 @@ onMounted(() => {
           v-model:wm-delay-seconds="value.wmDelaySeconds"
           v-model:partition-columns="value.partitionColumns"
           v-model:options="value.options"
+          :operation-type="'source'"
           :datasource-types="['kafka']">
         <template #definedOptions>
           <a-form-item name="keyFormat" label="keyFormat" class="form-item-360">
