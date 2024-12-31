@@ -103,6 +103,25 @@ CREATE TABLE `maple`.`maple_material_version`
 
 # endregion
 
+DROP TABLE IF EXISTS `maple`.`maple_udf`;
+CREATE TABLE `maple`.`maple_udf`
+(
+    `id`               int                                    NOT NULL AUTO_INCREMENT COMMENT '引擎ID',
+    `material_id`      int                                    NOT NULL COMMENT '物料ID',
+    `material_version` int                                    NOT NULL COMMENT '物料版本',
+    `function_name`    varchar(32)  DEFAULT ''                NOT NULL COMMENT '方法名称',
+    `main_class`       varchar(256) DEFAULT ''                NOT NULL COMMENT '方法主类',
+    `engine_home`      varchar(256) DEFAULT ''                NOT NULL COMMENT '引擎目录',
+    `udf_conf`         json                                   NOT NULL COMMENT '扩展信息',
+
+    `created_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci COMMENT = 'UDF';
+
 # region application
 
 DROP TABLE IF EXISTS `maple`.`maple_application`;
@@ -172,25 +191,6 @@ CREATE TABLE `maple`.`maple_cluster_engine`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci COMMENT = '计算引擎';
 
-DROP TABLE IF EXISTS `maple`.`maple_udf`;
-CREATE TABLE `maple`.`maple_udf`
-(
-    `id`               int                                    NOT NULL AUTO_INCREMENT COMMENT '引擎ID',
-    `material_id`      int                                    NOT NULL COMMENT '物料ID',
-    `material_version` int                                    NOT NULL COMMENT '物料版本',
-    `function_name`    varchar(32)  DEFAULT ''                NOT NULL COMMENT '方法名称',
-    `main_class`       varchar(256) DEFAULT ''                NOT NULL COMMENT '方法主类',
-    `engine_home`      varchar(256) DEFAULT ''                NOT NULL COMMENT '引擎目录',
-    `udf_conf`         json                                   NOT NULL COMMENT '扩展信息',
-
-    `created_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT = 'UDF';
-
 DROP TABLE IF EXISTS `maple`.`maple_cluster_engine_default_conf`;
 CREATE TABLE `maple`.`maple_cluster_engine_default_conf`
 (
@@ -209,163 +209,47 @@ CREATE TABLE `maple`.`maple_cluster_engine_default_conf`
 DROP TABLE IF EXISTS `maple`.`maple_engine_execution_queue`;
 CREATE TABLE `maple`.`maple_engine_execution_queue`
 (
-    `queue_name`    varchar(128) DEFAULT ''                NOT NULL COMMENT '执行队列名',
-    `cluster`       varchar(16)  DEFAULT ''                NOT NULL COMMENT '提交集群',
-    `cluster_queue` varchar(128) DEFAULT ''                NOT NULL COMMENT '集群队列',
-    `from_app`      varchar(16)  DEFAULT ''                NOT NULL COMMENT '来源应用',
-    `group`         varchar(16)  DEFAULT ''                NOT NULL COMMENT '用户组',
-    `priority`      tinyint                                NOT NULL COMMENT '队列优先级',
+    `queue_name`     varchar(128) DEFAULT ''                NOT NULL COMMENT '执行队列名',
+    `cluster`        varchar(16)  DEFAULT ''                NOT NULL COMMENT '提交集群',
+    `resource_group` varchar(128) DEFAULT ''                NOT NULL COMMENT '集群资源组',
+    `from_app`       varchar(16)  DEFAULT ''                NOT NULL COMMENT '来源应用',
+    `group`          varchar(16)  DEFAULT ''                NOT NULL COMMENT '用户组',
+    `priority`       tinyint                                NOT NULL COMMENT '队列优先级',
 
-    `created_at`    datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`    datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at`     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     PRIMARY KEY (`queue_name`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci COMMENT = '执行队列';
 
-DROP TABLE IF EXISTS `maple`.`maple_engine_execution`;
-CREATE TABLE `maple`.`maple_engine_execution`
-(
-    `id`              int                                   NOT NULL AUTO_INCREMENT COMMENT '执行ID',
-    `exec_file`       varchar(256)                          NOT NULL COMMENT '执行文件',
-
-    `from_app`        varchar(16)                           NOT NULL COMMENT '来源应用',           -- 用于区分哪个应用提交，例如调度系统，实时平台等
-    `job_id`          varchar(32)                           NOT NULL COMMENT '作业ID',             -- 用于关联到某一个具体的作业配置
-    `biz_id`          varchar(32)                           NOT NULL COMMENT '执行批次ID',         -- 某个作业同一个业务时间运行的实例的集合ID (可能包含多次执行)
-    `exec_uniq_id`    varchar(32)                           NOT NULL COMMENT '应用作业执行唯一ID', -- 一个作业运行实例的ID，用于防止重复提交执行
-    `exec_name`       varchar(32) DEFAULT ''                NOT NULL COMMENT '执行名称',           -- 作业的code，用于生成集群上的名称
-
-    `cluster`         varchar(32)                           NOT NULL COMMENT '提交集群',
-    `resource_group`  json        DEFAULT '{}'              NOT NULL COMMENT '集群资源组',         -- 如 YARN、Volcano 的 Queue，K8s 的 Namespace 等
-    `engine_category` varchar(16) DEFAULT ''                NOT NULL COMMENT '引擎种类',           -- 如 Spark、Flink、Hive 等
-    `engine_version`  varchar(16) DEFAULT ''                NOT NULL COMMENT '引擎版本',
-    `priority`        tinyint                               NOT NULL COMMENT '初始优先级',         -- 用于区分优先级，优先级高的先执行
-    `run_pri`         tinyint                               NOT NULL COMMENT '运行优先级',
-    `pri_upgradable`  bit         DEFAULT 0                 NOT NULL COMMENT '优先级可提升',       -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
-
-    `group`           varchar(32) DEFAULT ''                NOT NULL COMMENT '用户组',
-    `user`            varchar(32) DEFAULT ''                NOT NULL COMMENT '用户',
-
-    `cluster_app_id`  varchar(64) DEFAULT ''                NOT NULL COMMENT '集群应用ID',         -- K8s 按一定规则生成，直接写入数据库，YARN 的 ApplicationID 由 YARN 生成，后续回写到数据库
-    `status`          varchar(16) DEFAULT 'CREATED'         NOT NULL COMMENT '状态',               -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
-    `submitted_at`    datetime                              NULL COMMENT '任务提交时间',           -- 对应 STARTING 的时间，提交执行的时候设置
-    `started_at`      datetime                              NULL COMMENT '任务执行开始时间',       -- 对应首次 RUNNING 的时间，任务真正开始执行的时候设置
-    `finished_at`     datetime                              NULL COMMENT '任务执行结束时间',       -- 对应结束状态的时间，任务结束的时候设置，不管是否成功
-
-    `created_at`      datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`      datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-
-    PRIMARY KEY (`id`),
-    UNIQUE uniq_exec_from_app_uniq_id (`from_app`, `exec_uniq_id`),
-    INDEX idx_exec_name (`exec_name`),
-    INDEX idx_exec_cluster (`cluster`),
-    INDEX idx_exec_engine (`engine_category`, `engine_version`),
-    INDEX idx_exec_status (`status`),
-    INDEX idx_exec_group (`group`),
-    INDEX idx_exec_user (`user`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT = '引擎执行记录';
-
-DROP TABLE IF EXISTS `maple`.maple_engine_execution_ext_info;
-CREATE TABLE `maple`.`maple_engine_execution_ext_info`
-(
-    `id`        int  NOT NULL COMMENT '执行ID',
-    `exec_conf` json NULL COMMENT '作业配置', -- 作业的配置信息
-    `ext_info`  json NULL COMMENT '扩展信息', -- 作业的扩展信息，todo
-    `exec_info` json NULL COMMENT '执行信息', -- 包括状态信息，状态变更时间等
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT = '引擎执行扩展信息';
-
-
--- region 暂时不用
-
-DROP TABLE IF EXISTS `maple_engine_instance`;
-CREATE TABLE `maple_engine_instance`
-(
-    `id`              int                                    NOT NULL AUTO_INCREMENT COMMENT '引擎ID',
-    `application_id`  varchar(128) DEFAULT ''                NOT NULL COMMENT '程序ID',
-    `cluster`         varchar(16)  DEFAULT ''                NOT NULL COMMENT '请求集群',
-    `cluster_queue`   varchar(16)  DEFAULT ''                NOT NULL COMMENT '集群队列',
-    `address`         varchar(256) DEFAULT ''                NOT NULL COMMENT '地址',
-    `engine_category` varchar(16)  DEFAULT ''                NOT NULL COMMENT '引擎种类', # spark, flink
-    `engine_version`  varchar(16)  DEFAULT ''                NOT NULL COMMENT '版本',
-    `engine_type`     varchar(16)  DEFAULT ''                NOT NULL COMMENT '引擎类型 (once，resident)',
-    `job_count`       int UNSIGNED DEFAULT 0                 NOT NULL COMMENT '执行的作业次数',
-    `running_count`   int UNSIGNED DEFAULT 0                 NOT NULL COMMENT '执行中的作业数量',
-    `heartbeat_time`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '心跳时间',
-    `status`          varchar(16)  DEFAULT ''                NOT NULL COMMENT '状态 (SUBMITTED, ACCEPTED, RUNNING, FINISHED, FAILED, KILLED)',
-    `job_cleaned`     tinyint      DEFAULT 0                 NOT NULL COMMENT '是否已清理作业',
-    `group`           varchar(32)  DEFAULT ''                NOT NULL COMMENT '用户组',
-    `user`            varchar(32)  DEFAULT ''                NOT NULL COMMENT '用户',
-
-    `created_at`      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-
-    PRIMARY KEY (`id`),
-    INDEX idx_engine_status (`status`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT = '执行器实例';
-
-DROP TABLE IF EXISTS `maple`.`maple_job_queue`;
-CREATE TABLE `maple`.`maple_job_queue`
-(
-    `queue_name`      varchar(128) DEFAULT ''                NOT NULL COMMENT '作业队列名',
-    `lock_name`       varchar(128) DEFAULT ''                NOT NULL COMMENT '作业队列锁名',
-    `cluster`         varchar(16)  DEFAULT ''                NOT NULL COMMENT '提交集群',
-    `cluster_queue`   varchar(128) DEFAULT ''                NOT NULL COMMENT '集群队列',
-    `engine_category` varchar(16)  DEFAULT ''                NOT NULL COMMENT '引擎种类',
-    `engine_version`  varchar(16)  DEFAULT ''                NOT NULL COMMENT '引擎版本',
-    `from_app`        varchar(16)  DEFAULT ''                NOT NULL COMMENT '来源应用',
-    `group`           varchar(16)  DEFAULT ''                NOT NULL COMMENT '用户组',
-    `priority`        tinyint                                NOT NULL COMMENT '队列优先级',
-
-    `created_at`      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`queue_name`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT = '作业队列';
-
-DROP TABLE IF EXISTS `maple`.`maple_sys_conf`;
-CREATE TABLE `maple`.`maple_sys_conf`
-(
-    `conf_key`    varchar(64)                            NOT NULL COMMENT '配置键',
-    `conf_value`  json                                   NOT NULL COMMENT '配置值',
-    `description` varchar(512) DEFAULT ''                NOT NULL COMMENT '配置说明',
-
-    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
-    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
-    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
-    `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-
-    PRIMARY KEY (`conf_key`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT ='系统配置';
-
 DROP TABLE IF EXISTS `maple`.`maple_job`;
 CREATE TABLE `maple`.`maple_job`
 (
-    `id`          int                                    NOT NULL AUTO_INCREMENT COMMENT '作业ID',
-    `job_name`    varchar(64)                            NOT NULL COMMENT '作业名',
-    `description` varchar(256) DEFAULT ''                NOT NULL COMMENT '作业说明',
-    `job_type`    varchar(8)                             NOT NULL COMMENT '作业类型', -- spark-sql, spark-data-calc, flink-data-calc
-    `engine_id`   int                                    NOT NULL COMMENT '引擎ID',
-    `owner`       varchar(32)  DEFAULT ''                NOT NULL COMMENT '作业负责人',
-    `run_conf`    json                                   NOT NULL COMMENT '执行配置',
-    `job_conf`    json                                   NOT NULL COMMENT '作业配置', -- 启动参数，运行参数等，根据集群种类不同，配置不同
+    `id`               int                                    NOT NULL AUTO_INCREMENT COMMENT '作业ID',
+    `job_name`         varchar(32)                            NOT NULL COMMENT '作业名',
+    `description`      varchar(256) DEFAULT ''                NOT NULL COMMENT '作业说明',
+    `job_type`         varchar(8)                             NOT NULL COMMENT '作业类型',     -- spark-sql, spark-data-calc, flink-data-calc
+    `user_group`       int                                    NOT NULL COMMENT '用户组',
+    `owner`            int                                    NOT NULL COMMENT '作业负责人',
+    `from_app`         varchar(16)                            NOT NULL COMMENT '来源应用',     -- 用于区分哪个应用提交，例如调度系统，实时平台等
+    `engine_id`        int                                    NOT NULL COMMENT '引擎ID',
 
-    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
-    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
-    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
-    `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `cluster_id`       int          DEFAULT ''                NOT NULL COMMENT '所属集群',
+    `cluster_category` varchar(16)  DEFAULT ''                NOT NULL COMMENT '集群类型',
+
+    `priority`         tinyint                                NOT NULL COMMENT '作业优先级',   -- 用于区分优先级，优先级高的先执行
+    `pri_upgradable`   bit          DEFAULT 0                 NOT NULL COMMENT '优先级可提升', -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
+
+    `run_conf`         json                                   NOT NULL COMMENT '执行配置',
+    `job_conf`         json                                   NOT NULL COMMENT '作业配置',     -- 启动参数，运行参数等，根据集群种类不同，配置不同
+
+    `disabled`         tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
+    `created_by`       int          DEFAULT 0                 NOT NULL COMMENT '创建人',
+    `updated_by`       int          DEFAULT 0                 NOT NULL COMMENT '修改人',
+    `created_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     PRIMARY KEY (`id`),
     INDEX idx_job_name (`job_name`),
@@ -376,40 +260,62 @@ CREATE TABLE `maple`.`maple_job`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci COMMENT = '执行作业';
 
-DROP TABLE IF EXISTS `maple`.`maple_job_ext_info`;
-CREATE TABLE `maple`.`maple_job_ext_info`
+DROP TABLE IF EXISTS `maple`.`maple_engine_execution`;
+CREATE TABLE `maple`.`maple_engine_execution`
 (
-    `id`      int        NOT NULL,
-    `content` mediumtext NOT NULL COMMENT '执行配置',
-    `result`  mediumtext NOT NULL COMMENT '执行结果',
+    `id`               int                                   NOT NULL AUTO_INCREMENT COMMENT '执行ID',
+    `exec_file`        varchar(256)                          NOT NULL COMMENT '执行文件',
+
+    `job_id`           varchar(32)                           NOT NULL COMMENT '作业ID',             -- 用于关联到某一个具体的作业配置
+    `from_app`         varchar(16)                           NOT NULL COMMENT '来源应用',           -- 用于区分哪个应用提交，例如调度系统，实时平台等
+    `biz_id`           varchar(64)                           NOT NULL COMMENT '执行批次ID',         -- 某个作业同一个业务时间运行的实例的集合ID (可能包含多次执行，如用日期划分 "2022-03-05"，加上小时划分 "2022-03-05 12")
+    `exec_uniq_id`     varchar(32)                           NOT NULL COMMENT '应用作业执行唯一ID', -- 一个作业运行实例的ID，用于防止重复提交执行
+    `exec_name`        varchar(32) DEFAULT ''                NOT NULL COMMENT '执行名称',           -- 作业的code，用于生成集群上的名称(例如：xxx_2022-04-05、xxx_2022-04-05_12)
+    `engine_id`        int                                   NOT NULL COMMENT '引擎ID',
+    `resource_group`   json                                  NOT NULL COMMENT '集群资源组',         -- 如 YARN、Volcano 的 Queue，K8s 的 Namespace 等
+
+    `priority`         tinyint                               NOT NULL COMMENT '初始优先级',         -- 用于区分优先级，优先级高的先执行
+    `run_pri`          tinyint                               NOT NULL COMMENT '运行优先级',
+    `pri_upgradable`   bit         DEFAULT 0                 NOT NULL COMMENT '优先级可提升',       -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
+
+    `user_group`       int                                   NOT NULL COMMENT '用户组',
+    `run_by`           int                                   NOT NULL COMMENT '执行人',
+
+    `cluster_app_id`   varchar(64) DEFAULT ''                NOT NULL COMMENT '集群应用ID',         -- K8s 按一定规则生成，直接写入数据库，YARN 的 ApplicationID 由 YARN 生成，后续回写到数据库
+    `status`           varchar(16) DEFAULT 'CREATED'         NOT NULL COMMENT '状态',               -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
+    `submitted_at`     datetime                              NULL COMMENT '任务提交时间',           -- 对应 STARTING 的时间，提交执行的时候设置
+    `started_at`       datetime                              NULL COMMENT '任务执行开始时间',       -- 对应首次 RUNNING 的时间，任务真正开始执行的时候设置
+    `finished_at`      datetime                              NULL COMMENT '任务执行结束时间',       -- 对应结束状态的时间，任务结束的时候设置，不管是否成功
+
+    `created_at`       datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`       datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+
+    PRIMARY KEY (`id`),
+    UNIQUE uniq_exec_from_app_uniq_id (`from_app`, `exec_uniq_id`),
+    INDEX idx_exec_name (`exec_name`),
+    INDEX idx_exec_engine (`engine_id`),
+    INDEX idx_exec_status (`status`),
+    INDEX idx_exec_group (`user_group`),
+    INDEX idx_exec_user (`run_by`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci COMMENT = '引擎执行记录';
+
+DROP TABLE IF EXISTS `maple`.maple_engine_execution_ext_info;
+CREATE TABLE `maple`.`maple_engine_execution_ext_info`
+(
+    `id`        int  NOT NULL COMMENT '执行ID',
+    `exec_conf` json NULL COMMENT '作业配置',     -- 作业的配置信息
+    `run_conf`  json NULL COMMENT '启动参数信息', -- 作业的启动参数信息
+    `exec_info` json NULL COMMENT '执行信息',     -- 包括状态信息，状态变更时间等
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci COMMENT = '执行作业结果';
+  COLLATE = utf8_unicode_ci COMMENT = '引擎执行扩展信息';
+
+DROP TABLE IF EXISTS `maple`.`maple_engine_execution_log`;
+CREATE TABLE `maple`.`maple_engine_`
+
+-- region 作业配置
 
 -- endregion
-
-
-CREATE TABLE test1
-(
-    id int NOT NULL AUTO_INCREMENT,
-    name varchar(32) NOT NULL,
-    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
-    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
-    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
-    PRIMARY KEY (id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci;
-
-CREATE TABLE test2
-(
-    id int NOT NULL AUTO_INCREMENT,
-    name varchar(32) NOT NULL,
-    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
-    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
-    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
-    PRIMARY KEY (id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci;

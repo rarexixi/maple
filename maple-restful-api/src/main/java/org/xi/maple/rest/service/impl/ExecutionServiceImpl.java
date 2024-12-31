@@ -15,8 +15,11 @@ import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
 import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
+import org.xi.maple.persistence.model.response.JobDetailResp;
 import org.xi.maple.rest.client.PersistenceClient;
 import org.xi.maple.rest.client.SchedulerClient;
+import org.xi.maple.rest.model.request.ExecReq;
+import org.xi.maple.rest.model.request.JobExecReq;
 import org.xi.maple.rest.service.ExecutionService;
 import org.xi.maple.rest.service.MapleAppService;
 import org.xi.maple.service.util.ObjectUtils;
@@ -67,18 +70,48 @@ public class ExecutionServiceImpl implements ExecutionService {
      * 3. 将执行对象（执行ID，执行优先级，时间戳）插入队列
      * 4. 将执行状态更新为排队中
      *
-     * @param submitReq 执行提交请求对象
+     * @param execReq 执行提交请求对象
      * @return 执行记录ID
      */
     @Override
-    public Integer submit(EngineExecutionSaveReq submitReq) {
-        final Integer id = persistenceClient.addExecution(submitReq);
+    public Integer submit(ExecReq execReq) {
+        final Integer id = persistenceClient.addExecution(execReq);
         if (id == null || id < 0) {
             return id;
         }
         threadPoolTaskExecutor.execute(() -> {
-            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(submitReq.getCluster(), submitReq.getResourceGroup(),
-                    submitReq.getFromApp(), submitReq.getGroup(), submitReq.getPriority());
+            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(execReq.getCluster(), execReq.getResourceGroup(),
+                    execReq.getFromApp(), execReq.getGroup(), execReq.getPriority());
+            EngineExecutionQueueSaveReq saveReq = ObjectUtils.copy(execQueue, EngineExecutionQueueSaveReq.class);
+            persistenceClient.upsertExecQueue(saveReq);
+            logger.info("插入队列：{}, id: {}", execQueue.getQueueName(), id);
+            redisTemplate.opsForList().leftPush(execQueue.getQueueName(), new MapleEngineExecutionQueue.QueueItem(id, System.currentTimeMillis()));
+            persistenceClient.updateExecutionStatusById(id, new EngineExecutionStatusUpdateReq(EngineExecutionStatus.ACCEPTED.toString()));
+        });
+        return id;
+    }
+
+    /**
+     * 提交配置的作业
+     * 1. 验证请求是否合法
+     * 2. 将执行请求插入数据库，返回执行ID
+     * 3. 将执行对象（执行ID，执行优先级，时间戳）插入队列
+     * 4. 将执行状态更新为排队中
+     *
+     * @param jobExecReq 执行提交请求对象
+     * @return 执行记录ID
+     */
+    @Override
+    public Integer submitJob(JobExecReq jobExecReq) {
+        JobDetailResp jobDetail = persistenceClient.getJobById(jobExecReq.getJobId());
+        ExecReq execReq = ObjectUtils.copy(jobDetail, ExecReq.class);
+        final Integer id = persistenceClient.addExecution(execReq);
+        if (id == null || id < 0) {
+            return id;
+        }
+        threadPoolTaskExecutor.execute(() -> {
+            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(execReq.getCluster(), execReq.getResourceGroup(),
+                    execReq.getFromApp(), execReq.getGroup(), execReq.getPriority());
             EngineExecutionQueueSaveReq saveReq = ObjectUtils.copy(execQueue, EngineExecutionQueueSaveReq.class);
             persistenceClient.upsertExecQueue(saveReq);
             logger.info("插入队列：{}, id: {}", execQueue.getQueueName(), id);
@@ -89,8 +122,8 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
-    public Integer submitNow(EngineExecutionSaveReq submitReq) {
-        final Integer id = persistenceClient.addExecution(submitReq);
+    public Integer exec(ExecReq execReq) {
+        final Integer id = persistenceClient.addExecution(execReq);
         schedulerClient.submitExecution(id);
         return id;
     }

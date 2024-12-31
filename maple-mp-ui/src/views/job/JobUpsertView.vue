@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import { minimatch } from "minimatch"
-import { computed, onBeforeMount, onBeforeUpdate, onMounted, reactive } from "vue"
+import { onBeforeMount, onBeforeUpdate, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
 import common, { DataOperationType } from '@/composables/common'
 import jobs from '@/composables/jobs'
-import { listSearch } from "@/composables/requests"
-import { JobApis, ClusterEngineApis, ClusterApis } from "@/composables/service-apis"
+import { JobApis } from "@/composables/service-apis"
 import { useJobTypesStore } from "@/stores/sys-conf"
 import type { OperateCallback } from "@/composables/table-operations"
 import { getSingleDataOperations2 } from "@/composables/table-operations"
@@ -30,18 +28,6 @@ const {
   jobType,
   operateType
 } = defineProps<Props>()
-
-const clusterSearchParams = reactive<any>({
-  deleted: 0
-})
-const {
-  dataMap: clusterOptionMap
-} = listSearch(ClusterApis.list(), clusterSearchParams, undefined, common.convertToOptions('id', 'name'), common.setOptionMap('id', 'name'))
-
-const engineSearchParams = reactive<any>({})
-const {
-  dataList: engineList
-} = listSearch(ClusterEngineApis.list(), engineSearchParams, undefined)
 
 const {} = useJobTypesStore()
 
@@ -109,37 +95,6 @@ function setJobConf(runConf: any, jobConf: any, jobType?: string) {
   }
 }
 
-function versionMatch(patterns: string[], version: string) {
-  for (let pattern of patterns) {
-    if (minimatch(version, pattern)) {
-      return true
-    }
-  }
-  return false
-}
-
-const jobTypeDetail = computed(() => jobTypeMap[detail.jobType])
-
-const engineOptions = computed(() => {
-  let result = new Map<string, any>()
-
-  if (!jobTypeDetail.value)
-    return []
-
-  for (let engine of engineList.value) {
-    if (jobTypeDetail.value.engineType !== engine.name || !versionMatch(jobTypeDetail.value.engineVersions, engine.version)) {
-      continue
-    }
-    if (result.has(engine.clusterId)) {
-      result.get(engine.clusterId).push({ label: `${engine.name} ${engine.version}`, value: engine.id })
-    } else {
-      result.set(engine.clusterId, [{ label: `${engine.name} ${engine.version}`, value: engine.id }])
-    }
-  }
-  return Array.from(result).map(([clusterId, engines]) => ({ label: clusterOptionMap[clusterId], options: engines }))
-})
-
-
 let initialized = false
 const initPageConf = () => {
   if (initialized) return
@@ -169,10 +124,7 @@ onBeforeUpdate(() => initPageConf())
         <a-typography-text type="secondary">({{ jobTypeOptionMap[detail.jobType] }})</a-typography-text>
       </template>
     </template>
-    <JobUpsertForm ref="detailFormRef" v-model="detail"
-                   :engine-options="engineOptions"
-                   :job-type="jobTypeDetail"
-                   @save="upsert(operateType, false)">
+    <JobUpsertForm ref="detailFormRef" v-model="detail" @save="upsert(operateType, false)">
       <template #buttons>
         <a-button type="primary" @click="upsert(operateType)">保存并返回</a-button>
       </template>

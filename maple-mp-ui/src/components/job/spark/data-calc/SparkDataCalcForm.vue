@@ -89,7 +89,6 @@ async function validate(setValidated: (success: boolean) => void) {
 }
 
 function getTableIdentifier(conf: any) {
-  console.log(conf)
   let table = conf.targetTable
   if (!table || !(table.tableName)) return ''
   let tableIdentifier = table.tableName

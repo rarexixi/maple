@@ -1,3 +1,21 @@
+DROP TABLE IF EXISTS `maple`.`maple_sys_conf`;
+CREATE TABLE `maple`.`maple_sys_conf`
+(
+    `conf_key`    varchar(64)                            NOT NULL COMMENT '配置键',
+    `conf_value`  json                                   NOT NULL COMMENT '配置值',
+    `description` varchar(512) DEFAULT ''                NOT NULL COMMENT '配置说明',
+
+    `disabled`    tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
+    `created_by`  int          DEFAULT 0                 NOT NULL COMMENT '创建人',
+    `updated_by`  int          DEFAULT 0                 NOT NULL COMMENT '修改人',
+    `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+
+    PRIMARY KEY (`conf_key`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci COMMENT ='系统配置';
+
 DROP TABLE IF EXISTS `maple`.`maple_user`;
 CREATE TABLE `maple`.`maple_user`
 (
@@ -56,19 +74,6 @@ CREATE TABLE `maple`.`maple_user_permission`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci COMMENT = '用户权限';
-
-
-INSERT INTO maple.maple_user_permission (user_id, perm_id)
-VALUES (1, 1);
-
-INSERT INTO maple.maple_permission (id, code, `description`)
-VALUES (1, 'user:permissions', '用户权限查询');
-
-SELECT MP.`code`
-FROM `maple_permission` MP
-         JOIN `maple_user_permission` MUP ON MP.`id` = MUP.`perm_id`
-    where
-    MUP.`user_id` = 1
 
 
 

@@ -51,13 +51,13 @@ const labelWidth = 3
 <template>
   <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
-    <a-form-item ref="clusterId" label="所属集群" name="clusterId">
+    <a-form-item label="所属集群" name="clusterId">
       <a-select v-model:value="detail.clusterId" :options="clusterOptions" allow-clear placeholder="请选择" />
     </a-form-item>
-    <a-form-item ref="version" label="引擎版本" name="version">
+    <a-form-item label="引擎版本" name="version">
       <a-input v-model:value.trim="detail.version" type="text" />
     </a-form-item>
-    <a-form-item ref="engineHome" label="引擎目录" name="engineHome">
+    <a-form-item label="引擎目录" name="engineHome">
       <a-input v-model:value.trim="detail.engineHome" type="text" />
     </a-form-item>
     <SparkConfig ref="engineConfRef" v-model="detail.engineConf"/>

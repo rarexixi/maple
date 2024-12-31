@@ -18,7 +18,7 @@ public class MapleAppServiceImpl implements MapleAppService {
     @Cacheable(cacheNames = {"maple-app"}, key = "#appName")
     @Override
     public String getAppKey(String appName) {
-        ApplicationDetailResp app = persistenceClient.getByAppName(appName);
+        ApplicationDetailResp app = persistenceClient.getApplicationByAppName(appName);
         return app == null ? "" : app.getAccessKey();
     }
 }

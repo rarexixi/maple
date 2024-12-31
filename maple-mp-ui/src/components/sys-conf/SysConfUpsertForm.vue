@@ -40,13 +40,13 @@ const labelWidth = 4
 <template>
   <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
-    <a-form-item ref="confKey" label="配置键" name="confKey">
+    <a-form-item label="配置键" name="confKey">
       <a-input v-model:value.trim="detail.confKey" type="text" />
     </a-form-item>
-    <a-form-item ref="confValue" label="配置值" name="confValue">
+    <a-form-item label="配置值" name="confValue">
       <a-textarea v-model:value="detail.confValue" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
-    <a-form-item ref="description" label="配置说明" name="description">
+    <a-form-item label="配置说明" name="description">
       <a-textarea v-model:value="detail.description" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
     <a-form-item :wrapper-col="{ offset: labelWidth }">

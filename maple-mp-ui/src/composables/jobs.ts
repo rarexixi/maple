@@ -5,13 +5,23 @@ const JobRunTypes: any = {
     executorCores: undefined,
     executorMemory: undefined,
     numExecutors: undefined,
+    driverJavaOptions: undefined,
+    driverClassPath: undefined,
+    jars: undefined,
+    files: undefined,
+    archives: undefined,
+    confs: {}
   }),
   "flink": () => ({
-    driverCores: undefined,
-    driverMemory: undefined,
-    executorCores: undefined,
-    executorMemory: undefined,
-    numExecutors: undefined,
+    jobManagerHaEnable: true,
+    jobManagerReplicas: 2,
+    jobManagerCores: 1,
+    jobManagerMemory: undefined,
+    numTaskManager: undefined,
+    taskManagerCores: undefined,
+    taskManagerMemory: undefined,
+    numberOfTaskSlots: undefined,
+    confs: {}
   }),
 }
 

@@ -31,7 +31,7 @@ defineExpose({
 
 <template>
   <a-form ref="formRef" :model="conf" :label-col="{ span: 3 }">
-    <a-form-item ref="envs" label="环境变量" name="envs">
+    <a-form-item label="环境变量" name="envs">
       <a-input-string-map v-model:value="conf.envs" type="text" />
     </a-form-item>
     <h3>

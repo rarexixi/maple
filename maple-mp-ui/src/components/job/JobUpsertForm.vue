@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
 import type { ValidateErrorEntity } from "ant-design-vue/es/form/interface"
-import { useTemplateRef } from "vue"
+import { computed, reactive, useTemplateRef } from "vue"
 
 import common from "@/composables/common"
 import type { ValidatableComponent } from "@/composables/models"
@@ -10,19 +10,11 @@ import SparkRun from "@/components/job/spark/SparkRunForm.vue"
 import FlinkRun from "@/components/job/flink/FlinkRunForm.vue"
 import SparkDataCalc from "@/components/job/spark/data-calc/SparkDataCalcForm.vue"
 import FlinkDataCalc from "@/components/job/flink/data-calc/FlinkDataCalcForm.vue"
-import { useDatabaseTypesStore, useFlinkConnectorAvailableMetadataStore } from "@/stores/sys-conf";
-import { useDatasourceStore } from "@/stores/sys-data";
+import { useDatabaseTypesStore, useFlinkConnectorAvailableMetadataStore, useJobTypesStore } from "@/stores/sys-conf";
+import { useClusterEngineStore, useClusterStore, useDatasourceStore } from "@/stores/sys-data";
+import { minimatch } from "minimatch";
 
 const detail = defineModel<any>()
-
-const {
-  engineOptions,
-  jobType
-} = defineProps<{
-  engineOptions: any[],
-  jobType: any
-}>()
-
 
 const rules = {
   id: [
@@ -46,6 +38,44 @@ const jobConfFormRef = useTemplateRef<ValidatableComponent>("jobConfFormRef")
 const { dataInitialized } = useDatasourceStore()
 const { confInitialized } = useDatabaseTypesStore()
 const { confInitialized: metadataColumnsConfInitialized } = useFlinkConnectorAvailableMetadataStore()
+const { confMap: jobTypeMap } = useJobTypesStore()
+
+const { dataList: clusterList, dataMap: clusterMap } = useClusterStore()
+const { dataList: engineList, dataMap: engineMap } = useClusterEngineStore()
+
+function versionMatch(patterns: string[], version: string) {
+  for (let pattern of patterns) {
+    if (minimatch(version, pattern)) {
+      return true
+    }
+  }
+  return false
+}
+
+const jobTypeDetail = computed(() => jobTypeMap[detail.value.jobType])
+const engineOptions = computed(() => {
+  let result = new Map<string, any>()
+
+  if (!jobTypeDetail.value)
+    return []
+
+  for (let engine of engineList.value) {
+    if (jobTypeDetail.value.engineType !== engine.name || !versionMatch(jobTypeDetail.value.engineVersions, engine.version)) {
+      continue
+    }
+    if (result.has(engine.clusterId)) {
+      result.get(engine.clusterId).push({ label: `${engine.name} ${engine.version}`, value: engine.id })
+    } else {
+      result.set(engine.clusterId, [{ label: `${engine.name} ${engine.version}`, value: engine.id }])
+    }
+  }
+  return Array.from(result).map(([clusterId, engines]) => ({ label: clusterMap[clusterId]?.name, options: engines }))
+})
+const clusterCategory = computed(() => {
+  let clusterId = engineMap[detail.value.engineId]?.clusterId
+  if (!clusterId) return ""
+  return clusterMap[clusterId]?.category
+})
 
 const emit = defineEmits<{
   (e: 'save'): void
@@ -73,22 +103,23 @@ const wrapCols = common.Layout.wrapCols
 <template>
   <a-form ref="formRef" :model="detail" :rules="rules" :label-col="labelCols.l125">
     <a-flex wrap="wrap">
-      <a-form-item ref="jobName" label="作业名" name="jobName" class="form-item-360">
+      <a-form-item label="作业名" name="jobName" class="form-item-360">
         <a-input v-model:value.trim="detail.jobName" type="text" />
       </a-form-item>
-      <a-form-item ref="engineId" label="引擎ID" name="engineId" class="form-item-360">
+      <a-form-item label="引擎ID" name="engineId" class="form-item-360">
         <a-select v-model:value="detail.engineId" :options="engineOptions" allow-clear placeholder="请选择" />
       </a-form-item>
-      <a-form-item ref="owner" label="作业负责人" name="owner" class="form-item-360">
+      <a-form-item label="作业负责人" name="owner" class="form-item-360">
         <a-input v-model:value.trim="detail.owner" type="text" />
       </a-form-item>
-      <a-form-item ref="description" label="作业说明" name="description" class="form-item-720">
+      <a-form-item label="作业说明" name="description" class="form-item-720">
         <a-input v-model:value="detail.description" />
       </a-form-item>
     </a-flex>
-    <a-divider />
-    <SparkRun ref="runFormRef" :run-conf="detail.runConf" v-if="jobType?.engineType == 'spark'" />
-    <FlinkRun ref="runFormRef" :run-conf="detail.runConf" v-else-if="jobType?.engineType == 'flink'" />
+    <SparkRun ref="runFormRef" :job-type="detail.jobType" :cluster-category="clusterCategory" :run-conf="detail.runConf"
+              v-if="jobTypeDetail?.engineType == 'spark'" />
+    <FlinkRun ref="runFormRef" :job-type="detail.jobType" :cluster-category="clusterCategory" :run-conf="detail.runConf"
+              v-else-if="jobTypeDetail?.engineType == 'flink'" />
     <template v-if="confInitialized && dataInitialized && metadataColumnsConfInitialized">
       <a-divider />
       <SparkDataCalc ref="jobConfFormRef" :job-conf="detail.jobConf" v-if="detail.jobType === 'spark-data-calc'" />

@@ -79,19 +79,19 @@ const addConfOption = () => {
 <template>
   <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
-    <a-form-item ref="typeCode" label="类型编码" name="typeCode">
+    <a-form-item label="类型编码" name="typeCode">
       <a-input v-model:value.trim="detail.typeCode" type="text" />
     </a-form-item>
-    <a-form-item ref="typeName" label="类型名称" name="typeName">
+    <a-form-item label="类型名称" name="typeName">
       <a-input v-model:value.trim="detail.typeName" type="text" />
     </a-form-item>
-    <a-form-item ref="icon" label="图标地址" name="icon">
+    <a-form-item label="图标地址" name="icon">
       <a-input v-model:value.trim="detail.icon" type="text" />
     </a-form-item>
-    <a-form-item ref="classifier" label="分类" name="classifier">
+    <a-form-item label="分类" name="classifier">
       <a-input v-model:value.trim="detail.classifier" type="text" />
     </a-form-item>
-    <a-form-item ref="versions" label="版本" name="versions">
+    <a-form-item label="版本" name="versions">
       <a-input v-model:value.trim="detail.versions" type="text" />
     </a-form-item>
     <h3>

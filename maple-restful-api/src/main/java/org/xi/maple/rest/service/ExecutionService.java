@@ -2,6 +2,8 @@ package org.xi.maple.rest.service;
 
 import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
+import org.xi.maple.rest.model.request.ExecReq;
+import org.xi.maple.rest.model.request.JobExecReq;
 
 import java.util.Map;
 
@@ -29,18 +31,26 @@ public interface ExecutionService {
     /**
      * 提交执行
      *
-     * @param submitReq 执行提交请求对象
+     * @param execReq 执行提交请求对象
      * @return 执行记录ID
      */
-    Integer submit(EngineExecutionSaveReq submitReq);
+    Integer submit(ExecReq execReq);
+
+    /**
+     * 提交执行
+     *
+     * @param jobExecReq 执行提交请求对象
+     * @return 执行记录ID
+     */
+    Integer submitJob(JobExecReq jobExecReq);
 
     /**
      * 立即执行，返回提交结果
      *
-     * @param submitReq 执行提交请求对象
+     * @param execReq 执行提交请求对象
      * @return 执行记录ID
      */
-    Integer submitNow(EngineExecutionSaveReq submitReq);
+    Integer exec(ExecReq execReq);
 
     /**
      * 杀死执行任务

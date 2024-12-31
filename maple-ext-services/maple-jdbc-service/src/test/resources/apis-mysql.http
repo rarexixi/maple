@@ -63,3 +63,4 @@ GET http://localhost:8082/api/jdbc/1/tables?databaseName=maple
 Content-Type: application/json
 Accept: application/json
 maple-tag: maple-db-service:mysql
+

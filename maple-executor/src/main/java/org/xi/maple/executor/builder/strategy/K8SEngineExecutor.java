@@ -56,7 +56,8 @@ public class K8SEngineExecutor extends EngineExecutor {
                 yamlFiles.add(fileName);
             }
             for (String yamlPath : yamlFiles) {
-                schedulerClient.deploy(execution.getCluster(), Files.readString(Paths.get(getPath(execHome, yamlPath))));
+                String yaml = new String(Files.readAllBytes(Paths.get(getPath(execHome, yamlPath))));
+                schedulerClient.deploy(execution.getCluster(), yaml);
             }
         } catch (Throwable t) {
             logger.error("Generate file failed!", t);

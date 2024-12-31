@@ -66,32 +66,32 @@ const labelWidth = 4
     <#if column.notRequired>
     <#elseif column.autoIncrement>
     <#elseif (column.select || column.fkSelect)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-select v-model:value="detail.${fieldName}" :options="${fieldNameExceptKey}Options" allow-clear placeholder="请选择" />
     </a-form-item>
     <#elseif (column.validStatus)>
     <#elseif (isInteger)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-input-number v-model:value="detail.${fieldName}" />
     </a-form-item>
     <#elseif (isDecimal)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-input-number v-model:value="detail.${fieldName}" />
     </a-form-item>
     <#elseif (isDate)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-date-picker v-model:value="detail.${fieldName}" type="date" placeholder="选择日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
     </a-form-item>
     <#elseif (isDateTime)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-date-picker v-model:value="detail.${fieldName}" type="date" placeholder="选择日期时间" format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" />
     </a-form-item>
     <#elseif (isContent)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-textarea v-model:value="detail.${fieldName}" :autoSize="{ minRows: 5, maxRows: 100}" />
     </a-form-item>
     <#elseif (isString)>
-    <a-form-item ref="${fieldName}" label="${columnComment}" name="${fieldName}">
+    <a-form-item label="${columnComment}" name="${fieldName}">
       <a-input v-model:value.trim="detail.${fieldName}" type="text" />
     </a-form-item>
     <#else>

@@ -56,10 +56,10 @@ const labelWidth = 4
 <template>
   <a-form ref="formRef" :model="detail" :rules="rules"
           :label-col="{ span: labelWidth }" :wrapper-col="{ span: 24-labelWidth }">
-    <a-form-item ref="name" label="数据源名称" name="name">
+    <a-form-item label="数据源名称" name="name">
       <a-input v-model:value.trim="detail.name" type="text" />
     </a-form-item>
-    <a-form-item ref="description" label="数据源描述" name="description">
+    <a-form-item label="数据源描述" name="description">
       <a-input v-model:value.trim="detail.description" type="text" />
     </a-form-item>
     <template v-for="(item, index) in confOptions" :key="item.keyCode">

@@ -8,6 +8,7 @@ import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.persistence.model.response.*;
+import org.xi.maple.rest.model.request.ExecReq;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
@@ -20,7 +21,7 @@ public interface PersistenceClient {
     // region engine-execution
 
     @PostMapping("/api/engine-executions")
-    Integer addExecution(@RequestBody EngineExecutionSaveReq req);
+    Integer addExecution(@RequestBody ExecReq req);
 
     @GetMapping("/api/engine-executions/{id}")
     EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);
@@ -52,7 +53,14 @@ public interface PersistenceClient {
     // region application
 
     @GetMapping("/api/applications/{appName}")
-    ApplicationDetailResp getByAppName(@PathVariable("appName") String appName);
+    ApplicationDetailResp getApplicationByAppName(@PathVariable("appName") String appName);
+
+    // endregion
+
+    // region job
+
+    @GetMapping("/api/jobs/{id}")
+    JobDetailResp getJobById(@PathVariable("id") Integer id);
 
     // endregion
 }

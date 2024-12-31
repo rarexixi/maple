@@ -3,12 +3,13 @@ package org.xi.maple.rest.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.annotation.MapleAppAuthentication;
+import org.xi.maple.rest.model.request.ExecReq;
+import org.xi.maple.rest.model.request.JobExecReq;
 import org.xi.maple.rest.service.ExecutionService;
 import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -27,16 +28,23 @@ public class ExecutionController {
     }
 
     @MapleAppAuthentication(app = "#addRequest.fromApp", value = "#submitReq.execUniqId + '#;' + #submitReq.execName")
-    @PostMapping("exec")
-    public ResponseEntity<Integer> submit(@RequestBody EngineExecutionSaveReq addRequest) {
-        Integer id = executionService.submit(addRequest);
+    @PostMapping("submit")
+    public ResponseEntity<Integer> submit(@RequestBody ExecReq execReq) {
+        Integer id = executionService.submit(execReq);
         return ResponseEntity.ok(id);
     }
 
     @MapleAppAuthentication(app = "#addRequest.fromApp", value = "#submitReq.execUniqId + '#;' + #submitReq.execName")
-    @PostMapping("exec-now")
-    public ResponseEntity<Integer> submitNow(@RequestBody EngineExecutionSaveReq addRequest) {
-        Integer id = executionService.submitNow(addRequest);
+    @PostMapping("submit-job")
+    public ResponseEntity<Integer> submitJob(@RequestBody JobExecReq jobExecReq) {
+        Integer id = executionService.submitJob(jobExecReq);
+        return ResponseEntity.ok(id);
+    }
+
+    @MapleAppAuthentication(app = "#addRequest.fromApp", value = "#submitReq.execUniqId + '#;' + #submitReq.execName")
+    @PostMapping("exec")
+    public ResponseEntity<Integer> exec(@RequestBody ExecReq execReq) {
+        Integer id = executionService.exec(execReq);
         return ResponseEntity.ok(id);
     }
 
