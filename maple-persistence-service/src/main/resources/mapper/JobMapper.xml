@@ -8,15 +8,18 @@
         <result property="jobName" column="job_name"/>
         <result property="description" column="description"/>
         <result property="jobType" column="job_type"/>
-        <result property="engineId" column="engine_id"/>
+        <result property="userGroup" column="user_group"/>
         <result property="owner" column="owner"/>
+        <result property="fromApp" column="from_app"/>
+        <result property="engineId" column="engine_id"/>
+        <result property="clusterId" column="cluster_id"/>
+        <result property="clusterCategory" column="cluster_category"/>
+        <result property="priority" column="priority"/>
+        <result property="priUpgradable" column="pri_upgradable"/>
         <result property="runConf" column="run_conf"/>
         <result property="jobConf" column="job_conf"/>
-        <result property="disabled" column="disabled"/>
-        <result property="createdBy" column="created_by"/>
-        <result property="updatedBy" column="updated_by"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
+        <result property="engineCategory" column="engine_category"/>
+        <result property="engineVersion" column="engine_version"/>
     </resultMap>
 
     <sql id="tableName">`maple_job`</sql>
@@ -28,9 +31,16 @@
             MT.`job_name`,
             MT.`description`,
             MT.`job_type`,
-            MT.`engine_id`,
-            `T0`.`name` `engine_text`,
+            MT.`user_group`,
             MT.`owner`,
+            MT.`from_app`,
+            MT.`engine_id`,
+            CE.`name` AS `engine_category`,
+            CE.`version` AS `engine_version`,
+            MT.`cluster_id`,
+            MT.`cluster_category`,
+            MT.`priority`,
+            MT.`pri_upgradable`,
             MT.`run_conf`,
             MT.`job_conf`,
             MT.`disabled`,
@@ -41,6 +51,8 @@
         FROM
         <include refid="tableName"/> MT
             LEFT JOIN (SELECT `id`, `name` FROM `maple_cluster_engine`) T0 ON MT.engine_id = T0.`id`
+            JOIN `maple_cluster_engine` CE on MT.`engine_id` = CE.`id`
+            JOIN `maple_cluster` C on CE.`cluster_id` = C.`id`
         <where>
             MT.`id` = #{id}
         </where>

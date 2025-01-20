@@ -3,7 +3,8 @@ import type { FormInstance } from "ant-design-vue"
 import { ref, useTemplateRef } from "vue"
 
 import common from "@/composables/common"
-import ParamsMap from "@/components/ParamsMap.vue";
+
+import ParamsMap from "@/components/ParamsMap.vue"
 
 const { runConf } = defineProps<{
   clusterCategory: string,
@@ -39,7 +40,8 @@ defineExpose({
 <template>
   <a-form ref="formRef" :model="runConf" :rules="rules" :label-col="common.Layout.labelCols.l125">
     <a-flex wrap="wrap">
-      <a-typography-title :level="5">资源配置</a-typography-title>
+      <a-flex-br />
+      <a-typography-title :level="5">启动配置</a-typography-title>
       <a-flex-br />
       <a-form-item label="JM内存" name="jobManagerMemory" class="form-item-360">
         <a-input v-model:value.number="runConf.jobManagerMemory" type="text" />

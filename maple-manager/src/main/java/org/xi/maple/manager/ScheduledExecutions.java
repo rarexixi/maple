@@ -19,7 +19,7 @@ import org.xi.maple.manager.service.ExecutionService;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +69,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     public void consumeJobs() {
         logger.info("开始刷新要消费的队列...");
 
-        List<EngineExecutionQueue> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryReq());
+        List<EngineExecutionQueueResp> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryReq());
         if (queueList == null || queueList.isEmpty()) {
             logger.warn("队列列表为空, 清空消费队列...");
             for (String key : futureMap.keySet()) {
@@ -78,7 +78,7 @@ public class ScheduledExecutions implements CommandLineRunner {
             return;
         }
         Set<String> queueSet = new HashSet<>();
-        for (EngineExecutionQueue executionQueue : queueList) {
+        for (EngineExecutionQueueResp executionQueue : queueList) {
             queueSet.add(executionQueue.getQueueName());
             if (!futureMap.containsKey(executionQueue.getQueueName())) {
                 logger.info("开始消费队列 <{}> ...", executionQueue.getQueueName());
@@ -102,7 +102,7 @@ public class ScheduledExecutions implements CommandLineRunner {
      *
      * @param executionQueue redis 队列
      */
-    private void consumeQueueJobs(EngineExecutionQueue executionQueue) {
+    private void consumeQueueJobs(EngineExecutionQueueResp executionQueue) {
         logger.info("正在消费队列作业 <{}> ...", executionQueue.getQueueName());
 
         AtomicBoolean continueRunning = new AtomicBoolean(true);
@@ -125,13 +125,13 @@ public class ScheduledExecutions implements CommandLineRunner {
                 logger.error("作业不存在，id: {}", queueItem.getExecId());
                 continue;
             }
-            if (!executionQueue.getCluster().equals(execution.getCluster()) || !executionQueue.getClusterQueue().equals(execution.getResourceGroup())) {
-                logger.error("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getCluster(), executionQueue.getClusterQueue());
+            if (!executionQueue.getClusterId().equals(execution.getClusterId()) || !executionQueue.getResourceGroup().equals(execution.getResourceGroup())) {
+                logger.error("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getClusterId(), executionQueue.getResourceGroup());
                 executionService.updateExecutionStatus(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.FAILED.toString()));
                 continue;
             }
             threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {
-                logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getCluster(), execution.getResourceGroup());
+                logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getClusterId(), execution.getResourceGroup());
                 redisTemplate.opsForList().rightPush(executionQueue.getQueueName(), queueItem);
                 continueRunning.set(false);
             }));

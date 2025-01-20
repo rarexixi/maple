@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { FormInstance } from "ant-design-vue"
 import type { ValidateErrorEntity } from "ant-design-vue/es/form/interface"
-import { computed, reactive, useTemplateRef } from "vue"
+import { minimatch } from "minimatch"
+import { computed, useTemplateRef } from "vue"
 
 import common from "@/composables/common"
 import type { ValidatableComponent } from "@/composables/models"
+
+import { useDatabaseTypesStore, useFlinkConnectorAvailableMetadataStore, useJobTypesStore } from "@/stores/sys-conf"
+import { useClusterEngineStore, useClusterStore, useDatasourceStore } from "@/stores/sys-data"
 
 import SparkRun from "@/components/job/spark/SparkRunForm.vue"
 import FlinkRun from "@/components/job/flink/FlinkRunForm.vue"
 import SparkDataCalc from "@/components/job/spark/data-calc/SparkDataCalcForm.vue"
 import FlinkDataCalc from "@/components/job/flink/data-calc/FlinkDataCalcForm.vue"
-import { useDatabaseTypesStore, useFlinkConnectorAvailableMetadataStore, useJobTypesStore } from "@/stores/sys-conf";
-import { useClusterEngineStore, useClusterStore, useDatasourceStore } from "@/stores/sys-data";
-import { minimatch } from "minimatch";
 
 const detail = defineModel<any>()
 
@@ -95,6 +96,8 @@ async function save() {
   })
 }
 
+const priorityOptions = [{ label: '低', value: 1 }, { label: '中低', value: 2 }, {  label: '中',  value: 3}, { label: '中高', value: 4 }, { label: '高', value: 5 }]
+
 const labelCols = common.Layout.labelCols
 const wrapCols = common.Layout.wrapCols
 
@@ -103,17 +106,19 @@ const wrapCols = common.Layout.wrapCols
 <template>
   <a-form ref="formRef" :model="detail" :rules="rules" :label-col="labelCols.l125">
     <a-flex wrap="wrap">
+      <a-typography-title :level="5">基础信息</a-typography-title>
+      <a-flex-br />
       <a-form-item label="作业名" name="jobName" class="form-item-360">
         <a-input v-model:value.trim="detail.jobName" type="text" />
+      </a-form-item>
+      <a-form-item label="作业说明" name="description" class="form-item-720">
+        <a-input v-model:value="detail.description" type="text" />
       </a-form-item>
       <a-form-item label="引擎ID" name="engineId" class="form-item-360">
         <a-select v-model:value="detail.engineId" :options="engineOptions" allow-clear placeholder="请选择" />
       </a-form-item>
-      <a-form-item label="作业负责人" name="owner" class="form-item-360">
-        <a-input v-model:value.trim="detail.owner" type="text" />
-      </a-form-item>
-      <a-form-item label="作业说明" name="description" class="form-item-720">
-        <a-input v-model:value="detail.description" />
+      <a-form-item label="作业优先级" name="priority" class="form-item-360">
+        <a-select v-model:value="detail.priority" :options="priorityOptions" allow-clear placeholder="请选择" />
       </a-form-item>
     </a-flex>
     <SparkRun ref="runFormRef" :job-type="detail.jobType" :cluster-category="clusterCategory" :run-conf="detail.runConf"

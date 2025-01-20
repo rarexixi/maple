@@ -3,7 +3,8 @@ package org.xi.maple.persistence.persistence.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.xi.maple.common.model.BaseEntity;
+
+import java.io.Serializable;
 
 
 /**
@@ -14,7 +15,7 @@ import org.xi.maple.common.model.BaseEntity;
 @Getter
 @Setter
 @ToString
-public class JobEntity extends BaseEntity {
+public class JobEntity implements Serializable {
 
     /**
      * 作业ID
@@ -37,14 +38,44 @@ public class JobEntity extends BaseEntity {
     private String jobType;
 
     /**
+     * 用户组
+     */
+    private Integer userGroup;
+
+    /**
+     * 作业负责人
+     */
+    private Integer owner;
+
+    /**
+     * 来源应用
+     */
+    private String fromApp;
+
+    /**
      * 引擎ID
      */
     private Integer engineId;
 
     /**
-     * 作业负责人
+     * 所属集群
      */
-    private String owner;
+    private Integer clusterId;
+
+    /**
+     * 集群类型
+     */
+    private String clusterCategory;
+
+    /**
+     * 作业优先级
+     */
+    private Integer priority;
+
+    /**
+     * 优先级可提升
+     */
+    private Boolean priUpgradable;
 
     /**
      * 执行配置
@@ -55,4 +86,14 @@ public class JobEntity extends BaseEntity {
      * 作业配置
      */
     private String jobConf;
+
+    /**
+     * 引擎种类
+     */
+    private String engineCategory;
+
+    /**
+     * 引擎版本
+     */
+    private String engineVersion;
 }

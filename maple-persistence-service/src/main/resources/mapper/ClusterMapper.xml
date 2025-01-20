@@ -4,11 +4,12 @@
 <mapper namespace="org.xi.maple.persistence.persistence.mapper.ClusterMapper">
 
     <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.ClusterEntity">
+        <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="category" column="category"/>
         <result property="address" column="address"/>
         <result property="description" column="description"/>
-        <result property="configuration" column="configuration"/>
+        <result property="clusterConf" column="cluster_conf"/>
         <result property="disabled" column="disabled"/>
         <result property="createdBy" column="created_by"/>
         <result property="updatedBy" column="updated_by"/>
@@ -20,127 +21,15 @@
 
     <sql id="tableName">`maple_cluster`</sql>
 
-    <!--插入集群-->
-    <insert id="insert">
-        insert into <include refid="tableName"/>
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="entity.name != null">`name`,</if>
-            <if test="entity.category != null">`category`,</if>
-            <if test="entity.address != null">`address`,</if>
-            <if test="entity.description != null">`description`,</if>
-            <if test="entity.configuration != null">`configuration`,</if>
-            <if test="entity.disabled != null">`disabled`,</if>
-            <if test="entity.createdBy != null">`created_by`,</if>
-            <if test="entity.updatedBy != null">`updated_by`,</if>
-            <if test="entity.createdAt != null">`created_at`,</if>
-            <if test="entity.updatedAt != null">`updated_at`,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="entity.name != null">#{entity.name},</if>
-            <if test="entity.category != null">#{entity.category},</if>
-            <if test="entity.address != null">#{entity.address},</if>
-            <if test="entity.description != null">#{entity.description},</if>
-            <if test="entity.configuration != null">#{entity.configuration},</if>
-            <if test="entity.disabled != null">#{entity.disabled},</if>
-            <if test="entity.createdBy != null">#{entity.createdBy},</if>
-            <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
-            <if test="entity.createdAt != null">#{entity.createdAt},</if>
-            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
-        </trim>
-    </insert>
-
-    <!--todo 插入具体的列-->
-    <!--批量插入集群-->
-    <insert id="batchInsert">
-        insert into <include refid="tableName"/>
-        (
-            `name`,
-            `category`,
-            `address`,
-            `description`,
-            `configuration`,
-            `disabled`,
-            `created_by`,
-            `updated_by`,
-            `created_at`,
-            `updated_at`
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-        (
-            #{item.name},
-            #{item.category},
-            #{item.address},
-            #{item.description},
-            #{item.configuration},
-            #{item.disabled},
-            #{item.createdBy},
-            #{item.updatedBy},
-            #{item.createdAt},
-            #{item.updatedAt}
-        )
-        </foreach>
-    </insert>
-
-    <!--根据条件删除集群-->
-    <delete id="deleteByCondition">
-        DELETE FROM <include refid="tableName"/>
-        <include refid="updateByPkWhere"/>
-    </delete>
-
-    <!--根据条件更新集群实体不为空的字段-->
-    <update id="patchByCondition">
-        UPDATE <include refid="tableName"/>
-        <set>
-            <if test="entity.category != null">
-                `category` = #{entity.category},
-            </if>
-            <if test="entity.address != null">
-                `address` = #{entity.address},
-            </if>
-            <if test="entity.description != null">
-                `description` = #{entity.description},
-            </if>
-            <if test="entity.configuration != null">
-                `configuration` = #{entity.configuration},
-            </if>
-            <if test="entity.disabled != null">
-                `disabled` = #{entity.disabled},
-            </if>
-            <if test="entity.updatedBy != null">
-                `updated_by` = #{entity.updatedBy},
-            </if>
-            <if test="entity.updatedAt != null">
-                `updated_at` = #{entity.updatedAt}
-            </if>
-        </set>
-        <include refid="updateByPkWhere"/>
-    </update>
-
-    <!--根据条件更新集群所有字段-->
-    <update id="updateByName">
-        UPDATE <include refid="tableName"/>
-        <set>
-            `category` = #{entity.category},
-            `address` = #{entity.address},
-            `description` = #{entity.description},
-            `configuration` = #{entity.configuration},
-            `updated_by` = #{entity.updatedBy},
-            `updated_at` = #{entity.updatedAt}
-        </set>
-        <where>
-            `name` = #{name}
-        </where>
-    </update>
-
     <!--根据主键获取集群详情-->
     <select id="getByName" resultMap="ExtResultMap">
         SELECT
+            MT.`id`,
             MT.`name`,
             MT.`category`,
             MT.`address`,
             MT.`description`,
-            MT.`configuration`,
+            MT.`cluster_conf`,
             MT.`disabled`,
             MT.`created_by`,
             MT.`updated_by`,
@@ -154,18 +43,19 @@
     </select>
 
     <!-- 根据条件查询 -->
-    <select id="select" resultMap="ExtResultMap">
+    <select id="select" resultMap="BaseResultMap">
         SELECT
         <choose>
             <when test="columnsCondition != null and columnsCondition.columns != null">
                 <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
             </when>
             <otherwise>
+                MT.`id`,
                 MT.`name`,
                 MT.`category`,
                 MT.`address`,
                 MT.`description`,
-                MT.`configuration`,
+                MT.`cluster_conf`,
                 MT.`disabled`,
                 MT.`created_by`,
                 MT.`updated_by`,
@@ -179,31 +69,6 @@
             ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
         </if>
     </select>
-
-    <!-- 根据条件查询总数 -->
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-    </select>
-
-    <!-- 更新/删除条件 -->
-    <sql id="updateByPkWhere">
-        <where>
-            <if test="condition == null">1!=1</if>
-            <if test="condition != null">
-                <choose>
-                    <when test="condition.name != null">
-                        `name` = #{condition.name}
-                    </when>
-                    <otherwise>
-                        `name` IN
-                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </otherwise>
-                </choose>
-            </if>
-        </where>
-    </sql>
 
     <!-- 查询条件 -->
     <sql id="where">
@@ -262,100 +127,6 @@
                     </if>
                     <if test="condition.categoryContains != null and condition.categoryContains != ''">
                         AND MT.`category` LIKE concat('%', #{condition.categoryContains}, '%')
-                    </if>
-                    <if test="condition.address != null and condition.address != ''">
-                        AND MT.`address` = #{condition.address}
-                    </if>
-                    <if test="condition.addressIn != null and condition.addressIn.size() > 0">
-                        AND MT.`address` IN
-                        <foreach collection="condition.addressIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.addressNotIn != null and condition.addressNotIn.size() > 0">
-                        AND MT.`address` NOT IN
-                        <foreach collection="condition.addressNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.addressIsNotEmpty != null and condition.addressIsNotEmpty == true">
-                        AND MT.`address` IS NOT NULL AND `address` != ''
-                    </if>
-                    <if test="condition.addressIsEmpty != null and condition.addressIsEmpty == true">
-                        AND (MT.`address` IS NULL OR MT.`address` = '')
-                    </if>
-                    <if test="condition.addressStartWith != null and condition.addressStartWith != ''">
-                        AND MT.`address` LIKE concat(#{condition.addressStartWith}, '%')
-                    </if>
-                    <if test="condition.addressEndWith != null and condition.addressEndWith != ''">
-                        AND MT.`address` LIKE concat('%', #{condition.addressEndWith})
-                    </if>
-                    <if test="condition.addressContains != null and condition.addressContains != ''">
-                        AND MT.`address` LIKE concat('%', #{condition.addressContains}, '%')
-                    </if>
-                    <if test="condition.description != null and condition.description != ''">
-                        AND MT.`description` = #{condition.description}
-                    </if>
-                    <if test="condition.disabled != null">
-                        AND MT.`disabled` = #{condition.disabled}
-                    </if>
-                    <if test="condition.createdBy != null">
-                        AND MT.`created_by` = #{condition.createdBy}
-                    </if>
-                    <if test="condition.createdByIn != null and condition.createdByIn.size() > 0">
-                        AND MT.`created_by` IN
-                        <foreach collection="condition.createdByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.createdByNotIn != null and condition.createdByNotIn.size() > 0">
-                        AND MT.`created_by` NOT IN
-                        <foreach collection="condition.createdByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.createdByMin != null">
-                        <![CDATA[
-                        AND MT.`created_by` >= #{condition.createdByMin}
-                        ]]>
-                    </if>
-                    <if test="condition.createdByMax != null">
-                        <![CDATA[
-                        AND MT.`created_by` <= #{condition.createdByMax}
-                        ]]>
-                    </if>
-                    <if test="condition.updatedBy != null">
-                        AND MT.`updated_by` = #{condition.updatedBy}
-                    </if>
-                    <if test="condition.updatedByIn != null and condition.updatedByIn.size() > 0">
-                        AND MT.`updated_by` IN
-                        <foreach collection="condition.updatedByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.updatedByNotIn != null and condition.updatedByNotIn.size() > 0">
-                        AND MT.`updated_by` NOT IN
-                        <foreach collection="condition.updatedByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.updatedByMin != null">
-                        <![CDATA[
-                        AND MT.`updated_by` >= #{condition.updatedByMin}
-                        ]]>
-                    </if>
-                    <if test="condition.updatedByMax != null">
-                        <![CDATA[
-                        AND MT.`updated_by` <= #{condition.updatedByMax}
-                        ]]>
-                    </if>
-                    <if test="condition.createdAtMin != null">
-                        <![CDATA[
-                        AND MT.`created_at` >= #{condition.createdAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.createdAtMax != null">
-                        <![CDATA[
-                        AND MT.`created_at` <= #{condition.createdAtMax}
-                        ]]>
-                    </if>
-                    <if test="condition.updatedAtMin != null">
-                        <![CDATA[
-                        AND MT.`updated_at` >= #{condition.updatedAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.updatedAtMax != null">
-                        <![CDATA[
-                        AND MT.`updated_at` <= #{condition.updatedAtMax}
-                        ]]>
                     </if>
                 </trim>
             </if>

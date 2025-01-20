@@ -14,13 +14,14 @@ import { useBreadcrumbStore } from "@/stores/breadcrumbs"
 
 import DataOperations from "@/components/DataOperations.vue"
 import TableOperations from "@/components/TableOperations.vue"
+import { useClusterEngineStore, useClusterStore } from "@/stores/sys-data";
 
 const searchParams = reactive<any>({
   id: undefined,
   jobNameContains: undefined,
   jobType: undefined,
+  owner: undefined,
   engineId: undefined,
-  ownerContains: undefined,
 })
 
 const {
@@ -40,10 +41,9 @@ const {
   dataMap: clusterOptionMap
 } = listSearch(ClusterApis.list(), clusterSearchParams, undefined, common.convertToOptions('id', 'name'), common.setOptionMap('id', 'name'))
 
-const engineSearchParams = reactive<any>({})
-const {
-  dataList: engineList
-} = listSearch(ClusterEngineApis.list(), engineSearchParams, undefined)
+
+const { dataList: engineList, dataMap: engineMap } = useClusterEngineStore()
+const { dataMap: clusterMap } = useClusterStore()
 
 const engineOptions = computed(() => {
   let result = new Map<string, any>()
@@ -68,17 +68,30 @@ onMounted(() => {
   setBreadcrumb([{ text: '执行作业' }])
 })
 
+function getEngineShowName(data: any) {
+  let engine = engineMap[data.engineId]
+  return `${engine?.name} ${engine?.version}`
+}
+
+function getClusterShowName(data: any) {
+  let cluster = clusterMap[data.clusterId]
+  return `${cluster?.name} (${cluster?.category})`
+}
+
 const columns = [
   { title: '作业ID', dataIndex: 'id', key: 'id' },
   { title: '作业名', dataIndex: 'jobName', key: 'jobName' },
   { title: '作业类型', dataIndex: 'jobType', key: 'jobType', customRender: (row: any) => jobTypeOptionMap[row.text] },
-  { title: '引擎ID', dataIndex: 'engineId', key: 'engineId' },
+  { title: '来源应用', dataIndex: 'fromApp', key: 'fromApp' },
+  { title: '集群', dataIndex: 'clusterId', key: 'clusterCategory', customRender: (row: any) => getClusterShowName(row.record) },
+  { title: '引擎', dataIndex: 'engineId', key: 'engineId', customRender: (row: any) => getEngineShowName(row.record) },
+  { title: '用户组', dataIndex: 'userGroup', key: 'userGroup' },
   { title: '作业负责人', dataIndex: 'owner', key: 'owner' },
   { title: '创建人', dataIndex: 'createdBy', key: 'createdBy' },
   { title: '修改人', dataIndex: 'updatedBy', key: 'updatedBy' },
   { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt' },
   { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
-  { title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120 },
+  {title: '操作', dataIndex: 'action', key: 'action', fixed: 'right', width: 120},
 ]
 
 const callback: OperateCallback = {
@@ -114,11 +127,11 @@ const {
         <a-form-item label="作业类型" class="form-item-240">
           <a-select v-model:value="searchParams.jobType" :options="jobTypeOptions" allow-clear placeholder="全部" />
         </a-form-item>
+        <a-form-item label="作业负责人" class="form-item-240">
+          <a-input v-model:value.number="searchParams.owner" allow-clear />
+        </a-form-item>
         <a-form-item label="引擎ID" class="form-item-240">
           <a-select v-model:value="searchParams.engineId" :options="engineOptions" allow-clear placeholder="全部" />
-        </a-form-item>
-        <a-form-item label="作业负责人" class="form-item-240">
-          <a-input v-model:value.trim="searchParams.ownerContains" allow-clear />
         </a-form-item>
         <a-form-item>
           <a-button type="primary" @click="search">

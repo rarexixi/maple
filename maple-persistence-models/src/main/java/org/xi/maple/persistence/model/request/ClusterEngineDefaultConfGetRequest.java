@@ -10,27 +10,12 @@ import lombok.NoArgsConstructor;
 public class ClusterEngineDefaultConfGetRequest {
 
     /**
-     * 集群名称
-     */
-    private String cluster;
-
-    /**
-     * 引擎类型
-     */
-    private String engine;
-
-    /**
-     * 引擎版本
-     */
-    private String version;
-
-    /**
      * 用户组
      */
-    private String userGroup;
+    private Integer userGroup;
 
     /**
      * 用户
      */
-    private String user;
+    private Integer user;
 }

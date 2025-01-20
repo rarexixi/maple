@@ -14,13 +14,13 @@ public class EngineExecutionModel {
     private Integer execId;
     private String execFile;
     private String fromApp;
-    private String jobId;
+    private Integer jobId;
+    private String jobType;
     private String bizId;
-    private String execUniqId;
     private String execName;
-    private String resourceGroup;
-    private String group;
-    private String user;
+    private String userGroup;
+    private String runBy;
     private EngineConf engine;
-    private String configuration;
+    private String runConf;
+    private String execConf;
 }

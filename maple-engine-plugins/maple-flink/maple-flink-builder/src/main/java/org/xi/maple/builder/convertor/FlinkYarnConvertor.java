@@ -3,13 +3,12 @@ package org.xi.maple.builder.convertor;
 import org.xi.maple.builder.annotation.ClusterCategory;
 import org.xi.maple.builder.annotation.EngineCategory;
 import org.xi.maple.builder.annotation.EngineVersion;
-import org.xi.maple.builder.model.CommandGeneratorModel;
-import org.xi.maple.builder.model.EngineExecutionModel;
-import org.xi.maple.builder.model.ExecFtlModel;
-import org.xi.maple.builder.model.FlinkYarnDataModel;
+import org.xi.maple.builder.model.*;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
+import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.util.JsonUtils;
+import org.xi.maple.common.util.MapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,41 +16,49 @@ import java.util.List;
 @ClusterCategory(ClusterCategoryConstants.YARN)
 @EngineCategory(EngineCategoryConstants.FLINK)
 @EngineVersion(value = {"1.16.1", "1.17.2"})
-public class FlinkYarnConvertor implements MapleConvertor {
+public class FlinkYarnConvertor extends FlinkConvertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        ExecFtlModel<FlinkYarnDataModel> execConf = convert(execution);
+        ExecFtlModel<FlinkRunConf.Yarn, FlinkExecConf.ExecConf> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
 
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-submit.sh.ftl", "flink-yarn-submit.sh", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel("flink-yarn-submit.sh", "flink-yarn-submit.sh.ftl", execConf, true));
         return commandGeneratorModels;
     }
 
     @Override
     public List<CommandGeneratorModel> getStopCommandGenerator(EngineExecutionModel execution) {
-        ExecFtlModel<FlinkYarnDataModel> execConf = convert(execution);
+        ExecFtlModel<FlinkRunConf.Yarn, FlinkExecConf.ExecConf> execConf = convert(execution);
         if (execConf == null) {
             return null;
         }
 
         List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "flink-yarn-stop.sh.ftl", "flink-yarn-stop.sh", execConf));
+        commandGeneratorModels.add(new CommandGeneratorModel("flink-yarn-stop.sh", "flink-yarn-stop.sh.ftl", execConf, true));
         return commandGeneratorModels;
     }
 
-    private ExecFtlModel<FlinkYarnDataModel> convert(EngineExecutionModel execution) {
-        ExecFtlModel<FlinkYarnDataModel> execModel = new ExecFtlModel<>(execution);
-
-        String executionConf = execution.getConfiguration();
-        FlinkYarnDataModel jobConf = JsonUtils.parseObject(executionConf, FlinkYarnDataModel.class, null);
-        if (jobConf != null) {
-        }
-        execModel.setJob(jobConf);
-
+    private ExecFtlModel<FlinkRunConf.Yarn, FlinkExecConf.ExecConf> convert(EngineExecutionModel execution) {
+        ExecFtlModel<FlinkRunConf.Yarn, FlinkExecConf.ExecConf> execModel = new ExecFtlModel<>(execution);
+        execModel.setRunConf(getRunConf(execution));
+        execModel.setExecConf(getExecConf(execution));
         return execModel;
+    }
+
+    FlinkRunConf.Yarn getRunConf(EngineExecutionModel execution) {
+        FlinkRunConf.Yarn runConf = JsonUtils.parseObject(execution.getRunConf(), FlinkRunConf.Yarn.class, null);
+        if (runConf == null) {
+            throw new MapleException("RunConf has errors.");
+        }
+        if (execution.getEngine().getConfs() != null) {
+            runConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), runConf.getConf()));
+        } else {
+            runConf.setConf(runConf.getConf());
+        }
+        return runConf;
     }
 }

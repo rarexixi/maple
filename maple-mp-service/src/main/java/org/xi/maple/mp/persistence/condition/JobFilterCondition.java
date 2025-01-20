@@ -125,6 +125,96 @@ public class JobFilterCondition implements FilterCondition {
     private String jobTypeContains;
 
     /**
+     * 用户组
+     */
+    private Integer userGroup;
+
+    /**
+     * 用户组列表
+     */
+    private Collection<Integer> userGroupIn;
+
+    /**
+     * 排除的用户组列表
+     */
+    private Collection<Integer> userGroupNotIn;
+
+    /**
+     * 最小用户组
+     */
+    private Integer userGroupMin;
+
+    /**
+     * 最大用户组
+     */
+    private Integer userGroupMax;
+
+    /**
+     * 作业负责人
+     */
+    private Integer owner;
+
+    /**
+     * 作业负责人列表
+     */
+    private Collection<Integer> ownerIn;
+
+    /**
+     * 排除的作业负责人列表
+     */
+    private Collection<Integer> ownerNotIn;
+
+    /**
+     * 最小作业负责人
+     */
+    private Integer ownerMin;
+
+    /**
+     * 最大作业负责人
+     */
+    private Integer ownerMax;
+
+    /**
+     * 来源应用
+     */
+    private String fromApp;
+
+    /**
+     * 来源应用列表
+     */
+    private Collection<String> fromAppIn;
+
+    /**
+     * 排除的来源应用列表
+     */
+    private Collection<String> fromAppNotIn;
+
+    /**
+     * 来源应用不为空
+     */
+    private Boolean fromAppIsNotEmpty;
+
+    /**
+     * 来源应用为空
+     */
+    private Boolean fromAppIsEmpty;
+
+    /**
+     * 来源应用开始
+     */
+    private String fromAppStartWith;
+
+    /**
+     * 来源应用结束
+     */
+    private String fromAppEndWith;
+
+    /**
+     * 来源应用包含
+     */
+    private String fromAppContains;
+
+    /**
      * 引擎ID
      */
     private Integer engineId;
@@ -150,44 +240,94 @@ public class JobFilterCondition implements FilterCondition {
     private Integer engineIdMax;
 
     /**
-     * 作业负责人
+     * 所属集群
      */
-    private String owner;
+    private Integer clusterId;
 
     /**
-     * 作业负责人列表
+     * 所属集群列表
      */
-    private Collection<String> ownerIn;
+    private Collection<Integer> clusterIdIn;
 
     /**
-     * 排除的作业负责人列表
+     * 排除的所属集群列表
      */
-    private Collection<String> ownerNotIn;
+    private Collection<Integer> clusterIdNotIn;
 
     /**
-     * 作业负责人不为空
+     * 最小所属集群
      */
-    private Boolean ownerIsNotEmpty;
+    private Integer clusterIdMin;
 
     /**
-     * 作业负责人为空
+     * 最大所属集群
      */
-    private Boolean ownerIsEmpty;
+    private Integer clusterIdMax;
 
     /**
-     * 作业负责人开始
+     * 集群类型
      */
-    private String ownerStartWith;
+    private String clusterCategory;
 
     /**
-     * 作业负责人结束
+     * 集群类型列表
      */
-    private String ownerEndWith;
+    private Collection<String> clusterCategoryIn;
 
     /**
-     * 作业负责人包含
+     * 排除的集群类型列表
      */
-    private String ownerContains;
+    private Collection<String> clusterCategoryNotIn;
+
+    /**
+     * 集群类型不为空
+     */
+    private Boolean clusterCategoryIsNotEmpty;
+
+    /**
+     * 集群类型为空
+     */
+    private Boolean clusterCategoryIsEmpty;
+
+    /**
+     * 集群类型开始
+     */
+    private String clusterCategoryStartWith;
+
+    /**
+     * 集群类型结束
+     */
+    private String clusterCategoryEndWith;
+
+    /**
+     * 集群类型包含
+     */
+    private String clusterCategoryContains;
+
+    /**
+     * 作业优先级
+     */
+    private Integer priority;
+
+    /**
+     * 作业优先级列表
+     */
+    private Collection<Integer> priorityIn;
+
+    /**
+     * 排除的作业优先级列表
+     */
+    private Collection<Integer> priorityNotIn;
+
+    /**
+     * 最小作业优先级
+     */
+    private Integer priorityMin;
+
+    /**
+     * 最大作业优先级
+     */
+    private Integer priorityMax;
 
     /**
      * 是否禁用

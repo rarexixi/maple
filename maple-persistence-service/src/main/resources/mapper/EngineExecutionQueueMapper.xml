@@ -5,10 +5,10 @@
 
     <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionQueueEntity">
         <result property="queueName" column="queue_name"/>
-        <result property="cluster" column="cluster"/>
-        <result property="clusterQueue" column="cluster_queue"/>
+        <result property="clusterId" column="cluster_id"/>
+        <result property="resourceGroup" column="resource_group"/>
         <result property="fromApp" column="from_app"/>
-        <result property="group" column="group"/>
+        <result property="userGroup" column="user_group"/>
         <result property="priority" column="priority"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -21,53 +21,24 @@
         insert into <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.queueName != null">`queue_name`,</if>
-            <if test="entity.cluster != null">`cluster`,</if>
-            <if test="entity.clusterQueue != null">`cluster_queue`,</if>
+            <if test="entity.clusterId != null">`cluster_id`,</if>
+            <if test="entity.resourceGroup != null">`resource_group`,</if>
             <if test="entity.fromApp != null">`from_app`,</if>
-            <if test="entity.group != null">`group`,</if>
+            <if test="entity.userGroup != null">`user_group`,</if>
             <if test="entity.priority != null">`priority`,</if>
             <if test="entity.createdAt != null">`created_at`,</if>
             <if test="entity.updatedAt != null">`updated_at`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.queueName != null">#{entity.queueName},</if>
-            <if test="entity.cluster != null">#{entity.cluster},</if>
-            <if test="entity.clusterQueue != null">#{entity.clusterQueue},</if>
+            <if test="entity.clusterId != null">#{entity.clusterId},</if>
+            <if test="entity.resourceGroup != null">#{entity.resourceGroup},</if>
             <if test="entity.fromApp != null">#{entity.fromApp},</if>
-            <if test="entity.group != null">#{entity.group},</if>
+            <if test="entity.userGroup != null">#{entity.userGroup},</if>
             <if test="entity.priority != null">#{entity.priority},</if>
             <if test="entity.createdAt != null">#{entity.createdAt},</if>
             <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
         </trim>
-    </insert>
-
-    <!--todo 插入具体的列-->
-    <!--批量插入执行队列-->
-    <insert id="batchInsert">
-        insert into <include refid="tableName"/>
-        (
-            `queue_name`,
-            `cluster`,
-            `cluster_queue`,
-            `from_app`,
-            `group`,
-            `priority`,
-            `created_at`,
-            `updated_at`
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-        (
-            #{item.queueName},
-            #{item.cluster},
-            #{item.clusterQueue},
-            #{item.fromApp},
-            #{item.group},
-            #{item.priority},
-            #{item.createdAt},
-            #{item.updatedAt}
-        )
-        </foreach>
     </insert>
 
     <!--根据条件删除执行队列-->
@@ -76,40 +47,14 @@
         <include refid="updateByPkWhere"/>
     </delete>
 
-    <!--根据条件更新执行队列实体不为空的字段-->
-    <update id="patchByCondition">
-        UPDATE <include refid="tableName"/>
-        <set>
-            <if test="entity.cluster != null">
-                `cluster` = #{entity.cluster},
-            </if>
-            <if test="entity.clusterQueue != null">
-                `cluster_queue` = #{entity.clusterQueue},
-            </if>
-            <if test="entity.fromApp != null">
-                `from_app` = #{entity.fromApp},
-            </if>
-            <if test="entity.group != null">
-                `group` = #{entity.group},
-            </if>
-            <if test="entity.priority != null">
-                `priority` = #{entity.priority},
-            </if>
-            <if test="entity.updatedAt != null">
-                `updated_at` = #{entity.updatedAt}
-            </if>
-        </set>
-        <include refid="updateByPkWhere"/>
-    </update>
-
     <!--根据条件更新执行队列所有字段-->
     <update id="updateByQueueName">
         UPDATE <include refid="tableName"/>
         <set>
-            `cluster` = #{entity.cluster},
-            `cluster_queue` = #{entity.clusterQueue},
+            `cluster_id` = #{entity.clusterId},
+            `resource_group` = #{entity.resourceGroup},
             `from_app` = #{entity.fromApp},
-            `group` = #{entity.group},
+            `user_group` = #{entity.userGroup},
             `priority` = #{entity.priority},
             `updated_at` = #{entity.updatedAt}
         </set>
@@ -122,10 +67,10 @@
     <select id="getByQueueName" resultMap="BaseResultMap">
         SELECT
             MT.`queue_name`,
-            MT.`cluster`,
-            MT.`cluster_queue`,
+            MT.`cluster_id`,
+            MT.`resource_group`,
             MT.`from_app`,
-            MT.`group`,
+            MT.`user_group`,
             MT.`priority`,
             MT.`created_at`,
             MT.`updated_at`
@@ -145,10 +90,10 @@
             </when>
             <otherwise>
                 MT.`queue_name`,
-                MT.`cluster`,
-                MT.`cluster_queue`,
+                MT.`cluster_id`,
+                MT.`resource_group`,
                 MT.`from_app`,
-                MT.`group`,
+                MT.`user_group`,
                 MT.`priority`,
                 MT.`created_at`,
                 MT.`updated_at`
@@ -192,166 +137,12 @@
             <if test="condition == null">1!=1</if>
             <if test="condition != null">
                 <trim prefixOverrides="AND|OR">
-                    <if test="condition.queueName != null and condition.queueName != ''">
-                        AND MT.`queue_name` = #{condition.queueName}
-                    </if>
-                    <if test="condition.queueNameIn != null and condition.queueNameIn.size() > 0">
-                        AND MT.`queue_name` IN
-                        <foreach collection="condition.queueNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.queueNameNotIn != null and condition.queueNameNotIn.size() > 0">
-                        AND MT.`queue_name` NOT IN
-                        <foreach collection="condition.queueNameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.queueNameIsNotEmpty != null and condition.queueNameIsNotEmpty == true">
-                        AND MT.`queue_name` IS NOT NULL AND `queue_name` != ''
-                    </if>
-                    <if test="condition.queueNameIsEmpty != null and condition.queueNameIsEmpty == true">
-                        AND (MT.`queue_name` IS NULL OR MT.`queue_name` = '')
-                    </if>
-                    <if test="condition.queueNameStartWith != null and condition.queueNameStartWith != ''">
-                        AND MT.`queue_name` LIKE concat(#{condition.queueNameStartWith}, '%')
-                    </if>
-                    <if test="condition.queueNameEndWith != null and condition.queueNameEndWith != ''">
-                        AND MT.`queue_name` LIKE concat('%', #{condition.queueNameEndWith})
-                    </if>
-                    <if test="condition.queueNameContains != null and condition.queueNameContains != ''">
-                        AND MT.`queue_name` LIKE concat('%', #{condition.queueNameContains}, '%')
-                    </if>
-                    <if test="condition.cluster != null and condition.cluster != ''">
-                        AND MT.`cluster` = #{condition.cluster}
-                    </if>
-                    <if test="condition.clusterIn != null and condition.clusterIn.size() > 0">
-                        AND MT.`cluster` IN
-                        <foreach collection="condition.clusterIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterNotIn != null and condition.clusterNotIn.size() > 0">
-                        AND MT.`cluster` NOT IN
-                        <foreach collection="condition.clusterNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterIsNotEmpty != null and condition.clusterIsNotEmpty == true">
-                        AND MT.`cluster` IS NOT NULL AND `cluster` != ''
-                    </if>
-                    <if test="condition.clusterIsEmpty != null and condition.clusterIsEmpty == true">
-                        AND (MT.`cluster` IS NULL OR MT.`cluster` = '')
-                    </if>
-                    <if test="condition.clusterStartWith != null and condition.clusterStartWith != ''">
-                        AND MT.`cluster` LIKE concat(#{condition.clusterStartWith}, '%')
-                    </if>
-                    <if test="condition.clusterEndWith != null and condition.clusterEndWith != ''">
-                        AND MT.`cluster` LIKE concat('%', #{condition.clusterEndWith})
-                    </if>
-                    <if test="condition.clusterContains != null and condition.clusterContains != ''">
-                        AND MT.`cluster` LIKE concat('%', #{condition.clusterContains}, '%')
-                    </if>
-                    <if test="condition.clusterQueue != null and condition.clusterQueue != ''">
-                        AND MT.`cluster_queue` = #{condition.clusterQueue}
-                    </if>
-                    <if test="condition.clusterQueueIn != null and condition.clusterQueueIn.size() > 0">
-                        AND MT.`cluster_queue` IN
-                        <foreach collection="condition.clusterQueueIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterQueueNotIn != null and condition.clusterQueueNotIn.size() > 0">
-                        AND MT.`cluster_queue` NOT IN
-                        <foreach collection="condition.clusterQueueNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterQueueIsNotEmpty != null and condition.clusterQueueIsNotEmpty == true">
-                        AND MT.`cluster_queue` IS NOT NULL AND `cluster_queue` != ''
-                    </if>
-                    <if test="condition.clusterQueueIsEmpty != null and condition.clusterQueueIsEmpty == true">
-                        AND (MT.`cluster_queue` IS NULL OR MT.`cluster_queue` = '')
-                    </if>
-                    <if test="condition.clusterQueueStartWith != null and condition.clusterQueueStartWith != ''">
-                        AND MT.`cluster_queue` LIKE concat(#{condition.clusterQueueStartWith}, '%')
-                    </if>
-                    <if test="condition.clusterQueueEndWith != null and condition.clusterQueueEndWith != ''">
-                        AND MT.`cluster_queue` LIKE concat('%', #{condition.clusterQueueEndWith})
-                    </if>
-                    <if test="condition.clusterQueueContains != null and condition.clusterQueueContains != ''">
-                        AND MT.`cluster_queue` LIKE concat('%', #{condition.clusterQueueContains}, '%')
-                    </if>
                     <if test="condition.fromApp != null and condition.fromApp != ''">
                         AND MT.`from_app` = #{condition.fromApp}
                     </if>
                     <if test="condition.fromAppIn != null and condition.fromAppIn.size() > 0">
                         AND MT.`from_app` IN
                         <foreach collection="condition.fromAppIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.fromAppNotIn != null and condition.fromAppNotIn.size() > 0">
-                        AND MT.`from_app` NOT IN
-                        <foreach collection="condition.fromAppNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.fromAppIsNotEmpty != null and condition.fromAppIsNotEmpty == true">
-                        AND MT.`from_app` IS NOT NULL AND `from_app` != ''
-                    </if>
-                    <if test="condition.fromAppIsEmpty != null and condition.fromAppIsEmpty == true">
-                        AND (MT.`from_app` IS NULL OR MT.`from_app` = '')
-                    </if>
-                    <if test="condition.fromAppStartWith != null and condition.fromAppStartWith != ''">
-                        AND MT.`from_app` LIKE concat(#{condition.fromAppStartWith}, '%')
-                    </if>
-                    <if test="condition.fromAppEndWith != null and condition.fromAppEndWith != ''">
-                        AND MT.`from_app` LIKE concat('%', #{condition.fromAppEndWith})
-                    </if>
-                    <if test="condition.fromAppContains != null and condition.fromAppContains != ''">
-                        AND MT.`from_app` LIKE concat('%', #{condition.fromAppContains}, '%')
-                    </if>
-                    <if test="condition.group != null and condition.group != ''">
-                        AND MT.`group` = #{condition.group}
-                    </if>
-                    <if test="condition.groupIn != null and condition.groupIn.size() > 0">
-                        AND MT.`group` IN
-                        <foreach collection="condition.groupIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.groupNotIn != null and condition.groupNotIn.size() > 0">
-                        AND MT.`group` NOT IN
-                        <foreach collection="condition.groupNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.groupIsNotEmpty != null and condition.groupIsNotEmpty == true">
-                        AND MT.`group` IS NOT NULL AND `group` != ''
-                    </if>
-                    <if test="condition.groupIsEmpty != null and condition.groupIsEmpty == true">
-                        AND (MT.`group` IS NULL OR MT.`group` = '')
-                    </if>
-                    <if test="condition.groupStartWith != null and condition.groupStartWith != ''">
-                        AND MT.`group` LIKE concat(#{condition.groupStartWith}, '%')
-                    </if>
-                    <if test="condition.groupEndWith != null and condition.groupEndWith != ''">
-                        AND MT.`group` LIKE concat('%', #{condition.groupEndWith})
-                    </if>
-                    <if test="condition.groupContains != null and condition.groupContains != ''">
-                        AND MT.`group` LIKE concat('%', #{condition.groupContains}, '%')
-                    </if>
-                    <if test="condition.priority != null">
-                        AND MT.`priority` = #{condition.priority}
-                    </if>
-                    <if test="condition.priorityIn != null and condition.priorityIn.size() > 0">
-                        AND MT.`priority` IN
-                        <foreach collection="condition.priorityIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.priorityNotIn != null and condition.priorityNotIn.size() > 0">
-                        AND MT.`priority` NOT IN
-                        <foreach collection="condition.priorityNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.priorityMin != null">
-                        <![CDATA[
-                        AND MT.`priority` >= #{condition.priorityMin}
-                        ]]>
-                    </if>
-                    <if test="condition.priorityMax != null">
-                        <![CDATA[
-                        AND MT.`priority` <= #{condition.priorityMax}
-                        ]]>
-                    </if>
-                    <if test="condition.createdAtMin != null">
-                        <![CDATA[
-                        AND MT.`created_at` >= #{condition.createdAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.createdAtMax != null">
-                        <![CDATA[
-                        AND MT.`created_at` <= #{condition.createdAtMax}
-                        ]]>
                     </if>
                     <if test="condition.updatedAtMin != null">
                         <![CDATA[

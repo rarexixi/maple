@@ -4,7 +4,7 @@ import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public interface ExecutionService {
 
     Object stop(Integer id, Map<String, ?> cancelParams);
 
-    List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryReq request);
+    List<EngineExecutionQueueResp> getExecQueueList(EngineExecutionQueueQueryReq request);
 
     EngineExecutionDetailResp getExecutionById(int execId);
 

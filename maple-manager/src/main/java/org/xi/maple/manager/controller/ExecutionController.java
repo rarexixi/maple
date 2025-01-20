@@ -6,9 +6,11 @@ import org.xi.maple.manager.service.ExecutionService;
 
 import java.util.Map;
 
-@RequestMapping("execution")
+@RequestMapping(ExecutionController.BASE_URL)
 @RestController
 public class ExecutionController {
+
+    public static final String BASE_URL = "/api/execution";
 
     private final ExecutionService executionService;
 
@@ -16,20 +18,18 @@ public class ExecutionController {
         this.executionService = executionService;
     }
 
-    @PutMapping("exec-now")
+    @PostMapping("/exec-now")
     public void submitExecution(@RequestParam("execId") int execId) {
         executionService.submitExecution(execId);
     }
 
-    @PutMapping("kill/{id}")
+    @PatchMapping("/kill/{id}")
     public ResponseEntity<Object> killExecution(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(executionService.kill(id));
     }
 
-    @PutMapping("cancel/{id}")
+    @PatchMapping("/cancel/{id}")
     public ResponseEntity<Object> cancelExecution(@PathVariable("id") Integer id, @RequestBody Map<String, ?> cancelParams) {
         return ResponseEntity.ok(executionService.stop(id, cancelParams));
     }
-
-
 }

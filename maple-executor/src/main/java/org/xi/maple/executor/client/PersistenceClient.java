@@ -19,18 +19,18 @@ public interface PersistenceClient {
 
     // region engine-execution
 
-    @PatchMapping("/engine-executions/{id}/status")
+    @PatchMapping("/api/engine-executions/{id}/status")
     Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
-    @PatchMapping("/engine-executions/{id}/ext-info")
+    @PatchMapping("/api/engine-executions/{id}/ext-info")
     Integer updateExecutionExtInfoById(@RequestBody EngineExecutionExtUpdateReq req);
 
     // endregion
 
     // region cluster-engine
 
-    @GetMapping("/cluster-engines/conf")
-    EngineConf getEngineConf(@SpringQueryMap ClusterEngineDefaultConfGetRequest req);
+    @GetMapping("/api/cluster-engines/{id}/conf")
+    EngineConf getEngineConf(@PathVariable("id") Integer id, @SpringQueryMap ClusterEngineDefaultConfGetRequest req);
 
     // endregion
 }

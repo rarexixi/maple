@@ -63,7 +63,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     private Map<String, ClusterQueue> CLUSTER_QUEUE_MAP;
 
-    private Map<String, ClusterItemResp> CLUSTER_MAP;
+    private Map<Integer, ClusterItemResp> CLUSTER_MAP;
 
     public YarnClusterServiceImpl(PersistenceClient persistenceClient, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.persistenceClient = persistenceClient;
@@ -78,8 +78,8 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     // region engine operation
 
     @Override
-    public Object kill(String name, String applicationId) {
-        ClusterItemResp cluster = CLUSTER_MAP.get(name);
+    public Object kill(Integer clusterId, String applicationId) {
+        ClusterItemResp cluster = CLUSTER_MAP.get(clusterId);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps/%s/state", master, applicationId);
             HttpPut request = new HttpPut(uri);
@@ -93,8 +93,8 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     // endregion
 
     @Override
-    public void refreshExecutionStatus(String clusterName, String applicationId) {
-        ClusterItemResp cluster = CLUSTER_MAP.get(clusterName);
+    public void refreshExecutionStatus(Integer clusterId, String applicationId) {
+        ClusterItemResp cluster = CLUSTER_MAP.get(clusterId);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps/%s", master, applicationId);
             HttpGet request = new HttpGet(uri);
@@ -113,8 +113,8 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     }
 
     @Override
-    public void refreshExecutionsStatus(String clusterName, String states, Long startedTimeBegin, Long startedTimeEnd) {
-        ClusterItemResp cluster = persistenceClient.getClusterByName(clusterName);
+    public void refreshExecutionsStatus(Integer clusterId, String states, Long startedTimeBegin, Long startedTimeEnd) {
+        ClusterItemResp cluster = persistenceClient.getClusterById(clusterId);
         Function<String, HttpUriRequest> getRequest = master -> {
             String uri = String.format("%s/ws/v1/cluster/apps?applicationTags=%s&states=%s&startedTimeBegin=%d&startedTimeEnd=%d", master, MapleConstants.TAG_EXEC, states, startedTimeBegin, startedTimeEnd);
             HttpGet request = new HttpGet(uri);
@@ -125,18 +125,18 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     }
 
     @Override
-    public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
-        return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
+    public ClusterQueue getCachedQueueInfo(Integer clusterId, String queue) {
+        return CLUSTER_QUEUE_MAP.getOrDefault(ClusterQueue.getClusterQueueKey(clusterId, queue), null);
     }
 
     @Override
-    public void removeClusterConfig(String clusterName) {
-        CLUSTER_MAP.remove(clusterName);
+    public void removeClusterConfig(Integer clusterId) {
+        CLUSTER_MAP.remove(clusterId);
     }
 
     @Override
     public void addClusterConfig(ClusterDetailResp cluster) {
-        CLUSTER_MAP.put(cluster.getName(), cluster);
+        CLUSTER_MAP.put(cluster.getId(), cluster);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
         request.setDisabled(ValidConstant.VALID);
         List<ClusterItemResp> clusters = persistenceClient.getClusterList(request);
         for (ClusterItemResp cluster : clusters) {
-            CLUSTER_MAP.put(cluster.getName(), cluster);
+            CLUSTER_MAP.put(cluster.getId(), cluster);
         }
     }
 
@@ -179,7 +179,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
                 }
 
                 for (YarnScheduler.Queue queue : queues) {
-                    String key = ClusterQueue.getClusterQueueKey(cluster.getName(), queue.getQueueName());
+                    String key = ClusterQueue.getClusterQueueKey(cluster.getId(), queue.getQueueName());
                     ClusterQueue value = new YarnClusterQueue(queue.getNumPendingApplications());
                     queueMap.put(key, value);
                 }
@@ -232,10 +232,10 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
                     String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8.name());
                     return execResponse.apply(responseBody);
                 } else {
-                    logger.error("{}: name: {}, master: {}, code: {}", errorMsg, cluster.getName(), master, statusCode);
+                    logger.error("{}: name: {}, master: {}, code: {}", errorMsg, cluster.getId(), master, statusCode);
                 }
             } catch (Throwable t) {
-                logger.error("{}: name: {}, master: {}", errorMsg, cluster.getName(), master, t);
+                logger.error("{}: name: {}, master: {}", errorMsg, cluster.getId(), master, t);
             }
         }
         return null;

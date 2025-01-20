@@ -6,6 +6,7 @@ import org.xi.maple.builder.annotation.EngineVersion;
 import org.xi.maple.builder.model.*;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineCategoryConstants;
+import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.common.util.MapUtils;
 
@@ -15,30 +16,33 @@ import java.util.List;
 @ClusterCategory(ClusterCategoryConstants.K8s)
 @EngineCategory(EngineCategoryConstants.SPARK)
 @EngineVersion(value = {"3.3.2"})
-public class Spark3K8sConvertor implements MapleConvertor {
+public class Spark3K8sConvertor extends Spark3Convertor {
 
     @Override
     public List<CommandGeneratorModel> getSubmitCommandGenerator(EngineExecutionModel execution) {
-        ExecFtlModel<Spark3K8sDataModel> execConf = convert(execution);
-        List<CommandGeneratorModel> commandGeneratorModels = new ArrayList<>();
-        commandGeneratorModels.add(new CommandGeneratorModel(true, "spark3-k8s-submit.yaml.ftl", "spark3-k8s-submit.yaml", execConf));
-        return commandGeneratorModels;
+        ExecFtlModel<Spark3RunConf.K8s, Spark3ExecConf.ExecConf> execConf = convert(execution);
+        List<CommandGeneratorModel> generatorModels = new ArrayList<>();
+        generatorModels.add(new CommandGeneratorModel("spark3-k8s-submit.yaml", "spark3-k8s-submit.yaml.ftl", execConf, true));
+        return generatorModels;
     }
 
-    private ExecFtlModel<Spark3K8sDataModel> convert(EngineExecutionModel execution) {
-        ExecFtlModel<Spark3K8sDataModel> execModel = new ExecFtlModel<>(execution);
-
-        String executionConf = execution.getConfiguration();
-        Spark3K8sDataModel jobConf = JsonUtils.parseObject(executionConf, Spark3K8sDataModel.class, null);
-        // todo 根据 runType 设置 runConf
-        if (jobConf != null) {
-            jobConf.setQueue(execution.getResourceGroup());
-            if (execution.getEngine().getConfs() != null) {
-                jobConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), jobConf.getConf()));
-            }
-        }
-        execModel.setJob(jobConf);
-
+    private ExecFtlModel<Spark3RunConf.K8s, Spark3ExecConf.ExecConf> convert(EngineExecutionModel execution) {
+        ExecFtlModel<Spark3RunConf.K8s, Spark3ExecConf.ExecConf> execModel = new ExecFtlModel<>(execution);
+        execModel.setRunConf(getRunConf(execution));
+        execModel.setExecConf(getExecConf(execution));
         return execModel;
+    }
+
+    Spark3RunConf.K8s getRunConf(EngineExecutionModel execution) {
+        Spark3RunConf.K8s runConf = JsonUtils.parseObject(execution.getRunConf(), Spark3RunConf.K8s.class, null);
+        if (runConf == null) {
+            throw new MapleException("RunConf has errors.");
+        }
+        if (execution.getEngine().getConfs() != null) {
+            runConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), runConf.getConf()));
+        } else {
+            runConf.setConf(runConf.getConf());
+        }
+        return runConf;
     }
 }

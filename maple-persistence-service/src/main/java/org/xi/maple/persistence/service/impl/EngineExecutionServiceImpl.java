@@ -3,26 +3,21 @@ package org.xi.maple.persistence.service.impl;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleDataInsertException;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
-import org.xi.maple.common.model.PageList;
 import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
+import org.xi.maple.persistence.persistence.condition.ClusterEngineFilterCondition;
+import org.xi.maple.persistence.persistence.entity.ClusterEngineEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
+import org.xi.maple.persistence.persistence.mapper.ClusterEngineMapper;
 import org.xi.maple.service.util.ObjectUtils;
-import org.xi.maple.persistence.persistence.condition.EngineExecutionFilterCondition;
 import org.xi.maple.persistence.persistence.condition.EngineExecutionPkCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
 import org.xi.maple.persistence.persistence.mapper.EngineExecutionMapper;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionItemResp;
 import org.xi.maple.persistence.service.EngineExecutionService;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.ISelect;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +26,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * 引擎执行记录业务逻辑
@@ -48,9 +42,12 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
 
     final EngineExecutionMapper engineExecutionMapper;
 
+    final ClusterEngineMapper clusterEngineMapper;
+
     @Autowired
-    public EngineExecutionServiceImpl(EngineExecutionMapper engineExecutionMapper) {
+    public EngineExecutionServiceImpl(EngineExecutionMapper engineExecutionMapper, ClusterEngineMapper clusterEngineMapper) {
         this.engineExecutionMapper = engineExecutionMapper;
+        this.clusterEngineMapper = clusterEngineMapper;
     }
 
     /**
@@ -64,6 +61,11 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     @Transactional
     public Integer create(EngineExecutionSaveReq createReq) {
         EngineExecutionEntity entity = ObjectUtils.copy(createReq, EngineExecutionEntity.class);
+        // 设置集群ID
+        ClusterEngineEntity engine = clusterEngineMapper.getById(createReq.getEngineId());
+        entity.setClusterId(engine.getClusterId());
+        entity.setClusterCategory(engine.getClusterCategory());
+
         int count = engineExecutionMapper.insert(entity);
         if (count > 0) {
             EngineExecutionExtInfoEntity extInfoEntity = ObjectUtils.copy(createReq, EngineExecutionExtInfoEntity.class);
@@ -87,7 +89,19 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
         if (list == null || list.isEmpty()) {
             return Collections.emptyList();
         }
-        List<EngineExecutionEntity> entityList = ObjectUtils.copy(list, EngineExecutionEntity.class);
+
+        // 设置集群ID
+        List<Integer> engineIds = list.stream().map(EngineExecutionSaveReq::getEngineId).distinct().collect(Collectors.toList());
+        ClusterEngineFilterCondition clusterEngineFilterCondition = new ClusterEngineFilterCondition();
+        clusterEngineFilterCondition.setIdIn(engineIds);
+        List<ClusterEngineEntity> engineList = clusterEngineMapper.select(clusterEngineFilterCondition, null, null);
+        final Map<Integer, ClusterEngineEntity> engineClusterMap = engineList.stream().collect(Collectors.toMap(ClusterEngineEntity::getId, item -> item));
+        List<EngineExecutionEntity> entityList = ObjectUtils.copy(list, EngineExecutionEntity.class, entity -> {
+            ClusterEngineEntity engine = engineClusterMap.get(entity.getEngineId());
+            entity.setClusterId(engine.getClusterId());
+            entity.setClusterCategory(engine.getClusterCategory());
+        });
+
         int count = engineExecutionMapper.batchInsert(entityList);
         if (count > 0) {
             List<Integer> result = new ArrayList<>(entityList.size());
@@ -149,6 +163,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
             default:
                 break;
         }
+        // todo 设置 exec-info
         return engineExecutionMapper.updateStatusById(id, updateRequest.getStatus());
     }
 
@@ -208,26 +223,6 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     }
 
     // endregion 详情
-
-    /**
-     * 分页获取引擎执行记录列表
-     *
-     * @param queryReq 搜索条件
-     * @param pageNum  页码
-     * @param pageSize 分页大小
-     * @return 符合条件的引擎执行记录分页列表
-     */
-    @Override
-    public PageList<EngineExecutionItemResp> getPageList(EngineExecutionQueryReq queryReq, Integer pageNum, Integer pageSize) {
-
-        EngineExecutionFilterCondition condition = ObjectUtils.copy(queryReq, EngineExecutionFilterCondition.class);
-        ISelect select = () -> engineExecutionMapper.select(condition, null, queryReq.getSort());
-        try(Page<EngineExecutionEntityExt> page = PageHelper.startPage(pageNum, pageSize)) {
-            PageInfo<EngineExecutionEntityExt> pageInfo = page.doSelectPageInfo(select);
-            List<EngineExecutionItemResp> list = ObjectUtils.copy(pageInfo.getList(), EngineExecutionItemResp.class);
-            return new PageList<>(pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal(), list);
-        }
-    }
 
     private EngineExecutionPkCondition getPkCondition(Integer id) {
         EngineExecutionPkCondition condition = new EngineExecutionPkCondition();

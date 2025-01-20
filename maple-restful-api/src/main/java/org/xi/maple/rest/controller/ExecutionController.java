@@ -48,6 +48,13 @@ public class ExecutionController {
         return ResponseEntity.ok(id);
     }
 
+    @MapleAppAuthentication(app = "#addRequest.fromApp", value = "#submitReq.execUniqId + '#;' + #submitReq.execName")
+    @PostMapping("exec-job")
+    public ResponseEntity<Integer> execJob(@RequestBody JobExecReq jobExecReq) {
+        Integer id = executionService.execJob(jobExecReq);
+        return ResponseEntity.ok(id);
+    }
+
     @MapleAppAuthentication("#id")
     @PutMapping("kill/{id}")
     public ResponseEntity<Object> kill(@PathVariable("id") Integer id,

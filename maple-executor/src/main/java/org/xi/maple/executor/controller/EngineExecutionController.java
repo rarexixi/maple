@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.xi.maple.executor.service.EngineExecutionService;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
+@RequestMapping(EngineExecutionController.BASE_URL)
 @RestController
-@RequestMapping("engine-execution")
 public class EngineExecutionController {
+
+    public static final String BASE_URL = "/api/engine-execution";
 
     final EngineExecutionService engineExecutionService;
 
@@ -18,7 +20,7 @@ public class EngineExecutionController {
         this.engineExecutionService = engineExecutionService;
     }
 
-    @PostMapping("execute")
+    @PostMapping("/execute")
     public ResponseEntity<Void> execute(@RequestBody EngineExecutionDetailResp execution) {
         engineExecutionService.execute(execution);
         return ResponseEntity.ok().build();

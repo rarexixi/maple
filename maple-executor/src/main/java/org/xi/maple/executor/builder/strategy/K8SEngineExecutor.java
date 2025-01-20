@@ -11,7 +11,7 @@ import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.executor.builder.EngineExecutor;
 import org.xi.maple.executor.builder.spi.EnginePluginService;
 import org.xi.maple.executor.client.PersistenceClient;
-import org.xi.maple.executor.client.SchedulerClient;
+import org.xi.maple.executor.client.ManagerClient;
 import org.xi.maple.executor.configuration.ExecutionProperties;
 import org.xi.maple.executor.configuration.PluginProperties;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
@@ -26,15 +26,14 @@ public class K8SEngineExecutor extends EngineExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(K8SEngineExecutor.class);
 
-    private final SchedulerClient schedulerClient;
+    private final ManagerClient managerClient;
 
-    public K8SEngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, SchedulerClient schedulerClient) {
-        super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
-        this.schedulerClient = schedulerClient;
+    public K8SEngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient, ManagerClient managerClient) {
+        super(enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
+        this.managerClient = managerClient;
     }
 
     public void execute(EngineExecutionDetailResp execution) {
-
         updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {
             logger.error("Execution[" + execution.getId() + "] starts failed!");
@@ -57,7 +56,7 @@ public class K8SEngineExecutor extends EngineExecutor {
             }
             for (String yamlPath : yamlFiles) {
                 String yaml = new String(Files.readAllBytes(Paths.get(getPath(execHome, yamlPath))));
-                schedulerClient.deploy(execution.getCluster(), yaml);
+                managerClient.deploy(execution.getClusterId(), yaml);
             }
         } catch (Throwable t) {
             logger.error("Generate file failed!", t);

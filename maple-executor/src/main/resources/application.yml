@@ -27,3 +27,7 @@ feign:
 info:
   app:
     name: ${spring.application.name}
+
+maple:
+  aspect:
+    controller-method-pattern: "execution(public * org.xi.maple.executor.controller..*.*(..))"

@@ -5,14 +5,14 @@ import org.xi.maple.manager.model.ClusterQueue;
 
 public interface ClusterService {
 
-    ClusterQueue getCachedQueueInfo(String clusterName, String queue);
+    ClusterQueue getCachedQueueInfo(Integer clusterId, String queue);
 
     /**
      * 删除集群配置
      *
-     * @param clusterName 集群名称
+     * @param clusterId 集群ID
      */
-    void removeClusterConfig(String clusterName);
+    void removeClusterConfig(Integer clusterId);
 
     /**
      * 新增集群配置

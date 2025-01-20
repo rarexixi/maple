@@ -8,7 +8,6 @@ import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.persistence.model.response.*;
-import org.xi.maple.rest.model.request.ExecReq;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
@@ -21,7 +20,7 @@ public interface PersistenceClient {
     // region engine-execution
 
     @PostMapping("/api/engine-executions")
-    Integer addExecution(@RequestBody ExecReq req);
+    Integer addExecution(@RequestBody EngineExecutionSaveReq req);
 
     @GetMapping("/api/engine-executions/{id}")
     EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);
@@ -29,24 +28,12 @@ public interface PersistenceClient {
     @PatchMapping("/api/engine-executions/{id}/status")
     Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
-    @PatchMapping("/api/engine-executions/{id}/ext-info")
-    Integer updateExecutionInfoById(@PathVariable("id") Integer id, @RequestBody EngineExecutionExtUpdateReq req);
-
     // endregion
 
     // region engine-execution-queue
 
     @PostMapping("/api/engine-execution-queues")
     OperateResult<Integer> upsertExecQueue(@RequestBody EngineExecutionQueueSaveReq req);
-
-    @DeleteMapping("/api/engine-execution-queues/{queueName}")
-    Integer deleteExecQueue(@PathVariable("queueName") String queueName);
-
-    @GetMapping("/api/engine-execution-queues/{queueName}")
-    EngineExecutionQueue getExecQueueByName(@PathVariable("queueName") String queueName);
-
-    @GetMapping("/api/engine-execution-queues/all")
-    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryReq req);
 
     // endregion
 

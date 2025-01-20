@@ -1,27 +1,19 @@
 package org.xi.maple.persistence.model.request;
 
+import lombok.Data;
 import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.model.BaseEntity;
 
-import java.time.LocalDateTime;
 import javax.validation.constraints.*;
-
-import lombok.Data;
 
 @Data
 public class EngineExecutionSaveReq extends BaseEntity {
 
     /**
-     * 执行ID
+     * 作业ID
      */
-    @NotNull(message = "id(执行ID)不能为空", groups = {Jsr303ValidGroup.Put.class, Jsr303ValidGroup.Patch.class})
-    private Integer id;
-
-    /**
-     * 执行文件
-     */
-    @NotBlank(message = "execFile(执行文件)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private String execFile;
+    @NotNull(message = "jobId(作业ID)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer jobId;
 
     /**
      * 来源应用
@@ -30,22 +22,10 @@ public class EngineExecutionSaveReq extends BaseEntity {
     private String fromApp;
 
     /**
-     * 作业ID
-     */
-    @NotBlank(message = "jobId(作业ID)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private String jobId;
-
-    /**
      * 执行批次ID
      */
     @NotBlank(message = "bizId(执行批次ID)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
     private String bizId;
-
-    /**
-     * 应用作业执行唯一ID
-     */
-    @NotBlank(message = "execUniqId(应用作业执行唯一ID)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private String execUniqId;
 
     /**
      * 执行名称
@@ -53,25 +33,16 @@ public class EngineExecutionSaveReq extends BaseEntity {
     private String execName;
 
     /**
-     * 提交集群
+     * 引擎ID
      */
-    @NotBlank(message = "cluster(提交集群)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private String cluster;
+    @NotNull(message = "engineId(引擎ID)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer engineId;
 
     /**
      * 集群资源组
      */
+    @NotBlank(message = "resourceGroup(集群资源组)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
     private String resourceGroup;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
 
     /**
      * 初始优先级
@@ -80,63 +51,29 @@ public class EngineExecutionSaveReq extends BaseEntity {
     private Integer priority;
 
     /**
-     * 运行优先级
-     */
-    @NotNull(message = "runPri(运行优先级)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
-    private Integer runPri;
-
-    /**
      * 优先级可提升
      */
-    private Boolean priUpgradable = false;
+    private Boolean priUpgradable;
 
     /**
      * 用户组
      */
-    private String group;
+    @NotNull(message = "userGroup(用户组)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer userGroup;
 
     /**
-     * 用户
+     * 执行人
      */
-    private String user;
-
-    /**
-     * 集群应用ID
-     */
-    private String clusterAppId;
-
-    /**
-     * 状态
-     */
-    private String status;
-
-    /**
-     * 任务提交时间
-     */
-    private LocalDateTime submittedAt;
-
-    /**
-     * 任务执行开始时间
-     */
-    private LocalDateTime startedAt;
-
-    /**
-     * 任务执行结束时间
-     */
-    private LocalDateTime finishedAt;
+    @NotNull(message = "runBy(执行人)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer runBy;
 
     /**
      * 作业配置
      */
-    private String configuration;
+    private String execConf;
 
     /**
-     * 扩展信息
+     * 启动参数信息
      */
-    private String extInfo;
-
-    /**
-     * 执行信息
-     */
-    private String execInfo;
+    private String runConf;
 }

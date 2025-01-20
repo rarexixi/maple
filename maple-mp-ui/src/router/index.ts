@@ -10,6 +10,11 @@ const router = createRouter({
       component: () => import('@/views/sys-conf/SysConfIndexView.vue')
     },
     {
+      path: '/application',
+      name: 'application',
+      component: () => import('@/views/application/ApplicationIndexView.vue')
+    },
+    {
       path: '/cluster',
       name: 'cluster',
       component: () => import('@/views/cluster/ClusterIndexView.vue')

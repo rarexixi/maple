@@ -3,7 +3,6 @@ package org.xi.maple.persistence.service.impl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.xi.maple.common.exception.MapleDataNotFoundException;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.service.util.ObjectUtils;
 import org.xi.maple.common.model.BaseEntity;
@@ -13,8 +12,7 @@ import org.xi.maple.persistence.persistence.entity.EngineExecutionQueueEntity;
 import org.xi.maple.persistence.persistence.mapper.EngineExecutionQueueMapper;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
-import org.xi.maple.persistence.model.response.EngineExecutionQueueDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionQueueItemResp;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 import org.xi.maple.persistence.service.EngineExecutionQueueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,24 +83,6 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
 
     // endregion 删除
 
-    // region 详情
-
-    /**
-     * 根据执行队列名获取执行队列详情
-     *
-     * @param queueName 执行队列名
-     * @return 执行队列详情
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    @Override
-    public EngineExecutionQueueDetailResp getByQueueName(String queueName) {
-        EngineExecutionQueueEntity entity = engineExecutionQueueMapper.getByQueueName(queueName);
-        if (entity == null) {
-            throw new MapleDataNotFoundException("执行队列不存在");
-        }
-        return ObjectUtils.copy(entity, EngineExecutionQueueDetailResp.class);
-    }
-
     // endregion 详情
 
     /**
@@ -113,11 +93,11 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
      */
     @Cacheable(cacheNames = {"maple"}, key = "'exec-queue'") // todo 考虑如何清理
     @Override
-    public List<EngineExecutionQueueItemResp> getList(EngineExecutionQueueQueryReq queryReq) {
+    public List<EngineExecutionQueueResp> getList(EngineExecutionQueueQueryReq queryReq) {
         EngineExecutionQueueFilterCondition condition = ObjectUtils.copy(queryReq, EngineExecutionQueueFilterCondition.class);
         condition.setUpdatedAtMin(Timestamp.from(Instant.ofEpochMilli(System.currentTimeMillis() - 30 * 60 * 1000)).toLocalDateTime()); // 30分钟内更新过的队列, todo 验证时区影响
         List<EngineExecutionQueueEntity> list = engineExecutionQueueMapper.select(condition, null, queryReq.getSort());
-        return ObjectUtils.copy(list, EngineExecutionQueueItemResp.class);
+        return ObjectUtils.copy(list, EngineExecutionQueueResp.class);
     }
 
     private EngineExecutionQueuePkCondition getPkCondition(String queueName) {

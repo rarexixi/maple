@@ -4,9 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.manager.yarn.service.YarnClusterService;
 
-@RequestMapping("yarn")
+@RequestMapping(YarnController.BASE_URL)
 @RestController
 public class YarnController {
+
+    public static final String BASE_URL = "/api/yarn";
 
     private final YarnClusterService clusterService;
 
@@ -14,21 +16,21 @@ public class YarnController {
         this.clusterService = clusterService;
     }
 
-    @PutMapping("{clusterName}/kill")
+    @PatchMapping("/{clusterId}/kill")
     public ResponseEntity<Object> delete(
-            @PathVariable("clusterName") String clusterName,
+            @PathVariable("clusterId") Integer clusterId,
             @RequestParam("applicationId") String applicationId) {
-        Object result = clusterService.kill(clusterName, applicationId);
+        Object result = clusterService.kill(clusterId, applicationId);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("start-scheduler")
+    @PutMapping("/start-scheduler")
     public ResponseEntity<Object> startScheduler() {
         clusterService.startRefreshScheduler();
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("stop-scheduler")
+    @PutMapping("/stop-scheduler")
     public ResponseEntity<Object> stopScheduler() {
         clusterService.stopRefreshScheduler();
         return ResponseEntity.accepted().build();

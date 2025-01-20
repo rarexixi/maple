@@ -1,7 +1,6 @@
 package org.xi.maple.persistence.persistence.mapper;
 
 import org.xi.maple.common.mapper.*;
-import org.xi.maple.persistence.persistence.condition.EngineExecutionFilterCondition;
 import org.xi.maple.persistence.persistence.condition.EngineExecutionPkCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntity;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt;
@@ -20,9 +19,7 @@ import java.util.Collection;
 public interface EngineExecutionMapper extends
         InsertMapper<EngineExecutionEntity>,
         BatchInsertMapper<EngineExecutionEntity>,
-        PatchByConditionMapper<EngineExecutionEntity, EngineExecutionPkCondition>,
-        SelectByConditionMapper<EngineExecutionEntity, EngineExecutionFilterCondition>,
-        CountByConditionMapper<EngineExecutionFilterCondition> {
+        PatchByConditionMapper<EngineExecutionEntity, EngineExecutionPkCondition> {
 
     EngineExecutionEntityExt getById(@Param("id") Integer id);
 

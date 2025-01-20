@@ -42,7 +42,7 @@ resilience4j:
 
 maple:
   aspect:
-    controller-method-pattern: execution(public * org.xi.maple.rest.controller.*.*(..))
+    controller-method-pattern: "execution(public * org.xi.maple.rest.controller.*.*(..))"
   json-format:
     date-time-format: yyyy-MM-dd HH:mm:ss
     date-format: yyyy-MM-dd

@@ -80,7 +80,7 @@
 
 运行失败后，修改状态为 FAILED
 
-调用 scheduler kill 引擎，修改状态为 KILLED
+调用 manager kill 引擎，修改状态为 KILLED
 
 # 数据库设计
 

@@ -19,17 +19,7 @@ public class EngineExecutionExtUpdateReq extends BaseEntity {
     private Integer id;
 
     /**
-     * 作业配置
-     */
-    private String configuration;
-
-    /**
-     * 扩展信息
-     */
-    private String extInfo;
-
-    /**
      * 执行信息
      */
-    private String execInfo;
+    private String execInfo; // todo
 }

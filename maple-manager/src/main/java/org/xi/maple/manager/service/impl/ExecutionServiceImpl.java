@@ -7,7 +7,7 @@ import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleClusterNotSupportException;
 import org.xi.maple.common.model.ClusterMessage;
-import org.xi.maple.manager.client.ExecutionManagerClient;
+import org.xi.maple.manager.client.ExecutorClient;
 import org.xi.maple.manager.client.PersistenceClient;
 import org.xi.maple.manager.function.UpdateExecStatusFunc;
 import org.xi.maple.manager.k8s.service.K8sClusterService;
@@ -18,7 +18,7 @@ import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.ClusterDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionQueue;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     final PersistenceClient persistenceClient;
 
-    final ExecutionManagerClient executionManagerClient;
+    final ExecutorClient executorClient;
 
     final YarnClusterService yarnClusterService;
 
@@ -38,9 +38,9 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     private final UpdateExecStatusFunc updateExecStatusFunc;
 
-    public ExecutionServiceImpl(PersistenceClient persistenceClient, ExecutionManagerClient executionManagerClient, YarnClusterService yarnClusterService, K8sClusterService k8sClusterService, UpdateExecStatusFunc updateExecStatusFunc) {
+    public ExecutionServiceImpl(PersistenceClient persistenceClient, ExecutorClient executorClient, YarnClusterService yarnClusterService, K8sClusterService k8sClusterService, UpdateExecStatusFunc updateExecStatusFunc) {
         this.persistenceClient = persistenceClient;
-        this.executionManagerClient = executionManagerClient;
+        this.executorClient = executorClient;
         this.yarnClusterService = yarnClusterService;
         this.k8sClusterService = k8sClusterService;
         this.updateExecStatusFunc = updateExecStatusFunc;
@@ -54,25 +54,25 @@ public class ExecutionServiceImpl implements ExecutionService {
             return;
         }
         submitExecution(execution, () -> {
-            logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
+            logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroup());
             updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列资源不足"));
         });
     }
 
     @Override
     public void submitExecution(EngineExecutionDetailResp execution, Runnable queueBusyCallback) {
-        ClusterQueue cachedQueueInfo = null;
-        if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
-            cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getCluster(), execution.getResourceGroup());
-        } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
-            cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getCluster(), execution.getResourceGroup());
+        ClusterQueue cachedQueueInfo;
+        if (ClusterCategoryConstants.K8s.equalsIgnoreCase(execution.getClusterCategory())) {
+            cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getClusterId(), execution.getResourceGroup());
+        } else if (ClusterCategoryConstants.YARN.equalsIgnoreCase(execution.getClusterCategory())) {
+            cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getClusterId(), execution.getResourceGroup());
         } else {
-            logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
-            throw new MapleClusterNotSupportException("不支持的集群类型，cluster: " + execution.getCluster() + ", queue: " + execution.getResourceGroup());
+            logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroup());
+            throw new MapleClusterNotSupportException("不支持的集群类型，cluster: " + execution.getClusterName() + ", queue: " + execution.getResourceGroup());
         }
         // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
         if (cachedQueueInfo == null) {
-            logger.error("队列不存在，cluster: {}, queue: {}", execution.getCluster(), execution.getResourceGroup());
+            logger.error("队列不存在，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroup());
             // 修改作业状态
             updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列不存在"));
         } else if (!cachedQueueInfo.idle()) {
@@ -80,7 +80,7 @@ public class ExecutionServiceImpl implements ExecutionService {
         } else {
             logger.info("submit execution: {}", execution);
             try {
-                executionManagerClient.execute(execution);
+                executorClient.execute(execution);
             } catch (Throwable t) {
                 logger.error("执行作业失败，id: {}", execution.getId(), t);
                 updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "执行作业失败"));
@@ -92,9 +92,9 @@ public class ExecutionServiceImpl implements ExecutionService {
     public Object kill(Integer id) {
         EngineExecutionDetailResp execution = getExecutionById(id);
         if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
-            return null; // k8sClusterService.deleteEngine(execution.getCluster(), execution.getNamespace(), execution.getClusterCategory(), execution.getExecUniqId());
+            return null; // k8sClusterService.deleteEngine(execution.getClusterId(), execution.getNamespace(), execution.getEngineCategory(), execution.getClusterAppId());
         } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
-            return yarnClusterService.kill(execution.getCluster(), execution.getResourceGroup());
+            return yarnClusterService.kill(execution.getClusterId(), execution.getClusterAppId());
         } else {
             throw new MapleClusterNotSupportException("不支持的集群类型，id: " + id);
         }
@@ -109,7 +109,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
-    public List<EngineExecutionQueue> getExecQueueList(EngineExecutionQueueQueryReq request) {
+    public List<EngineExecutionQueueResp> getExecQueueList(EngineExecutionQueueQueryReq request) {
         return persistenceClient.getExecQueueList(request);
     }
 
@@ -125,24 +125,27 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public void refreshCluster(ClusterMessage clusterMessage) {
-        String clusterName = clusterMessage.getClusterName();
+        Integer clusterId = clusterMessage.getClusterId();
+        ClusterDetailResp cluster = persistenceClient.getClusterById(clusterId);
         if (ClusterMessage.Type.DELETE == clusterMessage.getType()) {
-            k8sClusterService.removeClusterConfig(clusterName);
-            yarnClusterService.removeClusterConfig(clusterName);
+            if (ClusterCategoryConstants.K8s.equals(cluster.getCategory())) {
+                k8sClusterService.removeClusterConfig(clusterId);
+            } else if (ClusterCategoryConstants.YARN.equals(cluster.getCategory())) {
+                yarnClusterService.removeClusterConfig(clusterId);
+            }
         } else {
-            ClusterDetailResp cluster = persistenceClient.getClusterByName(clusterName);
             if (ClusterCategoryConstants.K8s.equals(cluster.getCategory())) {
                 if (ClusterMessage.Type.UPDATE == clusterMessage.getType()) {
-                    k8sClusterService.removeClusterConfig(clusterName);
+                    k8sClusterService.removeClusterConfig(clusterId);
                 }
                 k8sClusterService.addClusterConfig(cluster);
             } else if (ClusterCategoryConstants.YARN.equals(cluster.getCategory())) {
                 if (ClusterMessage.Type.UPDATE == clusterMessage.getType()) {
-                    yarnClusterService.removeClusterConfig(clusterName);
+                    yarnClusterService.removeClusterConfig(clusterId);
                 }
                 yarnClusterService.addClusterConfig(cluster);
             } else {
-                logger.error("不支持的集群类型，cluster: {}, category: {}", clusterName, cluster.getCategory());
+                logger.error("不支持的集群类型，cluster: {}, category: {}", cluster.getName(), cluster.getCategory());
             }
         }
     }

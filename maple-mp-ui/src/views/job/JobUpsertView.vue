@@ -56,8 +56,16 @@ const callback: OperateCallback = {
     detail.description = response.description
     setJobConf(response.runConf, response.jobConf, response.jobType)
     detail.jobType = response.jobType
-    detail.engineId = response.engineId
+    detail.userGroup = response.userGroup
     detail.owner = response.owner
+    detail.fromApp = response.fromApp
+    detail.engineId = response.engineId + ''
+    detail.clusterId = response.clusterId
+    detail.clusterCategory = response.clusterCategory
+    detail.priority = response.priority
+    detail.priUpgradable = response.priUpgradable
+    detail.runConf = response.runConf
+    detail.jobConf = response.jobConf
   },
   resetDetail: (detail: any) => {
     detail.id = undefined
@@ -117,10 +125,10 @@ onBeforeUpdate(() => initPageConf())
   <UpsertCard back-url="/job">
     <template #title>
       <template v-if="detail.id === undefined">
-        <a-typography-text>{{ jobTypeOptionMap[detail.jobType] }}</a-typography-text>
+        <a-typography-text :level="5">{{ jobTypeOptionMap[detail.jobType] }}</a-typography-text>
       </template>
       <template v-else>
-        <a-typography-text>{{ detail.jobName }}</a-typography-text>
+        <a-typography-text :level="5">{{ detail.jobName }}</a-typography-text>
         <a-typography-text type="secondary">({{ jobTypeOptionMap[detail.jobType] }})</a-typography-text>
       </template>
     </template>

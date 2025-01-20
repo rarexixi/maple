@@ -1,8 +1,6 @@
 package org.xi.maple.persistence.service;
 
-import org.xi.maple.common.model.BaseEntity;
 import org.xi.maple.persistence.model.request.ClusterQueryReq;
-import org.xi.maple.persistence.model.request.ClusterSaveReq;
 import org.xi.maple.persistence.model.response.ClusterDetailResp;
 import org.xi.maple.persistence.model.response.ClusterItemResp;
 
@@ -16,72 +14,22 @@ import java.util.List;
 public interface ClusterService {
 
     /**
-     * 添加集群
+     * 根据集群ID获取集群详情
      *
-     * @param createReq 集群
-     * @return 受影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    ClusterDetailResp create(ClusterSaveReq createReq);
-
-    /**
-     * 删除集群
-     *
-     * @param name 集群名称
-     * @param entity
-     * @return 受影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    int deleteByName(String name, BaseEntity entity);
-
-    /**
-     * 禁用集群
-     *
-     * @param name 集群名称
-     * @param entity
-     * @return 受影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    int disableByName(String name, BaseEntity entity);
-
-    /**
-     * 启用集群
-     *
-     * @param name 集群名称
-     * @param entity
-     * @return 受影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    int enableByName(String name, BaseEntity entity);
-
-    /**
-     * 根据更新集群
-     *
-     * @param name 集群名称
-     * @param saveReq 保存集群请求实体
-     * @return 更新后的集群详情
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    ClusterDetailResp patchByName(String name, ClusterSaveReq saveReq);
-
-    /**
-     * 根据更新集群
-     *
-     * @param name 集群名称
-     * @param saveReq 保存集群请求实体
-     * @return 更新后的集群详情
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    ClusterDetailResp updateByName(String name, ClusterSaveReq saveReq);
-
-    /**
-     * 根据获取集群详情
-     *
-     * @param name 集群名称
+     * @param id 集群ID
      * @return 集群详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    ClusterDetailResp getByName(String name);
+    ClusterDetailResp getById(Integer id);
+
+    /**
+     * 根据集群ID获取集群种类
+     *
+     * @param id 集群ID
+     * @return 集群详情
+     * @author 郗世豪（rarexixi@gmail.com）
+     */
+    String getCategoryById(Integer id);
 
     /**
      * 获取集群列表

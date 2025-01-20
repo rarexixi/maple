@@ -1,13 +1,13 @@
 package org.xi.maple.persistence.persistence.condition;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import org.xi.maple.common.model.db.condition.FilterCondition;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * 引擎执行记录查询条件
@@ -85,6 +85,31 @@ public class EngineExecutionFilterCondition implements FilterCondition {
     private String execFileContains;
 
     /**
+     * 作业ID
+     */
+    private Integer jobId;
+
+    /**
+     * 作业ID列表
+     */
+    private Collection<Integer> jobIdIn;
+
+    /**
+     * 排除的作业ID列表
+     */
+    private Collection<Integer> jobIdNotIn;
+
+    /**
+     * 最小作业ID
+     */
+    private Integer jobIdMin;
+
+    /**
+     * 最大作业ID
+     */
+    private Integer jobIdMax;
+
+    /**
      * 来源应用
      */
     private String fromApp;
@@ -123,46 +148,6 @@ public class EngineExecutionFilterCondition implements FilterCondition {
      * 来源应用包含
      */
     private String fromAppContains;
-
-    /**
-     * 作业ID
-     */
-    private String jobId;
-
-    /**
-     * 作业ID列表
-     */
-    private Collection<String> jobIdIn;
-
-    /**
-     * 排除的作业ID列表
-     */
-    private Collection<String> jobIdNotIn;
-
-    /**
-     * 作业ID不为空
-     */
-    private Boolean jobIdIsNotEmpty;
-
-    /**
-     * 作业ID为空
-     */
-    private Boolean jobIdIsEmpty;
-
-    /**
-     * 作业ID开始
-     */
-    private String jobIdStartWith;
-
-    /**
-     * 作业ID结束
-     */
-    private String jobIdEndWith;
-
-    /**
-     * 作业ID包含
-     */
-    private String jobIdContains;
 
     /**
      * 执行批次ID
@@ -205,46 +190,6 @@ public class EngineExecutionFilterCondition implements FilterCondition {
     private String bizIdContains;
 
     /**
-     * 应用作业执行唯一ID
-     */
-    private String execUniqId;
-
-    /**
-     * 应用作业执行唯一ID列表
-     */
-    private Collection<String> execUniqIdIn;
-
-    /**
-     * 排除的应用作业执行唯一ID列表
-     */
-    private Collection<String> execUniqIdNotIn;
-
-    /**
-     * 应用作业执行唯一ID不为空
-     */
-    private Boolean execUniqIdIsNotEmpty;
-
-    /**
-     * 应用作业执行唯一ID为空
-     */
-    private Boolean execUniqIdIsEmpty;
-
-    /**
-     * 应用作业执行唯一ID开始
-     */
-    private String execUniqIdStartWith;
-
-    /**
-     * 应用作业执行唯一ID结束
-     */
-    private String execUniqIdEndWith;
-
-    /**
-     * 应用作业执行唯一ID包含
-     */
-    private String execUniqIdContains;
-
-    /**
      * 执行名称
      */
     private String execName;
@@ -285,59 +230,54 @@ public class EngineExecutionFilterCondition implements FilterCondition {
     private String execNameContains;
 
     /**
-     * 提交集群
+     * 引擎ID
      */
-    private String cluster;
+    private Integer engineId;
 
     /**
-     * 提交集群列表
+     * 引擎ID列表
      */
-    private Collection<String> clusterIn;
+    private Collection<Integer> engineIdIn;
 
     /**
-     * 排除的提交集群列表
+     * 排除的引擎ID列表
      */
-    private Collection<String> clusterNotIn;
+    private Collection<Integer> engineIdNotIn;
 
     /**
-     * 提交集群不为空
+     * 最小引擎ID
      */
-    private Boolean clusterIsNotEmpty;
+    private Integer engineIdMin;
 
     /**
-     * 提交集群为空
+     * 最大引擎ID
      */
-    private Boolean clusterIsEmpty;
+    private Integer engineIdMax;
 
     /**
-     * 提交集群开始
+     * 所属集群
      */
-    private String clusterStartWith;
+    private Integer clusterId;
 
     /**
-     * 提交集群结束
+     * 所属集群列表
      */
-    private String clusterEndWith;
+    private Collection<Integer> clusterIdIn;
 
     /**
-     * 提交集群包含
+     * 排除的所属集群列表
      */
-    private String clusterContains;
+    private Collection<Integer> clusterIdNotIn;
 
     /**
-     * 集群资源组
+     * 最小所属集群
      */
-    private String resourceGroup;
+    private Integer clusterIdMin;
 
     /**
-     * 集群资源组列表
+     * 最大所属集群
      */
-    private Collection<String> resourceGroupIn;
-
-    /**
-     * 排除的集群资源组列表
-     */
-    private Collection<String> resourceGroupNotIn;
+    private Integer clusterIdMax;
 
     /**
      * 集群资源组不为空
@@ -363,86 +303,6 @@ public class EngineExecutionFilterCondition implements FilterCondition {
      * 集群资源组包含
      */
     private String resourceGroupContains;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎种类列表
-     */
-    private Collection<String> engineCategoryIn;
-
-    /**
-     * 排除的引擎种类列表
-     */
-    private Collection<String> engineCategoryNotIn;
-
-    /**
-     * 引擎种类不为空
-     */
-    private Boolean engineCategoryIsNotEmpty;
-
-    /**
-     * 引擎种类为空
-     */
-    private Boolean engineCategoryIsEmpty;
-
-    /**
-     * 引擎种类开始
-     */
-    private String engineCategoryStartWith;
-
-    /**
-     * 引擎种类结束
-     */
-    private String engineCategoryEndWith;
-
-    /**
-     * 引擎种类包含
-     */
-    private String engineCategoryContains;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
-
-    /**
-     * 引擎版本列表
-     */
-    private Collection<String> engineVersionIn;
-
-    /**
-     * 排除的引擎版本列表
-     */
-    private Collection<String> engineVersionNotIn;
-
-    /**
-     * 引擎版本不为空
-     */
-    private Boolean engineVersionIsNotEmpty;
-
-    /**
-     * 引擎版本为空
-     */
-    private Boolean engineVersionIsEmpty;
-
-    /**
-     * 引擎版本开始
-     */
-    private String engineVersionStartWith;
-
-    /**
-     * 引擎版本结束
-     */
-    private String engineVersionEndWith;
-
-    /**
-     * 引擎版本包含
-     */
-    private String engineVersionContains;
 
     /**
      * 初始优先级
@@ -497,82 +357,52 @@ public class EngineExecutionFilterCondition implements FilterCondition {
     /**
      * 用户组
      */
-    private String group;
+    private Integer userGroup;
 
     /**
      * 用户组列表
      */
-    private Collection<String> groupIn;
+    private Collection<Integer> userGroupIn;
 
     /**
      * 排除的用户组列表
      */
-    private Collection<String> groupNotIn;
+    private Collection<Integer> userGroupNotIn;
 
     /**
-     * 用户组不为空
+     * 最小用户组
      */
-    private Boolean groupIsNotEmpty;
+    private Integer userGroupMin;
 
     /**
-     * 用户组为空
+     * 最大用户组
      */
-    private Boolean groupIsEmpty;
+    private Integer userGroupMax;
 
     /**
-     * 用户组开始
+     * 执行人
      */
-    private String groupStartWith;
+    private Integer runBy;
 
     /**
-     * 用户组结束
+     * 执行人列表
      */
-    private String groupEndWith;
+    private Collection<Integer> runByIn;
 
     /**
-     * 用户组包含
+     * 排除的执行人列表
      */
-    private String groupContains;
+    private Collection<Integer> runByNotIn;
 
     /**
-     * 用户
+     * 最小执行人
      */
-    private String user;
+    private Integer runByMin;
 
     /**
-     * 用户列表
+     * 最大执行人
      */
-    private Collection<String> userIn;
-
-    /**
-     * 排除的用户列表
-     */
-    private Collection<String> userNotIn;
-
-    /**
-     * 用户不为空
-     */
-    private Boolean userIsNotEmpty;
-
-    /**
-     * 用户为空
-     */
-    private Boolean userIsEmpty;
-
-    /**
-     * 用户开始
-     */
-    private String userStartWith;
-
-    /**
-     * 用户结束
-     */
-    private String userEndWith;
-
-    /**
-     * 用户包含
-     */
-    private String userContains;
+    private Integer runByMax;
 
     /**
      * 集群应用ID

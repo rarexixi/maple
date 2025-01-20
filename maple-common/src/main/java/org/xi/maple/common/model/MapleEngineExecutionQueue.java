@@ -19,10 +19,10 @@ import java.io.Serializable;
 public class MapleEngineExecutionQueue implements Serializable {
 
     private String queueName;
-    private String cluster;
-    private String clusterQueue;
+    private Integer cluster;
+    private String resourceGroup;
     private String fromApp;
-    private String group;
+    private Integer userGroup;
     private Integer priority;
 
     /**

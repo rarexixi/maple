@@ -1,11 +1,12 @@
 package org.xi.maple.persistence.persistence.entity;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.xi.maple.common.model.BaseEntity;
+
+import java.time.LocalDateTime;
 
 /**
  * 引擎执行记录实体
@@ -15,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class EngineExecutionEntity implements Serializable {
+public class EngineExecutionEntity extends BaseEntity {
 
     /**
      * 执行ID
@@ -28,14 +29,14 @@ public class EngineExecutionEntity implements Serializable {
     private String execFile;
 
     /**
+     * 作业ID
+     */
+    private Integer jobId;
+
+    /**
      * 来源应用
      */
     private String fromApp;
-
-    /**
-     * 作业ID
-     */
-    private String jobId;
 
     /**
      * 执行批次ID
@@ -43,34 +44,29 @@ public class EngineExecutionEntity implements Serializable {
     private String bizId;
 
     /**
-     * 应用作业执行唯一ID
-     */
-    private String execUniqId;
-
-    /**
      * 执行名称
      */
     private String execName;
 
     /**
-     * 提交集群
+     * 引擎ID
      */
-    private String cluster;
+    private Integer engineId;
+
+    /**
+     * 所属集群
+     */
+    private Integer clusterId;
+
+    /**
+     * 集群类型
+     */
+    private String clusterCategory;
 
     /**
      * 集群资源组
      */
     private String resourceGroup;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
 
     /**
      * 初始优先级
@@ -90,12 +86,12 @@ public class EngineExecutionEntity implements Serializable {
     /**
      * 用户组
      */
-    private String group;
+    private Integer userGroup;
 
     /**
-     * 用户
+     * 执行人
      */
-    private String user;
+    private Integer runBy;
 
     /**
      * 集群应用ID
@@ -121,14 +117,4 @@ public class EngineExecutionEntity implements Serializable {
      * 任务执行结束时间
      */
     private LocalDateTime finishedAt;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updatedAt;
 }

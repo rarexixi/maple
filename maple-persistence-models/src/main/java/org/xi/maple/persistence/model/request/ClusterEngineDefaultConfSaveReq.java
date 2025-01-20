@@ -26,7 +26,7 @@ public class ClusterEngineDefaultConfSaveReq extends BaseEntity {
      * 所属主体
      */
     @Null(message = "id(引擎ID)必须为空", groups = {Jsr303ValidGroup.Put.class, Jsr303ValidGroup.Patch.class})
-    private String objName;
+    private Integer objId;
 
     /**
      * 集群引擎ID

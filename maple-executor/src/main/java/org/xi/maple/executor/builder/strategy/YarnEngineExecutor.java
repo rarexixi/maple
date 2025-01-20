@@ -24,7 +24,7 @@ public class YarnEngineExecutor extends EngineExecutor {
     private static final Logger logger = LoggerFactory.getLogger(YarnEngineExecutor.class);
 
     public YarnEngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
-        super(logger, enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
+        super(enginePluginService, executionProperties, pluginProperties, threadPoolTaskExecutor, persistenceClient);
     }
 
     public void execute(EngineExecutionDetailResp execution) {

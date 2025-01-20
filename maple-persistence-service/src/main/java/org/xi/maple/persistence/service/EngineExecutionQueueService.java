@@ -4,8 +4,7 @@ import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.common.model.BaseEntity;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
-import org.xi.maple.persistence.model.response.EngineExecutionQueueDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionQueueItemResp;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
 import java.util.List;
 
@@ -36,19 +35,10 @@ public interface EngineExecutionQueueService {
     int deleteByQueueName(String queueName, BaseEntity entity);
 
     /**
-     * 根据获取执行队列详情
-     *
-     * @param queueName 执行队列名
-     * @return 执行队列详情
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    EngineExecutionQueueDetailResp getByQueueName(String queueName);
-
-    /**
      * 获取执行队列列表
      *
      * @param queryReq 搜索条件
      * @return 符合条件的执行队列列表
      */
-    List<EngineExecutionQueueItemResp> getList(EngineExecutionQueueQueryReq queryReq);
+    List<EngineExecutionQueueResp> getList(EngineExecutionQueueQueryReq queryReq);
 }

@@ -15,9 +15,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface EngineExecutionQueueMapper extends
         InsertMapper<EngineExecutionQueueEntity>,
-        BatchInsertMapper<EngineExecutionQueueEntity>,
         DeleteByConditionMapper<EngineExecutionQueuePkCondition>,
-        PatchByConditionMapper<EngineExecutionQueueEntity, EngineExecutionQueuePkCondition>,
         SelectByConditionMapper<EngineExecutionQueueEntity, EngineExecutionQueueFilterCondition>,
         CountByConditionMapper<EngineExecutionQueueFilterCondition> {
 

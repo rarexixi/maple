@@ -9,6 +9,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ObjectUtils {
+    public static <S, T> void copy(S source, T target, String... ignoreProperties) {
+        BeanUtils.copyProperties(source, target, ignoreProperties);
+    }
+
     public static <S, T> T copy(S source, Class<T> clazz, String... ignoreProperties) {
         if (source == null) {
             return null;

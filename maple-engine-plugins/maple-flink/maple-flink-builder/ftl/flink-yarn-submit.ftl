@@ -25,15 +25,15 @@ ${engine.engineHome}/bin/flink run-application \
     -D${key}=${value} \
 </#list>
 </#if>
-<#if job.runType == "jar">
-    --class ${job.runConf.mainClass} \
-    ${execFile} ${job.runConf.args}
-<#elseif job.runType == "py">
-    --python ${job.runConf.python} \
-    --pyArchives ${job.runConf.pyArchives} \
-    --pyClientExecutable ${job.runConf.pyClientExecutable} \
-    --pyExecutable ${job.runConf.pyExecutable} \
-    --pyFiles ${job.runConf.pyFiles} \
-    --pyRequirements ${job.runConf.pyRequirements} \
-    --pyModule ${job.runConf.pyModule} \
+<#if jobType == "jar">
+    --class ${execConf.mainClass} \
+    ${execConf.execFile} ${execConf.args}
+<#elseif jobType == "py">
+    --python ${execConf.python} \
+    --pyArchives ${execConf.pyArchives} \
+    --pyClientExecutable ${execConf.pyClientExecutable} \
+    --pyExecutable ${execConf.pyExecutable} \
+    --pyFiles ${execConf.pyFiles} \
+    --pyRequirements ${execConf.pyRequirements} \
+    --pyModule ${execConf.pyModule} \
 </#if>

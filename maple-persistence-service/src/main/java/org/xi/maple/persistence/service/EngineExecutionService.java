@@ -1,12 +1,9 @@
 package org.xi.maple.persistence.service;
 
-import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionItemResp;
 
 import java.util.List;
 
@@ -73,14 +70,4 @@ public interface EngineExecutionService {
      * @author 郗世豪（rarexixi@gmail.com）
      */
     EngineExecutionDetailResp getById(Integer id);
-
-    /**
-     * 分页获取引擎执行记录列表
-     *
-     * @param queryReq 搜索条件
-     * @param pageNum      页码
-     * @param pageSize     分页大小
-     * @return 符合条件的引擎执行记录分页列表
-     */
-    PageList<EngineExecutionItemResp> getPageList(EngineExecutionQueryReq queryReq, Integer pageNum, Integer pageSize);
 }

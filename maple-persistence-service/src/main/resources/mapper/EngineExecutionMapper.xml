@@ -6,20 +6,18 @@
     <resultMap id="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionEntity">
         <result property="id" column="id"/>
         <result property="execFile" column="exec_file"/>
-        <result property="fromApp" column="from_app"/>
         <result property="jobId" column="job_id"/>
+        <result property="fromApp" column="from_app"/>
         <result property="bizId" column="biz_id"/>
-        <result property="execUniqId" column="exec_uniq_id"/>
         <result property="execName" column="exec_name"/>
-        <result property="cluster" column="cluster"/>
+        <result property="engineId" column="engine_id"/>
+        <result property="clusterId" column="cluster_id"/>
         <result property="resourceGroup" column="resource_group"/>
-        <result property="engineCategory" column="engine_category"/>
-        <result property="engineVersion" column="engine_version"/>
         <result property="priority" column="priority"/>
         <result property="runPri" column="run_pri"/>
         <result property="priUpgradable" column="pri_upgradable"/>
-        <result property="group" column="group"/>
-        <result property="user" column="user"/>
+        <result property="userGroup" column="user_group"/>
+        <result property="runBy" column="run_by"/>
         <result property="clusterAppId" column="cluster_app_id"/>
         <result property="status" column="status"/>
         <result property="submittedAt" column="submitted_at"/>
@@ -30,8 +28,10 @@
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt">
         <result property="clusterCategory" column="cluster_category"/>
-        <result property="configuration" column="configuration"/>
-        <result property="extInfo" column="ext_info"/>
+        <result property="engineCategory" column="engine_category"/>
+        <result property="engineVersion" column="engine_version"/>
+        <result property="execConf" column="exec_conf"/>
+        <result property="runConf" column="run_conf"/>
         <result property="execInfo" column="exec_info"/>
     </resultMap>
 
@@ -44,19 +44,17 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">`id`,</if>
             <if test="entity.execFile != null">`exec_file`,</if>
-            <if test="entity.fromApp != null">`from_app`,</if>
             <if test="entity.jobId != null">`job_id`,</if>
+            <if test="entity.fromApp != null">`from_app`,</if>
             <if test="entity.bizId != null">`biz_id`,</if>
-            <if test="entity.execUniqId != null">`exec_uniq_id`,</if>
             <if test="entity.execName != null">`exec_name`,</if>
-            <if test="entity.cluster != null">`cluster`,</if>
+            <if test="entity.engineId != null">`engine_id`,</if>
+            <if test="entity.clusterId != null">`cluster_id`,</if>
             <if test="entity.resourceGroup != null">`resource_group`,</if>
-            <if test="entity.engineCategory != null">`engine_category`,</if>
-            <if test="entity.engineVersion != null">`engine_version`,</if>
             <if test="entity.priority != null">`priority`, `run_pri`,</if>
             <if test="entity.priUpgradable != null">`pri_upgradable`,</if>
-            <if test="entity.group != null">`group`,</if>
-            <if test="entity.user != null">`user`,</if>
+            <if test="entity.userGroup != null">`user_group`,</if>
+            <if test="entity.runBy != null">`run_by`,</if>
             <if test="entity.clusterAppId != null">`cluster_app_id`,</if>
             <if test="entity.status != null">`status`,</if>
             <if test="entity.submittedAt != null">`submitted_at`,</if>
@@ -68,19 +66,17 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
             <if test="entity.execFile != null">#{entity.execFile},</if>
-            <if test="entity.fromApp != null">#{entity.fromApp},</if>
             <if test="entity.jobId != null">#{entity.jobId},</if>
+            <if test="entity.fromApp != null">#{entity.fromApp},</if>
             <if test="entity.bizId != null">#{entity.bizId},</if>
-            <if test="entity.execUniqId != null">#{entity.execUniqId},</if>
             <if test="entity.execName != null">#{entity.execName},</if>
-            <if test="entity.cluster != null">#{entity.cluster},</if>
+            <if test="entity.engineId != null">#{entity.engineId},</if>
+            <if test="entity.clusterId != null">#{entity.clusterId},</if>
             <if test="entity.resourceGroup != null">#{entity.resourceGroup},</if>
-            <if test="entity.engineCategory != null">#{entity.engineCategory},</if>
-            <if test="entity.engineVersion != null">#{entity.engineVersion},</if>
             <if test="entity.priority != null">#{entity.priority}, #{entity.priority},</if>
             <if test="entity.priUpgradable != null">#{entity.priUpgradable},</if>
-            <if test="entity.group != null">#{entity.group},</if>
-            <if test="entity.user != null">#{entity.user},</if>
+            <if test="entity.userGroup != null">#{entity.userGroup},</if>
+            <if test="entity.runBy != null">#{entity.runBy},</if>
             <if test="entity.clusterAppId != null">#{entity.clusterAppId},</if>
             <if test="entity.status != null">#{entity.status},</if>
             <if test="entity.submittedAt != null">#{entity.submittedAt},</if>
@@ -95,14 +91,14 @@
         insert into <include refid="extTableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">`id`,</if>
-            <if test="entity.configuration != null">`configuration`,</if>
-            <if test="entity.extInfo != null">`ext_info`,</if>
+            <if test="entity.execConf != null">`exec_conf`,</if>
+            <if test="entity.runConf != null">`run_conf`,</if>
             <if test="entity.execInfo != null">`exec_info`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entity.id != null">#{entity.id},</if>
-            <if test="entity.configuration != null">#{entity.configuration},</if>
-            <if test="entity.extInfo != null">#{entity.extInfo},</if>
+            <if test="entity.execConf != null">#{entity.execConf},</if>
+            <if test="entity.runConf != null">#{entity.runConf},</if>
             <if test="entity.execInfo != null">#{entity.execInfo},</if>
         </trim>
     </insert>
@@ -114,20 +110,18 @@
         (
             `id`,
             `exec_file`,
-            `from_app`,
             `job_id`,
+            `from_app`,
             `biz_id`,
-            `exec_uniq_id`,
             `exec_name`,
-            `cluster`,
+            `engine_id`,
+            `cluster_id`,
             `resource_group`,
-            `engine_category`,
-            `engine_version`,
             `priority`,
             `run_pri`,
             `pri_upgradable`,
-            `group`,
-            `user`,
+            `user_group`,
+            `run_by`,
             `cluster_app_id`,
             `status`,
             `submitted_at`,
@@ -141,20 +135,18 @@
         (
             #{item.id},
             #{item.execFile},
-            #{item.fromApp},
             #{item.jobId},
+            #{item.fromApp},
             #{item.bizId},
-            #{item.execUniqId},
             #{item.execName},
-            #{item.cluster},
+            #{item.engineId},
+            #{item.clusterId},
             #{item.resourceGroup},
-            #{item.engineCategory},
-            #{item.engineVersion},
             #{item.priority},
             #{item.runPri},
-            #{item.priUpgradable},
-            #{item.group},
-            #{item.user},
+            #{item.runPri},
+            #{item.userGroup},
+            #{item.runBy},
             #{item.clusterAppId},
             #{item.status},
             #{item.submittedAt},
@@ -171,16 +163,16 @@
         insert into <include refid="tableName"/>
         (
             `id`,
-            `configuration`,
-            `ext_info`,
+            `exec_conf`,
+            `run_conf`,
             `exec_info`
         )
         values
         <foreach collection="list" item="item" separator=",">
         (
             #{item.id},
-            #{item.configuration},
-            #{item.extInfo},
+            #{item.execConf},
+            #{item.runConf},
             #{item.execInfo}
         )
         </foreach>
@@ -193,32 +185,26 @@
             <if test="entity.execFile != null">
                 `exec_file` = #{entity.execFile},
             </if>
-            <if test="entity.fromApp != null">
-                `from_app` = #{entity.fromApp},
-            </if>
             <if test="entity.jobId != null">
                 `job_id` = #{entity.jobId},
+            </if>
+            <if test="entity.fromApp != null">
+                `from_app` = #{entity.fromApp},
             </if>
             <if test="entity.bizId != null">
                 `biz_id` = #{entity.bizId},
             </if>
-            <if test="entity.execUniqId != null">
-                `exec_uniq_id` = #{entity.execUniqId},
-            </if>
             <if test="entity.execName != null">
                 `exec_name` = #{entity.execName},
             </if>
-            <if test="entity.cluster != null">
-                `cluster` = #{entity.cluster},
+            <if test="entity.engineId != null">
+                `engine_id` = #{entity.engineId},
+            </if>
+            <if test="entity.clusterId != null">
+                `cluster_id` = #{entity.clusterId},
             </if>
             <if test="entity.resourceGroup != null">
                 `resource_group` = #{entity.resourceGroup},
-            </if>
-            <if test="entity.engineCategory != null">
-                `engine_category` = #{entity.engineCategory},
-            </if>
-            <if test="entity.engineVersion != null">
-                `engine_version` = #{entity.engineVersion},
             </if>
             <if test="entity.priority != null">
                 `priority` = #{entity.priority},
@@ -229,11 +215,11 @@
             <if test="entity.priUpgradable != null">
                 `pri_upgradable` = #{entity.priUpgradable},
             </if>
-            <if test="entity.group != null">
-                `group` = #{entity.group},
+            <if test="entity.userGroup != null">
+                `user_group` = #{entity.userGroup},
             </if>
-            <if test="entity.user != null">
-                `user` = #{entity.user},
+            <if test="entity.runBy != null">
+                `run_by` = #{entity.runBy},
             </if>
             <if test="entity.clusterAppId != null">
                 `cluster_app_id` = #{entity.clusterAppId},
@@ -271,11 +257,11 @@
     <update id="patchExtInfoById">
         UPDATE <include refid="extTableName"/>
         <set>
-            <if test="entity.configuration != null">
-                `configuration` = #{entity.configuration},
+            <if test="entity.execConf != null">
+                `exec_conf` = #{entity.execConf},
             </if>
-            <if test="entity.extInfo != null">
-                `ext_info` = #{entity.extInfo},
+            <if test="entity.runConf != null">
+                `run_conf` = #{entity.runConf},
             </if>
             <if test="entity.execInfo != null">
                 `exec_info` = #{entity.execInfo}
@@ -291,21 +277,22 @@
         SELECT
             MT.`id`,
             MT.`exec_file`,
-            MT.`from_app`,
             MT.`job_id`,
+            MT.`from_app`,
             MT.`biz_id`,
-            MT.`exec_uniq_id`,
             MT.`exec_name`,
-            MT.`cluster`,
-            CLUSTER.`category` as `cluster_category`,
+            MT.`engine_id`,
+            CE.`name` AS `engine_category`,
+            CE.`version` AS `engine_version`,
+            MT.`cluster_id`,
+            C.`name` as `cluster_name`,
+            C.`category` as `cluster_category`,
             MT.`resource_group`,
-            MT.`engine_category`,
-            MT.`engine_version`,
             MT.`priority`,
             MT.`run_pri`,
             MT.`pri_upgradable`,
-            MT.`group`,
-            MT.`user`,
+            MT.`user_group`,
+            MT.`run_by`,
             MT.`cluster_app_id`,
             MT.`status`,
             MT.`submitted_at`,
@@ -313,63 +300,17 @@
             MT.`finished_at`,
             MT.`created_at`,
             MT.`updated_at`,
-            EXT.`configuration`,
-            EXT.`ext_info`,
+            EXT.`exec_conf`,
+            EXT.`run_conf`,
             EXT.`exec_info`
         FROM
         <include refid="tableName"/> MT
               JOIN <include refid="extTableName"/> EXT on MT.`id` = EXT.`id`
-              LEFT JOIN `maple_cluster` CLUSTER on MT.`cluster` = CLUSTER.`name`
+              JOIN `maple_cluster_engine` CE on MT.`engine_id` = CE.`id`
+              JOIN `maple_cluster` C on CE.`cluster_id` = C.`id`
         <where>
             MT.`id` = #{id}
         </where>
-    </select>
-
-    <!-- 根据条件查询 -->
-    <select id="select" resultMap="ExtResultMap">
-        SELECT
-        <choose>
-            <when test="columnsCondition != null and columnsCondition.columns != null">
-                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
-            </when>
-            <otherwise>
-                MT.`id`,
-                MT.`exec_file`,
-                MT.`from_app`,
-                MT.`job_id`,
-                MT.`biz_id`,
-                MT.`exec_uniq_id`,
-                MT.`exec_name`,
-                MT.`cluster`,
-                MT.`resource_group`,
-                MT.`engine_category`,
-                MT.`engine_version`,
-                MT.`priority`,
-                MT.`run_pri`,
-                MT.`pri_upgradable`,
-                MT.`group`,
-                MT.`user`,
-                MT.`cluster_app_id`,
-                MT.`status`,
-                MT.`submitted_at`,
-                MT.`started_at`,
-                MT.`finished_at`,
-                MT.`created_at`,
-                MT.`updated_at`
-            </otherwise>
-        </choose>
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
-        <if test="sortCondition != null and sortCondition.orderBy != null">
-            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
-        </if>
-    </select>
-
-    <!-- 根据条件查询总数 -->
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM <include refid="tableName"/> MT
-        <include refid="where"/>
     </select>
 
     <!-- 更新/删除条件 -->
@@ -390,509 +331,4 @@
         </where>
     </sql>
 
-    <!-- 查询条件 -->
-    <sql id="where">
-        <where>
-            <if test="condition == null">1!=1</if>
-            <if test="condition != null">
-                <trim prefixOverrides="AND|OR">
-                    <if test="condition.id != null">
-                        AND MT.`id` = #{condition.id}
-                    </if>
-                    <if test="condition.idIn != null and condition.idIn.size() > 0">
-                        AND MT.`id` IN
-                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.idNotIn != null and condition.idNotIn.size() > 0">
-                        AND MT.`id` NOT IN
-                        <foreach collection="condition.idNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.idMin != null">
-                        <![CDATA[
-                        AND MT.`id` >= #{condition.idMin}
-                        ]]>
-                    </if>
-                    <if test="condition.idMax != null">
-                        <![CDATA[
-                        AND MT.`id` <= #{condition.idMax}
-                        ]]>
-                    </if>
-                    <if test="condition.execFile != null and condition.execFile != ''">
-                        AND MT.`exec_file` = #{condition.execFile}
-                    </if>
-                    <if test="condition.execFileIn != null and condition.execFileIn.size() > 0">
-                        AND MT.`exec_file` IN
-                        <foreach collection="condition.execFileIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.execFileNotIn != null and condition.execFileNotIn.size() > 0">
-                        AND MT.`exec_file` NOT IN
-                        <foreach collection="condition.execFileNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.execFileIsNotEmpty != null and condition.execFileIsNotEmpty == true">
-                        AND MT.`exec_file` IS NOT NULL AND `exec_file` != ''
-                    </if>
-                    <if test="condition.execFileIsEmpty != null and condition.execFileIsEmpty == true">
-                        AND (MT.`exec_file` IS NULL OR MT.`exec_file` = '')
-                    </if>
-                    <if test="condition.execFileStartWith != null and condition.execFileStartWith != ''">
-                        AND MT.`exec_file` LIKE concat(#{condition.execFileStartWith}, '%')
-                    </if>
-                    <if test="condition.execFileEndWith != null and condition.execFileEndWith != ''">
-                        AND MT.`exec_file` LIKE concat('%', #{condition.execFileEndWith})
-                    </if>
-                    <if test="condition.execFileContains != null and condition.execFileContains != ''">
-                        AND MT.`exec_file` LIKE concat('%', #{condition.execFileContains}, '%')
-                    </if>
-                    <if test="condition.fromApp != null and condition.fromApp != ''">
-                        AND MT.`from_app` = #{condition.fromApp}
-                    </if>
-                    <if test="condition.fromAppIn != null and condition.fromAppIn.size() > 0">
-                        AND MT.`from_app` IN
-                        <foreach collection="condition.fromAppIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.fromAppNotIn != null and condition.fromAppNotIn.size() > 0">
-                        AND MT.`from_app` NOT IN
-                        <foreach collection="condition.fromAppNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.fromAppIsNotEmpty != null and condition.fromAppIsNotEmpty == true">
-                        AND MT.`from_app` IS NOT NULL AND `from_app` != ''
-                    </if>
-                    <if test="condition.fromAppIsEmpty != null and condition.fromAppIsEmpty == true">
-                        AND (MT.`from_app` IS NULL OR MT.`from_app` = '')
-                    </if>
-                    <if test="condition.fromAppStartWith != null and condition.fromAppStartWith != ''">
-                        AND MT.`from_app` LIKE concat(#{condition.fromAppStartWith}, '%')
-                    </if>
-                    <if test="condition.fromAppEndWith != null and condition.fromAppEndWith != ''">
-                        AND MT.`from_app` LIKE concat('%', #{condition.fromAppEndWith})
-                    </if>
-                    <if test="condition.fromAppContains != null and condition.fromAppContains != ''">
-                        AND MT.`from_app` LIKE concat('%', #{condition.fromAppContains}, '%')
-                    </if>
-                    <if test="condition.jobId != null and condition.jobId != ''">
-                        AND MT.`job_id` = #{condition.jobId}
-                    </if>
-                    <if test="condition.jobIdIn != null and condition.jobIdIn.size() > 0">
-                        AND MT.`job_id` IN
-                        <foreach collection="condition.jobIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.jobIdNotIn != null and condition.jobIdNotIn.size() > 0">
-                        AND MT.`job_id` NOT IN
-                        <foreach collection="condition.jobIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.jobIdIsNotEmpty != null and condition.jobIdIsNotEmpty == true">
-                        AND MT.`job_id` IS NOT NULL AND `job_id` != ''
-                    </if>
-                    <if test="condition.jobIdIsEmpty != null and condition.jobIdIsEmpty == true">
-                        AND (MT.`job_id` IS NULL OR MT.`job_id` = '')
-                    </if>
-                    <if test="condition.jobIdStartWith != null and condition.jobIdStartWith != ''">
-                        AND MT.`job_id` LIKE concat(#{condition.jobIdStartWith}, '%')
-                    </if>
-                    <if test="condition.jobIdEndWith != null and condition.jobIdEndWith != ''">
-                        AND MT.`job_id` LIKE concat('%', #{condition.jobIdEndWith})
-                    </if>
-                    <if test="condition.jobIdContains != null and condition.jobIdContains != ''">
-                        AND MT.`job_id` LIKE concat('%', #{condition.jobIdContains}, '%')
-                    </if>
-                    <if test="condition.bizId != null and condition.bizId != ''">
-                        AND MT.`biz_id` = #{condition.bizId}
-                    </if>
-                    <if test="condition.bizIdIn != null and condition.bizIdIn.size() > 0">
-                        AND MT.`biz_id` IN
-                        <foreach collection="condition.bizIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.bizIdNotIn != null and condition.bizIdNotIn.size() > 0">
-                        AND MT.`biz_id` NOT IN
-                        <foreach collection="condition.bizIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.bizIdIsNotEmpty != null and condition.bizIdIsNotEmpty == true">
-                        AND MT.`biz_id` IS NOT NULL AND `biz_id` != ''
-                    </if>
-                    <if test="condition.bizIdIsEmpty != null and condition.bizIdIsEmpty == true">
-                        AND (MT.`biz_id` IS NULL OR MT.`biz_id` = '')
-                    </if>
-                    <if test="condition.bizIdStartWith != null and condition.bizIdStartWith != ''">
-                        AND MT.`biz_id` LIKE concat(#{condition.bizIdStartWith}, '%')
-                    </if>
-                    <if test="condition.bizIdEndWith != null and condition.bizIdEndWith != ''">
-                        AND MT.`biz_id` LIKE concat('%', #{condition.bizIdEndWith})
-                    </if>
-                    <if test="condition.bizIdContains != null and condition.bizIdContains != ''">
-                        AND MT.`biz_id` LIKE concat('%', #{condition.bizIdContains}, '%')
-                    </if>
-                    <if test="condition.execUniqId != null and condition.execUniqId != ''">
-                        AND MT.`exec_uniq_id` = #{condition.execUniqId}
-                    </if>
-                    <if test="condition.execUniqIdIn != null and condition.execUniqIdIn.size() > 0">
-                        AND MT.`exec_uniq_id` IN
-                        <foreach collection="condition.execUniqIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.execUniqIdNotIn != null and condition.execUniqIdNotIn.size() > 0">
-                        AND MT.`exec_uniq_id` NOT IN
-                        <foreach collection="condition.execUniqIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.execUniqIdIsNotEmpty != null and condition.execUniqIdIsNotEmpty == true">
-                        AND MT.`exec_uniq_id` IS NOT NULL AND `exec_uniq_id` != ''
-                    </if>
-                    <if test="condition.execUniqIdIsEmpty != null and condition.execUniqIdIsEmpty == true">
-                        AND (MT.`exec_uniq_id` IS NULL OR MT.`exec_uniq_id` = '')
-                    </if>
-                    <if test="condition.execUniqIdStartWith != null and condition.execUniqIdStartWith != ''">
-                        AND MT.`exec_uniq_id` LIKE concat(#{condition.execUniqIdStartWith}, '%')
-                    </if>
-                    <if test="condition.execUniqIdEndWith != null and condition.execUniqIdEndWith != ''">
-                        AND MT.`exec_uniq_id` LIKE concat('%', #{condition.execUniqIdEndWith})
-                    </if>
-                    <if test="condition.execUniqIdContains != null and condition.execUniqIdContains != ''">
-                        AND MT.`exec_uniq_id` LIKE concat('%', #{condition.execUniqIdContains}, '%')
-                    </if>
-                    <if test="condition.execName != null and condition.execName != ''">
-                        AND MT.`exec_name` = #{condition.execName}
-                    </if>
-                    <if test="condition.execNameIn != null and condition.execNameIn.size() > 0">
-                        AND MT.`exec_name` IN
-                        <foreach collection="condition.execNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.execNameNotIn != null and condition.execNameNotIn.size() > 0">
-                        AND MT.`exec_name` NOT IN
-                        <foreach collection="condition.execNameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.execNameIsNotEmpty != null and condition.execNameIsNotEmpty == true">
-                        AND MT.`exec_name` IS NOT NULL AND `exec_name` != ''
-                    </if>
-                    <if test="condition.execNameIsEmpty != null and condition.execNameIsEmpty == true">
-                        AND (MT.`exec_name` IS NULL OR MT.`exec_name` = '')
-                    </if>
-                    <if test="condition.execNameStartWith != null and condition.execNameStartWith != ''">
-                        AND MT.`exec_name` LIKE concat(#{condition.execNameStartWith}, '%')
-                    </if>
-                    <if test="condition.execNameEndWith != null and condition.execNameEndWith != ''">
-                        AND MT.`exec_name` LIKE concat('%', #{condition.execNameEndWith})
-                    </if>
-                    <if test="condition.execNameContains != null and condition.execNameContains != ''">
-                        AND MT.`exec_name` LIKE concat('%', #{condition.execNameContains}, '%')
-                    </if>
-                    <if test="condition.cluster != null and condition.cluster != ''">
-                        AND MT.`cluster` = #{condition.cluster}
-                    </if>
-                    <if test="condition.clusterIn != null and condition.clusterIn.size() > 0">
-                        AND MT.`cluster` IN
-                        <foreach collection="condition.clusterIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterNotIn != null and condition.clusterNotIn.size() > 0">
-                        AND MT.`cluster` NOT IN
-                        <foreach collection="condition.clusterNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterIsNotEmpty != null and condition.clusterIsNotEmpty == true">
-                        AND MT.`cluster` IS NOT NULL AND `cluster` != ''
-                    </if>
-                    <if test="condition.clusterIsEmpty != null and condition.clusterIsEmpty == true">
-                        AND (MT.`cluster` IS NULL OR MT.`cluster` = '')
-                    </if>
-                    <if test="condition.clusterStartWith != null and condition.clusterStartWith != ''">
-                        AND MT.`cluster` LIKE concat(#{condition.clusterStartWith}, '%')
-                    </if>
-                    <if test="condition.clusterEndWith != null and condition.clusterEndWith != ''">
-                        AND MT.`cluster` LIKE concat('%', #{condition.clusterEndWith})
-                    </if>
-                    <if test="condition.clusterContains != null and condition.clusterContains != ''">
-                        AND MT.`cluster` LIKE concat('%', #{condition.clusterContains}, '%')
-                    </if>
-                    <if test="condition.resourceGroup != null and condition.resourceGroup != ''">
-                        AND MT.`resource_group` = #{condition.resourceGroup}
-                    </if>
-                    <if test="condition.resourceGroupIn != null and condition.resourceGroupIn.size() > 0">
-                        AND MT.`resource_group` IN
-                        <foreach collection="condition.resourceGroupIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.resourceGroupNotIn != null and condition.resourceGroupNotIn.size() > 0">
-                        AND MT.`resource_group` NOT IN
-                        <foreach collection="condition.resourceGroupNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.resourceGroupIsNotEmpty != null and condition.resourceGroupIsNotEmpty == true">
-                        AND MT.`resource_group` IS NOT NULL AND `resource_group` != ''
-                    </if>
-                    <if test="condition.resourceGroupIsEmpty != null and condition.resourceGroupIsEmpty == true">
-                        AND (MT.`resource_group` IS NULL OR MT.`resource_group` = '')
-                    </if>
-                    <if test="condition.resourceGroupStartWith != null and condition.resourceGroupStartWith != ''">
-                        AND MT.`resource_group` LIKE concat(#{condition.resourceGroupStartWith}, '%')
-                    </if>
-                    <if test="condition.resourceGroupEndWith != null and condition.resourceGroupEndWith != ''">
-                        AND MT.`resource_group` LIKE concat('%', #{condition.resourceGroupEndWith})
-                    </if>
-                    <if test="condition.resourceGroupContains != null and condition.resourceGroupContains != ''">
-                        AND MT.`resource_group` LIKE concat('%', #{condition.resourceGroupContains}, '%')
-                    </if>
-                    <if test="condition.engineCategory != null and condition.engineCategory != ''">
-                        AND MT.`engine_category` = #{condition.engineCategory}
-                    </if>
-                    <if test="condition.engineCategoryIn != null and condition.engineCategoryIn.size() > 0">
-                        AND MT.`engine_category` IN
-                        <foreach collection="condition.engineCategoryIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineCategoryNotIn != null and condition.engineCategoryNotIn.size() > 0">
-                        AND MT.`engine_category` NOT IN
-                        <foreach collection="condition.engineCategoryNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineCategoryIsNotEmpty != null and condition.engineCategoryIsNotEmpty == true">
-                        AND MT.`engine_category` IS NOT NULL AND `engine_category` != ''
-                    </if>
-                    <if test="condition.engineCategoryIsEmpty != null and condition.engineCategoryIsEmpty == true">
-                        AND (MT.`engine_category` IS NULL OR MT.`engine_category` = '')
-                    </if>
-                    <if test="condition.engineCategoryStartWith != null and condition.engineCategoryStartWith != ''">
-                        AND MT.`engine_category` LIKE concat(#{condition.engineCategoryStartWith}, '%')
-                    </if>
-                    <if test="condition.engineCategoryEndWith != null and condition.engineCategoryEndWith != ''">
-                        AND MT.`engine_category` LIKE concat('%', #{condition.engineCategoryEndWith})
-                    </if>
-                    <if test="condition.engineCategoryContains != null and condition.engineCategoryContains != ''">
-                        AND MT.`engine_category` LIKE concat('%', #{condition.engineCategoryContains}, '%')
-                    </if>
-                    <if test="condition.engineVersion != null and condition.engineVersion != ''">
-                        AND MT.`engine_version` = #{condition.engineVersion}
-                    </if>
-                    <if test="condition.engineVersionIn != null and condition.engineVersionIn.size() > 0">
-                        AND MT.`engine_version` IN
-                        <foreach collection="condition.engineVersionIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineVersionNotIn != null and condition.engineVersionNotIn.size() > 0">
-                        AND MT.`engine_version` NOT IN
-                        <foreach collection="condition.engineVersionNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.engineVersionIsNotEmpty != null and condition.engineVersionIsNotEmpty == true">
-                        AND MT.`engine_version` IS NOT NULL AND `engine_version` != ''
-                    </if>
-                    <if test="condition.engineVersionIsEmpty != null and condition.engineVersionIsEmpty == true">
-                        AND (MT.`engine_version` IS NULL OR MT.`engine_version` = '')
-                    </if>
-                    <if test="condition.engineVersionStartWith != null and condition.engineVersionStartWith != ''">
-                        AND MT.`engine_version` LIKE concat(#{condition.engineVersionStartWith}, '%')
-                    </if>
-                    <if test="condition.engineVersionEndWith != null and condition.engineVersionEndWith != ''">
-                        AND MT.`engine_version` LIKE concat('%', #{condition.engineVersionEndWith})
-                    </if>
-                    <if test="condition.engineVersionContains != null and condition.engineVersionContains != ''">
-                        AND MT.`engine_version` LIKE concat('%', #{condition.engineVersionContains}, '%')
-                    </if>
-                    <if test="condition.priority != null">
-                        AND MT.`priority` = #{condition.priority}
-                    </if>
-                    <if test="condition.priorityIn != null and condition.priorityIn.size() > 0">
-                        AND MT.`priority` IN
-                        <foreach collection="condition.priorityIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.priorityNotIn != null and condition.priorityNotIn.size() > 0">
-                        AND MT.`priority` NOT IN
-                        <foreach collection="condition.priorityNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.priorityMin != null">
-                        <![CDATA[
-                        AND MT.`priority` >= #{condition.priorityMin}
-                        ]]>
-                    </if>
-                    <if test="condition.priorityMax != null">
-                        <![CDATA[
-                        AND MT.`priority` <= #{condition.priorityMax}
-                        ]]>
-                    </if>
-                    <if test="condition.runPri != null">
-                        AND MT.`run_pri` = #{condition.runPri}
-                    </if>
-                    <if test="condition.runPriIn != null and condition.runPriIn.size() > 0">
-                        AND MT.`run_pri` IN
-                        <foreach collection="condition.runPriIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.runPriNotIn != null and condition.runPriNotIn.size() > 0">
-                        AND MT.`run_pri` NOT IN
-                        <foreach collection="condition.runPriNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.runPriMin != null">
-                        <![CDATA[
-                        AND MT.`run_pri` >= #{condition.runPriMin}
-                        ]]>
-                    </if>
-                    <if test="condition.runPriMax != null">
-                        <![CDATA[
-                        AND MT.`run_pri` <= #{condition.runPriMax}
-                        ]]>
-                    </if>
-                    <if test="condition.group != null and condition.group != ''">
-                        AND MT.`group` = #{condition.group}
-                    </if>
-                    <if test="condition.groupIn != null and condition.groupIn.size() > 0">
-                        AND MT.`group` IN
-                        <foreach collection="condition.groupIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.groupNotIn != null and condition.groupNotIn.size() > 0">
-                        AND MT.`group` NOT IN
-                        <foreach collection="condition.groupNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.groupIsNotEmpty != null and condition.groupIsNotEmpty == true">
-                        AND MT.`group` IS NOT NULL AND `group` != ''
-                    </if>
-                    <if test="condition.groupIsEmpty != null and condition.groupIsEmpty == true">
-                        AND (MT.`group` IS NULL OR MT.`group` = '')
-                    </if>
-                    <if test="condition.groupStartWith != null and condition.groupStartWith != ''">
-                        AND MT.`group` LIKE concat(#{condition.groupStartWith}, '%')
-                    </if>
-                    <if test="condition.groupEndWith != null and condition.groupEndWith != ''">
-                        AND MT.`group` LIKE concat('%', #{condition.groupEndWith})
-                    </if>
-                    <if test="condition.groupContains != null and condition.groupContains != ''">
-                        AND MT.`group` LIKE concat('%', #{condition.groupContains}, '%')
-                    </if>
-                    <if test="condition.user != null and condition.user != ''">
-                        AND MT.`user` = #{condition.user}
-                    </if>
-                    <if test="condition.userIn != null and condition.userIn.size() > 0">
-                        AND MT.`user` IN
-                        <foreach collection="condition.userIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.userNotIn != null and condition.userNotIn.size() > 0">
-                        AND MT.`user` NOT IN
-                        <foreach collection="condition.userNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.userIsNotEmpty != null and condition.userIsNotEmpty == true">
-                        AND MT.`user` IS NOT NULL AND `user` != ''
-                    </if>
-                    <if test="condition.userIsEmpty != null and condition.userIsEmpty == true">
-                        AND (MT.`user` IS NULL OR MT.`user` = '')
-                    </if>
-                    <if test="condition.userStartWith != null and condition.userStartWith != ''">
-                        AND MT.`user` LIKE concat(#{condition.userStartWith}, '%')
-                    </if>
-                    <if test="condition.userEndWith != null and condition.userEndWith != ''">
-                        AND MT.`user` LIKE concat('%', #{condition.userEndWith})
-                    </if>
-                    <if test="condition.userContains != null and condition.userContains != ''">
-                        AND MT.`user` LIKE concat('%', #{condition.userContains}, '%')
-                    </if>
-                    <if test="condition.clusterAppId != null and condition.clusterAppId != ''">
-                        AND MT.`cluster_app_id` = #{condition.clusterAppId}
-                    </if>
-                    <if test="condition.clusterAppIdIn != null and condition.clusterAppIdIn.size() > 0">
-                        AND MT.`cluster_app_id` IN
-                        <foreach collection="condition.clusterAppIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterAppIdNotIn != null and condition.clusterAppIdNotIn.size() > 0">
-                        AND MT.`cluster_app_id` NOT IN
-                        <foreach collection="condition.clusterAppIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.clusterAppIdIsNotEmpty != null and condition.clusterAppIdIsNotEmpty == true">
-                        AND MT.`cluster_app_id` IS NOT NULL AND `cluster_app_id` != ''
-                    </if>
-                    <if test="condition.clusterAppIdIsEmpty != null and condition.clusterAppIdIsEmpty == true">
-                        AND (MT.`cluster_app_id` IS NULL OR MT.`cluster_app_id` = '')
-                    </if>
-                    <if test="condition.clusterAppIdStartWith != null and condition.clusterAppIdStartWith != ''">
-                        AND MT.`cluster_app_id` LIKE concat(#{condition.clusterAppIdStartWith}, '%')
-                    </if>
-                    <if test="condition.clusterAppIdEndWith != null and condition.clusterAppIdEndWith != ''">
-                        AND MT.`cluster_app_id` LIKE concat('%', #{condition.clusterAppIdEndWith})
-                    </if>
-                    <if test="condition.clusterAppIdContains != null and condition.clusterAppIdContains != ''">
-                        AND MT.`cluster_app_id` LIKE concat('%', #{condition.clusterAppIdContains}, '%')
-                    </if>
-                    <if test="condition.status != null and condition.status != ''">
-                        AND MT.`status` = #{condition.status}
-                    </if>
-                    <if test="condition.statusIn != null and condition.statusIn.size() > 0">
-                        AND MT.`status` IN
-                        <foreach collection="condition.statusIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.statusNotIn != null and condition.statusNotIn.size() > 0">
-                        AND MT.`status` NOT IN
-                        <foreach collection="condition.statusNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.statusIsNotEmpty != null and condition.statusIsNotEmpty == true">
-                        AND MT.`status` IS NOT NULL AND `status` != ''
-                    </if>
-                    <if test="condition.statusIsEmpty != null and condition.statusIsEmpty == true">
-                        AND (MT.`status` IS NULL OR MT.`status` = '')
-                    </if>
-                    <if test="condition.statusStartWith != null and condition.statusStartWith != ''">
-                        AND MT.`status` LIKE concat(#{condition.statusStartWith}, '%')
-                    </if>
-                    <if test="condition.statusEndWith != null and condition.statusEndWith != ''">
-                        AND MT.`status` LIKE concat('%', #{condition.statusEndWith})
-                    </if>
-                    <if test="condition.statusContains != null and condition.statusContains != ''">
-                        AND MT.`status` LIKE concat('%', #{condition.statusContains}, '%')
-                    </if>
-                    <if test="condition.submittedAtMin != null">
-                        <![CDATA[
-                        AND MT.`submitted_at` >= #{condition.submittedAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.submittedAtMax != null">
-                        <![CDATA[
-                        AND MT.`submitted_at` <= #{condition.submittedAtMax}
-                        ]]>
-                    </if>
-                    <if test="condition.submittedAtIsNotNull != null and condition.submittedAtIsNotNull == true">
-                        AND MT.`submitted_at` IS NOT NULL
-                    </if>
-                    <if test="condition.submittedAtIsNull != null and condition.submittedAtIsNull == true">
-                        AND MT.`submitted_at` IS NULL
-                    </if>
-                    <if test="condition.startedAtMin != null">
-                        <![CDATA[
-                        AND MT.`started_at` >= #{condition.startedAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.startedAtMax != null">
-                        <![CDATA[
-                        AND MT.`started_at` <= #{condition.startedAtMax}
-                        ]]>
-                    </if>
-                    <if test="condition.startedAtIsNotNull != null and condition.startedAtIsNotNull == true">
-                        AND MT.`started_at` IS NOT NULL
-                    </if>
-                    <if test="condition.startedAtIsNull != null and condition.startedAtIsNull == true">
-                        AND MT.`started_at` IS NULL
-                    </if>
-                    <if test="condition.finishedAtMin != null">
-                        <![CDATA[
-                        AND MT.`finished_at` >= #{condition.finishedAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.finishedAtMax != null">
-                        <![CDATA[
-                        AND MT.`finished_at` <= #{condition.finishedAtMax}
-                        ]]>
-                    </if>
-                    <if test="condition.finishedAtIsNotNull != null and condition.finishedAtIsNotNull == true">
-                        AND MT.`finished_at` IS NOT NULL
-                    </if>
-                    <if test="condition.finishedAtIsNull != null and condition.finishedAtIsNull == true">
-                        AND MT.`finished_at` IS NULL
-                    </if>
-                    <if test="condition.createdAtMin != null">
-                        <![CDATA[
-                        AND MT.`created_at` >= #{condition.createdAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.createdAtMax != null">
-                        <![CDATA[
-                        AND MT.`created_at` <= #{condition.createdAtMax}
-                        ]]>
-                    </if>
-                    <if test="condition.updatedAtMin != null">
-                        <![CDATA[
-                        AND MT.`updated_at` >= #{condition.updatedAtMin}
-                        ]]>
-                    </if>
-                    <if test="condition.updatedAtMax != null">
-                        <![CDATA[
-                        AND MT.`updated_at` <= #{condition.updatedAtMax}
-                        ]]>
-                    </if>
-                </trim>
-            </if>
-        </where>
-    </sql>
 </mapper>

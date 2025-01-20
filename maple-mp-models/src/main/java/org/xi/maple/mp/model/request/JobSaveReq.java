@@ -35,15 +35,50 @@ public class JobSaveReq extends BaseEntity {
     private String jobType;
 
     /**
+     * 用户组
+     */
+    @NotNull(message = "userGroup(用户组)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer userGroup;
+
+    /**
+     * 作业负责人
+     */
+    @NotNull(message = "owner(作业负责人)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer owner;
+
+    /**
+     * 来源应用
+     */
+    @NotBlank(message = "fromApp(来源应用)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private String fromApp;
+
+    /**
      * 引擎ID
      */
     @NotNull(message = "engineId(引擎ID)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
     private Integer engineId;
 
     /**
-     * 作业负责人
+     * 所属集群
      */
-    private String owner;
+    @NotNull(message = "clusterId(所属集群)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer clusterId;
+
+    /**
+     * 集群类型
+     */
+    private String clusterCategory;
+
+    /**
+     * 作业优先级
+     */
+    @NotNull(message = "priority(作业优先级)不能为空", groups = {Jsr303ValidGroup.Post.class, Jsr303ValidGroup.Put.class})
+    private Integer priority;
+
+    /**
+     * 优先级可提升
+     */
+    private Boolean priUpgradable;
 
     /**
      * 执行配置

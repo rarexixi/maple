@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.manager.service.ExecutionService;
 
-@RequestMapping("cluster")
+@RequestMapping(ClusterController.BASE_URL)
 @RestController
 public class ClusterController {
+
+    public static final String BASE_URL = "/api/cluster";
 
     private final ExecutionService executionService;
 
@@ -18,7 +20,7 @@ public class ClusterController {
         this.executionService = executionService;
     }
 
-    @PutMapping("refresh")
+    @PutMapping("/refresh")
     public ResponseEntity<Void> refresh(@RequestBody ClusterMessage clusterMessage) {
         executionService.refreshCluster(clusterMessage);
         return ResponseEntity.accepted().build();

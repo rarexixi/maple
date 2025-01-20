@@ -17,6 +17,11 @@ import lombok.ToString;
 public class ClusterEntity extends BaseEntity {
 
     /**
+     * 集群ID
+     */
+    private Integer id;
+
+    /**
      * 集群名称
      */
     private String name;
@@ -39,5 +44,5 @@ public class ClusterEntity extends BaseEntity {
     /**
      * 集群配置
      */
-    private String configuration;
+    private String clusterConf;
 }

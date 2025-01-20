@@ -30,6 +30,14 @@ public class JobQueryReq extends QueryReq {
 
     private String jobTypeContains;
 
+    private Integer owner;
+
+    private Collection<Integer> ownerIn;
+
+    private Integer ownerMin;
+
+    private Integer ownerMax;
+
     private Integer engineId;
 
     private Collection<Integer> engineIdIn;
@@ -37,12 +45,6 @@ public class JobQueryReq extends QueryReq {
     private Integer engineIdMin;
 
     private Integer engineIdMax;
-
-    private String owner;
-
-    private Collection<String> ownerIn;
-
-    private String ownerContains;
 
     private Integer disabled;
 
@@ -78,6 +80,22 @@ public class JobQueryReq extends QueryReq {
         super.getOrderBy().getOrDefault("job_type", null);
     }
 
+    public void setOwnerRange(Integer[] ownerRange)  {
+        if (ownerRange == null || ownerRange.length != 2) {
+            return;
+        }
+        this.ownerMin = ownerRange[0];
+        this.ownerMax = ownerRange[1];
+    }
+
+    public void setOwnerSort(SortConstants sortConstants)  {
+        super.orderBy("owner", sortConstants);
+    }
+
+    public void getOwnerSort()  {
+        super.getOrderBy().getOrDefault("owner", null);
+    }
+
     public void setEngineIdRange(Integer[] engineIdRange)  {
         if (engineIdRange == null || engineIdRange.length != 2) {
             return;
@@ -92,13 +110,5 @@ public class JobQueryReq extends QueryReq {
 
     public void getEngineIdSort()  {
         super.getOrderBy().getOrDefault("engine_id", null);
-    }
-
-    public void setOwnerSort(SortConstants sortConstants)  {
-        super.orderBy("owner", sortConstants);
-    }
-
-    public void getOwnerSort()  {
-        super.getOrderBy().getOrDefault("owner", null);
     }
 }

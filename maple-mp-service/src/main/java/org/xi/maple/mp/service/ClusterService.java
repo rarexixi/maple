@@ -25,15 +25,6 @@ public interface ClusterService {
      */
     ClusterDetailResp create(ClusterSaveReq createReq);
 
-    /**
-     * 批量添加集群
-     *
-     * @param list 集群列表
-     * @return 受影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    int batchCreate(List<ClusterSaveReq> list);
-
     // region 删除/启用/禁用
 
     /**

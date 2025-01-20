@@ -8,8 +8,14 @@
         <result property="jobName" column="job_name"/>
         <result property="description" column="description"/>
         <result property="jobType" column="job_type"/>
-        <result property="engineId" column="engine_id"/>
+        <result property="userGroup" column="user_group"/>
         <result property="owner" column="owner"/>
+        <result property="fromApp" column="from_app"/>
+        <result property="engineId" column="engine_id"/>
+        <result property="clusterId" column="cluster_id"/>
+        <result property="clusterCategory" column="cluster_category"/>
+        <result property="priority" column="priority"/>
+        <result property="priUpgradable" column="pri_upgradable"/>
         <result property="runConf" column="run_conf"/>
         <result property="jobConf" column="job_conf"/>
         <result property="disabled" column="disabled"/>
@@ -32,8 +38,14 @@
             <if test="entity.jobName != null">`job_name`,</if>
             <if test="entity.description != null">`description`,</if>
             <if test="entity.jobType != null">`job_type`,</if>
-            <if test="entity.engineId != null">`engine_id`,</if>
+            <if test="entity.userGroup != null">`user_group`,</if>
             <if test="entity.owner != null">`owner`,</if>
+            <if test="entity.fromApp != null">`from_app`,</if>
+            <if test="entity.engineId != null">`engine_id`,</if>
+            <if test="entity.clusterId != null">`cluster_id`,</if>
+            <if test="entity.clusterCategory != null">`cluster_category`,</if>
+            <if test="entity.priority != null">`priority`,</if>
+            <if test="entity.priUpgradable != null">`pri_upgradable`,</if>
             <if test="entity.runConf != null">`run_conf`,</if>
             <if test="entity.jobConf != null">`job_conf`,</if>
             <if test="entity.disabled != null">`disabled`,</if>
@@ -47,8 +59,14 @@
             <if test="entity.jobName != null">#{entity.jobName},</if>
             <if test="entity.description != null">#{entity.description},</if>
             <if test="entity.jobType != null">#{entity.jobType},</if>
-            <if test="entity.engineId != null">#{entity.engineId},</if>
+            <if test="entity.userGroup != null">#{entity.userGroup},</if>
             <if test="entity.owner != null">#{entity.owner},</if>
+            <if test="entity.fromApp != null">#{entity.fromApp},</if>
+            <if test="entity.engineId != null">#{entity.engineId},</if>
+            <if test="entity.clusterId != null">#{entity.clusterId},</if>
+            <if test="entity.clusterCategory != null">#{entity.clusterCategory},</if>
+            <if test="entity.priority != null">#{entity.priority},</if>
+            <if test="entity.priUpgradable != null">#{entity.priUpgradable},</if>
             <if test="entity.runConf != null">#{entity.runConf},</if>
             <if test="entity.jobConf != null">#{entity.jobConf},</if>
             <if test="entity.disabled != null">#{entity.disabled},</if>
@@ -68,8 +86,14 @@
             `job_name`,
             `description`,
             `job_type`,
-            `engine_id`,
+            `user_group`,
             `owner`,
+            `from_app`,
+            `engine_id`,
+            `cluster_id`,
+            `cluster_category`,
+            `priority`,
+            `pri_upgradable`,
             `run_conf`,
             `job_conf`,
             `disabled`,
@@ -85,8 +109,14 @@
             #{item.jobName},
             #{item.description},
             #{item.jobType},
-            #{item.engineId},
+            #{item.userGroup},
             #{item.owner},
+            #{item.fromApp},
+            #{item.engineId},
+            #{item.clusterId},
+            #{item.clusterCategory},
+            #{item.priority},
+            #{item.priUpgradable},
             #{item.runConf},
             #{item.jobConf},
             #{item.disabled},
@@ -117,11 +147,29 @@
             <if test="entity.jobType != null">
                 `job_type` = #{entity.jobType},
             </if>
-            <if test="entity.engineId != null">
-                `engine_id` = #{entity.engineId},
+            <if test="entity.userGroup != null">
+                `user_group` = #{entity.userGroup},
             </if>
             <if test="entity.owner != null">
                 `owner` = #{entity.owner},
+            </if>
+            <if test="entity.fromApp != null">
+                `from_app` = #{entity.fromApp},
+            </if>
+            <if test="entity.engineId != null">
+                `engine_id` = #{entity.engineId},
+            </if>
+            <if test="entity.clusterId != null">
+                `cluster_id` = #{entity.clusterId},
+            </if>
+            <if test="entity.clusterCategory != null">
+                `cluster_category` = #{entity.clusterCategory},
+            </if>
+            <if test="entity.priority != null">
+                `priority` = #{entity.priority},
+            </if>
+            <if test="entity.priUpgradable != null">
+                `pri_upgradable` = #{entity.priUpgradable},
             </if>
             <if test="entity.runConf != null">
                 `run_conf` = #{entity.runConf},
@@ -149,8 +197,14 @@
             `job_name` = #{entity.jobName},
             `description` = #{entity.description},
             `job_type` = #{entity.jobType},
-            `engine_id` = #{entity.engineId},
+            `user_group` = #{entity.userGroup},
             `owner` = #{entity.owner},
+            `from_app` = #{entity.fromApp},
+            `engine_id` = #{entity.engineId},
+            `cluster_id` = #{entity.clusterId},
+            `cluster_category` = #{entity.clusterCategory},
+            `priority` = #{entity.priority},
+            `pri_upgradable` = #{entity.priUpgradable},
             `run_conf` = #{entity.runConf},
             `job_conf` = #{entity.jobConf},
             `updated_by` = #{entity.updatedBy},
@@ -168,9 +222,15 @@
             MT.`job_name`,
             MT.`description`,
             MT.`job_type`,
+            MT.`user_group`,
+            MT.`owner`,
+            MT.`from_app`,
             MT.`engine_id`,
             `T0`.`name` `engine_text`,
-            MT.`owner`,
+            MT.`cluster_id`,
+            MT.`cluster_category`,
+            MT.`priority`,
+            MT.`pri_upgradable`,
             MT.`run_conf`,
             MT.`job_conf`,
             MT.`disabled`,
@@ -198,8 +258,14 @@
                 MT.`job_name`,
                 MT.`description`,
                 MT.`job_type`,
-                MT.`engine_id`,
+                MT.`user_group`,
                 MT.`owner`,
+                MT.`from_app`,
+                MT.`engine_id`,
+                MT.`cluster_id`,
+                MT.`cluster_category`,
+                MT.`priority`,
+                MT.`pri_upgradable`,
                 MT.`run_conf`,
                 MT.`job_conf`,
                 MT.`disabled`,
@@ -320,6 +386,74 @@
                     <if test="condition.jobTypeContains != null and condition.jobTypeContains != ''">
                         AND MT.`job_type` LIKE concat('%', #{condition.jobTypeContains}, '%')
                     </if>
+                    <if test="condition.userGroup != null">
+                        AND MT.`user_group` = #{condition.userGroup}
+                    </if>
+                    <if test="condition.userGroupIn != null and condition.userGroupIn.size() > 0">
+                        AND MT.`user_group` IN
+                        <foreach collection="condition.userGroupIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.userGroupNotIn != null and condition.userGroupNotIn.size() > 0">
+                        AND MT.`user_group` NOT IN
+                        <foreach collection="condition.userGroupNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.userGroupMin != null">
+                        <![CDATA[
+                        AND MT.`user_group` >= #{condition.userGroupMin}
+                        ]]>
+                    </if>
+                    <if test="condition.userGroupMax != null">
+                        <![CDATA[
+                        AND MT.`user_group` <= #{condition.userGroupMax}
+                        ]]>
+                    </if>
+                    <if test="condition.owner != null">
+                        AND MT.`owner` = #{condition.owner}
+                    </if>
+                    <if test="condition.ownerIn != null and condition.ownerIn.size() > 0">
+                        AND MT.`owner` IN
+                        <foreach collection="condition.ownerIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.ownerNotIn != null and condition.ownerNotIn.size() > 0">
+                        AND MT.`owner` NOT IN
+                        <foreach collection="condition.ownerNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.ownerMin != null">
+                        <![CDATA[
+                        AND MT.`owner` >= #{condition.ownerMin}
+                        ]]>
+                    </if>
+                    <if test="condition.ownerMax != null">
+                        <![CDATA[
+                        AND MT.`owner` <= #{condition.ownerMax}
+                        ]]>
+                    </if>
+                    <if test="condition.fromApp != null and condition.fromApp != ''">
+                        AND MT.`from_app` = #{condition.fromApp}
+                    </if>
+                    <if test="condition.fromAppIn != null and condition.fromAppIn.size() > 0">
+                        AND MT.`from_app` IN
+                        <foreach collection="condition.fromAppIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.fromAppNotIn != null and condition.fromAppNotIn.size() > 0">
+                        AND MT.`from_app` NOT IN
+                        <foreach collection="condition.fromAppNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.fromAppIsNotEmpty != null and condition.fromAppIsNotEmpty == true">
+                        AND MT.`from_app` IS NOT NULL AND `from_app` != ''
+                    </if>
+                    <if test="condition.fromAppIsEmpty != null and condition.fromAppIsEmpty == true">
+                        AND (MT.`from_app` IS NULL OR MT.`from_app` = '')
+                    </if>
+                    <if test="condition.fromAppStartWith != null and condition.fromAppStartWith != ''">
+                        AND MT.`from_app` LIKE concat(#{condition.fromAppStartWith}, '%')
+                    </if>
+                    <if test="condition.fromAppEndWith != null and condition.fromAppEndWith != ''">
+                        AND MT.`from_app` LIKE concat('%', #{condition.fromAppEndWith})
+                    </if>
+                    <if test="condition.fromAppContains != null and condition.fromAppContains != ''">
+                        AND MT.`from_app` LIKE concat('%', #{condition.fromAppContains}, '%')
+                    </if>
                     <if test="condition.engineId != null">
                         AND MT.`engine_id` = #{condition.engineId}
                     </if>
@@ -341,31 +475,73 @@
                         AND MT.`engine_id` <= #{condition.engineIdMax}
                         ]]>
                     </if>
-                    <if test="condition.owner != null and condition.owner != ''">
-                        AND MT.`owner` = #{condition.owner}
+                    <if test="condition.clusterId != null">
+                        AND MT.`cluster_id` = #{condition.clusterId}
                     </if>
-                    <if test="condition.ownerIn != null and condition.ownerIn.size() > 0">
-                        AND MT.`owner` IN
-                        <foreach collection="condition.ownerIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.clusterIdIn != null and condition.clusterIdIn.size() > 0">
+                        AND MT.`cluster_id` IN
+                        <foreach collection="condition.clusterIdIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.ownerNotIn != null and condition.ownerNotIn.size() > 0">
-                        AND MT.`owner` NOT IN
-                        <foreach collection="condition.ownerNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    <if test="condition.clusterIdNotIn != null and condition.clusterIdNotIn.size() > 0">
+                        AND MT.`cluster_id` NOT IN
+                        <foreach collection="condition.clusterIdNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.ownerIsNotEmpty != null and condition.ownerIsNotEmpty == true">
-                        AND MT.`owner` IS NOT NULL AND `owner` != ''
+                    <if test="condition.clusterIdMin != null">
+                        <![CDATA[
+                        AND MT.`cluster_id` >= #{condition.clusterIdMin}
+                        ]]>
                     </if>
-                    <if test="condition.ownerIsEmpty != null and condition.ownerIsEmpty == true">
-                        AND (MT.`owner` IS NULL OR MT.`owner` = '')
+                    <if test="condition.clusterIdMax != null">
+                        <![CDATA[
+                        AND MT.`cluster_id` <= #{condition.clusterIdMax}
+                        ]]>
                     </if>
-                    <if test="condition.ownerStartWith != null and condition.ownerStartWith != ''">
-                        AND MT.`owner` LIKE concat(#{condition.ownerStartWith}, '%')
+                    <if test="condition.clusterCategory != null and condition.clusterCategory != ''">
+                        AND MT.`cluster_category` = #{condition.clusterCategory}
                     </if>
-                    <if test="condition.ownerEndWith != null and condition.ownerEndWith != ''">
-                        AND MT.`owner` LIKE concat('%', #{condition.ownerEndWith})
+                    <if test="condition.clusterCategoryIn != null and condition.clusterCategoryIn.size() > 0">
+                        AND MT.`cluster_category` IN
+                        <foreach collection="condition.clusterCategoryIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
                     </if>
-                    <if test="condition.ownerContains != null and condition.ownerContains != ''">
-                        AND MT.`owner` LIKE concat('%', #{condition.ownerContains}, '%')
+                    <if test="condition.clusterCategoryNotIn != null and condition.clusterCategoryNotIn.size() > 0">
+                        AND MT.`cluster_category` NOT IN
+                        <foreach collection="condition.clusterCategoryNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.clusterCategoryIsNotEmpty != null and condition.clusterCategoryIsNotEmpty == true">
+                        AND MT.`cluster_category` IS NOT NULL AND `cluster_category` != ''
+                    </if>
+                    <if test="condition.clusterCategoryIsEmpty != null and condition.clusterCategoryIsEmpty == true">
+                        AND (MT.`cluster_category` IS NULL OR MT.`cluster_category` = '')
+                    </if>
+                    <if test="condition.clusterCategoryStartWith != null and condition.clusterCategoryStartWith != ''">
+                        AND MT.`cluster_category` LIKE concat(#{condition.clusterCategoryStartWith}, '%')
+                    </if>
+                    <if test="condition.clusterCategoryEndWith != null and condition.clusterCategoryEndWith != ''">
+                        AND MT.`cluster_category` LIKE concat('%', #{condition.clusterCategoryEndWith})
+                    </if>
+                    <if test="condition.clusterCategoryContains != null and condition.clusterCategoryContains != ''">
+                        AND MT.`cluster_category` LIKE concat('%', #{condition.clusterCategoryContains}, '%')
+                    </if>
+                    <if test="condition.priority != null">
+                        AND MT.`priority` = #{condition.priority}
+                    </if>
+                    <if test="condition.priorityIn != null and condition.priorityIn.size() > 0">
+                        AND MT.`priority` IN
+                        <foreach collection="condition.priorityIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.priorityNotIn != null and condition.priorityNotIn.size() > 0">
+                        AND MT.`priority` NOT IN
+                        <foreach collection="condition.priorityNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.priorityMin != null">
+                        <![CDATA[
+                        AND MT.`priority` >= #{condition.priorityMin}
+                        ]]>
+                    </if>
+                    <if test="condition.priorityMax != null">
+                        <![CDATA[
+                        AND MT.`priority` <= #{condition.priorityMax}
+                        ]]>
                     </if>
                     <if test="condition.disabled != null">
                         AND MT.`disabled` = #{condition.disabled}

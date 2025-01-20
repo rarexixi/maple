@@ -7,7 +7,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -46,12 +45,8 @@ import org.xi.maple.manager.k8s.crds.volcano.VolcanoQueueList;
 import org.xi.maple.manager.model.ClusterQueue;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -78,7 +73,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     /**
      * 集群名称 -> KubernetesClient
      */
-    private final Map<String, KubernetesClient> k8sClients;
+    private final Map<Integer, KubernetesClient> k8sClients;
 
     public K8sClusterServiceImpl(PersistenceClient persistenceClient, UpdateExecStatusFunc updateExecStatusFunc, MapleManagerProperties managerProperties, ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.persistenceClient = persistenceClient;
@@ -92,8 +87,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     // region engine operation
 
     @Override
-    public List<HasMetadata> deployEngine(String clusterName, MultipartFile yamlFile) {
-        return executeInK8sClient(clusterName, kubernetesClient -> {
+    public List<HasMetadata> deployEngine(Integer clusterId, MultipartFile yamlFile) {
+        return executeInK8sClient(clusterId, kubernetesClient -> {
             try (InputStream is = yamlFile.getInputStream()) {
                 return kubernetesClient.load(is).serverSideApply();
             }
@@ -101,8 +96,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     }
 
     @Override
-    public List<StatusDetails> deleteEngine(String clusterName, MultipartFile yamlFile) {
-        return executeInK8sClient(clusterName, kubernetesClient -> {
+    public List<StatusDetails> deleteEngine(Integer clusterId, MultipartFile yamlFile) {
+        return executeInK8sClient(clusterId, kubernetesClient -> {
             try (InputStream is = yamlFile.getInputStream()) {
                 return kubernetesClient.load(is).delete();
             }
@@ -110,8 +105,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     }
 
     @Override
-    public List<HasMetadata> deployEngine(String clusterName, String yaml) {
-        return executeInK8sClient(clusterName, kubernetesClient -> {
+    public List<HasMetadata> deployEngine(Integer clusterId, String yaml) {
+        return executeInK8sClient(clusterId, kubernetesClient -> {
             try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
                 return kubernetesClient.load(is).serverSideApply();
             }
@@ -119,8 +114,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     }
 
     @Override
-    public List<StatusDetails> deleteEngine(String clusterName, String yaml) {
-        return executeInK8sClient(clusterName, kubernetesClient -> {
+    public List<StatusDetails> deleteEngine(Integer clusterId, String yaml) {
+        return executeInK8sClient(clusterId, kubernetesClient -> {
             try (InputStream is = new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8))) {
                 return kubernetesClient.load(is).delete();
             }
@@ -128,8 +123,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     }
 
     @Override
-    public List<StatusDetails> deleteEngine(String clusterName, String namespace, String type, String name) {
-        return executeInK8sClient(clusterName, kubernetesClient -> {
+    public List<StatusDetails> deleteEngine(Integer clusterId, String namespace, String type, String name) {
+        return executeInK8sClient(clusterId, kubernetesClient -> {
             if (K8sResourceType.FLINK.is(type)) {
                 return kubernetesClient.resources(FlinkDeployment.class).inNamespace(namespace).withName(name).delete();
             } else if (K8sResourceType.SPARK.is(type)) {
@@ -140,11 +135,11 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
         });
     }
 
-    private <T> T executeInK8sClient(String clusterName, ThrowableFunction<KubernetesClient, T> executor) {
-        if (!k8sClients.containsKey(clusterName)) {
-            throw new MapleClusterNotConfiguredException("K8s 集群 [" + clusterName + "] 没有被配置");
+    private <T> T executeInK8sClient(Integer clusterId, ThrowableFunction<KubernetesClient, T> executor) {
+        if (!k8sClients.containsKey(clusterId)) {
+            throw new MapleClusterNotConfiguredException("K8s 集群 [" + clusterId + "] 没有被配置");
         }
-        KubernetesClient kubernetesClient = k8sClients.get(clusterName);
+        KubernetesClient kubernetesClient = k8sClients.get(clusterId);
         try {
             return executor.apply(kubernetesClient);
         } catch (KubernetesClientException e) {
@@ -158,12 +153,12 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     // endregion
 
     @Override
-    public void removeClusterConfig(String clusterName) {
-        if (k8sClients.containsKey(clusterName)) {
-            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterName)) {
+    public void removeClusterConfig(Integer clusterId) {
+        if (k8sClients.containsKey(clusterId)) {
+            try (KubernetesClient kubernetesClient = k8sClients.remove(clusterId)) {
                 kubernetesClient.informers().stopAllRegisteredInformers();
             } catch (Throwable t) {
-                logger.error("关闭 K8s 客户端错误, name: {}", clusterName, t);
+                logger.error("关闭 K8s 客户端错误, name: {}", clusterId, t);
             }
         }
     }
@@ -171,8 +166,8 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     @Override
     public void addClusterConfig(ClusterDetailResp cluster) {
         KubernetesClient kubernetesClient = new KubernetesClientBuilder().withConfig(getConfig(cluster)).build();
-        k8sClients.put(cluster.getName(), kubernetesClient);
-        refreshExecStatus(cluster.getName(), kubernetesClient);
+        k8sClients.put(cluster.getId(), kubernetesClient);
+        refreshExecStatus(cluster.getId(), kubernetesClient);
     }
 
 
@@ -193,13 +188,13 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
                 kubernetesClient = k8sClients.get(cluster.getName());
             } else {
                 kubernetesClient = new KubernetesClientBuilder().withConfig(getConfig(cluster)).build();
-                k8sClients.put(cluster.getName(), kubernetesClient);
+                k8sClients.put(cluster.getId(), kubernetesClient);
             }
-            refreshExecStatus(cluster.getName(), kubernetesClient);
+            refreshExecStatus(cluster.getId(), kubernetesClient);
         }
-        for (String clusterName : k8sClients.keySet()) {
-            if (!clusterNames.contains(clusterName)) {
-                removeClusterConfig(clusterName);
+        for (Integer clusterId : k8sClients.keySet()) {
+            if (!clusterNames.contains(clusterId)) {
+                removeClusterConfig(clusterId);
             }
         }
     }
@@ -207,10 +202,10 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
     /**
      * 刷新引擎执行任务状态
      *
-     * @param clusterName      集群名称
+     * @param clusterId        集群ID
      * @param kubernetesClient K8s client
      */
-    public void refreshExecStatus(String clusterName, KubernetesClient kubernetesClient) {
+    public void refreshExecStatus(Integer clusterId, KubernetesClient kubernetesClient) {
 
         SharedIndexInformer<FlinkDeployment> flinkInformer = kubernetesClient
                 .resources(FlinkDeployment.class, FlinkDeploymentList.class)
@@ -227,34 +222,33 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
 
         SharedIndexInformer<VolcanoQueue> volcanoInformer = kubernetesClient
                 .resources(VolcanoQueue.class, VolcanoQueueList.class)
-                .inform(new MapleResourceEventHandler<>() {
+                .inform(new MapleResourceEventHandler<VolcanoQueue>() {
                     @Override
                     public void onAdd(VolcanoQueue volcanoQueue) {
-                        String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
+                        String key = ClusterQueue.getClusterQueueKey(clusterId, volcanoQueue.getMetadata().getName());
                         ClusterQueue clusterQueue = new K8sClusterQueue(volcanoQueue.getStatus().getPending());
                         clusterQueueMap.put(key, clusterQueue);
                     }
 
                     @Override
                     public void onUpdate(VolcanoQueue oldVolcanoQueue, VolcanoQueue volcanoQueue) {
-                        String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
+                        String key = ClusterQueue.getClusterQueueKey(clusterId, volcanoQueue.getMetadata().getName());
                         ClusterQueue clusterQueue = new K8sClusterQueue(volcanoQueue.getStatus().getPending());
                         clusterQueueMap.put(key, clusterQueue);
                     }
 
                     @Override
                     public void onDelete(VolcanoQueue volcanoQueue, boolean deletedFinalStateUnknown) {
-                        String key = ClusterQueue.getClusterQueueKey(clusterName, volcanoQueue.getMetadata().getName());
+                        String key = ClusterQueue.getClusterQueueKey(clusterId, volcanoQueue.getMetadata().getName());
                         clusterQueueMap.remove(key);
                     }
                 }, 10000L);
         volcanoInformer.start();
-
     }
 
     @Override
-    public ClusterQueue getCachedQueueInfo(String clusterName, String queue) {
-        return clusterQueueMap.getOrDefault(ClusterQueue.getClusterQueueKey(clusterName, queue), null);
+    public ClusterQueue getCachedQueueInfo(Integer clusterId, String queue) {
+        return clusterQueueMap.getOrDefault(ClusterQueue.getClusterQueueKey(clusterId, queue), null);
     }
 
 
@@ -265,12 +259,12 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
      * @return Config
      */
     private Config getConfig(ClusterItemResp cluster) {
-        String name = cluster.getName();
+        Integer id = cluster.getId();
         String master = cluster.getAddress();
-        String configJson = cluster.getConfiguration();
+        String configJson = cluster.getClusterConf();
         KubeConfigWithType kubeConfig = JsonUtils.parseObject(configJson, KubeConfigWithType.class, null);
         if (kubeConfig == null) {
-            throw new MapleClusterConfigException("K8s 集群配置错误, name: " + name);
+            throw new MapleClusterConfigException("K8s 集群配置错误, name: " + cluster.getName());
         }
         /*if ("file".equals(kubeConfig.getType())) {
             if (StringUtils.isBlank(kubeConfig.getKubeConfigContent())) {

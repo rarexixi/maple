@@ -24,12 +24,12 @@ public class EngineExecutionQueueEntity extends BaseEntity {
     /**
      * 提交集群
      */
-    private String cluster;
+    private Integer clusterId;
 
     /**
      * 集群队列
      */
-    private String clusterQueue;
+    private String resourceGroup;
 
     /**
      * 来源应用
@@ -39,7 +39,7 @@ public class EngineExecutionQueueEntity extends BaseEntity {
     /**
      * 用户组
      */
-    private String group;
+    private Integer userGroup;
 
     /**
      * 队列优先级

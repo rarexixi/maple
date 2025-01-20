@@ -6,8 +6,7 @@ import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.common.model.BaseEntity;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
-import org.xi.maple.persistence.model.response.EngineExecutionQueueDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionQueueItemResp;
+import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 import org.xi.maple.persistence.service.EngineExecutionQueueService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,20 +59,10 @@ public class EngineExecutionQueueController {
 
     // endregion 删除/启用/禁用
 
-    // region 详情
-
-    @GetMapping("/{queueName}")
-    public ResponseEntity<EngineExecutionQueueDetailResp> getByQueueName(
-            @PathVariable("queueName") @Validated @NotBlank(message = "queueName(执行队列名)不能为空") String queueName
-    ) {
-        EngineExecutionQueueDetailResp detail = engineExecutionQueueService.getByQueueName(queueName);
-        return ResponseEntity.ok(detail);
-    }
-
     // endregion 详情
 
     @GetMapping("/all")
-    public ResponseEntity<List<EngineExecutionQueueItemResp>> getList(EngineExecutionQueueQueryReq queryReq) {
+    public ResponseEntity<List<EngineExecutionQueueResp>> getList(EngineExecutionQueueQueryReq queryReq) {
         return ResponseEntity.ok(engineExecutionQueueService.getList(queryReq));
     }
 }

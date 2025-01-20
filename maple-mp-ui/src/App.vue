@@ -24,6 +24,12 @@ const navMenuItems = ref<MenuProps['items']>([
     title: 'cluster',
   },
   {
+    key: 'application',
+    icon: () => h(AntdIcons['AppstoreOutlined']),
+    label: h(RouterLink, { to: { path: '/application' } }, () => '对接应用'),
+    title: 'application',
+  },
+  {
     key: 'clusterEngine',
     icon: () => h(AntdIcons['CalculatorOutlined']),
     label: h(RouterLink, { to: { path: '/cluster-engine' } }, () => '计算引擎'),

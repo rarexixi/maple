@@ -2,13 +2,10 @@ package org.xi.maple.persistence.controller;
 
 import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.annotation.SetFieldTypes;
-import org.xi.maple.common.model.PageList;
-import org.xi.maple.persistence.model.request.EngineExecutionQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
-import org.xi.maple.persistence.model.response.EngineExecutionItemResp;
 import org.xi.maple.persistence.service.EngineExecutionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,13 +80,4 @@ public class EngineExecutionController {
     }
 
     // endregion 详情
-
-    @GetMapping
-    public ResponseEntity<PageList<EngineExecutionItemResp>> getPageList(
-            EngineExecutionQueryReq queryReq,
-            @RequestParam(value = "pageNum", defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer pageNum,
-            @RequestParam(value = "pageSize", defaultValue = "50") @Min(value = 1, message = "分页大小必须大于0") Integer pageSize
-    ) {
-        return ResponseEntity.ok(engineExecutionService.getPageList(queryReq, pageNum, pageSize));
-    }
 }

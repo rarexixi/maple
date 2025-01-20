@@ -120,6 +120,7 @@ generator:
     tinytext: String
     mediumtext: String
     longtext: String
+    json: String
     blob: byte[]
     tinyblob: byte[]
     mediumblob: byte[]

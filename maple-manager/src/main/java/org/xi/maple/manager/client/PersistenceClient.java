@@ -19,42 +19,39 @@ public interface PersistenceClient {
 
     // region engine-execution
 
-    @PostMapping("/engine-executions")
+    @PostMapping("/api/engine-executions")
     Integer addExecution(@RequestBody EngineExecutionSaveReq req);
 
-    @GetMapping("/engine-executions/{id}")
+    @GetMapping("/api/engine-executions/{id}")
     EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);
 
-    @PatchMapping("/engine-executions/{id}/status")
+    @PatchMapping("/api/engine-executions/{id}/status")
     Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
-    @PatchMapping("/engine-executions/{id}/ext-info")
+    @PatchMapping("/api/engine-executions/{id}/ext-info")
     Integer updateExecutionExtInfoById(@PathVariable("id") Integer id, @RequestBody EngineExecutionExtUpdateReq req);
 
     // endregion
 
     // region engine-execution-queue
 
-    @PostMapping("/engine-execution-queues")
+    @PostMapping("/api/engine-execution-queues")
     OperateResult<Integer> upsertExecQueue(@RequestBody EngineExecutionQueueSaveReq req);
 
-    @DeleteMapping("/engine-execution-queues/{queueName}")
+    @DeleteMapping("/api/engine-execution-queues/{queueName}")
     Integer deleteExecQueue(@PathVariable("queueName") String queueName);
 
-    @GetMapping("/engine-execution-queues/{queueName}")
-    EngineExecutionQueue getExecQueueByName(@PathVariable("queueName") String queueName);
-
-    @GetMapping("/engine-execution-queues/all")
-    List<EngineExecutionQueue> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryReq req);
+    @GetMapping("/api/engine-execution-queues/all")
+    List<EngineExecutionQueueResp> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryReq req);
 
     // endregion
 
     // region cluster
 
-    @GetMapping("/clusters/{name}")
-    ClusterDetailResp getClusterByName(@PathVariable("name") String name);
+    @GetMapping("/api/clusters/{id}")
+    ClusterDetailResp getClusterById(@PathVariable("id") Integer id);
 
-    @GetMapping("/clusters/all")
+    @GetMapping("/api/clusters/all")
     List<ClusterItemResp> getClusterList(@SpringQueryMap ClusterQueryReq queryReq);
 
     // endregion

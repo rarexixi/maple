@@ -2,7 +2,7 @@ apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
   name: SPARK-${execName}-${execId}
-  namespace: ${job.namespace}
+  namespace: ${runConf.namespace}
   labels:
     from-app: maple-exec
     maple-id: "${execId}"
@@ -15,30 +15,30 @@ spec:
   mode: cluster
   image:
   sparkVersion: 3.3.2
-<#if job.runType == "data_calc">
+<#if jobType == "data_calc">
   type: Scala
   mainClass: xxx.xxx.xxx
   mainApplicationFile: "local:///opt/spark/opt/maple-spark-data-calc.jar"
-<#elseif job.runType == "sql">
+<#elseif jobType == "sql">
   type: Scala
   mainClass: xxx.xxx.xxx
   mainApplicationFile: "local:///opt/spark/opt/maple-spark-data-calc.jar"
-<#elseif job.runType == "scala">
+<#elseif jobType == "scala">
   type: Scala
   mainClass: xxx.xxx.xxx
   mainApplicationFile: "local:///opt/spark/opt/maple-spark-data-calc.jar"
-<#elseif job.runType == "py">
+<#elseif jobType == "py">
   type: Python   # Scala, Java, Python, or R
-  mainApplicationFile: ${execFile}
-<#elseif job.runType == "jar">
+  mainApplicationFile: ${execConf.execFile}
+<#elseif jobType == "jar">
   type: Scala
-  mainClass: ${job.runConf.mainClass}
-  mainApplicationFile: ${execFile}
+  mainClass: ${execConf.mainClass}
+  mainApplicationFile: ${execConf.execFile}
 </#if>
   imagePullSecrets:
-<#if job.runConf.args??>
+<#if execConf.args??>
   arguments:
-  <#list job.runConf.args as arg>
+  <#list execConf.args as arg>
     - "${arg}"
   </#list>
 </#if>
@@ -69,11 +69,11 @@ spec:
     "spark.eventLog.dir": "hdfs://hadoop-cluster/spark/benchmark/logs/"
     "spark.kubernetes.file.upload.path": "local:///tmp/"
     "spark.kubernetes.executor.podNamePrefix": "maple-spark-${execId}"
-    "spark.ui.proxyBase": "/ui/${job.namespace}/maple-spark-${execId}-ui-svc"
+    "spark.ui.proxyBase": "/ui/${runConf.namespace}/maple-spark-${execId}-ui-svc"
     "spark.ui.proxyRedirectUri": ""
     "spark.ui.port": "8080"
-    <#if job.conf??>
-    <#list job.conf as key, value>
+    <#if runConf.conf??>
+    <#list runConf.conf as key, value>
     "${key}": "${value}"
     </#list>
     </#if>
@@ -85,10 +85,10 @@ spec:
         value: ${value}
     </#list>
     </#if>
-    cores: ${job.driverCores}
-    <#-- coreLimit: "${job.driverCoreLimit}" -->
-    memory: "${job.driverMemory}"
-    javaOptions: "${job.driverJavaOptions}"
+    cores: ${runConf.driverCores}
+    <#-- coreLimit: "${runConf.driverCoreLimit}" -->
+    memory: "${runConf.driverMemory}"
+    javaOptions: "${runConf.driverJavaOptions}"
     labels:
       from-app: maple-exec
       maple-id: "${execId}"
@@ -101,12 +101,12 @@ spec:
     annotations:
     tolerations:
   executor:
-    cores: ${job.executorCores}
-    <#-- coreLimit: "${job.executorCoreLimit}" -->
-    instances: ${job.numExecutors}
-    memory: "${job.executorMemory}"
-    <#if job.memoryOverhead??>
-    memoryOverhead: "${job.memoryOverhead}"
+    cores: ${runConf.executorCores}
+    <#-- coreLimit: "${runConf.executorCoreLimit}" -->
+    instances: ${runConf.numExecutors}
+    memory: "${runConf.executorMemory}"
+    <#if runConf.memoryOverhead??>
+    memoryOverhead: "${runConf.memoryOverhead}"
     </#if>
     javaOptions: ""
     labels:

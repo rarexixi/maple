@@ -6,7 +6,7 @@ eureka:
     fetch-registry: true # 是否从 Eureka Server 获取注册表信息，默认为 true
   instance:
     prefer-ip-address: true # 使用 IP 地址而不是主机名进行注册，默认为 false
-    instance-id: ${spring.application.name}:${server.port} # 设置实例 ID，默认是主机名和端口
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port} # 设置实例 ID，默认是主机名和端口
 
 server:
   port: 8082
@@ -15,7 +15,7 @@ server:
       charset: UTF-8
       enabled: true
       force: true
-  
+
 spring:
   main:
     allow-bean-definition-overriding: true # 是否允许覆盖已定义的 Bean
@@ -77,6 +77,7 @@ maple:
     date-time-format: yyyy-MM-dd HH:mm:ss
     date-format: yyyy-MM-dd
     time-format: HH:mm:ss
+
 
 freemarker:
   template:

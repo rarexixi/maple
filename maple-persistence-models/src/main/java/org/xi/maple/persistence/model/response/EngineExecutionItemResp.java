@@ -1,9 +1,9 @@
 package org.xi.maple.persistence.model.response;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
-import lombok.Data;
 
 @Data
 public class EngineExecutionItemResp implements Serializable {
@@ -19,14 +19,14 @@ public class EngineExecutionItemResp implements Serializable {
     private String execFile;
 
     /**
+     * 作业ID
+     */
+    private Integer jobId;
+
+    /**
      * 来源应用
      */
     private String fromApp;
-
-    /**
-     * 作业ID
-     */
-    private String jobId;
 
     /**
      * 执行批次ID
@@ -34,34 +34,24 @@ public class EngineExecutionItemResp implements Serializable {
     private String bizId;
 
     /**
-     * 应用作业执行唯一ID
-     */
-    private String execUniqId;
-
-    /**
      * 执行名称
      */
     private String execName;
 
     /**
-     * 提交集群
+     * 引擎ID
      */
-    private String cluster;
+    private Integer engineId;
+
+    /**
+     * 所属集群
+     */
+    private Integer clusterId;
 
     /**
      * 集群资源组
      */
     private String resourceGroup;
-
-    /**
-     * 引擎种类
-     */
-    private String engineCategory;
-
-    /**
-     * 引擎版本
-     */
-    private String engineVersion;
 
     /**
      * 初始优先级
@@ -81,12 +71,12 @@ public class EngineExecutionItemResp implements Serializable {
     /**
      * 用户组
      */
-    private String group;
+    private Integer userGroup;
 
     /**
-     * 用户
+     * 执行人
      */
-    private String user;
+    private Integer runBy;
 
     /**
      * 集群应用ID

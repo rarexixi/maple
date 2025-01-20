@@ -29,7 +29,7 @@ public class EngineExecutionUpdateService {
         Integer execId = ParamsUtils.EXEC_ID;
         String updateExecInfoUrl = ParamsUtils.UPDATE_EXEC_INFO_URL;
         EngineExecutionExtUpdateReq request = new EngineExecutionExtUpdateReq();
-        request.setExtInfo(info);
+        request.setExecInfo(info); // todo
         post(execId, updateExecInfoUrl, request);
     }
 

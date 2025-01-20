@@ -22,9 +22,19 @@ public class ClusterEngineEntity extends BaseEntity {
     private Integer id;
 
     /**
+     * 集群ID
+     */
+    private Integer clusterId;
+
+    /**
      * 集群名称
      */
-    private String cluster;
+    private Integer clusterName;
+
+    /**
+     * 集群类型
+     */
+    private String clusterCategory;
 
     /**
      * 类型名称
@@ -42,7 +52,7 @@ public class ClusterEngineEntity extends BaseEntity {
     private String engineHome;
 
     /**
-     * 扩展信息
+     * 引擎配置
      */
-    private String extInfo;
+    private String engineConf;
 }

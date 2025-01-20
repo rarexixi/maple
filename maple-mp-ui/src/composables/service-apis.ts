@@ -58,6 +58,17 @@ export const SysConfApis = {
   delete: getReqUrl('/api/sys-conf/{confKey|confKeyList}', 'DELETE'),
 }
 
+export const ApplicationApis = {
+  list: getReqUrl('/api/applications/all', 'GET'),
+  pageList: getReqUrl('/api/applications', 'GET'),
+  detail: getReqUrl('/api/applications/{appName}', 'GET'),
+  add: getReqUrl('/api/applications', 'POST'),
+  update: getReqUrl('/api/applications/{appName}', 'PUT'),
+  enable: getReqUrl('/api/applications/enable/{appName|appNameList}', 'PATCH'),
+  disable: getReqUrl('/api/applications/disable/{appName|appNameList}', 'PATCH'),
+  delete: getReqUrl('/api/applications/{appName|appNameList}', 'DELETE'),
+}
+
 export const ClusterApis = {
   list: getReqUrl('/api/clusters/all', 'GET'),
   pageList: getReqUrl('/api/clusters', 'GET'),

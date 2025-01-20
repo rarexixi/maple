@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class MapleProperties {
 
     @NestedConfigurationProperty
-    private MapleJsonFormatProperties jsonFormat;
+    private MapleJsonFormatProperties jsonFormat = new MapleJsonFormatProperties();
 
     @NestedConfigurationProperty
-    private MapleAspectProperties aspect;
+    private MapleAspectProperties aspect = new MapleAspectProperties();
 }

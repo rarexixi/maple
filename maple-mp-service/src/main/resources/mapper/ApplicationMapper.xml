@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.xi.maple.mp.persistence.mapper.ApplicationMapper">
+
+    <resultMap id="BaseResultMap" type="org.xi.maple.mp.persistence.entity.ApplicationEntity">
+        <result property="appName" column="app_name"/>
+        <result property="accessKey" column="access_key"/>
+        <result property="legalHosts" column="legal_hosts"/>
+        <result property="webhooks" column="webhooks"/>
+        <result property="disabled" column="disabled"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.mp.persistence.entity.ApplicationEntityExt">
+    </resultMap>
+
+    <sql id="tableName">`maple_application`</sql>
+
+    <!--插入访问程序-->
+    <insert id="insert">
+        insert into <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entity.appName != null">`app_name`,</if>
+            <if test="entity.accessKey != null">`access_key`,</if>
+            <if test="entity.legalHosts != null">`legal_hosts`,</if>
+            <if test="entity.webhooks != null">`webhooks`,</if>
+            <if test="entity.disabled != null">`disabled`,</if>
+            <if test="entity.createdBy != null">`created_by`,</if>
+            <if test="entity.updatedBy != null">`updated_by`,</if>
+            <if test="entity.createdAt != null">`created_at`,</if>
+            <if test="entity.updatedAt != null">`updated_at`,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entity.appName != null">#{entity.appName},</if>
+            <if test="entity.accessKey != null">#{entity.accessKey},</if>
+            <if test="entity.legalHosts != null">#{entity.legalHosts},</if>
+            <if test="entity.webhooks != null">#{entity.webhooks},</if>
+            <if test="entity.disabled != null">#{entity.disabled},</if>
+            <if test="entity.createdBy != null">#{entity.createdBy},</if>
+            <if test="entity.updatedBy != null">#{entity.updatedBy},</if>
+            <if test="entity.createdAt != null">#{entity.createdAt},</if>
+            <if test="entity.updatedAt != null">#{entity.updatedAt},</if>
+        </trim>
+    </insert>
+
+    <!--todo 插入具体的列-->
+    <!--批量插入访问程序-->
+    <insert id="batchInsert">
+        insert into <include refid="tableName"/>
+        (
+            `app_name`,
+            `access_key`,
+            `legal_hosts`,
+            `webhooks`,
+            `disabled`,
+            `created_by`,
+            `updated_by`,
+            `created_at`,
+            `updated_at`
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.appName},
+            #{item.accessKey},
+            #{item.legalHosts},
+            #{item.webhooks},
+            #{item.disabled},
+            #{item.createdBy},
+            #{item.updatedBy},
+            #{item.createdAt},
+            #{item.updatedAt}
+        )
+        </foreach>
+    </insert>
+
+    <!--根据条件删除访问程序-->
+    <delete id="deleteByCondition">
+        DELETE FROM <include refid="tableName"/>
+        <include refid="updateByPkWhere"/>
+    </delete>
+
+    <!--根据条件更新访问程序实体不为空的字段-->
+    <update id="patchByCondition">
+        UPDATE <include refid="tableName"/>
+        <set>
+            <if test="entity.accessKey != null">
+                `access_key` = #{entity.accessKey},
+            </if>
+            <if test="entity.legalHosts != null">
+                `legal_hosts` = #{entity.legalHosts},
+            </if>
+            <if test="entity.webhooks != null">
+                `webhooks` = #{entity.webhooks},
+            </if>
+            <if test="entity.disabled != null">
+                `disabled` = #{entity.disabled},
+            </if>
+            <if test="entity.updatedBy != null">
+                `updated_by` = #{entity.updatedBy},
+            </if>
+            <if test="entity.updatedAt != null">
+                `updated_at` = #{entity.updatedAt}
+            </if>
+        </set>
+        <include refid="updateByPkWhere"/>
+    </update>
+
+    <!--根据条件更新访问程序所有字段-->
+    <update id="updateByAppName">
+        UPDATE <include refid="tableName"/>
+        <set>
+            `access_key` = #{entity.accessKey},
+            `legal_hosts` = #{entity.legalHosts},
+            `webhooks` = #{entity.webhooks},
+            `updated_by` = #{entity.updatedBy},
+            `updated_at` = #{entity.updatedAt}
+        </set>
+        <where>
+            `app_name` = #{appName}
+        </where>
+    </update>
+
+    <!--根据主键获取访问程序详情-->
+    <select id="getByAppName" resultMap="ExtResultMap">
+        SELECT
+            MT.`app_name`,
+            MT.`access_key`,
+            MT.`legal_hosts`,
+            MT.`webhooks`,
+            MT.`disabled`,
+            MT.`created_by`,
+            MT.`updated_by`,
+            MT.`created_at`,
+            MT.`updated_at`
+        FROM
+        <include refid="tableName"/> MT
+        <where>
+            MT.`app_name` = #{appName}
+        </where>
+    </select>
+
+    <!-- 根据条件查询 -->
+    <select id="select" resultMap="ExtResultMap">
+        SELECT
+        <choose>
+            <when test="columnsCondition != null and columnsCondition.columns != null">
+                <foreach collection="columnsCondition.columns" item="it" separator=",">MT.`${it}`</foreach>
+            </when>
+            <otherwise>
+                MT.`app_name`,
+                MT.`access_key`,
+                MT.`legal_hosts`,
+                MT.`webhooks`,
+                MT.`disabled`,
+                MT.`created_by`,
+                MT.`updated_by`,
+                MT.`created_at`,
+                MT.`updated_at`
+            </otherwise>
+        </choose>
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+        <if test="sortCondition != null and sortCondition.orderBy != null">
+            ORDER BY <foreach collection="sortCondition.orderBy" index="key" item="val" separator=",">MT.${key} ${val}</foreach>
+        </if>
+    </select>
+
+    <!-- 根据条件查询总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName"/> MT
+        <include refid="where"/>
+    </select>
+
+    <!-- 更新/删除条件 -->
+    <sql id="updateByPkWhere">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <choose>
+                    <when test="condition.appName != null">
+                        `app_name` = #{condition.appName}
+                    </when>
+                    <otherwise>
+                        `app_name` IN
+                        <foreach collection="condition.appNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="where">
+        <where>
+            <if test="condition == null">1!=1</if>
+            <if test="condition != null">
+                <trim prefixOverrides="AND|OR">
+                    <if test="condition.appName != null and condition.appName != ''">
+                        AND MT.`app_name` = #{condition.appName}
+                    </if>
+                    <if test="condition.appNameIn != null and condition.appNameIn.size() > 0">
+                        AND MT.`app_name` IN
+                        <foreach collection="condition.appNameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.appNameNotIn != null and condition.appNameNotIn.size() > 0">
+                        AND MT.`app_name` NOT IN
+                        <foreach collection="condition.appNameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.appNameIsNotEmpty != null and condition.appNameIsNotEmpty == true">
+                        AND MT.`app_name` IS NOT NULL AND `app_name` != ''
+                    </if>
+                    <if test="condition.appNameIsEmpty != null and condition.appNameIsEmpty == true">
+                        AND (MT.`app_name` IS NULL OR MT.`app_name` = '')
+                    </if>
+                    <if test="condition.appNameStartWith != null and condition.appNameStartWith != ''">
+                        AND MT.`app_name` LIKE concat(#{condition.appNameStartWith}, '%')
+                    </if>
+                    <if test="condition.appNameEndWith != null and condition.appNameEndWith != ''">
+                        AND MT.`app_name` LIKE concat('%', #{condition.appNameEndWith})
+                    </if>
+                    <if test="condition.appNameContains != null and condition.appNameContains != ''">
+                        AND MT.`app_name` LIKE concat('%', #{condition.appNameContains}, '%')
+                    </if>
+                    <if test="condition.accessKey != null and condition.accessKey != ''">
+                        AND MT.`access_key` = #{condition.accessKey}
+                    </if>
+                    <if test="condition.accessKeyIn != null and condition.accessKeyIn.size() > 0">
+                        AND MT.`access_key` IN
+                        <foreach collection="condition.accessKeyIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.accessKeyNotIn != null and condition.accessKeyNotIn.size() > 0">
+                        AND MT.`access_key` NOT IN
+                        <foreach collection="condition.accessKeyNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.accessKeyIsNotEmpty != null and condition.accessKeyIsNotEmpty == true">
+                        AND MT.`access_key` IS NOT NULL AND `access_key` != ''
+                    </if>
+                    <if test="condition.accessKeyIsEmpty != null and condition.accessKeyIsEmpty == true">
+                        AND (MT.`access_key` IS NULL OR MT.`access_key` = '')
+                    </if>
+                    <if test="condition.accessKeyStartWith != null and condition.accessKeyStartWith != ''">
+                        AND MT.`access_key` LIKE concat(#{condition.accessKeyStartWith}, '%')
+                    </if>
+                    <if test="condition.accessKeyEndWith != null and condition.accessKeyEndWith != ''">
+                        AND MT.`access_key` LIKE concat('%', #{condition.accessKeyEndWith})
+                    </if>
+                    <if test="condition.accessKeyContains != null and condition.accessKeyContains != ''">
+                        AND MT.`access_key` LIKE concat('%', #{condition.accessKeyContains}, '%')
+                    </if>
+                    <if test="condition.legalHosts != null and condition.legalHosts != ''">
+                        AND MT.`legal_hosts` = #{condition.legalHosts}
+                    </if>
+                    <if test="condition.legalHostsIn != null and condition.legalHostsIn.size() > 0">
+                        AND MT.`legal_hosts` IN
+                        <foreach collection="condition.legalHostsIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.legalHostsNotIn != null and condition.legalHostsNotIn.size() > 0">
+                        AND MT.`legal_hosts` NOT IN
+                        <foreach collection="condition.legalHostsNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.legalHostsIsNotEmpty != null and condition.legalHostsIsNotEmpty == true">
+                        AND MT.`legal_hosts` IS NOT NULL AND `legal_hosts` != ''
+                    </if>
+                    <if test="condition.legalHostsIsEmpty != null and condition.legalHostsIsEmpty == true">
+                        AND (MT.`legal_hosts` IS NULL OR MT.`legal_hosts` = '')
+                    </if>
+                    <if test="condition.legalHostsStartWith != null and condition.legalHostsStartWith != ''">
+                        AND MT.`legal_hosts` LIKE concat(#{condition.legalHostsStartWith}, '%')
+                    </if>
+                    <if test="condition.legalHostsEndWith != null and condition.legalHostsEndWith != ''">
+                        AND MT.`legal_hosts` LIKE concat('%', #{condition.legalHostsEndWith})
+                    </if>
+                    <if test="condition.legalHostsContains != null and condition.legalHostsContains != ''">
+                        AND MT.`legal_hosts` LIKE concat('%', #{condition.legalHostsContains}, '%')
+                    </if>
+                    <if test="condition.webhooks != null and condition.webhooks != ''">
+                        AND MT.`webhooks` = #{condition.webhooks}
+                    </if>
+                    <if test="condition.webhooksIn != null and condition.webhooksIn.size() > 0">
+                        AND MT.`webhooks` IN
+                        <foreach collection="condition.webhooksIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.webhooksNotIn != null and condition.webhooksNotIn.size() > 0">
+                        AND MT.`webhooks` NOT IN
+                        <foreach collection="condition.webhooksNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.webhooksIsNotEmpty != null and condition.webhooksIsNotEmpty == true">
+                        AND MT.`webhooks` IS NOT NULL AND `webhooks` != ''
+                    </if>
+                    <if test="condition.webhooksIsEmpty != null and condition.webhooksIsEmpty == true">
+                        AND (MT.`webhooks` IS NULL OR MT.`webhooks` = '')
+                    </if>
+                    <if test="condition.webhooksStartWith != null and condition.webhooksStartWith != ''">
+                        AND MT.`webhooks` LIKE concat(#{condition.webhooksStartWith}, '%')
+                    </if>
+                    <if test="condition.webhooksEndWith != null and condition.webhooksEndWith != ''">
+                        AND MT.`webhooks` LIKE concat('%', #{condition.webhooksEndWith})
+                    </if>
+                    <if test="condition.webhooksContains != null and condition.webhooksContains != ''">
+                        AND MT.`webhooks` LIKE concat('%', #{condition.webhooksContains}, '%')
+                    </if>
+                    <if test="condition.disabled != null">
+                        AND MT.`disabled` = #{condition.disabled}
+                    </if>
+                    <if test="condition.createdBy != null">
+                        AND MT.`created_by` = #{condition.createdBy}
+                    </if>
+                    <if test="condition.createdByIn != null and condition.createdByIn.size() > 0">
+                        AND MT.`created_by` IN
+                        <foreach collection="condition.createdByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createdByNotIn != null and condition.createdByNotIn.size() > 0">
+                        AND MT.`created_by` NOT IN
+                        <foreach collection="condition.createdByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.createdByMin != null">
+                        <![CDATA[
+                        AND MT.`created_by` >= #{condition.createdByMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createdByMax != null">
+                        <![CDATA[
+                        AND MT.`created_by` <= #{condition.createdByMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedBy != null">
+                        AND MT.`updated_by` = #{condition.updatedBy}
+                    </if>
+                    <if test="condition.updatedByIn != null and condition.updatedByIn.size() > 0">
+                        AND MT.`updated_by` IN
+                        <foreach collection="condition.updatedByIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updatedByNotIn != null and condition.updatedByNotIn.size() > 0">
+                        AND MT.`updated_by` NOT IN
+                        <foreach collection="condition.updatedByNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
+                    </if>
+                    <if test="condition.updatedByMin != null">
+                        <![CDATA[
+                        AND MT.`updated_by` >= #{condition.updatedByMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedByMax != null">
+                        <![CDATA[
+                        AND MT.`updated_by` <= #{condition.updatedByMax}
+                        ]]>
+                    </if>
+                    <if test="condition.createdAtMin != null">
+                        <![CDATA[
+                        AND MT.`created_at` >= #{condition.createdAtMin}
+                        ]]>
+                    </if>
+                    <if test="condition.createdAtMax != null">
+                        <![CDATA[
+                        AND MT.`created_at` <= #{condition.createdAtMax}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedAtMin != null">
+                        <![CDATA[
+                        AND MT.`updated_at` >= #{condition.updatedAtMin}
+                        ]]>
+                    </if>
+                    <if test="condition.updatedAtMax != null">
+                        <![CDATA[
+                        AND MT.`updated_at` <= #{condition.updatedAtMax}
+                        ]]>
+                    </if>
+                </trim>
+            </if>
+        </where>
+    </sql>
+</mapper>

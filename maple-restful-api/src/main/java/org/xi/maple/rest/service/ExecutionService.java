@@ -1,6 +1,5 @@
 package org.xi.maple.rest.service;
 
-import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.rest.model.request.ExecReq;
 import org.xi.maple.rest.model.request.JobExecReq;
@@ -53,8 +52,17 @@ public interface ExecutionService {
     Integer exec(ExecReq execReq);
 
     /**
+     * 立即执行，返回提交结果
+     *
+     * @param jobExecReq 执行提交请求对象
+     * @return 执行记录ID
+     */
+    Integer execJob(JobExecReq jobExecReq);
+
+    /**
      * 杀死执行任务
-     * @param id 执行记录ID
+     *
+     * @param id  执行记录ID
      * @param app 来源应用
      * @return 执行结果
      */
@@ -62,7 +70,8 @@ public interface ExecutionService {
 
     /**
      * 取消执行任务
-     * @param id 执行记录ID
+     *
+     * @param id  执行记录ID
      * @param app 来源应用
      * @return 执行结果
      */

@@ -9,9 +9,11 @@ import org.xi.maple.manager.k8s.service.K8sClusterService;
 
 import java.util.List;
 
-@RequestMapping("k8s")
+@RequestMapping(K8sController.BASE_URL)
 @RestController
 public class K8sController {
+
+    public static final String BASE_URL = "/api/k8s";
 
     private final K8sClusterService clusterService;
 
@@ -19,55 +21,55 @@ public class K8sController {
         this.clusterService = clusterService;
     }
 
-    @PutMapping("{clusterName}/deploy-by-file")
+    @PutMapping("/{clusterId}/deploy-by-file")
     public ResponseEntity<List<HasMetadata>> deployByFile(
-            @PathVariable("clusterName") String clusterName,
+            @PathVariable("clusterId") Integer clusterId,
             @RequestParam("yamlFile") MultipartFile yamlFile) {
-        List<HasMetadata> result = clusterService.deployEngine(clusterName, yamlFile);
+        List<HasMetadata> result = clusterService.deployEngine(clusterId, yamlFile);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("{clusterName}/delete-by-file")
+    @PutMapping("/{clusterId}/delete-by-file")
     public ResponseEntity<List<StatusDetails>> deleteByFile(
-            @PathVariable("clusterName") String clusterName,
+            @PathVariable("clusterId") Integer clusterId,
             @RequestParam("yamlFile") MultipartFile yamlFile) {
-        List<StatusDetails> result = clusterService.deleteEngine(clusterName, yamlFile);
+        List<StatusDetails> result = clusterService.deleteEngine(clusterId, yamlFile);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("{clusterName}/delete-by-name")
+    @PutMapping("/{clusterId}/delete-by-name")
     public ResponseEntity<List<StatusDetails>> deleteByName(
-            @PathVariable("clusterName") String clusterName,
+            @PathVariable("clusterId") Integer clusterId,
             @RequestParam("namespace") String namespace,
             @RequestParam("type") String type,
             @RequestParam("name") String name) {
-        List<StatusDetails> result = clusterService.deleteEngine(clusterName, namespace, type, name);
+        List<StatusDetails> result = clusterService.deleteEngine(clusterId, namespace, type, name);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("{clusterName}/deploy")
+    @PutMapping("/{clusterId}/deploy")
     public ResponseEntity<List<HasMetadata>> deploy(
-            @PathVariable("clusterName") String clusterName,
+            @PathVariable("clusterId") Integer clusterId,
             @RequestBody String yaml) {
-        List<HasMetadata> result = clusterService.deployEngine(clusterName, yaml);
+        List<HasMetadata> result = clusterService.deployEngine(clusterId, yaml);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("{clusterName}/delete")
+    @PutMapping("/{clusterId}/delete")
     public ResponseEntity<List<StatusDetails>> delete(
-            @PathVariable("clusterName") String clusterName,
+            @PathVariable("clusterId") Integer clusterId,
             @RequestBody String yaml) {
-        List<StatusDetails> result = clusterService.deleteEngine(clusterName, yaml);
+        List<StatusDetails> result = clusterService.deleteEngine(clusterId, yaml);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("start-scheduler")
+    @PutMapping("/start-scheduler")
     public ResponseEntity<Object> startScheduler() {
         clusterService.startRefreshScheduler();
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("stop-scheduler")
+    @PutMapping("/stop-scheduler")
     public ResponseEntity<Object> stopScheduler() {
         clusterService.stopRefreshScheduler();
         return ResponseEntity.accepted().build();

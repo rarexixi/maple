@@ -4,7 +4,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.slf4j.Logger;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
@@ -30,16 +29,13 @@ import java.util.Set;
 
 public abstract class EngineExecutor implements EngineExecutionService {
 
-    private final Logger logger;
-
     protected final EnginePluginService enginePluginService;
     protected final ExecutionProperties executionProperties;
     protected final PluginProperties pluginProperties;
     protected final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     protected final PersistenceClient persistenceClient;
 
-    public EngineExecutor(Logger logger, EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
-        this.logger = logger;
+    public EngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
         this.enginePluginService = enginePluginService;
         this.executionProperties = executionProperties;
         this.pluginProperties = pluginProperties;
@@ -78,20 +74,19 @@ public abstract class EngineExecutor implements EngineExecutionService {
     }
 
     protected EngineExecutionModel convert(EngineExecutionDetailResp execution) {
-        ClusterEngineDefaultConfGetRequest request = new ClusterEngineDefaultConfGetRequest(execution.getCluster(), execution.getEngineCategory(), execution.getEngineVersion(), execution.getGroup(), execution.getUser());
-        EngineConf engineConf = persistenceClient.getEngineConf(request);
+        ClusterEngineDefaultConfGetRequest request = new ClusterEngineDefaultConfGetRequest(execution.getUserGroup(), execution.getRunBy());
+        EngineConf engineConf = persistenceClient.getEngineConf(execution.getEngineId(), request);
+
         return new EngineExecutionModel().withExecId(execution.getId())
-                .withExecFile(execution.getExecFile())
                 .withFromApp(execution.getFromApp())
                 .withJobId(execution.getJobId())
                 .withBizId(execution.getBizId())
-                .withExecUniqId(execution.getExecUniqId())
                 .withExecName(execution.getExecName())
-                .withResourceGroup(execution.getResourceGroup())
-                .withGroup(execution.getGroup())
-                .withUser(execution.getUser())
+                .withUserGroup(execution.getUserGroupName())
+                .withRunBy(execution.getRunByName())
                 .withEngine(engineConf)
-                .withConfiguration(execution.getConfiguration());
+                .withRunConf(execution.getRunConf())
+                .withExecConf(execution.getExecConf());
     }
 
     /**
