@@ -29,7 +29,7 @@ public class ClusterEngineEntity extends BaseEntity {
     /**
      * 集群名称
      */
-    private Integer clusterName;
+    private String clusterName;
 
     /**
      * 集群类型

@@ -1,11 +1,11 @@
 package org.xi.maple.persistence.service;
 
-import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
-import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionCreateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionPatchReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * 引擎执行记录业务逻辑
@@ -21,46 +21,37 @@ public interface EngineExecutionService {
      * @return 执行ID
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    Integer create(EngineExecutionSaveReq createReq);
+    Integer create(EngineExecutionCreateReq createReq);
 
     /**
-     * 批量添加引擎执行记录
+     * 根据执行ID更新引擎执行记录
      *
-     * @param list 引擎执行记录列表
-     * @return 受影响的行数
-     * @author 郗世豪（rarexixi@gmail.com）
-     */
-    List<Integer> batchCreate(List<EngineExecutionSaveReq> list);
-
-    /**
-     * 根据更新引擎执行记录
-     *
-     * @param id 执行ID
+     * @param id      执行ID
      * @param saveReq 保存引擎执行记录请求实体
      * @return 更新后的引擎执行记录详情
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    EngineExecutionDetailResp patchById(Integer id, EngineExecutionSaveReq saveReq);
+    int patchById(Integer id, EngineExecutionPatchReq saveReq);
 
     /**
      * 根据执行ID更新引擎执行状态
      *
-     * @param id            引擎执行记录ID
-     * @param updateRequest 更新引擎执行记录请求实体
+     * @param id        引擎执行记录ID
+     * @param updateReq 更新引擎执行记录请求实体
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int updateStatusById(int id, EngineExecutionStatusUpdateReq updateRequest);
+    int updateStatusById(int id, EngineExecutionStatusUpdateReq updateReq);
 
     /**
      * 根据执行ID更新引擎执行信息
      *
-     * @param id            引擎执行记录ID
-     * @param updateRequest 更新引擎执行记录请求实体
+     * @param id        引擎执行记录ID
+     * @param updateReq 引擎执行扩展信息
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int patchExtInfoById(int id, EngineExecutionExtUpdateReq updateRequest);
+    int patchExecInfoById(Integer id, Map<String, ?> updateReq);
 
     /**
      * 根据获取引擎执行记录详情

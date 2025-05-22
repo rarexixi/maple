@@ -197,7 +197,7 @@ CREATE TABLE `maple`.`maple_cluster_engine_default_conf`
 (
     `id`           int                    NOT NULL AUTO_INCREMENT COMMENT '引擎ID',
     `obj_type`     varchar(32) DEFAULT '' NOT NULL COMMENT '主体类型(user_group、user)',
-    `obj_id`     int         DEFAULT 0  NOT NULL COMMENT '所属主体(user_group_name、user_name)',
+    `obj_id`       int         DEFAULT 0  NOT NULL COMMENT '所属主体(user_group_name、user_name)',
     `engine_id`    int                    NOT NULL COMMENT '集群引擎ID',
     `default_conf` json                   NOT NULL COMMENT '默认配置', -- json，包括 envs，conf，args
 
@@ -228,34 +228,37 @@ CREATE TABLE `maple`.`maple_engine_execution_queue`
 DROP TABLE IF EXISTS `maple`.`maple_job`;
 CREATE TABLE `maple`.`maple_job`
 (
-    `id`               int                                    NOT NULL AUTO_INCREMENT COMMENT '作业ID',
-    `job_name`         varchar(32)                            NOT NULL COMMENT '作业名',
-    `description`      varchar(256) DEFAULT ''                NOT NULL COMMENT '作业说明',
-    `job_type`         varchar(16)  DEFAULT ''                NOT NULL COMMENT '作业类型',     -- spark-sql, spark-data-calc, flink-data-calc
-    `user_group`       int          DEFAULT 0                 NOT NULL COMMENT '用户组',
-    `owner`            int          DEFAULT 0                 NOT NULL COMMENT '作业负责人',
-    `from_app`         varchar(16)  DEFAULT ''                NOT NULL COMMENT '来源应用',     -- 用于区分哪个应用提交，例如调度系统，实时平台等
-    `engine_id`        int          DEFAULT 0                 NOT NULL COMMENT '引擎ID',
+    `id`                    int                                    NOT NULL AUTO_INCREMENT COMMENT '作业ID',
+    `job_name`              varchar(32)                            NOT NULL COMMENT '作业名',
+    `description`           varchar(256) DEFAULT ''                NOT NULL COMMENT '作业说明',
+    `job_type`              varchar(16)  DEFAULT ''                NOT NULL COMMENT '作业类型',       -- spark-sql, spark-data-calc, flink-data-calc
+    `user_group`            int          DEFAULT 0                 NOT NULL COMMENT '用户组',
+    `owner`                 int          DEFAULT 0                 NOT NULL COMMENT '作业负责人',
+    `from_app`              varchar(16)  DEFAULT ''                NOT NULL COMMENT '来源应用',       -- 用于区分哪个应用提交，例如调度系统，实时平台等
+    `engine_id`             int          DEFAULT 0                 NOT NULL COMMENT '引擎ID',
 
-    `cluster_id`       int          DEFAULT 0                 NOT NULL COMMENT '所属集群',
-    `cluster_category` varchar(16)  DEFAULT ''                NOT NULL COMMENT '集群类型',
+    `cluster_id`            int          DEFAULT 0                 NOT NULL COMMENT '所属集群',
+    `cluster_category`      varchar(16)  DEFAULT ''                NOT NULL COMMENT '集群类型',
+    `resource_group_keys`   varchar(64)                            NOT NULL COMMENT '集群资源组名称', -- 多个之间用 "--" 分隔，如 YARN: queue、Volcano: namespace--queue，K8s: namespace 等
+    `resource_group_values` varchar(128)                           NOT NULL COMMENT '集群资源组',     -- 多个之间用 "--" 分隔，如 YARN: default、Volcano: bigdata--current，K8s: namespace 等
 
-    `priority`         tinyint      DEFAULT 0                 NOT NULL COMMENT '作业优先级',   -- 用于区分优先级，优先级高的先执行
-    `pri_upgradable`   bit          DEFAULT b'0'              NOT NULL COMMENT '优先级可提升', -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
+    `priority`              tinyint      DEFAULT 0                 NOT NULL COMMENT '作业优先级',     -- 用于区分优先级，优先级高的先执行
+    `pri_upgradable`        bit          DEFAULT b'0'              NOT NULL COMMENT '优先级可提升',   -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
 
-    `run_conf`         json                                   NOT NULL COMMENT '执行配置',
-    `job_conf`         json                                   NOT NULL COMMENT '作业配置',     -- 启动参数，运行参数等，根据集群种类不同，配置不同
+    `run_conf`              json                                   NOT NULL COMMENT '执行配置',
+    `job_conf`              json                                   NOT NULL COMMENT '作业配置',       -- 启动参数，运行参数等，根据集群种类不同，配置不同
 
-    `disabled`         tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
-    `created_by`       int          DEFAULT 0                 NOT NULL COMMENT '创建人',
-    `updated_by`       int          DEFAULT 0                 NOT NULL COMMENT '修改人',
-    `created_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `disabled`              tinyint      DEFAULT 0                 NOT NULL COMMENT '是否禁用',
+    `created_by`            int          DEFAULT 0                 NOT NULL COMMENT '创建人',
+    `updated_by`            int          DEFAULT 0                 NOT NULL COMMENT '修改人',
+    `created_at`            datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`            datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     PRIMARY KEY (`id`),
     INDEX idx_job_name (`job_name`),
     INDEX idx_job_type (`job_type`),
-    INDEX idx_job_cluster_id (`engine_id`),
+    INDEX idx_job_engine (`engine_id`),
+    INDEX idx_job_cluster (`cluster_id`),
     INDEX idx_job_owner (`owner`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -264,37 +267,42 @@ CREATE TABLE `maple`.`maple_job`
 DROP TABLE IF EXISTS `maple`.`maple_engine_execution`;
 CREATE TABLE `maple`.`maple_engine_execution`
 (
-    `id`             int                                   NOT NULL AUTO_INCREMENT COMMENT '执行ID',
-    `exec_file`      varchar(256)                          NOT NULL COMMENT '执行文件',
+    `id`                    int                                   NOT NULL AUTO_INCREMENT COMMENT '执行ID',
+    `exec_file`             varchar(256)                          NOT NULL COMMENT '执行文件',       -- spark jar 提交的 jar 地址，spark data-calc 的json文件地址
 
-    `job_id`         int                                   NOT NULL COMMENT '作业ID',       -- 用于关联到某一个具体的作业配置
-    `from_app`       varchar(16)                           NOT NULL COMMENT '来源应用',     -- 用于区分哪个应用提交，例如调度系统，实时平台等
-    `biz_id`         varchar(64)                           NOT NULL COMMENT '执行批次ID',   -- 某个作业同一个业务时间运行的实例的集合ID (可能包含多次执行，如用日期划分 "2022-03-05"，加上小时划分 "2022-03-05 12")
-    `exec_name`      varchar(32) DEFAULT ''                NOT NULL COMMENT '执行名称',     -- 作业的code，用于生成集群上的名称(例如：xxx_2022-04-05、xxx_2022-04-05_12)
-    `engine_id`      int                                   NOT NULL COMMENT '引擎ID',
-    `cluster_id`     int                                   NOT NULL COMMENT '所属集群',
-    `resource_group` json                                  NOT NULL COMMENT '集群资源组',   -- 如 YARN、Volcano 的 Queue，K8s 的 Namespace 等
+    `job_id`                int                                   NOT NULL COMMENT '作业ID',         -- 用于关联到某一个具体的作业配置
+    `from_app`              varchar(16)                           NOT NULL COMMENT '来源应用',       -- 用于区分哪个应用提交，例如调度系统，实时平台等
+    `biz_id`                varchar(64)                           NOT NULL COMMENT '执行批次ID',     -- 某个作业同一个业务时间运行的实例的集合ID (可能包含多次执行，如用日期划分 "2022-03-05"，加上小时划分 "2022-03-05 12")
+    `exec_name`             varchar(32) DEFAULT ''                NOT NULL COMMENT '执行名称',       -- 作业的code，用于生成集群上的名称(例如：xxx_2022-04-05、xxx_2022-04-05_12)，实时任务不需要加日期
+    `job_type`              varchar(16)                           NOT NULL COMMENT '作业类型',       -- spark-sql, spark-data-calc, flink-data-calc
+    `engine_id`             int                                   NOT NULL COMMENT '引擎ID',
+    `cluster_id`            int                                   NOT NULL COMMENT '所属集群',
+    `cluster_category`      varchar(16) DEFAULT ''                NOT NULL COMMENT '集群类型',
+    `resource_group_keys`   varchar(64)                           NOT NULL COMMENT '集群资源组名称', -- 多个之间用 "--" 分隔，如 YARN: queue、Volcano: namespace--queue，K8s: namespace 等
+    `resource_group_values` varchar(128)                          NOT NULL COMMENT '集群资源组',     -- 多个之间用 "--" 分隔，如 YARN: default、Volcano: bigdata--current，K8s: namespace 等
 
-    `priority`       tinyint                               NOT NULL COMMENT '初始优先级',   -- 用于区分优先级，优先级高的先执行
-    `run_pri`        tinyint                               NOT NULL COMMENT '运行优先级',
-    `pri_upgradable` bit         DEFAULT 0                 NOT NULL COMMENT '优先级可提升', -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
+    `priority`              tinyint                               NOT NULL COMMENT '初始优先级',     -- 用于区分优先级，优先级高的先执行
+    `run_pri`               tinyint                               NOT NULL COMMENT '运行优先级',
+    `pri_upgradable`        bit         DEFAULT 0                 NOT NULL COMMENT '优先级可提升',   -- 执行时，优先级是否按照一定规则提升优先级 (当资源不足重试时，将优先级提升)
 
-    `user_group`     int                                   NOT NULL COMMENT '用户组',
-    `run_by`         int                                   NOT NULL COMMENT '执行人',
+    `user_group`            int                                   NOT NULL COMMENT '用户组',
+    `run_by`                int                                   NOT NULL COMMENT '执行人',
 
-    `cluster_app_id` varchar(64) DEFAULT ''                NOT NULL COMMENT '集群应用ID',   -- K8s 按一定规则生成，直接写入数据库，YARN 的 ApplicationID 由 YARN 生成，后续回写到数据库
-    `status`         varchar(16) DEFAULT 'CREATED'         NOT NULL COMMENT '状态',         -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
-    `submitted_at`   datetime                              NULL COMMENT '任务提交时间',     -- 对应 STARTING 的时间，提交执行的时候设置
-    `started_at`     datetime                              NULL COMMENT '任务执行开始时间', -- 对应首次 RUNNING 的时间，任务真正开始执行的时候设置
-    `finished_at`    datetime                              NULL COMMENT '任务执行结束时间', -- 对应结束状态的时间，任务结束的时候设置，不管是否成功
+    `cluster_app_id`        varchar(64) DEFAULT ''                NOT NULL COMMENT '集群应用ID',     -- K8s 按一定规则生成，直接写入数据库，YARN 的 ApplicationID 由 YARN 生成，后续回写到数据库
+    `cluster_app_address`   varchar(64) DEFAULT ''                NOT NULL COMMENT '集群应用地址',   -- 如 flink webui 地址，spark ui 地址等
+    `status`                varchar(16) DEFAULT 'CREATED'         NOT NULL COMMENT '状态',           -- 任务状态，CREATED、ACCEPTED、STARTING、START_FAILED、RUNNING、SUCCEED、FAILED、KILLED、CANCELED、UNKNOWN
+    `submitted_at`          datetime                              NULL COMMENT '任务提交时间',       -- 对应 STARTING 的时间，提交执行的时候设置
+    `started_at`            datetime                              NULL COMMENT '任务执行开始时间',   -- 对应首次 RUNNING 的时间，任务真正开始执行的时候设置
+    `finished_at`           datetime                              NULL COMMENT '任务执行结束时间',   -- 对应结束状态的时间，任务结束的时候设置，不管是否成功
 
-    `created_at`     datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updated_at`     datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at`            datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `updated_at`            datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     PRIMARY KEY (`id`),
     INDEX exec_from_app (`from_app`),
     INDEX idx_exec_job (`job_id`),
     INDEX idx_exec_name (`exec_name`),
+    INDEX idx_exec_cluster (`cluster_id`),
     INDEX idx_exec_engine (`engine_id`),
     INDEX idx_exec_status (`status`),
     INDEX idx_exec_group (`user_group`),
@@ -310,7 +318,7 @@ CREATE TABLE `maple`.`maple_engine_execution_ext_info`
     `id`        int  NOT NULL COMMENT '执行ID',
     `exec_conf` json NULL COMMENT '作业配置',     -- 作业的配置信息
     `run_conf`  json NULL COMMENT '启动参数信息', -- 作业的启动参数信息
-    `exec_info` json NULL COMMENT '执行信息',     -- 包括状态信息，状态变更时间等
+    `exec_info` json NULL COMMENT '执行信息',     -- 包括引擎地址、状态信息，状态变更时间等
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8

@@ -1,107 +1,171 @@
 
-### Spark
-
-POST http://localhost:8080/execution/exec-now?timestamp=0&secret=
-Content-Type: application/json
-
-{
-  "fromApp": "schedule",
-  "jobId": 1,
-  "bizId": 2,
-  "execName": "测试执行",
-  "clusterId": 2,
-  "engineId": 2,
-  "priority": 1,
-  "priUpgradable": false,
-  "userGroup": "schedule-manager",
-  "runBy": "xishihao",
-  "execConf": {
-    "execFile": "hdfs:///spark3/spark-examples_2.12-3.3.2.jar",
-    "mainClass": "org.apache.spark.examples.SparkPi",
-    "args": [
-      "10"
-    ]
-  },
-  "runConf": {
-    "namespace": "ns-tjgzvu",
-    "queue": "default-offline",
-    "driverCores": 1,
-    "driverMemory": "4g",
-    "numExecutors": 2,
-    "executorCores": 2,
-    "executorMemory": "8g",
-    "driverJavaOptions": "",
-    "driverClassPath": "",
-    "jars": "",
-    "files": "",
-    "archives": "",
-    "conf": {
-      "spark.hadoop.ipc.client.connect.timeout": 3000,
-      "spark.hadoop.yarn.client.failover-max-attempts": 2
-    }
-  }
-}
-
-### Spark
-
-POST http://localhost:8080/execution/exec-now?timestamp=0&secret=
-Content-Type: application/json
-
-{
-  "fromApp": "schedule",
-  "jobId": "1",
-  "bizId": "1",
-  "execUniqId": "7",
-  "execName": "test-spark-jar",
-  "cluster": "hadoop-default",
-  "engineCategory": "spark",
-  "engineVersion": "3.3.2",
-  "priority": 1,
-  "priUpgradable": false,
-  "userGroup": "schedule-manager",
-  "runBy": "xishihao",
-  "execConf": {
-    "execFile": "hdfs:///spark3/spark-examples_2.12-3.3.2.jar",
-    "mainClass": "org.apache.spark.examples.SparkPi",
-    "args": "10"
-  },
-  "runConf": {
-    "queue": "default",
-    "driverCores": 1,
-    "driverMemory": "4g",
-    "numExecutors": 2,
-    "executorCores": 2,
-    "executorMemory": "8g",
-    "driverJavaOptions": "",
-    "driverClassPath": "",
-    "jars": "",
-    "files": "",
-    "archives": "",
-    "conf": {
-      "spark.hadoop.ipc.client.connect.timeout": 3000,
-      "spark.hadoop.yarn.client.failover-max-attempts": 2
-    }
-  }
-}
-
-
-### Flink
+### Spark3 jar yarn
 
 POST http://localhost:8080/execution/exec?timestamp=0&secret=
 Content-Type: application/json
 
 {
+  "execFile": "hdfs:///spark/jars/3.5/spark-examples_2.12-3.5.5.jar",
   "fromApp": "schedule",
-  "jobId": 3,
-  "bizId": "201",
-  "execName": "test-flink-py",
-  "engineId": 4,
-  "clusterId": 2,
+  "bizId": "20250520",
+  "execName": "spark3-pi-test-20250520",
+  "jobType": "spark3-jar",
+  "clusterId": 1,
+  "engineId": 1,
+  "resourceGroup": {
+    "queue": "default"
+  },
   "priority": 1,
   "priUpgradable": false,
-  "userGroup": "schedule-manager",
-  "runBy": "xishihao",
-  "clusterAppId": "",
+  "userGroup": 1,
+  "runBy": 1,
+  "execConf": {
+    "execFile": "hdfs:///spark3/spark-examples_2.12-3.3.2.jar",
+    "mainClass": "org.apache.spark.examples.SparkPi",
+    "args": "1000"
+  },
+  "runConf": {
+    "queue": "default",
+    "driverCores": 1,
+    "driverMemory": "1g",
+    "numExecutors": 1,
+    "executorCores": 1,
+    "executorMemory": "1g",
+    "driverJavaOptions": "",
+    "driverClassPath": "",
+    "jars": "",
+    "files": "",
+    "archives": "",
+    "conf": {
+      "spark.hadoop.ipc.client.connect.timeout": 3000,
+      "spark.hadoop.yarn.client.failover-max-attempts": 2
+    }
+  }
+}
+
+### Spark
+
+
+### Flink jar yarn
+
+
+POST http://localhost:8080/execution/exec?timestamp=0&secret=
+Content-Type: application/json
+
+{
+  "execFile": "hdfs:///flink/jars/1.17/original-flink-test-1.0-SNAPSHOT.jar",
+  "fromApp": "streaming",
+  "bizId": "20250520",
+  "execName": "flink-nc-wc-test-20250520",
+  "jobType": "flink-jar",
+  "clusterId": 1,
+  "engineId": 3,
+  "resourceGroup": {
+    "queue": "default"
+  },
+  "priority": 1,
+  "priUpgradable": false,
+  "userGroup": 1,
+  "runBy": 1,
+  "execConf": {
+    "execFile": "hdfs:///flink/jars/1.17/original-flink-test-1.0-SNAPSHOT.jar",
+    "mainClass": "org.xi.flink.WordCount",
+    "args": ""
+  },
+  "runConf": {
+    "jobManagerCores": "1",
+    "jobManagerMemory": "1g",
+    "parallelism": "2",
+    "taskManagerCores": "1",
+    "taskManagerMemory": "1g",
+    "numberOfTaskSlots": "2",
+    "yarnFlinkLib": "hdfs://localhost:9000/flink/dist/1.17",
+    "conf": {
+      "state.backend": "rocksdb",
+      "state.backend.incremental": "true",
+      "restart-strategy": "fixeddelay",
+      "restart-strategy.fixed-delay.attempts": "15",
+      "restart-strategy.fixed-delay.delay": "10s",
+      "execution.checkpointing.interval": "10min",
+      "execution.checkpointing.timeout": "10min",
+      "execution.checkpointing.unaligned": "false"
+    }
+  }
+}
+
+### Flink py yarn
+
+POST http://localhost:8080/execution/exec?timestamp=0&secret=
+Content-Type: application/json
+
+{
+  "execFile": "hdfs:///flink/py/1.17/word-count.py",
+  "fromApp": "schedule",
+  "bizId": "20250520",
+  "execName": "flink-py-test",
+  "jobType": "flink-py",
+  "clusterId": 1,
+  "engineId": 1,
+  "resourceGroup": {
+    "queue": "default"
+  },
+  "priority": 1,
+  "priUpgradable": false,
+  "userGroup": 1,
+  "runBy": 1,
+  "execConf": {
+    "python": "",
+    "pyArchives": "hdfs:///tmp/py39.zip,hdfs:///tmp/data.zip#data",
+    "pyClientExecutable": "py39.zip/py39/python",
+    "pyExecutable": "py39.zip/py39/python",
+    "pyRequirements": "",
+    "pyFiles": "",
+    "pyModule": "",
+    "pyFiles": "hdfs:///flink/py/1.17/word-count.py",
+    "pyModule": "word-count",
+    "args": ""
+  },
+  "runConf": {
+    "jobManagerCores": "1",
+    "jobManagerMemory": "1g",
+    "parallelism": "2",
+    "taskManagerCores": "1",
+    "taskManagerMemory": "1g",
+    "numberOfTaskSlots": "2",
+    "yarnFlinkLib": "hdfs://localhost:9000/flink/dist/1.17",
+    "conf": {
+      "state.backend": "rocksdb",
+      "state.backend.incremental": "true",
+      "restart-strategy": "fixeddelay",
+      "restart-strategy.fixed-delay.attempts": "15",
+      "restart-strategy.fixed-delay.delay": "10s",
+      "execution.checkpointing.interval": "10min",
+      "execution.checkpointing.timeout": "10min",
+      "execution.checkpointing.unaligned": "false"
+    }
+  }
+}
+
+### Flink py volcano
+
+POST http://localhost:8080/execution/exec?timestamp=0&secret=
+Content-Type: application/json
+
+{
+  "execFile": "hdfs:///flink/data-jar/",
+  "fromApp": "schedule",
+  "bizId": "20250520",
+  "execName": "测试执行",
+  "jobType": "flink-py",
+  "clusterId": 1,
+  "engineId": 1,
+  "resourceGroup": {
+    "queue": "default"
+  },
+  "priority": 1,
+  "priUpgradable": false,
+  "userGroup": 1,
+  "runBy": 1,
   "execConf": {
     "pyFiles": "/data_query/file/b02f6fe1-575c-4cf4-ab03-df65a3d74e69.py",
     "pyModule": "b02f6fe1-575c-4cf4-ab03-df65a3d74e69",
@@ -134,3 +198,30 @@ Content-Type: application/json
 }
 
 ###
+
+
+
+
+### Flink jar yarn cancel
+
+PUT http://localhost:8080/execution/108/cancel?timestamp=0&secret=&app=streaming
+Content-Type: application/json
+
+{
+}
+
+### Flink jar yarn stop
+
+PUT http://localhost:8080/execution/109/stop?timestamp=0&secret=&app=streaming
+Content-Type: application/json
+
+{
+}
+
+### Flink jar yarn kill
+
+PUT http://localhost:8080/execution/109/kill?timestamp=0&secret=&app=streaming
+Content-Type: application/json
+
+{
+}

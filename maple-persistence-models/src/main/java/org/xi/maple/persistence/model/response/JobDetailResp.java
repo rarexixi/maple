@@ -58,6 +58,16 @@ public class JobDetailResp implements Serializable {
     private String clusterCategory;
 
     /**
+     * 集群资源组名称
+     */
+    private String resourceGroupKeys;
+
+    /**
+     * 集群资源组
+     */
+    private String resourceGroupValues;
+
+    /**
      * 作业优先级
      */
     private Integer priority;

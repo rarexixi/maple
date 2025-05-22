@@ -1,9 +1,12 @@
 package org.xi.maple.persistence.model.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class EngineExecutionItemResp implements Serializable {
@@ -39,6 +42,11 @@ public class EngineExecutionItemResp implements Serializable {
     private String execName;
 
     /**
+     * 作业类型
+     */
+    private String jobType;
+
+    /**
      * 引擎ID
      */
     private Integer engineId;
@@ -49,9 +57,19 @@ public class EngineExecutionItemResp implements Serializable {
     private Integer clusterId;
 
     /**
+     * 集群类型
+     */
+    private String clusterCategory;
+
+    /**
+     * 集群资源组名称
+     */
+    private String resourceGroupKeys;
+
+    /**
      * 集群资源组
      */
-    private String resourceGroup;
+    private String resourceGroupValues;
 
     /**
      * 初始优先级
@@ -84,6 +102,11 @@ public class EngineExecutionItemResp implements Serializable {
     private String clusterAppId;
 
     /**
+     * 集群应用地址
+     */
+    private String clusterAppAddress;
+
+    /**
      * 状态
      */
     private String status;
@@ -112,4 +135,18 @@ public class EngineExecutionItemResp implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
+
+    @JsonIgnore
+    public Map<String, String> getResourceGroup() {
+        String[] groupKeys = resourceGroupKeys.split("--");
+        String[] groupValues = resourceGroupValues.split("--");
+        if (groupKeys.length != groupValues.length) {
+            return null;
+        }
+        Map<String, String> resourceGroup = new HashMap<>();
+        for (int i = 0; i < groupKeys.length; i++) {
+            resourceGroup.put(groupKeys[i], groupValues[i]);
+        }
+        return resourceGroup;
+    }
 }

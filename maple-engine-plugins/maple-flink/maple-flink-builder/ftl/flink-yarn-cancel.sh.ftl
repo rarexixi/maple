@@ -5,8 +5,7 @@ export ${key}=${value}
 </#list>
 </#if>
 JOB_ID=$(flink list -t yarn-application -Dyarn.application.id=${execInfo.APPLICATION_ID} | grep RUNNING | tr -s ' ' | cut -d ' ' -f 4)
-${engine.engineHome}/bin/flink stop \
+${engine.engineHome}/bin/flink cancel \
   -t yarn-application \
   -Dyarn.application.id=${execInfo.APPLICATION_ID} \
-  --savepointPath ${params.savepointPath} \
   $JOB_ID

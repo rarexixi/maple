@@ -1,3 +1,4 @@
+#!/bin/bash
 <#if engine.envs??>
 <#list engine.envs as key, value>
 export ${key}=${value}
@@ -6,7 +7,7 @@ export ${key}=${value}
 ${engine.engineHome}/bin/spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --queue ${runConf.queue} \
+    --queue ${resourceGroup.queue} \
     --name SPARK-${execName}-${execId} \
     --driver-cores ${runConf.driverCores} \
     --driver-memory ${runConf.driverMemory} \
@@ -35,15 +36,15 @@ ${engine.engineHome}/bin/spark-submit \
     </#list>
 </#if>
 <#if jobType == "data_calc">
-    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execConf.execFile}
+    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execFile}
 <#elseif jobType == "sql">
-    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execConf.execFile}
+    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execFile}
 <#elseif jobType == "scala">
-    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execConf.execFile}
+    --class xxx.xxx.xxx maple-spark-data-calc.jar ${execFile}
 <#elseif jobType == "py">
-    --py-files ${execConf.pyFiles} ${execConf.execFile} ${execConf.args}
+    --py-files ${execConf.pyFiles} ${execFile} ${execConf.args}
 <#elseif jobType == "jar">
     --class ${execConf.mainClass} \
-    ${execConf.execFile} ${execConf.args}
+    ${execFile} ${execConf.args}
 </#if>
 

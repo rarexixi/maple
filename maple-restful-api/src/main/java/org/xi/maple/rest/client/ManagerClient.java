@@ -20,10 +20,10 @@ public interface ManagerClient {
     void submitExecution(@RequestParam("execId") int execId);
 
     @PatchMapping("/api/execution/kill/{id}")
-    Object killExecution(@PathVariable("id") Integer id);
+    Object killExecution(@PathVariable("id") Integer id, @RequestParam("app") String app);
 
-    @PatchMapping("/api/execution/stop/{id}")
-    Object stopExecution(@PathVariable("id") Integer id, Map<String, ?> cancelParams);
+    @PatchMapping("/api/execution/{action}/{id}")
+    Object operateExecution(@PathVariable("id") Integer id, @PathVariable("action") String action, @RequestParam("app") String app, Map<String, ?> params);
 
     // endregion
 

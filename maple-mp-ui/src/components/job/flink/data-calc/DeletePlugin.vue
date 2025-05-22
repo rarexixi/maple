@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineEmits, h } from 'vue'
+import { h } from 'vue'
 import { MinusOutlined } from '@ant-design/icons-vue'
 
 const emit = defineEmits<{

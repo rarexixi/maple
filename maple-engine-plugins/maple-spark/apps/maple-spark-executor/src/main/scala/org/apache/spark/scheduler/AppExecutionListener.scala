@@ -1,7 +1,6 @@
 package org.apache.spark.scheduler
 
 import org.xi.maple.common.constant.EngineExecutionStatus
-import org.xi.maple.common.util.JsonUtils
 import org.xi.maple.engine.common.service.EngineExecutionUpdateService
 
 import scala.collection.JavaConverters._
@@ -15,10 +14,9 @@ class AppExecutionListener extends SparkListener {
     println("========================= onApplicationStart =========================")
 
     val map = Map("applicationId" -> applicationStart.appId.getOrElse("No_Application_Id"))
-    val info = JsonUtils.toJsonString(map.asJava)
 
     EngineExecutionUpdateService.updateStatus(EngineExecutionStatus.RUNNING)
-    EngineExecutionUpdateService.updateInfo(info)
+    EngineExecutionUpdateService.updateInfo(map.asJava)
   }
 
 

@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import org.xi.maple.builder.annotation.*;
 import org.xi.maple.builder.convertor.MapleConvertor;
+import org.xi.maple.builder.exception.ConvertorNotExistException;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.executor.configuration.PluginProperties;
 
@@ -33,6 +34,14 @@ public class EnginePluginService implements CommandLineRunner {
         refreshPluginURLs();
     }
 
+    /**
+     * 获取引擎转换器
+     *
+     * @param clusterCategory 集群类型 (YARN，K8s等)
+     * @param engineCategory  引擎类型（Spark、Flink等）
+     * @param engineVersion   引擎版本
+     * @return 引擎转换器
+     */
     public MapleConvertor getConvertor(String clusterCategory, String engineCategory, String engineVersion) {
         if (serviceLoader == null) {
             return null;
@@ -51,16 +60,28 @@ public class EnginePluginService implements CommandLineRunner {
                 return convertor;
             }
         }
-        return null;
+        throw new ConvertorNotExistException(String.format("Not supported engine, clusterCategory: %s, engineCategory: %s, engineVersion: %s", clusterCategory, engineCategory, engineVersion));
     }
 
+    /**
+     * 获取引擎转换器
+     *
+     * @param clusterCategory  集群类型 (YARN，K8s等)
+     * @param engineCategory   引擎类型（Spark、Flink等）
+     * @param engineVersion    引擎版本
+     * @param notExistCallback 获取失败回调
+     * @return 引擎转换器
+     */
     public MapleConvertor getConvertor(String clusterCategory, String engineCategory, String engineVersion, Runnable notExistCallback) {
-        MapleConvertor convertor = getConvertor(clusterCategory, engineCategory, engineVersion);
-        if (convertor == null) {
-            notExistCallback.run();
-            throw new MapleException(String.format("不支持的引擎类型, clusterCategory: %s, engineCategory: %s, engineVersion: %s", clusterCategory, engineCategory, engineVersion));
+        try {
+            return getConvertor(clusterCategory, engineCategory, engineVersion);
+        } catch (Throwable t) {
+            if (notExistCallback != null) {
+                notExistCallback.run();
+            }
+            logger.error("获取转换器失败", t);
+            throw t;
         }
-        return convertor;
     }
 
     public void refreshPluginURLs() {

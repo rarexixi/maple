@@ -27,8 +27,8 @@
         SELECT
             MT.`id`,
             MT.`cluster_id`,
-            C.`cluster_name`,
-            C.`cluster_category`,
+            C.`name` as `cluster_name`,
+            C.`category` as `cluster_category`,
             MT.`name`,
             MT.`version`,
             MT.`engine_home`,
@@ -59,8 +59,8 @@
         SELECT
             MT.`id`,
             MT.`cluster_id`,
-            C.`cluster_name`,
-            C.`cluster_category`,
+            C.`name` as `cluster_name`,
+            C.`category` as `cluster_category`,
             MT.`name`,
             MT.`version`,
             MT.`engine_home`,
@@ -89,8 +89,8 @@
             <otherwise>
                 MT.`id`,
                 MT.`cluster_id`,
-                C.`cluster_name`,
-                C.`cluster_category`,
+                C.`name` as `cluster_name`,
+                C.`category` as `cluster_category`,
                 MT.`name`,
                 MT.`version`,
                 MT.`engine_home`,

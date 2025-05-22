@@ -10,14 +10,11 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
-import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.common.model.MapleEngineExecutionQueue;
 import org.xi.maple.common.util.ActionUtils;
 import org.xi.maple.manager.configuration.properties.MapleManagerProperties;
 import org.xi.maple.manager.service.ExecutionService;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
-import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
@@ -69,7 +66,7 @@ public class ScheduledExecutions implements CommandLineRunner {
     public void consumeJobs() {
         logger.info("开始刷新要消费的队列...");
 
-        List<EngineExecutionQueueResp> queueList = executionService.getExecQueueList(new EngineExecutionQueueQueryReq());
+        List<EngineExecutionQueueResp> queueList = executionService.getExecQueueList();
         if (queueList == null || queueList.isEmpty()) {
             logger.warn("队列列表为空, 清空消费队列...");
             for (String key : futureMap.keySet()) {
@@ -125,13 +122,13 @@ public class ScheduledExecutions implements CommandLineRunner {
                 logger.error("作业不存在，id: {}", queueItem.getExecId());
                 continue;
             }
-            if (!executionQueue.getClusterId().equals(execution.getClusterId()) || !executionQueue.getResourceGroup().equals(execution.getResourceGroup())) {
-                logger.error("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getClusterId(), executionQueue.getResourceGroup());
-                executionService.updateExecutionStatus(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.FAILED.toString()));
-                continue;
-            }
-            threadPoolTaskExecutor.submit(() -> executionService.submitExecution(execution, () -> {
-                logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getClusterId(), execution.getResourceGroup());
+            // if (!executionQueue.getClusterId().equals(execution.getClusterId()) || !executionQueue.getResourceGroup().equals(execution.getResourceGroup())) {
+            //     logger.error("作业不在当前队列，id: {}, cluster: {}, queue: {}", queueItem.getExecId(), executionQueue.getClusterId(), executionQueue.getResourceGroup());
+            //     executionService.updateExecutionStatus(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.FAILED.toString()));
+            //     continue;
+            // }
+            threadPoolTaskExecutor.submit(() -> executionService.submitToCluster(execution, () -> {
+                logger.warn("队列没有足够的资源，cluster: {}, queue: {}, 任务重新加回队列", execution.getClusterId(), executionQueue.getResourceGroup());
                 redisTemplate.opsForList().rightPush(executionQueue.getQueueName(), queueItem);
                 continueRunning.set(false);
             }));

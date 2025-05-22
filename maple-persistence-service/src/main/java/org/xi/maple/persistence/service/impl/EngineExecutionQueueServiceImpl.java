@@ -10,7 +10,6 @@ import org.xi.maple.persistence.persistence.condition.EngineExecutionQueueFilter
 import org.xi.maple.persistence.persistence.condition.EngineExecutionQueuePkCondition;
 import org.xi.maple.persistence.persistence.entity.EngineExecutionQueueEntity;
 import org.xi.maple.persistence.persistence.mapper.EngineExecutionQueueMapper;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 import org.xi.maple.persistence.service.EngineExecutionQueueService;
@@ -88,15 +87,14 @@ public class EngineExecutionQueueServiceImpl implements EngineExecutionQueueServ
     /**
      * 获取执行队列列表
      *
-     * @param queryReq 搜索条件
      * @return 符合条件的执行队列列表
      */
     @Cacheable(cacheNames = {"maple"}, key = "'exec-queue'") // todo 考虑如何清理
     @Override
-    public List<EngineExecutionQueueResp> getList(EngineExecutionQueueQueryReq queryReq) {
-        EngineExecutionQueueFilterCondition condition = ObjectUtils.copy(queryReq, EngineExecutionQueueFilterCondition.class);
+    public List<EngineExecutionQueueResp> getList() {
+        EngineExecutionQueueFilterCondition condition = new EngineExecutionQueueFilterCondition();
         condition.setUpdatedAtMin(Timestamp.from(Instant.ofEpochMilli(System.currentTimeMillis() - 30 * 60 * 1000)).toLocalDateTime()); // 30分钟内更新过的队列, todo 验证时区影响
-        List<EngineExecutionQueueEntity> list = engineExecutionQueueMapper.select(condition, null, queryReq.getSort());
+        List<EngineExecutionQueueEntity> list = engineExecutionQueueMapper.select(condition, null, null);
         return ObjectUtils.copy(list, EngineExecutionQueueResp.class);
     }
 

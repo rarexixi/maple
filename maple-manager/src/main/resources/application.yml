@@ -61,11 +61,11 @@ feign:
 
 maple:
   manager:
-    consume-job: true
+    consume-job: false
     consume-job-period: 6000
-    refresh-yarn: false
+    refresh-yarn: true
     yarn-refresh-period: 60000
-    refresh-k8s: true
+    refresh-k8s: false
     k8s-refresh-period: 10000
   json-format:
     date-time-format: yyyy-MM-dd HH:mm:ss

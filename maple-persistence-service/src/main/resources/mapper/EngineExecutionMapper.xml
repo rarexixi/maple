@@ -10,15 +10,19 @@
         <result property="fromApp" column="from_app"/>
         <result property="bizId" column="biz_id"/>
         <result property="execName" column="exec_name"/>
+        <result property="jobType" column="job_type"/>
         <result property="engineId" column="engine_id"/>
         <result property="clusterId" column="cluster_id"/>
-        <result property="resourceGroup" column="resource_group"/>
+        <result property="clusterCategory" column="cluster_category"/>
+        <result property="resourceGroupKeys" column="resource_group_keys"/>
+        <result property="resourceGroupValues" column="resource_group_values"/>
         <result property="priority" column="priority"/>
         <result property="runPri" column="run_pri"/>
         <result property="priUpgradable" column="pri_upgradable"/>
         <result property="userGroup" column="user_group"/>
         <result property="runBy" column="run_by"/>
         <result property="clusterAppId" column="cluster_app_id"/>
+        <result property="clusterAppAddress" column="cluster_app_address"/>
         <result property="status" column="status"/>
         <result property="submittedAt" column="submitted_at"/>
         <result property="startedAt" column="started_at"/>
@@ -27,7 +31,6 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <resultMap id="ExtResultMap" extends="BaseResultMap" type="org.xi.maple.persistence.persistence.entity.EngineExecutionEntityExt">
-        <result property="clusterCategory" column="cluster_category"/>
         <result property="engineCategory" column="engine_category"/>
         <result property="engineVersion" column="engine_version"/>
         <result property="execConf" column="exec_conf"/>
@@ -48,14 +51,18 @@
             <if test="entity.fromApp != null">`from_app`,</if>
             <if test="entity.bizId != null">`biz_id`,</if>
             <if test="entity.execName != null">`exec_name`,</if>
+            <if test="entity.jobType != null">`job_type`,</if>
             <if test="entity.engineId != null">`engine_id`,</if>
             <if test="entity.clusterId != null">`cluster_id`,</if>
-            <if test="entity.resourceGroup != null">`resource_group`,</if>
+            <if test="entity.clusterCategory != null">`cluster_category`,</if>
+            <if test="entity.resourceGroupKeys != null">`resource_group_keys`,</if>
+            <if test="entity.resourceGroupValues != null">`resource_group_values`,</if>
             <if test="entity.priority != null">`priority`, `run_pri`,</if>
             <if test="entity.priUpgradable != null">`pri_upgradable`,</if>
             <if test="entity.userGroup != null">`user_group`,</if>
             <if test="entity.runBy != null">`run_by`,</if>
             <if test="entity.clusterAppId != null">`cluster_app_id`,</if>
+            <if test="entity.clusterAppAddress != null">`cluster_app_address`,</if>
             <if test="entity.status != null">`status`,</if>
             <if test="entity.submittedAt != null">`submitted_at`,</if>
             <if test="entity.startedAt != null">`started_at`,</if>
@@ -70,14 +77,18 @@
             <if test="entity.fromApp != null">#{entity.fromApp},</if>
             <if test="entity.bizId != null">#{entity.bizId},</if>
             <if test="entity.execName != null">#{entity.execName},</if>
+            <if test="entity.jobType != null">#{entity.jobType},</if>
             <if test="entity.engineId != null">#{entity.engineId},</if>
             <if test="entity.clusterId != null">#{entity.clusterId},</if>
-            <if test="entity.resourceGroup != null">#{entity.resourceGroup},</if>
+            <if test="entity.clusterCategory != null">#{entity.clusterCategory},</if>
+            <if test="entity.resourceGroupKeys != null">#{entity.resourceGroupKeys},</if>
+            <if test="entity.resourceGroupValues != null">#{entity.resourceGroupValues},</if>
             <if test="entity.priority != null">#{entity.priority}, #{entity.priority},</if>
             <if test="entity.priUpgradable != null">#{entity.priUpgradable},</if>
             <if test="entity.userGroup != null">#{entity.userGroup},</if>
             <if test="entity.runBy != null">#{entity.runBy},</if>
             <if test="entity.clusterAppId != null">#{entity.clusterAppId},</if>
+            <if test="entity.clusterAppAddress != null">#{entity.clusterAppAddress},</if>
             <if test="entity.status != null">#{entity.status},</if>
             <if test="entity.submittedAt != null">#{entity.submittedAt},</if>
             <if test="entity.startedAt != null">#{entity.startedAt},</if>
@@ -88,141 +99,36 @@
     </insert>
 
     <insert id="insertExt">
-        insert into <include refid="extTableName"/>
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="entity.id != null">`id`,</if>
-            <if test="entity.execConf != null">`exec_conf`,</if>
-            <if test="entity.runConf != null">`run_conf`,</if>
-            <if test="entity.execInfo != null">`exec_info`,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="entity.id != null">#{entity.id},</if>
-            <if test="entity.execConf != null">#{entity.execConf},</if>
-            <if test="entity.runConf != null">#{entity.runConf},</if>
-            <if test="entity.execInfo != null">#{entity.execInfo},</if>
-        </trim>
-    </insert>
-
-    <!--todo 插入具体的列-->
-    <!--批量插入引擎执行记录-->
-    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
-        insert into <include refid="tableName"/>
-        (
-            `id`,
-            `exec_file`,
-            `job_id`,
-            `from_app`,
-            `biz_id`,
-            `exec_name`,
-            `engine_id`,
-            `cluster_id`,
-            `resource_group`,
-            `priority`,
-            `run_pri`,
-            `pri_upgradable`,
-            `user_group`,
-            `run_by`,
-            `cluster_app_id`,
-            `status`,
-            `submitted_at`,
-            `started_at`,
-            `finished_at`,
-            `created_at`,
-            `updated_at`
+        insert into <include refid="extTableName"/>(`id`, `exec_conf`, `run_conf`, `exec_info`)
+        values (
+            #{entity.id}
+            <choose>
+                <when test="entity.execConf != null">,#{entity.execConf}</when>
+                <otherwise>,'{}'</otherwise>
+            </choose>
+            <choose>
+                <when test="entity.runConf != null">,#{entity.runConf}</when>
+                <otherwise>,'{}'</otherwise>
+            </choose>
+            <choose>
+                <when test="entity.execInfo != null">,#{entity.execInfo}</when>
+                <otherwise>,'{}'</otherwise>
+            </choose>
         )
-        values
-        <foreach collection="list" item="item" separator=",">
-        (
-            #{item.id},
-            #{item.execFile},
-            #{item.jobId},
-            #{item.fromApp},
-            #{item.bizId},
-            #{item.execName},
-            #{item.engineId},
-            #{item.clusterId},
-            #{item.resourceGroup},
-            #{item.priority},
-            #{item.runPri},
-            #{item.runPri},
-            #{item.userGroup},
-            #{item.runBy},
-            #{item.clusterAppId},
-            #{item.status},
-            #{item.submittedAt},
-            #{item.startedAt},
-            #{item.finishedAt},
-            #{item.createdAt},
-            #{item.updatedAt}
-        )
-        </foreach>
-    </insert>
-
-    <!--批量插入引擎执行扩展信息-->
-    <insert id="batchInsertExt">
-        insert into <include refid="tableName"/>
-        (
-            `id`,
-            `exec_conf`,
-            `run_conf`,
-            `exec_info`
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-        (
-            #{item.id},
-            #{item.execConf},
-            #{item.runConf},
-            #{item.execInfo}
-        )
-        </foreach>
     </insert>
 
     <!--根据条件更新引擎执行记录实体不为空的字段-->
     <update id="patchByCondition">
         UPDATE <include refid="tableName"/>
         <set>
-            <if test="entity.execFile != null">
-                `exec_file` = #{entity.execFile},
-            </if>
-            <if test="entity.jobId != null">
-                `job_id` = #{entity.jobId},
-            </if>
-            <if test="entity.fromApp != null">
-                `from_app` = #{entity.fromApp},
-            </if>
-            <if test="entity.bizId != null">
-                `biz_id` = #{entity.bizId},
-            </if>
-            <if test="entity.execName != null">
-                `exec_name` = #{entity.execName},
-            </if>
-            <if test="entity.engineId != null">
-                `engine_id` = #{entity.engineId},
-            </if>
-            <if test="entity.clusterId != null">
-                `cluster_id` = #{entity.clusterId},
-            </if>
-            <if test="entity.resourceGroup != null">
-                `resource_group` = #{entity.resourceGroup},
-            </if>
-            <if test="entity.priority != null">
-                `priority` = #{entity.priority},
-            </if>
             <if test="entity.runPri != null">
                 `run_pri` = #{entity.runPri},
             </if>
-            <if test="entity.priUpgradable != null">
-                `pri_upgradable` = #{entity.priUpgradable},
-            </if>
-            <if test="entity.userGroup != null">
-                `user_group` = #{entity.userGroup},
-            </if>
-            <if test="entity.runBy != null">
-                `run_by` = #{entity.runBy},
-            </if>
             <if test="entity.clusterAppId != null">
                 `cluster_app_id` = #{entity.clusterAppId},
+            </if>
+            <if test="entity.clusterAppAddress != null">
+                `cluster_app_address` = #{entity.clusterAppAddress},
             </if>
             <if test="entity.status != null">
                 `status` = #{entity.status},
@@ -240,7 +146,9 @@
                 `updated_at` = #{entity.updatedAt}
             </if>
         </set>
-        <include refid="updateByPkWhere"/>
+        <where>
+            `id` = #{condition.id}
+        </where>
     </update>
 
     <update id="updateStatusById">
@@ -254,22 +162,10 @@
     </update>
 
     <!--根据条件更新引擎执行扩展信息实体不为空的字段-->
-    <update id="patchExtInfoById">
+    <update id="patchExecInfoById">
         UPDATE <include refid="extTableName"/>
-        <set>
-            <if test="entity.execConf != null">
-                `exec_conf` = #{entity.execConf},
-            </if>
-            <if test="entity.runConf != null">
-                `run_conf` = #{entity.runConf},
-            </if>
-            <if test="entity.execInfo != null">
-                `exec_info` = #{entity.execInfo}
-            </if>
-        </set>
-        <where>
-            `id` = #{id}
-        </where>
+        SET `exec_info` = JSON_MERGE_PATCH(`exec_info`, #{execInfo})
+        WHERE `id` = #{id}
     </update>
 
     <!--根据主键获取引擎执行记录详情-->
@@ -281,19 +177,22 @@
             MT.`from_app`,
             MT.`biz_id`,
             MT.`exec_name`,
+            MT.`job_type`,
             MT.`engine_id`,
             CE.`name` AS `engine_category`,
             CE.`version` AS `engine_version`,
             MT.`cluster_id`,
+            MT.`cluster_category`,
+            MT.`resource_group_keys`,
+            MT.`resource_group_values`,
             C.`name` as `cluster_name`,
-            C.`category` as `cluster_category`,
-            MT.`resource_group`,
             MT.`priority`,
             MT.`run_pri`,
             MT.`pri_upgradable`,
             MT.`user_group`,
             MT.`run_by`,
             MT.`cluster_app_id`,
+            MT.`cluster_app_address`,
             MT.`status`,
             MT.`submitted_at`,
             MT.`started_at`,
@@ -312,23 +211,4 @@
             MT.`id` = #{id}
         </where>
     </select>
-
-    <!-- 更新/删除条件 -->
-    <sql id="updateByPkWhere">
-        <where>
-            <if test="condition == null">1!=1</if>
-            <if test="condition != null">
-                <choose>
-                    <when test="condition.id != null">
-                        `id` = #{condition.id}
-                    </when>
-                    <otherwise>
-                        `id` IN
-                        <foreach collection="condition.idIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </otherwise>
-                </choose>
-            </if>
-        </where>
-    </sql>
-
 </mapper>

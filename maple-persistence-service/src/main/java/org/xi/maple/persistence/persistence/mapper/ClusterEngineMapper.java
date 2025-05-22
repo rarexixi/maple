@@ -17,7 +17,7 @@ public interface ClusterEngineMapper extends
 
     ClusterEngineEntity getById(@Param("id") Integer id);
 
-    String getDefaultConfByTypeAndName(@Param("engineId") Integer engineId, @Param("objType") String objType, @Param("objId") Integer objId);
+    String getByTypeAndName(@Param("engineId") Integer engineId, @Param("objType") String objType, @Param("objId") Integer objId);
 
     ClusterEngineEntity getByClusterEngineVersion(@Param("clusterId") Integer clusterId, @Param("name") String name, @Param("version") String version);
 }

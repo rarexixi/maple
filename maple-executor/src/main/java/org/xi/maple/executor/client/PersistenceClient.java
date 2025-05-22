@@ -13,17 +13,22 @@ import org.xi.maple.persistence.model.request.*;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
+import java.util.Map;
+
 @FeignClient(value = MapleServiceName.PERSISTENCE, configuration = MapleFeignHeadersInterceptor.class)
 @LoadBalancerClient(name = MapleServiceName.PERSISTENCE, configuration = RandomRouteLoadBalancerConfiguration.class)
 public interface PersistenceClient {
 
     // region engine-execution
 
+    @PatchMapping("/api/engine-executions/{id}")
+    Integer patchExecutionById(@PathVariable("id") Integer id, @RequestBody EngineExecutionPatchReq req);
+
     @PatchMapping("/api/engine-executions/{id}/status")
     Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
-    @PatchMapping("/api/engine-executions/{id}/ext-info")
-    Integer updateExecutionExtInfoById(@RequestBody EngineExecutionExtUpdateReq req);
+    @PatchMapping("/api/engine-executions/{id}/exec-info")
+    Integer updateExecutionExecInfoById(@PathVariable("id") Integer id, @RequestBody Map<String, ?> req);
 
     // endregion
 

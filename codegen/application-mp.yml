@@ -67,11 +67,11 @@ generator:
       - column-name-set: created_at
     cannot-update:
       - column-name-set: created_by,created_at
-#    img-url:
-#    video-url:
-#    doc-url:
-#    page-url:
-#    other-url:
+    # img-url:
+    # video-url:
+    # doc-url:
+    # page-url:
+    # other-url:
     select:
       - column-name-set: category
         table-name: maple_cluster

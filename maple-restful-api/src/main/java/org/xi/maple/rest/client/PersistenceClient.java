@@ -2,7 +2,6 @@ package org.xi.maple.rest.client;
 
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 import org.xi.maple.common.constant.MapleServiceName;
 import org.xi.maple.common.model.OperateResult;
@@ -11,7 +10,6 @@ import org.xi.maple.persistence.model.response.*;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
-import java.util.List;
 
 @FeignClient(value = MapleServiceName.PERSISTENCE, configuration = MapleFeignHeadersInterceptor.class)
 @LoadBalancerClient(name = MapleServiceName.PERSISTENCE, configuration = RandomRouteLoadBalancerConfiguration.class)
@@ -20,7 +18,7 @@ public interface PersistenceClient {
     // region engine-execution
 
     @PostMapping("/api/engine-executions")
-    Integer addExecution(@RequestBody EngineExecutionSaveReq req);
+    Integer addExecution(@RequestBody EngineExecutionCreateReq req);
 
     @GetMapping("/api/engine-executions/{id}")
     EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);

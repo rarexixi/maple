@@ -36,13 +36,13 @@ public class ClusterEngineServiceImpl implements ClusterEngineService {
         engineConf.setEngineHome(entity.getEngineHome());
         engineConf.setVersion(entity.getVersion());
 
-        String groupDefaultConf = clusterEngineMapper.getDefaultConfByTypeAndName(id, "group", getRequest.getUserGroup());
+        String groupDefaultConf = clusterEngineMapper.getByTypeAndName(id, "group", getRequest.getUserGroup());
         if (StringUtils.isNotBlank(groupDefaultConf)) {
             EngineConf groupConf = JsonUtils.parseObject(groupDefaultConf, EngineConf.class, new EngineConf());
             engineConf.getConfs().putAll(groupConf.getConfs());
             engineConf.getEnvs().putAll(groupConf.getEnvs());
         }
-        String userDefaultConf = clusterEngineMapper.getDefaultConfByTypeAndName(id, "user", getRequest.getUser());
+        String userDefaultConf = clusterEngineMapper.getByTypeAndName(id, "user", getRequest.getUser());
         if (StringUtils.isNotBlank(userDefaultConf)) {
             EngineConf userConf = JsonUtils.parseObject(userDefaultConf, EngineConf.class, new EngineConf());
             engineConf.getConfs().putAll(userConf.getConfs());

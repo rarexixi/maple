@@ -2,7 +2,6 @@ package org.xi.maple.persistence.service;
 
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.common.model.BaseEntity;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
@@ -37,8 +36,7 @@ public interface EngineExecutionQueueService {
     /**
      * 获取执行队列列表
      *
-     * @param queryReq 搜索条件
      * @return 符合条件的执行队列列表
      */
-    List<EngineExecutionQueueResp> getList(EngineExecutionQueueQueryReq queryReq);
+    List<EngineExecutionQueueResp> getList();
 }

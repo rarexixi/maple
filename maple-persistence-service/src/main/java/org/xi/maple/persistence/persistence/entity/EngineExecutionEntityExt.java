@@ -14,6 +14,11 @@ import lombok.ToString;
 @ToString
 public class EngineExecutionEntityExt extends EngineExecutionEntity {
     /**
+     * 作业类型
+     */
+    private String jobType;
+
+    /**
      * 集群类型
      */
     private String clusterName;

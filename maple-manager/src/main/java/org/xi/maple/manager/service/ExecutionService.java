@@ -1,7 +1,6 @@
 package org.xi.maple.manager.service;
 
 import org.xi.maple.common.model.ClusterMessage;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
@@ -11,15 +10,15 @@ import java.util.Map;
 
 public interface ExecutionService {
 
-    void submitExecution(int execId);
+    void submitToCluster(int execId);
 
-    void submitExecution(EngineExecutionDetailResp execution, Runnable queueBusyCallback);
+    void submitToCluster(EngineExecutionDetailResp execution, Runnable queueBusyCallback);
 
-    Object kill(Integer id);
+    Object kill(Integer id, String app);
 
-    Object stop(Integer id, Map<String, ?> cancelParams);
+    void operate(Integer id, String action, String app, Map<String, ?> params);
 
-    List<EngineExecutionQueueResp> getExecQueueList(EngineExecutionQueueQueryReq request);
+    List<EngineExecutionQueueResp> getExecQueueList();
 
     EngineExecutionDetailResp getExecutionById(int execId);
 

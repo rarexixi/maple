@@ -64,11 +64,11 @@ generator:
       - column-name-set: created_at
     cannot-update:
       - column-name-set: created_by,created_at
-    #    img-url:
-    #    video-url:
-    #    doc-url:
-    #    page-url:
-    #    other-url:
+    # img-url:
+    # video-url:
+    # doc-url:
+    # page-url:
+    # other-url:
     fk-select:
       - column-name-set: datasource_type
         table-name: maple_datasource
@@ -77,9 +77,25 @@ generator:
           value-column-name: type_name
           text-column-name: type_code
     content:
-      - column-name-set: configurations, datasource_conf, material_conf, cluster_conf, ext_info, default_conf, exec_conf, exec_info, job_conf
-
-    valid-status:
+      - column-name-set:
+        - cluster_conf
+        - engine_conf
+        - description
+        - configuration
+        - configurations
+        - datasource_conf
+        - material_conf
+        - cluster_conf
+        - ext_info
+        - default_conf
+        - exec_conf
+        - exec_info
+        - job_conf
+        - run_conf
+        - conf_value
+        - resource_group_keys
+        - resource_group_values
+  valid-status:
       - column-name-set: disabled
         status:
           valid: 0

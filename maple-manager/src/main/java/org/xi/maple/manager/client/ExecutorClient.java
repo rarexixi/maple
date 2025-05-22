@@ -5,6 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.xi.maple.common.constant.MapleServiceName;
+import org.xi.maple.persistence.model.response.EngineExecutionAction;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
@@ -17,6 +18,9 @@ public interface ExecutorClient {
 
     @PostMapping("/api/engine-execution/execute")
     void execute(@RequestBody EngineExecutionDetailResp execution);
+
+    @PostMapping("/api/engine-execution/operate")
+    void operate(@RequestBody EngineExecutionAction execution);
 
     // endregion
 }

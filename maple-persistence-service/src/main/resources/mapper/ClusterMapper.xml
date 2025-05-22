@@ -73,62 +73,14 @@
     <!-- 查询条件 -->
     <sql id="where">
         <where>
-            <if test="condition == null">1!=1</if>
+            MT.`disabled` = 0
             <if test="condition != null">
-                <trim prefixOverrides="AND|OR">
-                    <if test="condition.name != null and condition.name != ''">
-                        AND MT.`name` = #{condition.name}
-                    </if>
-                    <if test="condition.nameIn != null and condition.nameIn.size() > 0">
-                        AND MT.`name` IN
-                        <foreach collection="condition.nameIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.nameNotIn != null and condition.nameNotIn.size() > 0">
-                        AND MT.`name` NOT IN
-                        <foreach collection="condition.nameNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.nameIsNotEmpty != null and condition.nameIsNotEmpty == true">
-                        AND MT.`name` IS NOT NULL AND `name` != ''
-                    </if>
-                    <if test="condition.nameIsEmpty != null and condition.nameIsEmpty == true">
-                        AND (MT.`name` IS NULL OR MT.`name` = '')
-                    </if>
-                    <if test="condition.nameStartWith != null and condition.nameStartWith != ''">
-                        AND MT.`name` LIKE concat(#{condition.nameStartWith}, '%')
-                    </if>
-                    <if test="condition.nameEndWith != null and condition.nameEndWith != ''">
-                        AND MT.`name` LIKE concat('%', #{condition.nameEndWith})
-                    </if>
-                    <if test="condition.nameContains != null and condition.nameContains != ''">
-                        AND MT.`name` LIKE concat('%', #{condition.nameContains}, '%')
-                    </if>
-                    <if test="condition.category != null and condition.category != ''">
-                        AND MT.`category` = #{condition.category}
-                    </if>
-                    <if test="condition.categoryIn != null and condition.categoryIn.size() > 0">
-                        AND MT.`category` IN
-                        <foreach collection="condition.categoryIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.categoryNotIn != null and condition.categoryNotIn.size() > 0">
-                        AND MT.`category` NOT IN
-                        <foreach collection="condition.categoryNotIn" item="it" open="(" close=")" separator=",">#{it}</foreach>
-                    </if>
-                    <if test="condition.categoryIsNotEmpty != null and condition.categoryIsNotEmpty == true">
-                        AND MT.`category` IS NOT NULL AND `category` != ''
-                    </if>
-                    <if test="condition.categoryIsEmpty != null and condition.categoryIsEmpty == true">
-                        AND (MT.`category` IS NULL OR MT.`category` = '')
-                    </if>
-                    <if test="condition.categoryStartWith != null and condition.categoryStartWith != ''">
-                        AND MT.`category` LIKE concat(#{condition.categoryStartWith}, '%')
-                    </if>
-                    <if test="condition.categoryEndWith != null and condition.categoryEndWith != ''">
-                        AND MT.`category` LIKE concat('%', #{condition.categoryEndWith})
-                    </if>
-                    <if test="condition.categoryContains != null and condition.categoryContains != ''">
-                        AND MT.`category` LIKE concat('%', #{condition.categoryContains}, '%')
-                    </if>
-                </trim>
+                <if test="condition.name != null and condition.name != ''">
+                    AND MT.`name` = #{condition.name}
+                </if>
+                <if test="condition.category != null and condition.category != ''">
+                    AND MT.`category` = #{condition.category}
+                </if>
             </if>
         </where>
     </sql>

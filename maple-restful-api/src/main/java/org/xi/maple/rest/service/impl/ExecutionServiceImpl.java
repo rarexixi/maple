@@ -8,13 +8,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleDataNotFoundException;
-import org.xi.maple.common.exception.MapleException;
-import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.model.MapleEngineExecutionQueue;
-import org.xi.maple.common.util.JsonUtils;
 import org.xi.maple.common.util.MapleRedisUtil;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
-import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
+import org.xi.maple.persistence.model.request.EngineExecutionCreateReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.JobDetailResp;
@@ -77,7 +74,7 @@ public class ExecutionServiceImpl implements ExecutionService {
      */
     @Override
     public Integer submit(ExecReq execReq) {
-        EngineExecutionSaveReq saveReq = getExecutionSaveReq(execReq);
+        EngineExecutionCreateReq saveReq = getExecutionSaveReq(execReq);
         return submit(saveReq);
     }
 
@@ -93,20 +90,20 @@ public class ExecutionServiceImpl implements ExecutionService {
      */
     @Override
     public Integer submitJob(JobExecReq jobExecReq) {
-        EngineExecutionSaveReq saveReq = getExecutionSaveReq(jobExecReq);
+        EngineExecutionCreateReq saveReq = getExecutionSaveReq(jobExecReq);
         return submit(saveReq);
     }
 
-    private Integer submit(EngineExecutionSaveReq saveReq) {
+    private Integer submit(EngineExecutionCreateReq saveReq) {
+        saveReq.getEngineId();
         final Integer id = persistenceClient.addExecution(saveReq);
         if (id == null || id < 0) {
             return id;
         }
         EngineExecutionDetailResp execution = persistenceClient.getExecutionById(id);
         threadPoolTaskExecutor.execute(() -> {
-            String resourceGroup = getResourceGroup(execution.getClusterCategory(), saveReq.getRunConf());
-            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(execution.getClusterId(), resourceGroup,
-                    saveReq.getFromApp(), saveReq.getUserGroup(), saveReq.getPriority());
+            MapleEngineExecutionQueue execQueue = MapleRedisUtil.getEngineExecutionQueue(execution.getClusterId(),
+                    saveReq.getResourceGroupValues(), saveReq.getFromApp(), saveReq.getUserGroup(), saveReq.getPriority());
             EngineExecutionQueueSaveReq queueSaveReq = ObjectUtils.copy(execQueue, EngineExecutionQueueSaveReq.class);
             persistenceClient.upsertExecQueue(queueSaveReq);
             logger.info("插入队列：{}, id: {}", execQueue.getQueueName(), id);
@@ -116,35 +113,23 @@ public class ExecutionServiceImpl implements ExecutionService {
         return id;
     }
 
-    private EngineExecutionSaveReq getExecutionSaveReq(ExecReq execReq ) {
-        return ObjectUtils.copy(execReq, EngineExecutionSaveReq.class);
+    private EngineExecutionCreateReq getExecutionSaveReq(ExecReq execReq) {
+        EngineExecutionCreateReq executionSaveReq = ObjectUtils.copy(execReq, EngineExecutionCreateReq.class);
+        executionSaveReq.setJobId(0);
+        return executionSaveReq;
     }
 
-    private EngineExecutionSaveReq getExecutionSaveReq(JobExecReq jobExecReq) {
+    private EngineExecutionCreateReq getExecutionSaveReq(JobExecReq jobExecReq) {
         JobDetailResp job = persistenceClient.getJobById(jobExecReq.getJobId());
-        EngineExecutionSaveReq saveReq = ObjectUtils.copy(job, EngineExecutionSaveReq.class, "id");
+        EngineExecutionCreateReq saveReq = ObjectUtils.copy(job, EngineExecutionCreateReq.class, "id");
         ObjectUtils.copy(jobExecReq, saveReq);
         saveReq.setExecConf(job.getJobConf());
         return saveReq;
     }
 
-    private String getResourceGroup(String clusterCategory, String runConf) {
-        Map<String, Object> runConfMap = JsonUtils.parseObject(runConf, Map.class, null);
-        if (runConfMap == null) {
-            return null;
-        }
-        switch (clusterCategory.toUpperCase()) {
-            case "YARN":
-            case "K8S":
-                return (String) runConfMap.get("queue");
-            default:
-                throw new MapleException("unknown cluster category: " + clusterCategory);
-        }
-    }
-
     @Override
     public Integer exec(ExecReq execReq) {
-        EngineExecutionSaveReq saveReq = getExecutionSaveReq(execReq);
+        EngineExecutionCreateReq saveReq = getExecutionSaveReq(execReq);
         final Integer id = persistenceClient.addExecution(saveReq);
         managerClient.submitExecution(id);
         return id;
@@ -152,7 +137,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public Integer execJob(JobExecReq jobExecReq) {
-        EngineExecutionSaveReq saveReq = getExecutionSaveReq(jobExecReq);
+        EngineExecutionCreateReq saveReq = getExecutionSaveReq(jobExecReq);
         final Integer id = persistenceClient.addExecution(saveReq);
         managerClient.submitExecution(id);
         return id;
@@ -160,20 +145,11 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     public Object kill(Integer id, String app) {
-        EngineExecutionDetailResp detail = detail(id);
-        if (!app.equals(detail.getFromApp())) {
-            throw new MapleValidException("任务来源应用不一致");
-        }
-        return managerClient.killExecution(id);
+        return managerClient.killExecution(id, app);
     }
 
     @Override
-    public Object stop(Integer id, Map<String, ?> cancelParams, String app) {
-        EngineExecutionDetailResp detail = detail(id);
-        if (!app.equals(detail.getFromApp())) {
-            throw new MapleValidException("任务来源应用不一致");
-        }
-        return managerClient.stopExecution(id, cancelParams);
+    public Object operate(Integer id, String action, Map<String, ?> params, String app) {
+        return managerClient.operateExecution(id, action, app, params);
     }
-
 }

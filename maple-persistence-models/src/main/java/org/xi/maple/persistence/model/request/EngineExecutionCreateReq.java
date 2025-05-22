@@ -1,46 +1,35 @@
-package org.xi.maple.persistence.persistence.entity;
+package org.xi.maple.persistence.model.request;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
+import lombok.Data;
 import org.xi.maple.common.model.BaseEntity;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.*;
 
-/**
- * 引擎执行记录实体
- *
- * @author 郗世豪（rarexixi@gmail.com）
- */
-@Getter
-@Setter
-@ToString
-public class EngineExecutionEntity extends BaseEntity {
-
-    /**
-     * 执行ID
-     */
-    private Integer id;
+@Data
+public class EngineExecutionCreateReq extends BaseEntity {
 
     /**
      * 执行文件
      */
+    @NotBlank(message = "execFile(执行文件)不能为空")
     private String execFile;
 
     /**
      * 作业ID
      */
+    @NotNull(message = "jobId(作业ID)不能为空")
     private Integer jobId;
 
     /**
      * 来源应用
      */
+    @NotBlank(message = "fromApp(来源应用)不能为空")
     private String fromApp;
 
     /**
      * 执行批次ID
      */
+    @NotBlank(message = "bizId(执行批次ID)不能为空")
     private String bizId;
 
     /**
@@ -51,42 +40,32 @@ public class EngineExecutionEntity extends BaseEntity {
     /**
      * 作业类型
      */
+    @NotBlank(message = "jobType(作业类型)不能为空")
     private String jobType;
 
     /**
      * 引擎ID
      */
+    @NotNull(message = "engineId(引擎ID)不能为空")
     private Integer engineId;
-
-    /**
-     * 所属集群
-     */
-    private Integer clusterId;
-
-    /**
-     * 集群类型
-     */
-    private String clusterCategory;
 
     /**
      * 集群资源组名称
      */
+    @NotBlank(message = "resourceGroupKeys(集群资源组名称)不能为空")
     private String resourceGroupKeys;
 
     /**
      * 集群资源组
      */
+    @NotBlank(message = "resourceGroupValues(集群资源组)不能为空")
     private String resourceGroupValues;
 
     /**
      * 初始优先级
      */
+    @NotNull(message = "priority(初始优先级)不能为空")
     private Integer priority;
-
-    /**
-     * 运行优先级
-     */
-    private Integer runPri;
 
     /**
      * 优先级可提升
@@ -96,11 +75,13 @@ public class EngineExecutionEntity extends BaseEntity {
     /**
      * 用户组
      */
+    @NotNull(message = "userGroup(用户组)不能为空")
     private Integer userGroup;
 
     /**
      * 执行人
      */
+    @NotNull(message = "runBy(执行人)不能为空")
     private Integer runBy;
 
     /**
@@ -114,22 +95,12 @@ public class EngineExecutionEntity extends BaseEntity {
     private String clusterAppAddress;
 
     /**
-     * 状态
+     * 作业配置
      */
-    private String status;
+    private String execConf;
 
     /**
-     * 任务提交时间
+     * 启动参数信息
      */
-    private LocalDateTime submittedAt;
-
-    /**
-     * 任务执行开始时间
-     */
-    private LocalDateTime startedAt;
-
-    /**
-     * 任务执行结束时间
-     */
-    private LocalDateTime finishedAt;
+    private String runConf;
 }

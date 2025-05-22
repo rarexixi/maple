@@ -49,9 +49,9 @@
 
 2. 添加作业状态为 SUBMITTED
 
-  1. 将作业信息存储到数据库，获取到作业ID
+   1. 将作业信息存储到数据库，获取到作业ID
 
-  2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
+   2. 将作业ID添加到Redis队列，队列标识：cluster + queue + 来源应用 + group + 优先级，例：hadoop-root.default-schedule-maple-1，修改作业状态为 ACCEPTED
 
 3. scheduler 持续消费 redis 队列，根据作业ID拿到执行详细信息
 
@@ -61,9 +61,9 @@
 
 6. execution-manager 根据执行命令生成对象，
 
-  1. YARN 生成对应的脚本，并启动
+   1. YARN 生成对应的脚本，并启动
 
-  2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
+   2. K8s 生成对应的 yaml 文件，并调用 Scheduler 服务提交
 
 如果启动失败，由 execution-manager 将作业状态更新为 START_FAILED（发送请求到 persistence-service，persistence-service
 判断作业状态为 STARTING 时才更新）
@@ -81,6 +81,14 @@
 运行失败后，修改状态为 FAILED
 
 调用 manager kill 引擎，修改状态为 KILLED
+
+
+任务需关联集群，执行文件上传到对应集群，执行时直接提交到对应集群即可
+
+yarn 上的 spark、flink任务提交时，直接获取 application ID 和 web 接口地址
+spark 有 spark-submit和 yarn kill 任务
+flink 有 flink run-application、flink stop、flink cancel 和 yarn kill 任务
+执行时，将启动、停止等脚本上传到统一位置，用于事后分析
 
 # 数据库设计
 

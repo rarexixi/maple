@@ -24,6 +24,7 @@ public class FlinkExecConf {
     @Data
     public static class Jar extends ExecConf {
         String execFile;
+        String mainClass;
         String args;
     }
 

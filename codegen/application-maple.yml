@@ -61,11 +61,11 @@ generator:
       - column-name-set: created_at
     cannot-update:
       - column-name-set: created_by,created_at
-#    img-url:
-#    video-url:
-#    doc-url:
-#    page-url:
-#    other-url:
+    # img-url:
+    # video-url:
+    # doc-url:
+    # page-url:
+    # other-url:
     fk-select:
       - column-name-set: datasource_type
         table-name: maple_datasource

@@ -14,7 +14,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
-import org.xi.maple.common.constant.ValidConstant;
 import org.xi.maple.common.exception.MapleClusterConfigException;
 import org.xi.maple.common.exception.MapleClusterNotConfiguredException;
 import org.xi.maple.common.exception.MapleEngineTypeNotSupportException;
@@ -176,9 +175,7 @@ public class K8sClusterServiceImpl implements K8sClusterService, CommandLineRunn
      */
     @Override
     public void refreshAllClusterConfig() {
-        ClusterQueryReq request = new ClusterQueryReq();
-        request.setCategory(ClusterCategoryConstants.K8s);
-        request.setDisabled(ValidConstant.VALID);
+        ClusterQueryReq request = new ClusterQueryReq(ClusterCategoryConstants.K8s);
         List<ClusterItemResp> clusters = persistenceClient.getClusterList(request);
         final Set<String> clusterNames = new HashSet<>(clusters.size());
         for (ClusterItemResp cluster : clusters) {

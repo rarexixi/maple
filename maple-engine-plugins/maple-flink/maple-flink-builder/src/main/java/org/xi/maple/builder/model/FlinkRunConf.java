@@ -9,6 +9,7 @@ public class FlinkRunConf {
 
     @Data
     public static abstract class RunConf implements Serializable {
+        private Integer jobManagerCores;
         private String jobManagerMemory;
 
         private Integer parallelism;
@@ -24,12 +25,10 @@ public class FlinkRunConf {
     @Data
     public static class K8s extends RunConf {
         private String namespace;
-
         private String queue;
 
         private Boolean jobManagerHaEnable;
         private Integer jobManagerReplicas;
-        private Integer jobManagerCores;
     }
 
     @Data

@@ -3,6 +3,7 @@ package org.xi.maple.builder.convertor;
 import org.xi.maple.builder.model.*;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.util.JsonUtils;
+import org.xi.maple.common.util.MapUtils;
 
 public abstract class Spark3Convertor implements MapleConvertor {
 
@@ -24,5 +25,19 @@ public abstract class Spark3Convertor implements MapleConvertor {
             throw new MapleException("ExecConf has errors.");
         }
         return execConf;
+    }
+
+
+    protected <T extends Spark3RunConf.RunConf> T getRunConf(EngineExecutionModel execution, Class<T> clazz) {
+        T runConf = JsonUtils.parseObject(execution.getRunConf(), clazz, null);
+        if (runConf == null) {
+            throw new MapleException("RunConf has errors.");
+        }
+        if (execution.getEngine().getConfs() != null) {
+            runConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), runConf.getConf()));
+        } else {
+            runConf.setConf(runConf.getConf());
+        }
+        return runConf;
     }
 }

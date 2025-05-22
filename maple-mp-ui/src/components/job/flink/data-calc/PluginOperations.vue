@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineEmits } from 'vue'
 import { UpOutlined, DownOutlined } from '@ant-design/icons-vue'
 
 import DeletePlugin from "@/components/job/flink/data-calc/DeletePlugin.vue"

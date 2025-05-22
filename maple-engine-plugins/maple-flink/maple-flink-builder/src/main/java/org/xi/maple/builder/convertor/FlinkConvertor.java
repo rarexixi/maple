@@ -2,8 +2,10 @@ package org.xi.maple.builder.convertor;
 
 import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.builder.model.FlinkExecConf;
+import org.xi.maple.builder.model.FlinkRunConf;
 import org.xi.maple.common.exception.MapleException;
 import org.xi.maple.common.util.JsonUtils;
+import org.xi.maple.common.util.MapUtils;
 
 public abstract class FlinkConvertor implements MapleConvertor {
     protected FlinkExecConf.ExecConf getExecConf(EngineExecutionModel execution) {
@@ -24,5 +26,18 @@ public abstract class FlinkConvertor implements MapleConvertor {
             throw new MapleException("ExecConf has errors.");
         }
         return execConf;
+    }
+
+    protected <T extends FlinkRunConf.RunConf> T getRunConf(EngineExecutionModel execution, Class<T> clazz) {
+        T runConf = JsonUtils.parseObject(execution.getRunConf(), clazz, null);
+        if (runConf == null) {
+            throw new MapleException("RunConf has errors.");
+        }
+        if (execution.getEngine().getConfs() != null) {
+            runConf.setConf(MapUtils.mergeMap(execution.getEngine().getConfs(), runConf.getConf()));
+        } else {
+            runConf.setConf(runConf.getConf());
+        }
+        return runConf;
     }
 }

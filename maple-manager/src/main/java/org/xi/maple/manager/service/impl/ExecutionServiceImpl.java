@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleClusterNotSupportException;
+import org.xi.maple.common.exception.MapleValidException;
 import org.xi.maple.common.model.ClusterMessage;
 import org.xi.maple.manager.client.ExecutorClient;
 import org.xi.maple.manager.client.PersistenceClient;
@@ -14,9 +15,9 @@ import org.xi.maple.manager.k8s.service.K8sClusterService;
 import org.xi.maple.manager.model.ClusterQueue;
 import org.xi.maple.manager.service.ExecutionService;
 import org.xi.maple.manager.yarn.service.YarnClusterService;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.ClusterDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionAction;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 
@@ -47,74 +48,80 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
-    public void submitExecution(int execId) {
+    public void submitToCluster(int execId) {
         EngineExecutionDetailResp execution = persistenceClient.getExecutionById(execId);
         if (execution == null) {
             logger.error("作业不存在，id: {}", execId);
             return;
         }
-        submitExecution(execution, () -> {
-            logger.warn("队列资源不足，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroup());
+        submitToCluster(execution, () -> {
+            logger.warn("Insufficient resources，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroupValues());
             updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列资源不足"));
         });
     }
 
     @Override
-    public void submitExecution(EngineExecutionDetailResp execution, Runnable queueBusyCallback) {
+    public void submitToCluster(EngineExecutionDetailResp execution, Runnable queueBusyCallback) {
         ClusterQueue cachedQueueInfo;
         if (ClusterCategoryConstants.K8s.equalsIgnoreCase(execution.getClusterCategory())) {
-            cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getClusterId(), execution.getResourceGroup());
+            cachedQueueInfo = k8sClusterService.getCachedQueueInfo(execution.getClusterId(), execution.getResourceGroupValues());
         } else if (ClusterCategoryConstants.YARN.equalsIgnoreCase(execution.getClusterCategory())) {
-            cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getClusterId(), execution.getResourceGroup());
+            cachedQueueInfo = yarnClusterService.getCachedQueueInfo(execution.getClusterId(), execution.getResourceGroupValues());
         } else {
-            logger.error("不支持的集群类型，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroup());
-            throw new MapleClusterNotSupportException("不支持的集群类型，cluster: " + execution.getClusterName() + ", queue: " + execution.getResourceGroup());
+            logger.error("Unsupported cluster type，cluster: {}", execution.getClusterName());
+            throw new MapleClusterNotSupportException("Unsupported cluster type，cluster: " + execution.getClusterName());
         }
         // 单次任务需要新建引擎，判断队列是否有排队任务，有排队任务说明资源不足，直接返回
         if (cachedQueueInfo == null) {
-            logger.error("队列不存在，cluster: {}, queue: {}", execution.getClusterName(), execution.getResourceGroup());
+            logger.error("Queue do not exist，cluster: {}, resource group: {}", execution.getClusterName(), execution.getResourceGroupValues());
             // 修改作业状态
-            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "队列不存在"));
+            updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "Queue do not exist"));
         } else if (!cachedQueueInfo.idle()) {
             queueBusyCallback.run();
         } else {
-            logger.info("submit execution: {}", execution);
+            logger.info("Submit execution: {}", execution);
             try {
                 executorClient.execute(execution);
             } catch (Throwable t) {
-                logger.error("执行作业失败，id: {}", execution.getId(), t);
-                updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "执行作业失败"));
+                logger.error("Execute failed，id: {}", execution.getId(), t);
+                updateExecStatusFunc.apply(execution.getId(), new EngineExecutionStatusUpdateReq(EngineExecutionStatus.START_FAILED.toString(), "", 12, "Execute failed"));
             }
         }
     }
 
     @Override
-    public Object kill(Integer id) {
-        EngineExecutionDetailResp execution = getExecutionById(id);
+    public Object kill(Integer id, String app) {
+        EngineExecutionAction execution = getExecutionById(id);
+        if (!app.equals(execution.getFromApp())) {
+            throw new MapleValidException("任务来源应用不一致");
+        }
         if (ClusterCategoryConstants.K8s.equals(execution.getClusterCategory())) {
-            return null; // k8sClusterService.deleteEngine(execution.getClusterId(), execution.getNamespace(), execution.getEngineCategory(), execution.getClusterAppId());
+            return k8sClusterService.deleteEngine(execution.getClusterId(), execution.getResourceGroup().get("namespace"), execution.getEngineCategory(), execution.getClusterAppId());
         } else if (ClusterCategoryConstants.YARN.equals(execution.getClusterCategory())) {
             return yarnClusterService.kill(execution.getClusterId(), execution.getClusterAppId());
         } else {
-            throw new MapleClusterNotSupportException("不支持的集群类型，id: " + id);
+            throw new MapleClusterNotSupportException("Unsupported cluster type，id: " + id);
         }
     }
 
     @Override
-    public Object stop(Integer id, Map<String, ?> cancelParams) {
-        EngineExecutionDetailResp execution = getExecutionById(id);
-        // execution.getConfiguration().putAll(cancelParams);
-        // executionManagerClient.stop(execution);
-        return null;
+    public void operate(Integer id, String action, String app, Map<String, ?> params) {
+        EngineExecutionAction execution = getExecutionById(id);
+        if (!app.equals(execution.getFromApp())) {
+            throw new MapleValidException("任务来源应用不一致");
+        }
+        execution.setAction(action);
+        execution.setParams(params);
+        executorClient.operate(execution);
     }
 
     @Override
-    public List<EngineExecutionQueueResp> getExecQueueList(EngineExecutionQueueQueryReq request) {
-        return persistenceClient.getExecQueueList(request);
+    public List<EngineExecutionQueueResp> getExecQueueList() {
+        return persistenceClient.getExecQueueList();
     }
 
     @Override
-    public EngineExecutionDetailResp getExecutionById(int execId) {
+    public EngineExecutionAction getExecutionById(int execId) {
         return persistenceClient.getExecutionById(execId);
     }
 
@@ -145,7 +152,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 }
                 yarnClusterService.addClusterConfig(cluster);
             } else {
-                logger.error("不支持的集群类型，cluster: {}, category: {}", cluster.getName(), cluster.getCategory());
+                logger.error("Unsupported cluster type，cluster: {}, category: {}", cluster.getName(), cluster.getCategory());
             }
         }
     }

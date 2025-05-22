@@ -8,8 +8,6 @@ import org.xi.maple.persistence.persistence.entity.EngineExecutionExtInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
-
 /**
  * 引擎执行记录数据访问
  *
@@ -18,7 +16,6 @@ import java.util.Collection;
 @Mapper
 public interface EngineExecutionMapper extends
         InsertMapper<EngineExecutionEntity>,
-        BatchInsertMapper<EngineExecutionEntity>,
         PatchByConditionMapper<EngineExecutionEntity, EngineExecutionPkCondition> {
 
     EngineExecutionEntityExt getById(@Param("id") Integer id);
@@ -32,14 +29,6 @@ public interface EngineExecutionMapper extends
     int insertExt(@Param("entity") EngineExecutionExtInfoEntity entity);
 
     /**
-     * 批量添加引擎执行记录扩展信息
-     *
-     * @param list 新增实体列表
-     * @return 影响的行数
-     */
-    int batchInsertExt(@Param("list") Collection<EngineExecutionExtInfoEntity> list);
-
-    /**
      * 根据执行ID更新引擎执行状态
      *
      * @param id     引擎执行记录ID
@@ -51,10 +40,10 @@ public interface EngineExecutionMapper extends
     /**
      * 根据执行ID更新引擎执行信息
      *
-     * @param id            引擎执行记录ID
-     * @param extInfoEntity 引擎执行记录扩展实体
+     * @param id       引擎执行记录ID
+     * @param execInfo 引擎执行扩展信息
      * @return 影响的行数
      * @author 郗世豪（rarexixi@gmail.com）
      */
-    int patchExtInfoById(@Param("id") Integer id, @Param("entity") EngineExecutionExtInfoEntity extInfoEntity);
+    int patchExecInfoById(@Param("id") Integer id, @Param("execInfo") String execInfo);
 }

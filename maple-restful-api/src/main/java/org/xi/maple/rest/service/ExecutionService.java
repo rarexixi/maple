@@ -69,11 +69,13 @@ public interface ExecutionService {
     Object kill(Integer id, String app);
 
     /**
-     * 取消执行任务
+     * 对任务执行其他操作
      *
-     * @param id  执行记录ID
-     * @param app 来源应用
+     * @param id     执行记录ID
+     * @param action 执行动作
+     * @param params 执行参数
+     * @param app    来源应用
      * @return 执行结果
      */
-    Object stop(Integer id, Map<String, ?> cancelParams, String app);
+    Object operate(Integer id, String action, Map<String, ?> params, String app);
 }

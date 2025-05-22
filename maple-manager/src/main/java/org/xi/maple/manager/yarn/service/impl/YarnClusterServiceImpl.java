@@ -18,7 +18,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.xi.maple.common.constant.ClusterCategoryConstants;
-import org.xi.maple.common.constant.ValidConstant;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.function.ThrowableFunction;
 import org.xi.maple.common.util.ActionUtils;
@@ -40,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Function;
 
@@ -141,9 +141,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
 
     @Override
     public void refreshAllClusterConfig() {
-        ClusterQueryReq request = new ClusterQueryReq();
-        request.setCategory(ClusterCategoryConstants.YARN);
-        request.setDisabled(ValidConstant.VALID);
+        ClusterQueryReq request = new ClusterQueryReq(ClusterCategoryConstants.YARN);
         List<ClusterItemResp> clusters = persistenceClient.getClusterList(request);
         for (ClusterItemResp cluster : clusters) {
             CLUSTER_MAP.put(cluster.getId(), cluster);
@@ -156,6 +154,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
     public void cacheClusterQueueInfo() {
         logger.info("刷新 YARN 队列资源...");
         final Map<String, ClusterQueue> queueMap = new ConcurrentHashMap<>();
+        CountDownLatch latch = new CountDownLatch(CLUSTER_MAP.size());
         for (ClusterItemResp cluster : CLUSTER_MAP.values()) {
             threadPoolTaskExecutor.execute(() -> {
                 Function<String, HttpUriRequest> getRequest = master -> {
@@ -175,6 +174,7 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
                         || (schedulerQueues = schedulerInfo.getQueues()) == null
                         || (queues = schedulerQueues.getQueue()) == null
                         || queues.isEmpty()) {
+                    latch.countDown();
                     return;
                 }
 
@@ -183,7 +183,13 @@ public class YarnClusterServiceImpl implements YarnClusterService, CommandLineRu
                     ClusterQueue value = new YarnClusterQueue(queue.getNumPendingApplications());
                     queueMap.put(key, value);
                 }
+                latch.countDown();
             });
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.error("刷新 YARN 队列资源失败", e);
         }
         CLUSTER_QUEUE_MAP = queueMap;
     }

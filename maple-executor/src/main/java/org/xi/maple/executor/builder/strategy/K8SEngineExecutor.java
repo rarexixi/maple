@@ -6,15 +6,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.xi.maple.builder.convertor.MapleConvertor;
 import org.xi.maple.builder.model.CommandGeneratorModel;
+import org.xi.maple.builder.model.EngineExecutionModel;
 import org.xi.maple.common.constant.EngineExecutionStatus;
 import org.xi.maple.common.exception.MapleException;
+import org.xi.maple.executor.builder.BaseEngineExecutor;
 import org.xi.maple.executor.builder.EngineExecutor;
 import org.xi.maple.executor.builder.spi.EnginePluginService;
 import org.xi.maple.executor.client.PersistenceClient;
 import org.xi.maple.executor.client.ManagerClient;
 import org.xi.maple.executor.configuration.ExecutionProperties;
 import org.xi.maple.executor.configuration.PluginProperties;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class K8SEngineExecutor extends EngineExecutor {
+public class K8SEngineExecutor extends BaseEngineExecutor implements EngineExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(K8SEngineExecutor.class);
 
@@ -33,18 +34,19 @@ public class K8SEngineExecutor extends EngineExecutor {
         this.managerClient = managerClient;
     }
 
-    public void execute(EngineExecutionDetailResp execution) {
-        updateExecutionStatus(execution.getId(), EngineExecutionStatus.STARTING);
+    public void execute(EngineExecutionModel execution) {
+        updateExecutionStatus(execution.getExecId(), EngineExecutionStatus.STARTING);
+
         MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion(), () -> {
-            logger.error("Execution[" + execution.getId() + "] starts failed!");
-            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+            logger.error("Execution[{}] starts failed! ", execution.getExecId());
+            updateExecutionStatus(execution.getExecId(), EngineExecutionStatus.START_FAILED);
         });
 
-        List<CommandGeneratorModel> commandGenerators = convertor.getSubmitCommandGenerator(convert(execution));
+        List<CommandGeneratorModel> commandGenerators = convertor.getSubmitCommandGenerator(execution);
         if (commandGenerators == null || commandGenerators.isEmpty()) {
             throw new MapleException(""); // todo
         }
-        String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getId()));
+        String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getExecId()));
         List<String> yamlFiles = new ArrayList<>(commandGenerators.size());
 
         try {
@@ -60,7 +62,20 @@ public class K8SEngineExecutor extends EngineExecutor {
             }
         } catch (Throwable t) {
             logger.error("Generate file failed!", t);
-            updateExecutionStatus(execution.getId(), EngineExecutionStatus.START_FAILED);
+            updateExecutionStatus(execution.getExecId(), EngineExecutionStatus.START_FAILED);
         }
+    }
+
+    @Override
+    public void operate(EngineExecutionModel execution) {
+        MapleConvertor convertor = enginePluginService.getConvertor(execution.getClusterCategory(), execution.getEngineCategory(), execution.getEngineVersion());
+
+        List<CommandGeneratorModel> commandGenerators = convertor.getOperateCommandGenerator(execution);
+        if (commandGenerators == null || commandGenerators.isEmpty()) {
+            throw new MapleException("");
+        }
+        String execHome = getPath(executionProperties.getExecHome(), execution.getEngineCategory(), execution.getEngineVersion(), String.valueOf(execution.getExecId()));
+        List<String> yamlFiles = new ArrayList<>(commandGenerators.size());
+        // todo
     }
 }

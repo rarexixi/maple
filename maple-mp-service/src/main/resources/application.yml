@@ -9,7 +9,7 @@ eureka:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port} # 设置实例 ID，默认是主机名和端口
 
 server:
-  port: 8082
+  port: 6081
   servlet:
     encoding:
       charset: UTF-8

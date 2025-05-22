@@ -4,7 +4,6 @@ import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.annotation.SetFieldTypes;
 import org.xi.maple.common.model.OperateResult;
 import org.xi.maple.common.model.BaseEntity;
-import org.xi.maple.persistence.model.request.EngineExecutionQueueQueryReq;
 import org.xi.maple.persistence.model.request.EngineExecutionQueueSaveReq;
 import org.xi.maple.persistence.model.response.EngineExecutionQueueResp;
 import org.xi.maple.persistence.service.EngineExecutionQueueService;
@@ -62,7 +61,7 @@ public class EngineExecutionQueueController {
     // endregion 详情
 
     @GetMapping("/all")
-    public ResponseEntity<List<EngineExecutionQueueResp>> getList(EngineExecutionQueueQueryReq queryReq) {
-        return ResponseEntity.ok(engineExecutionQueueService.getList(queryReq));
+    public ResponseEntity<List<EngineExecutionQueueResp>> getList() {
+        return ResponseEntity.ok(engineExecutionQueueService.getList());
     }
 }

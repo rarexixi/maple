@@ -12,6 +12,7 @@ import org.xi.maple.service.configuration.RandomRouteLoadBalancerConfiguration;
 import org.xi.maple.service.feign.MapleFeignHeadersInterceptor;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(value = MapleServiceName.PERSISTENCE, configuration = MapleFeignHeadersInterceptor.class)
 @LoadBalancerClient(name = MapleServiceName.PERSISTENCE, configuration = RandomRouteLoadBalancerConfiguration.class)
@@ -20,16 +21,16 @@ public interface PersistenceClient {
     // region engine-execution
 
     @PostMapping("/api/engine-executions")
-    Integer addExecution(@RequestBody EngineExecutionSaveReq req);
+    Integer addExecution(@RequestBody EngineExecutionCreateReq req);
 
     @GetMapping("/api/engine-executions/{id}")
-    EngineExecutionDetailResp getExecutionById(@PathVariable("id") Integer id);
+    EngineExecutionAction getExecutionById(@PathVariable("id") Integer id);
 
     @PatchMapping("/api/engine-executions/{id}/status")
     Integer updateExecutionStatusById(@PathVariable("id") Integer id, @RequestBody EngineExecutionStatusUpdateReq req);
 
-    @PatchMapping("/api/engine-executions/{id}/ext-info")
-    Integer updateExecutionExtInfoById(@PathVariable("id") Integer id, @RequestBody EngineExecutionExtUpdateReq req);
+    @PatchMapping("/api/engine-executions/{id}/exec-info")
+    Integer updateExecutionExecInfoById(@PathVariable("id") Integer id, @RequestBody Map<String, ?> req);
 
     // endregion
 
@@ -42,7 +43,7 @@ public interface PersistenceClient {
     Integer deleteExecQueue(@PathVariable("queueName") String queueName);
 
     @GetMapping("/api/engine-execution-queues/all")
-    List<EngineExecutionQueueResp> getExecQueueList(@SpringQueryMap EngineExecutionQueueQueryReq req);
+    List<EngineExecutionQueueResp> getExecQueueList();
 
     // endregion
 

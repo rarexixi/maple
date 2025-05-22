@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xi.maple.executor.service.EngineExecutionService;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
+import org.xi.maple.persistence.model.response.EngineExecutionAction;
 
 @RequestMapping(EngineExecutionController.BASE_URL)
 @RestController
@@ -21,8 +21,14 @@ public class EngineExecutionController {
     }
 
     @PostMapping("/execute")
-    public ResponseEntity<Void> execute(@RequestBody EngineExecutionDetailResp execution) {
+    public ResponseEntity<Void> execute(@RequestBody EngineExecutionAction execution) throws Exception {
         engineExecutionService.execute(execution);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/operate")
+    public ResponseEntity<Void> operate(@RequestBody EngineExecutionAction action) throws Exception {
+        engineExecutionService.operate(action);
         return ResponseEntity.ok().build();
     }
 }

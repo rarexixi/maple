@@ -23,6 +23,7 @@ public interface Spark3ExecConf {
     @Data
     class Jar extends ExecConf {
         String execFile;
+        String mainClass;
         String args;
     }
 

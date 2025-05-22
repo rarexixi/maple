@@ -1,143 +1,20 @@
 package org.xi.maple.executor.builder;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.xi.maple.builder.model.EngineExecutionModel;
-import org.xi.maple.common.constant.EngineExecutionStatus;
-import org.xi.maple.common.model.EngineConf;
-import org.xi.maple.executor.client.PersistenceClient;
-import org.xi.maple.executor.configuration.ExecutionProperties;
-import org.xi.maple.executor.builder.spi.EnginePluginService;
-import org.xi.maple.executor.configuration.PluginProperties;
-import org.xi.maple.executor.service.EngineExecutionService;
-import org.xi.maple.persistence.model.request.ClusterEngineDefaultConfGetRequest;
-import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
-import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Set;
-
-public abstract class EngineExecutor implements EngineExecutionService {
-
-    protected final EnginePluginService enginePluginService;
-    protected final ExecutionProperties executionProperties;
-    protected final PluginProperties pluginProperties;
-    protected final ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    protected final PersistenceClient persistenceClient;
-
-    public EngineExecutor(EnginePluginService enginePluginService, ExecutionProperties executionProperties, PluginProperties pluginProperties, ThreadPoolTaskExecutor threadPoolTaskExecutor, PersistenceClient persistenceClient) {
-        this.enginePluginService = enginePluginService;
-        this.executionProperties = executionProperties;
-        this.pluginProperties = pluginProperties;
-        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
-        this.persistenceClient = persistenceClient;
-    }
+public interface EngineExecutor {
 
     /**
-     * 修改执行状态，状态变更逻辑已在接口实现
+     * 执行引擎作业
      *
-     * @param id     执行ID
-     * @param status 变更状态
-     * @return 修改的数据量
+     * @param execution 执行实体对象
      */
-    protected Integer updateExecutionStatus(Integer id, EngineExecutionStatus status) {
-        return persistenceClient.updateExecutionStatusById(id, new EngineExecutionStatusUpdateReq(status.toString())); // todo
-    }
-
-    protected long getPid(Process process) {
-        long pid = -1;
-        try {
-            if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
-                java.lang.reflect.Field field = process.getClass().getDeclaredField("pid");
-                field.setAccessible(true);
-                pid = field.getLong(process);
-                field.setAccessible(false);
-            }
-        } catch (Exception e) {
-            pid = -1;
-        }
-        return pid;
-    }
-
-    protected String getPath(String... more) {
-        return String.join("/", more).replaceAll("/+", "/");
-    }
-
-    protected EngineExecutionModel convert(EngineExecutionDetailResp execution) {
-        ClusterEngineDefaultConfGetRequest request = new ClusterEngineDefaultConfGetRequest(execution.getUserGroup(), execution.getRunBy());
-        EngineConf engineConf = persistenceClient.getEngineConf(execution.getEngineId(), request);
-
-        return new EngineExecutionModel().withExecId(execution.getId())
-                .withFromApp(execution.getFromApp())
-                .withJobId(execution.getJobId())
-                .withBizId(execution.getBizId())
-                .withExecName(execution.getExecName())
-                .withUserGroup(execution.getUserGroupName())
-                .withRunBy(execution.getRunByName())
-                .withEngine(engineConf)
-                .withRunConf(execution.getRunConf())
-                .withExecConf(execution.getExecConf());
-    }
+    void execute(EngineExecutionModel execution) throws Exception;
 
     /**
-     * 生成最终的可执行文件
+     * 操作引擎作业
      *
-     * @param execHome  生成目录地址
-     * @param ftlPath   模板路径
-     * @param fileName  生成的文件
-     * @param dataModel 模板数据模型
-     * @throws IOException
-     * @throws TemplateException
+     * @param action 操作实体对象
      */
-    protected String generateFileContent(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
-        String pluginHome = pluginProperties.getFtlPath();
-
-        Configuration cfg = new Configuration(freemarker.template.Configuration.VERSION_2_3_31);
-        cfg.setDirectoryForTemplateLoading(new File(pluginHome));
-        cfg.setDefaultEncoding(StandardCharsets.UTF_8.name());
-        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-
-        try (StringWriter sw = new StringWriter(4096)) {
-            Template ftl = cfg.getTemplate(ftlPath);
-            ftl.process(dataModel, sw);
-            sw.flush();
-            return sw.toString();
-        }
-    }
-
-    /**
-     * 生成最终的可执行文件
-     *
-     * @param execHome  生成目录地址
-     * @param ftlPath   模板路径
-     * @param fileName  生成的文件
-     * @param dataModel 模板数据模型
-     * @throws IOException
-     * @throws TemplateException
-     */
-    protected void generateFile(String execHome, String ftlPath, String fileName, Object dataModel) throws IOException, TemplateException {
-        Path path = Paths.get(execHome, fileName);
-        Path dir = path.getParent();
-        if (Files.notExists(dir)) {
-            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxr-x");
-            FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
-            Files.createDirectories(dir, fileAttributes);
-        }
-
-        try (FileWriter out = new FileWriter(path.toFile())) {
-            String content = generateFileContent(execHome, ftlPath, fileName, dataModel);
-            out.write(content);
-            out.flush();
-        }
-    }
+    void operate(EngineExecutionModel action) throws Exception;
 }

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.xi.maple.rest.client.ManagerClient;
 import org.xi.maple.rest.service.ClusterService;
 
+import javax.validation.constraints.NotNull;
+
 @RestController
 @RequestMapping("/cluster")
 public class ClusterController {
@@ -19,8 +21,8 @@ public class ClusterController {
     }
 
     @RequestMapping
-    public ResponseEntity<Integer> refresh(String clusterName) {
-        int refresh = clusterService.refresh(clusterName);
+    public ResponseEntity<Integer> refresh(@NotNull(message = "集群ID不能为空") Integer clusterId) {
+        int refresh = clusterService.refresh(clusterId);
         return ResponseEntity.ok(refresh);
     }
 }

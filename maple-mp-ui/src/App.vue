@@ -142,7 +142,7 @@ const headerNavMenuItems = ref<MenuProps['items']>([
   margin-left: 1rem;
 }
 
-:deep .ant-layout-sider-collapsed .logo > .logo-text {
+:deep(.ant-layout-sider-collapsed .logo > .logo-text) {
   display: none;
 }
 </style>

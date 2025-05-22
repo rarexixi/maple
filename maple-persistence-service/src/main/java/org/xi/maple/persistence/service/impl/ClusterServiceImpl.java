@@ -76,7 +76,7 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public List<ClusterItemResp> getList(ClusterQueryReq queryReq) {
         ClusterFilterCondition condition = ObjectUtils.copy(queryReq, ClusterFilterCondition.class);
-        List<ClusterEntity> list = clusterMapper.select(condition, null, queryReq.getSort());
+        List<ClusterEntity> list = clusterMapper.select(condition, null, null);
         return ObjectUtils.copy(list, ClusterItemResp.class);
     }
 }

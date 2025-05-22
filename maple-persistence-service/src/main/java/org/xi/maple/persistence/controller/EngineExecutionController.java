@@ -1,9 +1,8 @@
 package org.xi.maple.persistence.controller;
 
-import org.xi.maple.common.annotation.Jsr303ValidGroup;
 import org.xi.maple.common.annotation.SetFieldTypes;
-import org.xi.maple.persistence.model.request.EngineExecutionSaveReq;
-import org.xi.maple.persistence.model.request.EngineExecutionExtUpdateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionCreateReq;
+import org.xi.maple.persistence.model.request.EngineExecutionPatchReq;
 import org.xi.maple.persistence.model.request.EngineExecutionStatusUpdateReq;
 import org.xi.maple.persistence.model.response.EngineExecutionDetailResp;
 import org.xi.maple.persistence.service.EngineExecutionService;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.*;
 import java.net.URI;
+import java.util.Map;
 
 import static org.xi.maple.common.constant.SetFieldType.*;
 
@@ -36,8 +36,8 @@ public class EngineExecutionController {
     // region 创建
 
     @PostMapping
-    public ResponseEntity<Integer> create(@Validated({Jsr303ValidGroup.Post.class}) @RequestBody @SetFieldTypes(types = {CREATE}) EngineExecutionSaveReq engineExecution) {
-        Integer id = engineExecutionService.create(engineExecution);
+    public ResponseEntity<Integer> create(@RequestBody @SetFieldTypes(types = {CREATE}) EngineExecutionCreateReq createReq) {
+        Integer id = engineExecutionService.create(createReq);
         String detailPath = String.format("%s/%s", BASE_URL, id);
         return ResponseEntity.created(URI.create(detailPath)).body(id);
     }
@@ -46,25 +46,25 @@ public class EngineExecutionController {
 
     // region 更新
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Integer> patchById(
+            @PathVariable("id") @Validated @NotNull(message = "id(执行ID)不能为空") @Min(value = 1, message = "id(执行ID)必须大于0") Integer id,
+            @RequestBody @SetFieldTypes(types = {UPDATE}) EngineExecutionPatchReq saveReq
+    ) {
+        int count = engineExecutionService.patchById(id, saveReq);
+        return ResponseEntity.ok(count);
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<Integer> updateStatusById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionStatusUpdateReq updateRequest) {
         int count = engineExecutionService.updateStatusById(id, updateRequest);
         return ResponseEntity.ok(count);
     }
 
-    @PatchMapping("/{id}/ext-info")
-    public ResponseEntity<Integer> patchExtInfoById(@PathVariable("id") Integer id, @Validated @RequestBody EngineExecutionExtUpdateReq updateRequest) {
-        int count = engineExecutionService.patchExtInfoById(id, updateRequest);
+    @PatchMapping("/{id}/exec-info")
+    public ResponseEntity<Integer> patchExecInfoById(@PathVariable("id") Integer id, @Validated @RequestBody Map<String, ?> updateReq) {
+        int count = engineExecutionService.patchExecInfoById(id, updateReq);
         return ResponseEntity.ok(count);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<EngineExecutionDetailResp> patchById(
-            @PathVariable("id") @Validated @NotNull(message = "id(执行ID)不能为空") @Min(value = 1, message = "id(执行ID)必须大于0") Integer id,
-            @Validated({Jsr303ValidGroup.Patch.class}) @RequestBody @SetFieldTypes(types = {UPDATE}) EngineExecutionSaveReq engineExecution
-    ) {
-        EngineExecutionDetailResp detail = engineExecutionService.patchById(id, engineExecution);
-        return ResponseEntity.ok(detail);
     }
 
     // endregion 更新

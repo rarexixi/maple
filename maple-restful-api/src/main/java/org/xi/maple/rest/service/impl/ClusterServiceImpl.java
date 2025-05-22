@@ -19,16 +19,16 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public int refresh(String clusterName) {
-        sendRefreshClusterMsg(ClusterMessage.Type.UPDATE, clusterName);
+    public int refresh(Integer clusterId) {
+        sendRefreshClusterMsg(ClusterMessage.Type.UPDATE, clusterId);
         return 0;
     }
 
-    private void sendRefreshClusterMsg(ClusterMessage.Type type, String clusterName) {
+    private void sendRefreshClusterMsg(ClusterMessage.Type type, Integer clusterId) {
         try {
-            redisTemplate.convertAndSend(ClusterMessage.CLUSTER_CHANNEL, new ClusterMessage(type, clusterName));
+            redisTemplate.convertAndSend(ClusterMessage.CLUSTER_CHANNEL, new ClusterMessage(type, clusterId));
         } catch (Throwable t) {
-            logger.error("发送集群刷新消息失败, cluster: {}, type: {}", clusterName, type, t);
+            logger.error("发送集群刷新消息失败, cluster: {}, type: {}", clusterId, type, t);
         }
     }
 }
